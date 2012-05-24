@@ -9,13 +9,17 @@ import sys
 import os
 import re
 import base64
-import json
 import getpass
 import urllib
 import urllib2
 import optparse
 import ConfigParser
 import pdb
+
+try:
+    import json
+except ImportError:
+    import json_compat as json
 
 DEFAULT_CONFIG_FILE = "~/.sdelint.cnf"
 LINE_SEP_RE = re.compile('\n')
