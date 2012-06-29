@@ -12,7 +12,6 @@ import base64
 import getpass
 import urllib
 import urllib2
-import optparse
 import ConfigParser
 import pdb
 
@@ -21,10 +20,10 @@ try:
 except ImportError:
     import json_compat as json
 
-DEFAULT_CONFIG_FILE = "~/.sdelint.cnf"
+from conf_mgr import config
+
 LINE_SEP_RE = re.compile('\n')
 SHOW_LINES = 1
-
 
 class URLRequest(urllib2.Request):
     GET = 'GET'
@@ -49,65 +48,6 @@ def show_error(err_msg, usage_hint=False):
     if usage_hint:
         print "Try -h to see the usage"
     print
-
-def parseArgs(arvg):
-    usage = "%prog [options...] target1 [target2 ...]\n\ntarget(s) are the directory/file to be scanned."
-
-    parser = optparse.OptionParser(usage)
-    parser.add_option('-i', '--cnf', metavar='CONF_FILE', dest='cnf', 
-        help = "Location of config file. Note that command line values bypass the values specified in the config file.", type='string')
-    parser.add_option('-I', '--noninteractive', dest='interactive', default=True, action='store_false', help="Run in Non-Interactive mode")
-    parser.add_option('-e', '--email', metavar='EMAIL', dest='username', default='', type='string',
-        help = "Username for SDE Accout")
-    parser.add_option('-p', '--password', metavar='PASSWORD', dest='password', default='', type='string',
-        help = "Password for SDE Accout")
-    parser.add_option('-P', '--askpasswd', dest='askpasswd', default=False, action='store_true',
-        help = "Prompt for SDE Accout password (interactive mode only)")
-    parser.add_option('-s', '--server', dest='server', default='', help="SDE Server instance to use")
-    parser.add_option('-a', '--application', dest='application', default='', help="SDE Application to use")
-    parser.add_option('-j', '--project', dest='project', default='', help="SDE Project to use")
-    parser.add_option('-H', '--skiphidden', dest='skip_hidden', default=True, action='store_false',
-        help = "Skip hidden files/directories.")
-    parser.add_option('-d', '--debug', metavar='LEVEL', dest='debug_level', default=0, type='int',
-        help = "Set debug level (Default is 0, i.e. show no debug messages)")
-
-    try:
-        (opts, args) = parser.parse_args()
-    except:
-        if (str(sys.exc_info()[1]) == '0'):
-            # This happens when -h is used
-            return
-        else:
-            show_error("Invalid options specified.", usage_hint=True)
-            return
-
-    if (len(args) < 1):
-        show_error("Missing target (e.g. use \".\" for current dir)", usage_hint=True)
-        return
-
-    for path in args:
-        if not os.path.exists(path):
-            show_error("Unable to locate or access the path: %s" % path)
-            return
-
-    retval = {}
-    retval['targets'] = args
-    retval['debug_level'] = opts.debug_level
-    retval['skip_hidden'] = opts.skip_hidden
-    retval['server'] = opts.server
-    retval['username'] = opts.username
-    retval['interactive'] = opts.interactive
-    retval['password'] = None
-    retval['askpasswd'] = opts.askpasswd
-    if (not retval['interactive']) and (retval['askpasswd']):
-        show_error("Password can not be asked in Non-Interactive mode", usage_hint=True)
-        return
-    if not opts.askpasswd:
-        retval['password'] = opts.password
-    retval['application'] = opts.application
-    retval['project'] = opts.project
-
-    return retval
 
 class Content:
     def __init__(self, connector):
@@ -455,7 +395,7 @@ class FileScanner:
         return
 
 class Scanner:
-    def __init__(self, config, content):
+    def __init__(self, content):
         self.config = config
         self.content = content
 
@@ -480,7 +420,7 @@ class Scanner:
                     file_scanner = FileScanner(self.config, self.content, file_path)
                     file_scanner.scan()
 
-def load(config):
+def load():
     while True:
         if config['askpasswd']:
             print "Enter the password for account: %s" % (config['username'])
@@ -504,17 +444,17 @@ def load(config):
     return content 
 
 def main(argv):
-    cmd_line_args = parseArgs(argv)
-    if cmd_line_args is None:
+    ret = config.parse_args(argv)
+    if not ret:
         sys.exit(1)
 
-    handler = urllib2.HTTPSHandler(debuglevel=cmd_line_args['debug_level'])
+    handler = urllib2.HTTPSHandler(debuglevel=config['debug_level'])
     opener = urllib2.build_opener(handler)
     urllib2.install_opener(opener)
 
-    content = load(cmd_line_args)
+    content = load()
 
-    scanner = Scanner(cmd_line_args, content)
+    scanner = Scanner(content)
     scanner.scan()
 
 if __name__ == "__main__":
