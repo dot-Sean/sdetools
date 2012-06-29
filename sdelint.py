@@ -21,6 +21,25 @@ DEFAULT_CONFIG_FILE = "~/.sdelint.cnf"
 LINE_SEP_RE = re.compile('\n')
 SHOW_LINES = 1
 
+
+class URLRequest(urllib2.Request):
+    GET = 'GET'
+    POST = 'POST'
+    PUT = 'PUT'
+    DELETE = 'DELETE'
+
+    def __init__(self, url, data=None, headers={},
+                 origin_req_host=None, unverifiable=False, method=None):
+       urllib2.Request.__init__(self, url, data, headers, origin_req_host, unverifiable)
+       self.method = method
+
+    def get_method(self):
+        if self.method:
+            return self.method
+
+        return urllib2.Request.get_method(self)
+
+
 def show_error(err_msg, usage_hint=False):
     print "FATAL ERROR: %s" % (err_msg)
     if usage_hint:
@@ -133,43 +152,80 @@ class Content:
 class ServerConnector:
     def __init__(self, config):
         self.config = config
-        self.base_uri = 'https://%s/api/' % (self.config['server'])
+        self.base_uri = 'https://%s/api' % (self.config['server'])
         self.app = None
         self.prj = None
+        self.auth_mode = 'basic'
+        self.session_info = None
 
-    def call_api(self, target, args):
+    def call_api(self, target, method=URLRequest.GET, args=None):
         req_url = '%s/%s' % (self.base_uri, target)
-        if args:
-            req_url = '%s?%s' % (req_url, urllib.urlencode(args))
-        req = urllib2.Request(req_url)
-        encoded_auth = base64.encodestring('%s:%s' % (self.config['username'], self.config['password']))[:-1]
-        authheader =  "Basic %s" % (encoded_auth)
-        req.add_header("Authorization", authheader)
+        if not args:
+            args = {}
+        data = None
+        if method == URLRequest.GET:
+            if args:
+                req_url = '%s?%s' % (req_url, urllib.urlencode(args))
+        else:
+            data = json.dumps(args)
+        req = URLRequest(req_url, data=data, method=method)
+        if target == 'session':
+            pass
+        elif self.auth_mode == 'basic':
+            encoded_auth = base64.encodestring('%s:%s' % (self.config['username'], self.config['password']))[:-1]
+            authheader =  "Basic %s" % (encoded_auth)
+            req.add_header("Authorization", authheader)
+        elif self.auth_mode == 'session':
+            if not self.session_info:
+                return -105, 'Session not setup or invalid'
+            req.add_header('Cookie', '%s=%s' % (self.session_info['session-cookie-name'], self.session_info['session-token']))
+            if method != URLRequest.GET:
+                req.add_header(self.session_info['csrf-header-name'], self.session_info['csrf-token'])
+        else:
+            return -103, 'Unknown Authentication mode.'
 
         try:
             handle = urllib2.urlopen(req)
         except IOError, e:
             if not hasattr(e, 'code'):
-                return -101, 'Invalid server or server unreachable'
+                return -101, 'Invalid server or server unreachable.'
             if e.code == 401:
-                return e.code, 'Invalid Email/Password'
+                return e.code, 'Invalid Email/Password.'
             return e.code, 'Unknown Error'
 
-        result = handle.read()
+        result = ''
+        while True:
+            res_buf = handle.read()
+            if not res_buf:
+                break
+            result += res_buf
         handle.close()
 
         try:
             result = json.loads(result)
         except:
-            return -102, 'Unable to process JSON data'
+            return -102, 'Unable to process JSON data.'
 
         return 0, result
+
+    def start_session(self):
+        args = {
+            'username': self.config['username'],
+            'password': self.config['password']}
+        ret_stat, ret_val = self.call_api('session', URLRequest.PUT, args=args)
+        for key in ['session-cookie-name', 'csrf-token', 'csrf-header-name', 
+            'csrf-cookie-domain', 'csrf-cookie-name', 'session-token']:
+            if key not in ret_val:
+                return -104, 'Invalid session information structure.'
+        self.session_info = ret_val
+        #self.auth_mode = 'session'
+        return 0, 'Session established.'
 
     def select_application(self):
         args = {}
         if self.config['application']:
             args['name'] = self.config['application']
-        ret_stat, ret_val = self.call_api('applications', args)
+        ret_stat, ret_val = self.call_api('applications', args=args)
         if ret_stat != 0:
             return ret_stat, ret_val
         app_list = ret_val['applications']
@@ -234,7 +290,7 @@ class ServerConnector:
             args = {'application':sel_app['id']}
             if self.config['project']:
                 args['name'] = self.config['project']
-            ret_stat, ret_val = self.call_api('projects', args)
+            ret_stat, ret_val = self.call_api('projects', args=args)
             if ret_stat != 0:
                 return ret_stat, ret_val
             prj_list = ret_val['projects']
@@ -258,7 +314,7 @@ class ServerConnector:
             return ret_stat, ret_val
         self.app, self.prj = ret_val
         
-        ret_stat, ret_val = self.call_api('tasks', {'project':self.prj['id']})
+        ret_stat, ret_val = self.call_api('tasks', args={'project':self.prj['id']})
         if ret_stat != 0:
             return ret_stat, ret_val
         task_list = ret_val['tasks']
@@ -426,6 +482,7 @@ def load(config):
             print "Enter the password for account: %s" % (config['username'])
             config['password'] = getpass.getpass()
         connector = ServerConnector(config)
+        ret_stat, ret_val = connector.start_session()
         ret_stat, ret_val = connector.get_compile_task_list()
         if ret_stat == 0:
             content = ret_val
@@ -446,6 +503,10 @@ def main(argv):
     cmd_line_args = parseArgs(argv)
     if cmd_line_args is None:
         sys.exit(1)
+
+    handler = urllib2.HTTPSHandler(debuglevel=cmd_line_args['debug_level'])
+    opener = urllib2.build_opener(handler)
+    urllib2.install_opener(opener)
 
     content = load(cmd_line_args)
 
