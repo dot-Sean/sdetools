@@ -2,6 +2,10 @@ import sys
 import os
 import optparse
 
+from commons import show_error
+
+__all__ = ['config', 'Config']
+
 #TODO: Add local config
 DEFAULT_CONFIG_FILE = "~/.sdelint.cnf"
 
@@ -78,10 +82,19 @@ class Config:
         self.settings['interactive'] = opts.interactive
         self.settings['askpasswd'] = opts.askpasswd
         self.settings['server'] = opts.server
+        if not self.settings['server']:
+            show_error("Server not specified", usage_hint=True)
+            return False
         self.settings['username'] = opts.username
+        if not self.settings['username']:
+            show_error("Username not specified", usage_hint=True)
+            return False
         self.settings['password'] = None
         if not opts.askpasswd:
             self.settings['password'] = opts.password
+        if not self.settings['password']:
+            show_error("Password not specified", usage_hint=True)
+            return False
         self.settings['application'] = opts.application
         self.settings['project'] = opts.project
 

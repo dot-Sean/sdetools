@@ -21,6 +21,7 @@ except ImportError:
     import json_compat as json
 
 from conf_mgr import config
+from commons import show_error
 
 LINE_SEP_RE = re.compile('\n')
 SHOW_LINES = 1
@@ -41,13 +42,6 @@ class URLRequest(urllib2.Request):
             return self.method
 
         return urllib2.Request.get_method(self)
-
-
-def show_error(err_msg, usage_hint=False):
-    print "FATAL ERROR: %s" % (err_msg)
-    if usage_hint:
-        print "Try -h to see the usage"
-    print
 
 class Content:
     def __init__(self, connector):
