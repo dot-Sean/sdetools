@@ -17,6 +17,8 @@ class Config:
             'interactive': True,
             'askpasswd': False,
             'server': None,
+            'method': 'https',   # Can be 'http' or 'https'
+            'authmode': 'basic', # Can be 'session' or 'basic'
             'username': None,
             'password': None,
             'application': None,
@@ -87,7 +89,7 @@ class Config:
             return False
         self.settings['username'] = opts.username
         if not self.settings['username']:
-            show_error("Username not specified", usage_hint=True)
+            show_error("Email not specified", usage_hint=True)
             return False
         self.settings['password'] = None
         if not opts.askpasswd:
