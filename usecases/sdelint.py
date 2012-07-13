@@ -5,12 +5,13 @@
 # Copyright SDElements Inc
 #
 
-import sys
+import sys, os
+sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
 
-from conf_mgr import config
-from commons import show_error
-from interactive_plugin import PlugInExperience
-from scanner import Scanner
+from sdelib.conf_mgr import config
+from sdelib.commons import show_error
+from sdelib.interactive_plugin import PlugInExperience
+from sdelib.scanner import Scanner
 
 """
     def read_config(self):
