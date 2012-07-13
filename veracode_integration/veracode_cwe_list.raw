@@ -1,0 +1,130 @@
+API Abuse
+234	Failure to Handle Missing Parameter	3	X	 	 	 
+243	Creation of Chroot Jail Without Changing Working Directory	4	X	 	 	 
+245	J2EE Bad Practices: Direct Management of Connections	2	X	 	X	 
+560	Use of Umask() with Chmod-Style Argument	3	X	 	 	 
+675	Duplicate Operations on Resource	2	X	 	 	 
+Authentication Issues
+247	Reliance on DNS Lookups in a Security Decision	3	X	 	X	 
+287	Improper Authentication	4	 	X	 	 
+Authorization Issues
+732	Incorrect Permission Assignment for Critical Resource	3	X	 	X	 
+Buffer Management Errors
+125	Out-of-Bounds Read	3	X	 	 	X
+129	Improper Validation of Array Index	3	X	 	 	X
+135	Incorrect Calculation of Multi-Byte String Length	5	X	 	 	X
+170	Improper Null Termination	3	X	 	 	 
+193	Off-by-One Error	3	X	 	X	 
+Buffer Overflow
+121	Stack-Based Buffer Overflow	5	X	 	 	X
+Code Injection
+95	Improper Neutralization of Directives in Dynamically Evaluated Code (Eval Injection)	5	X	 	 	 
+98	Improper Control of Filename for Include/Require Statement in PHP Program (PHP File Inclusion)	4	X	X	 	 
+830	Inclusion of Web Functionality from an Untrusted Source	2	 	X	 	 
+Code Quality
+111	Direct Use of Unsafe JNI	4	X	 	 	 
+404	Improper Resource Shutdown or Release	2	X	 	X	 
+415	Double Free	3	X	 	 	X
+416	Use After Free	2	X	 	 	X
+479	Signal Handler Use of a Non-Reentrant Function	3	X	 	X	 
+489	Leftover Debug Code	3	X	 	X	 
+597	Use of Wrong Operator in String Comparison	2	X	 	X	 
+Credentials Management
+256	Plaintext Storage of a Password	3	X	 	X	 
+259	Use of Hard-coded Password	3	X	 X	X	 
+359	Privacy Violation	2	 	X	 	 
+522	Insufficiently Protected Credentials	3	X	X	 	X
+CRLF Injection
+93	Improper Neutralization of CRLF Sequences (CRLF Injection)	3	X	 	X	 
+113	Improper Neutralization of CRLF Sequences in HTTP Headers (HTTP Response Splitting)	3	X	X	 	 
+117	Improper Output Neutralization for Logs	3	X	 	X	 
+Cross-Site Scripting (XSS)
+79	Improper Neutralization of Input During Web Page Generation (Cross-site Scripting)	3	 	X	 	 
+80	Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)	3	X	X	X	 
+83	Improper Neutralization of Script in Attributes in a Web Page	3	 	X	X	 
+Cryptographic Issues
+296	Improper Following of Chain of Trust for Certificate Validation	3	X	X	 	X
+297	Improper Validation of Host-specific Certificate Data	3	X	X	 	X
+298	Improper Validation of Certificate Expiration	3	 	X	 	 
+311	Missing Encryption of Sensitive Data	3	X	 	X	 
+312	Cleartext Storage of Sensitive Information	3	X	 	 	X
+313	Plaintext Storage in a File or on Disk	3	X	 	X	 
+316	Plaintext Storage in Memory	3	X	 	X	 
+321	Use of Hard-coded Cryptographic Key	3	X	 X	X	X
+326	Inadequate Encryption Strength	3	X	X	X	X
+327	Use of a Broken or Risky Cryptographic Algorithm	3	X	X	X	 
+329	Not Using a Random IV with CBC Mode	2	X	 	X	X
+331	Insufficient Entropy	3	X	 	X	X
+347	Improper Verification of Cryptographic Signature	2	X	 	X	X
+354	Improper Validation of Integrity Check Value	3	X	 	X	 
+614	Sensitive Cookie in HTTPS Session Without Secure Attribute	2	X	X	X	 
+Dangerous Functions
+242	Use of Inherently Dangerous Function	5	X	 	X	 
+Deployment Configuration
+668	Exposure of Resource to Wrong Sphere	3	 	X	 	 
+Directory Traversal
+22	Improper Limitation of a Pathname to a Restricted Directory (Path Traversal)	3	 	X	 	 
+73	External Control of File Name or Path	3	X	 	X	X
+Encapsulation
+494	Download of Code Without Integrity Check	5	X	 	 	 
+501	Trust Boundary Violation	3	X	 	X	 
+Error Handling
+391	Unchecked Error Condition	2	X	 	X	X
+Format String
+134	Uncontrolled Format String	5	X	 	 	X
+Information Leakage
+201	Information Exposure Through Sent Data	2	X	 	X	X
+209	Information Exposure Through an Error Message	2	X	 	X	 
+215	Information Exposure Through Debug Information	2	 	X	X	 
+497	Exposure of System Data to an Unauthorized Control Sphere	2	X	 	X	 
+498	Cloneable Class Containing Sensitive Information	2	X	 	 	 
+526	Information Exposure Through Environmental Variables	2	 	X	 	 
+530	Exposure of Backup File to an Unauthorized Control Sphere	2	 	X	 	 
+548	Information Exposure Through Directory Listing	2	 	X	 	 
+611	Information Exposure Through XML External Entity Reference	3	X	 	 	X
+Insufficient Input Validation
+90	Improper Neutralization of Special Elements Used in an LDAP Query (LDAP Injection)	3	X	 	 	 
+103	Struts: Incomplete validate() Method Definition	3	X	 	 	 
+104	Struts: Form Bean Does Not Extend Validation Class	3	X	 	 	 
+112	Missing XML Validation	3	X	 	 	 
+434	Unrestricted Upload of File with Dangerous Type	4	 	X	 	 
+470	Use of Externally-Controlled Input to Select Classes or Code (Unsafe Reflection)	3	X	 	X	 
+601	URL Redirection to Untrusted Site (Open Redirect)	3	X	 	 	 
+Numeric Errors
+190	Integer Overflow or Wraparound	5	X	 	 	X
+191	Integer Underflow (Wrap or Wraparound)	3	X	 	 	X
+192	Integer Coercion Error	3	X	 	 	X
+195	Signed to Unsigned Conversion Error	3	X	 	 	X
+196	Unsigned to Signed Conversion Error	3	X	 	 	X
+197	Numeric Truncation Error	3	X	 	 	X
+OS Command Injection
+78	Improper Neutralization of Special Elements used in an OS Command (OS Command Injection)	5	X	X	 	 
+88	Argument Injection or Modification	3	X	 	X	 
+Potential Backdoor
+398	Indicator of Poor Code Quality	0	X	 	 	 
+506	Embedded Malicious Code	4	X	 	X	 
+511	Logic/Time Bomb	5	X	 	X	 
+514	Covert Channel	2	X	 	X	 
+656	Reliance on Security Through Obscurity	0	X	 	 	X
+Race Conditions
+366	Race Condition within a Thread	3	X	 	 	 
+367	Time-of-check Time-of-use (TOCTOU) Race Condition	3	X	 	X	 
+Server Configuration
+757	Selection of Less-Secure Algorithm During Negotiation (Algorithm Downgrade)	3	 	X	 	 
+Session Fixation
+384	Session Fixation	3	X	X	X	 
+SQL Injection
+89	Improper Neutralization of Special Elements used in an SQL Command (SQL Injection)	4	X	X	X	 
+564	SQL Injection: Hibernate	4	X	 	X	 
+Time and State
+377	Insecure Temporary File	3	X	 	X	 
+378	Creation of Temporary File With Insecure Permissions	3	X	 	X	 
+382	J2EE Bad Practices: Use of System.exit()	2	X	 	X	 
+557	Concurrency Issues	2	X	 	X	 
+708	Incorrect Ownership Assignment	4	X	 	X	 
+Untrusted Initialization
+15	External Control of System or Configuration Setting	4	X	 	X	 
+Untrusted Search Path
+114	Process Control	5	X	 	X	 
+426	Untrusted Search Path	3	X	 	X	 
+427	Uncontrolled Search Path Element	3	X	 	 	 
