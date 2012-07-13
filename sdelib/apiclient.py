@@ -2,11 +2,7 @@ import urllib
 import urllib2
 import base64
 
-try:
-    import json
-except ImportError:
-    import json_compat as json
-
+from commons import json
 
 class URLRequest(urllib2.Request):
     GET = 'GET'
