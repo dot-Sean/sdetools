@@ -26,7 +26,7 @@ class PlugInExperience:
         while not self.connected:
             if self.config['askpasswd']:
                 print "Enter the password for account: %s" % (self.config['username'])
-                self.config['password'] = getpass.getpass()
+                self.config.settings['password'] = getpass.getpass()
             ret_err, ret_val = self.connect()
             if not ret_err:
                 break

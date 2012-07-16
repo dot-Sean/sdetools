@@ -93,10 +93,11 @@ class Config:
             return False
         self.settings['password'] = None
         if not opts.askpasswd:
-            self.settings['password'] = opts.password
-        if not self.settings['password']:
-            show_error("Password not specified", usage_hint=True)
-            return False
+            if opts.password:
+                self.settings['password'] = opts.password
+            if not self.settings['password']:
+                show_error("Password not specified", usage_hint=True)
+                return False
         self.settings['application'] = opts.application
         self.settings['project'] = opts.project
 
