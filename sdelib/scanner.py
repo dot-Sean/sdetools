@@ -116,7 +116,7 @@ class FileScanner:
                     self.match_list[task_ref] = []
                 self.match_list[task_ref].append(' AND '.join(matched_reason))
         if self.match_list:
-            print "====================================="
+            print "====================================================="
             print "Tasks for file %s:" % (self.file_path)
             for item in self.match_list:
                 print "  %s" % (self.content.content[item]['title'])
@@ -135,7 +135,11 @@ class Scanner:
         file_scanner.scan()
 
     def scan(self):
+        file_paths = []
         for target in self.config['targets']:
+            if not os.path.isdir(target):
+                file_paths.append(target)
+                continue
             for (dirpath, dirnames, filenames) in os.walk(target):
                 if self.config['skip_hidden']:
                     for dirname in reversed(dirnames):
@@ -143,5 +147,9 @@ class Scanner:
                             dirnames.remove(dirname)
                 for file_name in filenames:
                     file_path = os.path.join(dirpath, file_name)
-                    file_scanner = FileScanner(self.config, self.content, file_path)
-                    file_scanner.scan()
+                    file_paths.append(file_path)
+
+        for file_path in file_paths:
+            print "=== Scanning: %s ===" % (file_path.ljust(35))
+            file_scanner = FileScanner(self.config, self.content, file_path)
+            file_scanner.scan()
