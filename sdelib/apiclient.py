@@ -98,7 +98,7 @@ class APIBase:
             if key not in ret_val:
                 return -104, 'Invalid session information structure.'
         self.session_info = ret_val
-        #self.auth_mode = 'session'
+        self.auth_mode = 'session'
         return 0, 'Session established.'
 
     def get_applications(self, **filters):

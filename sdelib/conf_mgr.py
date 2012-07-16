@@ -18,7 +18,7 @@ class Config:
             'askpasswd': False,
             'server': None,
             'method': 'https',   # Can be 'http' or 'https'
-            'authmode': 'basic', # Can be 'session' or 'basic'
+            'authmode': 'session', # Can be 'session' or 'basic'
             'username': None,
             'password': None,
             'application': None,
