@@ -214,6 +214,8 @@ class AlmConnector:
                raise AlmException("Requires initialization")
           
           has_error = False
+          logging.info('Attempting to update task %s to %s' % (task['id'],
+                                                               status))
 
           retval = self.sde_plugin.api.update_task_status(task['id'], status)
           
@@ -250,8 +252,7 @@ class AlmConnector:
           """
 
           try:
-               if (self.sde_plugin == None): # or self.connector == None):
-                    #log.error("Incorrect initialization")             
+               if (self.sde_plugin == None):
                     raise AlmException("Requires initialization")
 
                #Attempt to connect to SDE & ALM
@@ -271,8 +272,8 @@ class AlmConnector:
                               
                               if (self.conflict_policy == 'ALM'):
                                   #TODO: Add a check for timestamps
-                                  #self.sde_update_task_status(task,
-                                  # alm_task.status)
+                                  self.sde_update_task_status(task,
+                                   alm_task.get_status())
                                   pass
                                   
                               else:

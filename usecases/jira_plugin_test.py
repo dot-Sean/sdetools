@@ -35,11 +35,13 @@ class JIRATask(AlmTask):
      """
      Representation of a task in JIRA
      """
-     def __init__(self, task_id, alm_id, priority, status, timestamp):
+     def __init__(self, task_id, alm_id, priority,
+                  status, resolution, timestamp):
           self.task_id = task_id
           self.alm_id = alm_id
           self.priority = priority
           self.status = status
+          self.resolution = resolution
           self.timestampe = timestamp
      
      def get_task_id(self):
@@ -58,8 +60,18 @@ class JIRATask(AlmTask):
              self.status == 'Incomplete' or
              self.status == 'Reopened'):
              return 'TODO'
-         elif (self.status == 'Fixed'):
-             return 'DONE'
+         elif (self.status == 'Resolved'):
+             if (self.resolution):
+                 logging.info("Resolution is %s" % self.resolution)
+             else:
+                 logging.info("No resolution")
+             if (self.resolution == 'Won\'t Fix' or
+                 self.resolution == 'Duplicate' or
+                 self.resolution == 'Incomplete' or
+                 self.resolution == 'Cannot Reproduce'):
+                 return 'NA'
+             else:
+                 return 'DONE'
          else:
              return 'NA'      
 
@@ -120,16 +132,17 @@ class JIRAConnector(AlmConnector):
         else:
             #We will use the first result from the query
             jtask = ret_val['issues'][0]
+
+            resolution = None
+
+            if (jtask['fields']['resolution']):
+                resolution = jtask['fields']['resolution']['name']
             
-            logging.debug("Found task with: %s %s %s %s %s" % (task['id'],
-                            jtask['key'],
-                            jtask['fields']['priority']['name'],
-                            jtask['fields']['status']['name'],
-                            jtask['fields']['updated']))
             return JIRATask(task['id'],
                             jtask['key'],
                             jtask['fields']['priority']['name'],
                             jtask['fields']['status']['name'],
+                            resolution,
                             jtask['fields']['updated'])
             
         
@@ -167,7 +180,7 @@ def main(argv):
     jira_config = JIRAConfig()
     jira_config.set_settings({'method':'https', 'server':'sdetest.atlassian.net',
               'username':'sdetest', 'password':'YZC9H6etExRj2KNLeUjTNZU3jR',
-              'project':'SIM',
+              'project':'SMPLPROJ',
               'targets': None,
               'debug_level': 1,
               'skip_hidden': True,
