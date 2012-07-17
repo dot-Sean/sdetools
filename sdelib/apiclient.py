@@ -40,6 +40,7 @@ class APIBase:
 
     def _call_api(self, target, method=URLRequest.GET, args=None):
         req_url = '%s/%s' % (self.base_uri, target)
+        
         if not args:
             args = {}
         data = None
@@ -49,6 +50,7 @@ class APIBase:
         else:
             data = json.dumps(args)
         req = URLRequest(req_url, data=data, method=method)
+
         if target == 'session':
             pass
         elif self.auth_mode == 'basic':
@@ -128,3 +130,15 @@ class APIBase:
         if ret_err:
             return ret_err, ret_val
         return 0, ret_val['tasks']
+
+    def update_task_status(self, task, status):
+        """
+        Update the task status. The task ID should include the project number
+        """
+        #TODO: regular expression on task and status for validation
+        ret_err, ret_val = self._call_api('tasks/%s' % task, args={'status':status},
+                                          method=URLRequest.PUT)
+        if ret_err:
+            return ret_err, ret_val
+        return 0, ret_val['status']
+
