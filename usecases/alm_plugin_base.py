@@ -89,6 +89,8 @@ class AlmConnector:
           self.sde_plugin = sde_plugin
           self.alm_plugin = alm_plugin
           self.configuration = configuration
+
+         
           logging.info("---------")
           logging.info("---------")
           logging.info("AlmConnector initialized")
@@ -124,7 +126,11 @@ class AlmConnector:
      def alm_add_task(self, task):
           """ Adds SD Elements task to the ALM tool.
 
-          Raises an AlmException on encountering an error
+          Returns a string represeting the task in the ALM tool,
+          or None if that's not possible. This string will be
+          added to a note for the task.
+          
+          Raises an AlmException on encountering an error.
 
           Keyword arguments:
           task  -- An SDE task
@@ -196,6 +202,25 @@ class AlmConnector:
                                   "permission to access the project")
 
           return retval[1]
+     
+     def __add_note(self, task_id, note_msg, filename, status):
+          """ Convenience method to add note """
+          retval = self.sde_plugin.api.add_note(task_id, note_msg,
+                                                filename, status)
+          if (retval[0]):
+               logging.error("Unable to add note because of %s, %s" %
+                             (retval[0],retval[1]))
+               raise AlmException("Unable to add note in SD Elements")
+
+          logging.debug("Sucessfuly set note for task %s" % task_id)
+
+     def in_scope(self, task):
+          """ Check to see if an SDE task is in scope
+            (i.e. has one of the appropriate phases)
+
+          """
+          return task['phase'] in self.configuration['phases']
+
 
      def sde_update_task_status(self, task, status):
           """ Updates the status of the given task in SD Elements
@@ -213,9 +238,10 @@ class AlmConnector:
                logging.error("Incorrect initialization")             
                raise AlmException("Requires initialization")
           
-          has_error = False
+
           logging.info('Attempting to update task %s to %s' % (task['id'],
                                                                status))
+          
 
           retval = self.sde_plugin.api.update_task_status(task['id'], status)
           
@@ -226,8 +252,13 @@ class AlmConnector:
                                   " Elements. Either the task no longer " +
                                   "exists, there was a problem connecting " +
                                   " to the server, or the status was invalid")
+          logging.info("Status for task %s successfully set in SD Elements" % task['id'])
 
-          logging.info("Status for task %s successfully set in SD Elements")   
+          note_msg = "Task status changed via %s" % self.alm_name()
+
+          self.__add_note(task['id'], note_msg, '', status)
+          
+          
 
      def synchronize(self):
           """ Synchronizes SDE project with ALM project.
@@ -264,7 +295,8 @@ class AlmConnector:
                logging.info("Retrieved all tasks from SDE")
 
                for task in tasks:
-                    
+                    if not(self.in_scope(task)):
+                         continue
                     alm_task = self.alm_get_task(task)
                     if (alm_task):
                          #Exists in both SDE & ALM
@@ -284,11 +316,17 @@ class AlmConnector:
                                                % (task['id'],alm_task.status))
                     else:
                          #Only exists in SD Elements, add it to ALM
-                         self.alm_add_task(task)
+                         ref = self.alm_add_task(task)
+                         note_msg = "Task synchronized in %s" % self.alm_name()
+                         if (ref):
+                              note_msg += ". Reference: %s" % (ref)
+                         self.__add_note(task['id'], note_msg, '', task['status'])                                   
                          logging.info("Added task %s to ALM" % (task['id']))
 
                logging.info("Synchronization complete")
                self.alm_disconnect()
+
+               print "Synchronization completed without errors"
                     
           except AlmException as err:
                logging.error("%s" % err)
@@ -299,93 +337,5 @@ class AlmConnector:
                print "error was encountered, please see log"
 
 
-class TestAlmTask(AlmTask):
 
-     def __init__(self, task_id, alm_id, priority, status, timestamp):
-          self.task_id = task_id
-          self.alm_id = alm_id
-          self.priority = priority
-          self.status = status
-          self.timestampe = timestamp
-     
-     def get_task_id(self):
-          return self.task_id
-
-     def get_alm_id(self):
-          return self.alm_id
-     
-     def get_priority(self):
-          return self.priority        
-          
-     def get_status(self):
-          return self.status       
-
-     def get_timestamp(self):
-          return self.timestamp
-
-     
-class TestAlmConnector(AlmConnector):
-    """ Test class. 'Connects' to a CSV file that has a list of tasks
-    """
-    def alm_name(self):
-          return "CSV File"
-
-    def alm_connect(self):
-          self.fields = ['id','priority','status']
-          self.csv_file = open(self.configuration['file'], 'r+b')
-
-    def alm_get_task (self, task):
-
-          (alm_task, reader) = self.find_matching_row(task)
- 
-          if (alm_task):
-               return TestAlmTask(alm_task['id'],
-                                  '%d' % (reader.line_num),
-                                  alm_task['priority'],
-                                  alm_task['status'],
-                                  None)
-          return None
-
-    def find_matching_row(self, task):
-          reader = csv.DictReader(self.csv_file, self.fields)
-          
-          for row in reader:
-               if (row['id'] == task['id']):
-                    return (row, reader)
-
-          return (None, reader)
-          
-    def alm_add_task(self, task):
-          writer = csv.writer(self.csv_file, self.fields)
-          writer.writerow(['%s' % task['id'], '%s' % task['priority'],
-                           '%s' % task['status']])
-
-    def alm_update_task_status(self, task, status):
-
-          alm_task_row = self.find_matching_row(task)
- 
-          if (alm_task_row):
-               writer = csv.DictWriter(self.csv_file, self.fields)
-               writer[alm_task_row]['status'] = status
-          
-
-    def alm_disconnect(self):
-          pass
-
-
-
-def load():
-    plugin = PlugInExperience(config)
-    tac = TestAlmConnector(plugin, None, {'file':'test.csv'})
-    tac.synchronize()
-
-def main(argv):
-    ret = config.parse_args(argv)
-    if not ret:
-        sys.exit(1)
-
-    load()
-
-if __name__ == "__main__":
-    main(sys.argv)
 
