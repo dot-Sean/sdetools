@@ -58,9 +58,14 @@ class APIBase:
         elif self.auth_mode == 'session':
             if not self.session_info:
                 return -105, 'Session not setup or invalid'
-            req.add_header('Cookie', '%s=%s' % (self.session_info['session-cookie-name'], self.session_info['session-token']))
+            cookies = {self.session_info['session-cookie-name']: self.session_info['session-token']}
             if method != URLRequest.GET:
+                #TODO: This should be removed on the server side
+                req.add_header('Referer', self.base_uri)
                 req.add_header(self.session_info['csrf-header-name'], self.session_info['csrf-token'])
+                cookies[self.session_info['csrf-cookie-name']] = self.session_info['csrf-token']
+            cookie_str = '; '.join(['%s=%s' % (x, cookies[x]) for x in cookies])
+            req.add_header('Cookie', cookie_str)
         else:
             return -103, 'Unknown Authentication mode.'
 
@@ -128,3 +133,11 @@ class APIBase:
         if ret_err:
             return ret_err, ret_val
         return 0, ret_val['tasks']
+
+    def add_note(self, task, text, filename, status):
+         note = {'text':text, 'filename':filename, 'status':status, 'task':task}
+         ret_err, ret_val = self._call_api('notes', URLRequest.POST, args=note)
+         if ret_err:
+             return ret_err, ret_val
+         return 0, ret_val
+

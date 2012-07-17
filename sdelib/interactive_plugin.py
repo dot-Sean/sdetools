@@ -150,3 +150,12 @@ class PlugInExperience:
         content.import_task_list(task_list)
         return 0, content
 
+    def add_note(self, task_id, text, filename, status):
+        if not self.connected:
+            self.get_and_validate_password()
+
+        if (not self.prj['id']):
+            return -1, 'Missing Project'
+
+        return self.api.add_note("%d-%s" % (self.prj['id'], task_id), text, filename, status)
+
