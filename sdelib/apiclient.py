@@ -40,10 +40,10 @@ class APIBase:
 
     def _call_api(self, target, method=URLRequest.GET, args=None):
         req_url = '%s/%s' % (self.base_uri, target)
-        
         if not args:
             args = {}
         data = None
+
         if method == URLRequest.GET:
             if args:
                 req_url = '%s?%s' % (req_url, urllib.urlencode(args))
@@ -60,9 +60,14 @@ class APIBase:
         elif self.auth_mode == 'session':
             if not self.session_info:
                 return -105, 'Session not setup or invalid'
-            req.add_header('Cookie', '%s=%s' % (self.session_info['session-cookie-name'], self.session_info['session-token']))
+            cookies = {self.session_info['session-cookie-name']: self.session_info['session-token']}
             if method != URLRequest.GET:
+                #TODO: This should be removed on the server side
+                req.add_header('Referer', self.base_uri)
                 req.add_header(self.session_info['csrf-header-name'], self.session_info['csrf-token'])
+                cookies[self.session_info['csrf-cookie-name']] = self.session_info['csrf-token']
+            cookie_str = '; '.join(['%s=%s' % (x, cookies[x]) for x in cookies])
+            req.add_header('Cookie', cookie_str)
         else:
             return -103, 'Unknown Authentication mode.'
 
@@ -131,14 +136,20 @@ class APIBase:
             return ret_err, ret_val
         return 0, ret_val['tasks']
 
+    def add_note(self, task, text, filename, status):
+         note = {'text':text, 'filename':filename, 'status':status, 'task':task}
+         ret_err, ret_val = self._call_api('notes', URLRequest.POST, args=note)
+         if ret_err:
+             return ret_err, ret_val
+         return 0, ret_val
+
     def update_task_status(self, task, status):
         """
         Update the task status. The task ID should include the project number
         """
         #TODO: regular expression on task and status for validation
-        ret_err, ret_val = self._call_api('tasks/%s' % task, args={'status':status},
-                                          method=URLRequest.PUT)
+        ret_err, ret_val = self._call_api('tasks/%s' % task, URLRequest.PUT,
+            args={'status':status})
         if ret_err:
             return ret_err, ret_val
         return 0, ret_val['status']
-
