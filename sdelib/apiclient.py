@@ -51,6 +51,9 @@ class APIBase:
             data = json.dumps(args)
         req = URLRequest(req_url, data=data, method=method)
 
+        if (method != URLRequest.GET):
+            req.add_header('Content-Type','application/json')
+
         if target == 'session':
             pass
         elif self.auth_mode == 'basic':
