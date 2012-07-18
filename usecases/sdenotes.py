@@ -23,13 +23,19 @@ from sdelib.scanner import Scanner
 
 def load():
     plugin = PlugInExperience(config)
+    plugin.get_and_validate_password()
 
-    ret_err, ret_val = plugin.get_compiled_task_list()
+    ret_err, ret_val = plugin.select_project()
     if ret_err:
         show_error('Unexpected Error - code %s: %s' % (ret_err, ret_val))
         sys.exit(1)
-        
-    plugin.add_note("T21","Test note","filename","DONE")
+
+    app, prj = ret_val
+    plugin.prj = prj
+    ret_err, ret_val = plugin.add_note("T21","Test note","filename","DONE")
+    if ret_err:
+        show_error('Unexpected Error - code %s: %s' % (ret_err, ret_val))
+        sys.exit(1)
 
 def main(argv):
     ret = config.parse_args(argv)
