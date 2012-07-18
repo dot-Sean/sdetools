@@ -23,15 +23,16 @@ class PlugInExperience:
         return ret_err, ret_val
 
     def get_and_validate_password(self):
+        askpasswd = (self.config['password'] is None)
         while not self.connected:
-            if self.config['askpasswd']:
-                print "Enter the password for account: %s" % (self.config['username'])
-                self.config.settings['password'] = getpass.getpass()
+            if askpasswd:
+                print "Enter the password for account: %s" % (self.config['email'])
+                self.config['password'] = getpass.getpass()
             ret_err, ret_val = self.connect()
             if not ret_err:
                 break
             elif ret_err == 401:
-                if self.config['askpasswd']:
+                if askpasswd:
                     print "Password Error\n"
                     continue
                 show_error('Invalid Email/Password')

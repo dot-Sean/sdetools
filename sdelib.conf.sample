@@ -1,0 +1,8 @@
+# You can put this file in ~/.sdelint.conf
+# OR use -c to specify the location of this file via arguments
+
+[global]
+server = newcastle.sdelements.com
+email = ehsan@sdelements.com
+password = PASSWORD_PLACEHOLDER
+targets = .

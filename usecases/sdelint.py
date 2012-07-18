@@ -13,14 +13,6 @@ from sdelib.commons import show_error, json
 from sdelib.interactive_plugin import PlugInExperience
 from sdelib.scanner import Scanner
 
-"""
-    def read_config(self):
-        import ConfigParser
-        cnf = ConfigParser.ConfigParser()
-        cnf.read(self.config['cnf'])
-        self.ID = cnf.get('mysqld', 'server-id')
-"""
-
 def load():
     plugin = PlugInExperience(config)
 
