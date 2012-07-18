@@ -41,7 +41,7 @@ class VeracodeIntegrator(BaseIntegrator):
             print item['description'][:120]
 
 def main(argv):
-    vcInt = VeracodeIntegrator({'method':'https','server':'newcastle.sdelements.com','debug_level':3,'username':'geoff@sdelements.com','password':'!B00Bl3ss'})
+    vcInt = VeracodeIntegrator({'method':'https','server':'newcastle.sdelements.com','debug_level':3,'username':'geoff@sdelements.com','password':'xxxxx'})
     vcInt.load_mapping_from_csv(argv[1])
     vcInt.output_mapping()
     vcInt.parse(argv[2])
