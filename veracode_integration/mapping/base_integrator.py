@@ -49,7 +49,7 @@ class BaseIntegrator:
 
 
 def main(argv):
-    base = BaseIntegrator({},{'method':'https','server':'newcastle.sdelements.com','debug_level':3,'username':'geoff@sdelements.com','password':'!B00Bl3ss'})
+    base = BaseIntegrator({},{'method':'https','server':'newcastle.sdelements.com','debug_level':3,'username':'geoff@sdelements.com','password':'xxxxxxx'})
     base.load_mapping_from_csv(argv[1])
     base.output_mapping()
 
