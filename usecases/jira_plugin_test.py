@@ -18,13 +18,14 @@ import logging
 
 
 def main(argv):
+
     ret = config.parse_args(argv)
     if not ret:
         sys.exit(1)
     jira_config = JIRAConfig()
     jira_config.set_settings({'method':'https', 'server':'sdetest.atlassian.net',
               'username':'sdetest', 'password':'YZC9H6etExRj2KNLeUjTNZU3jR',
-              'project':'TESTA',
+              'project':'TESTG',
               'targets': None,
               'debug_level': 0,
               'skip_hidden': True,
@@ -32,6 +33,7 @@ def main(argv):
               'askpasswd': False,
               'auth_mode': 'basic',
               'application': None,
+              'standard_workflow' : True,
               'phases':['requirements']})
     #Valid values for phases are 'requirements,'architecture-design',
     #'development','testing'

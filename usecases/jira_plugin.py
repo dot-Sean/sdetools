@@ -54,13 +54,12 @@ class JIRATask(AlmTask):
           
      def get_status(self):
          #Translates JIRA priority into SDE priority
-         if (self.status == 'Open' or
-             self.status == 'In Progress' or
-             self.status == 'Incomplete' or
-             self.status == 'Reopened'):
-             return 'TODO'
-         elif (self.status == 'Resolved'):
-             
+         #(self.status == 'Open' or
+         #    self.status == 'In Progress' or
+         #    self.status == 'Incomplete' or
+         #    self.status == 'Reopened'):
+         #    return 'TODO'
+         if (self.status == 'Resolved'):    
              if (self.resolution == 'Won\'t Fix' or
                  self.resolution == 'Duplicate' or
                  self.resolution == 'Incomplete' or
@@ -68,8 +67,10 @@ class JIRATask(AlmTask):
                  return 'NA'
              else:
                  return 'DONE'
+         elif (self.status == 'Closed'):
+             return 'DONE'  
          else:
-             return 'NA'      
+             return 'TODO'      
 
      def get_timestamp(self):
           return self.timestamp
@@ -118,8 +119,8 @@ class JIRAConnector(AlmConnector):
                                               task_id))
          
         if (ret_err):
-            logging.info("Error return: %s, %s" % (result[0], result[1]))
-            raise AlmException("Unable to get task %s from JIRA")
+            logging.info("Error return: %s, %s" % (ret_err, ret_val))
+            raise AlmException("Unable to get task %s from JIRA" % task['id'])
 
         num_results = ret_val['total']
         if (num_results == 0):
@@ -144,8 +145,10 @@ class JIRAConnector(AlmConnector):
         
        
           
-    def alm_add_task(self, task):     
-         err, result = self.alm_plugin._call_api('issue',method=URLRequest.POST,
+    def alm_add_task(self, task):
+         #Add task
+         add_err, add_result = self.alm_plugin._call_api('issue',
+                                                         method=URLRequest.POST,
                                args={'fields':{'project':
                                       {'key':self.configuration['project']},
                                      'summary':task['title'],
@@ -154,21 +157,66 @@ class JIRAConnector(AlmConnector):
                                                  translate_priority(
                                                      task['priority'])},  
                                      'issuetype':{'id':'1'}}})
-         if (err):
+
+         if (add_err):
              return None
             
+         trans_err, trans_result = 0, 0
+         if (self.configuration['standard_workflow'] and
+             ((task['status']=='DONE') or task['status']=='NA')):
+             logging.debug('Attempting to set a task status to %s' %
+                          task['status'])
+             trans_err,
+             trans_result = self.alm_plugin._call_api('issue' +
+                                                      '/%s/transitions' %
+                                                      add_result['key'],
+                                            args={ 'transition' :{'id':'2'}},#,
+                                            method=URLRequest.POST)
+             logging.debug('setting err %s and result %s' % (trans_err,
+                                                            trans_result))
+         
+         if (trans_err):
+             logging.info("Unable to change status of JIRA task: %s, %s" % (
+                 trans_err, trans_val))
+         
+            
          #Return a unique identifier to this task in JIRA 
-         return "Issue %s" % result['key']
+         return "Issue %s" % add_result['key']
 
         
 
     def alm_update_task_status(self, task, status):
 
-          alm_task_row = self.find_matching_row(task)
- 
-          if (alm_task_row):
-               writer = csv.DictWriter(self.csv_file, self.fields)
-               writer[alm_task_row]['status'] = status
+        #Find task first and exist if it doesn't exist
+        alm_task = alm_get_task(task)
+        
+        if (not(alm_task) or not(self.configuration['standard_workflow'])):
+            return
+
+        trans_err, trans_result = None, None
+        if ((status=='DONE') or (status=='NA')):
+            trans_err,
+            trans_result = self.alm_plugin._call_api('issue' +
+                                                      '/%s/transitions' %
+                                                      add_result['key'],
+                                            args={ 'transition' :{'id':'2'}},#,
+                                            method=URLRequest.POST)
+        elif (status=='TODO'):
+            #We are updating a closed task to TODO
+            trans_err,
+            trans_result = self.alm_plugin._call_api('issue' +
+                                                      '/%s/transitions' %
+                                                      add_result['key'],
+                                            args={ 'transition' :{'id':'3'}},#,
+                                            method=URLRequest.POST)
+        logging.debug('setting err %s and result %s' % (trans_err,
+                                                            trans_result))
+        if (ret_err):
+            logging.info("Unable to set task status: %s, %s" % (trans_err,
+                                                                trans_val))
+            
+             
+          
           
 
     def alm_disconnect(self):
