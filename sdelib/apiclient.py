@@ -35,7 +35,7 @@ class APIBase:
         else:
             handler_func = urllib2.HTTPHandler
 
-        handler = handler_func(debuglevel=config['debug_level'])
+        handler = handler_func(debuglevel=config['debug'])
         self.opener = urllib2.build_opener(handler)
 
     def _call_api(self, target, method=URLRequest.GET, args=None):
@@ -57,7 +57,7 @@ class APIBase:
         if target == 'session':
             pass
         elif self.auth_mode == 'basic':
-            encoded_auth = base64.encodestring('%s:%s' % (self.config['username'], self.config['password']))[:-1]
+            encoded_auth = base64.encodestring('%s:%s' % (self.config['email'], self.config['password']))[:-1]
             authheader =  "Basic %s" % (encoded_auth)
             req.add_header("Authorization", authheader)
         elif self.auth_mode == 'session':
@@ -100,7 +100,7 @@ class APIBase:
 
     def start_session(self):
         args = {
-            'username': self.config['username'],
+            'username': self.config['email'],
             'password': self.config['password']}
         ret_err, ret_val = self._call_api('session', URLRequest.PUT, args=args)
         for key in ['session-cookie-name', 'csrf-token', 'csrf-header-name', 
