@@ -16,6 +16,7 @@ from sdelib.conf_mgr import config
 from sdelib.commons import show_error, json
 from sdelib.interactive_plugin import PlugInExperience
 from abc import ABCMeta, abstractmethod
+from datetime import datetime
 import logging
 import csv
 
@@ -58,7 +59,7 @@ class AlmTask:
 
      @abstractmethod
      def get_timestamp(self):
-          """ Returns a timestamp compatible with SD Elements """
+          """ Returns a datetime.datetime object of last modified time """
           pass  
 
 class AlmConnector:
@@ -73,9 +74,6 @@ class AlmConnector:
      #ALM Configuration
      configuration = None
 
-     #Conflict policy. ALM tool takes precedence by default
-     conflict_policy = 'ALM'
-
      def __init__(self, sde_plugin, alm_plugin , configuration):
           """  Initialization of the Connector
 
@@ -85,7 +83,7 @@ class AlmConnector:
 
           """
           logging.basicConfig(format='%(asctime)s,%(levelname)s:%(message)s'
-                              ,filename='info.log',level=logging.INFO)
+                              ,filename='info.log',level=logging.DEBUG)
           self.sde_plugin = sde_plugin
           self.alm_plugin = alm_plugin
           self.configuration = configuration
@@ -299,21 +297,42 @@ class AlmConnector:
                          continue
                     alm_task = self.alm_get_task(task)
                     if (alm_task):
+
                          #Exists in both SDE & ALM
                          if (alm_task.get_status() != task['status']):
+
+                              #what takes precedence in case of a
+                              #conflict of status. Start with ALM
+                              precedence = 'alm'
                               
-                              if (self.conflict_policy == 'ALM'):
-                                  #TODO: Add a check for timestamps
-                                  self.sde_update_task_status(task,
+                              if (self.configuration['conflict_policy']
+                                  == 'sde'):
+                                  precedence = 'sde'
+                              elif (self.configuration['conflict_policy']
+                                  == 'timestamp' ):
+                                   
+                                   sde_time = datetime.fromtimestamp(
+                                        task['timestamp'])
+                                   alm_time = alm_task.get_timestamp()
+
+                                   logging.debug('comparing timestamps for ' +
+                                        'task %s - SDE: %s, ALM: %s' %
+                                                (task['id'],
+                                                str(sde_time),
+                                                str(alm_time)))
+                                   
+                                   if (sde_time > alm_time):
+                                        precedence = 'sde'
+
+                              if (precedence == 'alm'):
+                                   self.sde_update_task_status(task,
                                    alm_task.get_status())
-                                  pass
-                                  
                               else:
-                                  self.alm_update_task_status(alm_task,
+                                   self.alm_update_task_status(alm_task,
                                                               task['status'])
-                                  logging.info("Updated status of task " +
-                                               " %s to %s in ALM"
-                                               % (task['id'],alm_task.status))
+                              logging.info("Updated status of task " +
+                                               " %s in %s"
+                                               % (task['id'],precedence))    
                     else:
                          #Only exists in SD Elements, add it to ALM
                          ref = self.alm_add_task(task)

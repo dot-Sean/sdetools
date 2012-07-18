@@ -14,6 +14,7 @@ from sdelib.interactive_plugin import PlugInExperience
 from sdelib.apiclient import APIBase, URLRequest
 from alm_plugin_base import AlmException, AlmTask, AlmConnector 
 from sdelib.conf_mgr import Config
+from datetime import datetime
 import logging
 
 
@@ -41,7 +42,7 @@ class JIRATask(AlmTask):
           self.priority = priority
           self.status = status
           self.resolution = resolution
-          self.timestampe = timestamp
+          self.timestamp = timestamp
      
      def get_task_id(self):
           return self.task_id
@@ -54,11 +55,7 @@ class JIRATask(AlmTask):
           
      def get_status(self):
          #Translates JIRA priority into SDE priority
-         #(self.status == 'Open' or
-         #    self.status == 'In Progress' or
-         #    self.status == 'Incomplete' or
-         #    self.status == 'Reopened'):
-         #    return 'TODO'
+         
          if (self.status == 'Resolved'):    
              if (self.resolution == 'Won\'t Fix' or
                  self.resolution == 'Duplicate' or
@@ -70,10 +67,14 @@ class JIRATask(AlmTask):
          elif (self.status == 'Closed'):
              return 'DONE'  
          else:
+             #Valid 'TODO' statuses, in case we need them later:
+             #'Open', 'In Progress' , 'Incomplete' 'Reopened'
              return 'TODO'      
 
      def get_timestamp(self):
-          return self.timestamp
+          """ Returns a datetime object """
+          return datetime.strptime(self.timestamp.split('.')[0],
+                                   '%Y-%m-%dT%H:%M:%S')
     
      @classmethod
      def translate_priority(cls, priority):
@@ -156,7 +157,8 @@ class JIRAConnector(AlmConnector):
                                      'priority':{'name':JIRATask.
                                                  translate_priority(
                                                      task['priority'])},  
-                                     'issuetype':{'id':'1'}}})
+                                     'issuetype':{'id':self.
+                                                  configuration['issue_id']}}})
 
          if (add_err):
              return None
@@ -170,8 +172,13 @@ class JIRAConnector(AlmConnector):
              trans_result = self.alm_plugin._call_api('issue' +
                                                       '/%s/transitions' %
                                                       add_result['key'],
-                                            args={ 'transition' :{'id':'2'}},#,
+                                                      
+                                            args={ 'transition' :
+                                            {'id':self.configuration[
+                                                 'close_transition']}},
+                                                      
                                             method=URLRequest.POST)
+             
              logging.debug('setting err %s and result %s' % (trans_err,
                                                             trans_result))
          
@@ -187,10 +194,8 @@ class JIRAConnector(AlmConnector):
 
     def alm_update_task_status(self, task, status):
 
-        #Find task first and exist if it doesn't exist
-        alm_task = alm_get_task(task)
-        
-        if (not(alm_task) or not(self.configuration['standard_workflow'])):
+     
+        if (not(task) or not(self.configuration['standard_workflow'])):
             return
 
         trans_err, trans_result = None, None
@@ -198,20 +203,28 @@ class JIRAConnector(AlmConnector):
             trans_err,
             trans_result = self.alm_plugin._call_api('issue' +
                                                       '/%s/transitions' %
-                                                      add_result['key'],
-                                            args={ 'transition' :{'id':'2'}},#,
+                                                      task.get_alm_id(),
+                                                     
+                                            args={ 'transition' :
+                                            {'id':self.configuration[
+                                                 'close_transition']}},
+                                                     
                                             method=URLRequest.POST)
         elif (status=='TODO'):
             #We are updating a closed task to TODO
             trans_err,
             trans_result = self.alm_plugin._call_api('issue' +
                                                       '/%s/transitions' %
-                                                      add_result['key'],
-                                            args={ 'transition' :{'id':'3'}},#,
+                                                      task.get_alm_id(),
+                                                     
+                                            args={ 'transition' :
+                                            {'id':self.configuration[
+                                                 'reopen_transition']}},
+                                                     
                                             method=URLRequest.POST)
         logging.debug('setting err %s and result %s' % (trans_err,
                                                             trans_result))
-        if (ret_err):
+        if (trans_err):
             logging.info("Unable to set task status: %s, %s" % (trans_err,
                                                                 trans_val))
             
