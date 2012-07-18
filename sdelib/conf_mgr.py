@@ -3,6 +3,7 @@ import os
 import optparse
 import ConfigParser
 import shlex
+import getpass
 
 from commons import show_error
 
@@ -141,7 +142,7 @@ class Config:
             show_error("Email not specified", usage_hint=True)
             return False
         if opts.askpasswd:
-            self['password'] = None
+            self['password'] = getpass.getpass()
         else:
             if opts.password:
                 self['password'] = opts.password
