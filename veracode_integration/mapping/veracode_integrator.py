@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import sys
 from base_integrator import BaseIntegrator
+from sdelib.conf_mgr import config
 from xml.dom import minidom
 
 REQUIRED_ATTRIBS = ['issueid', 'cweid', 'categoryid', 'categoryname', 'description', 'severity', 'module']
@@ -41,12 +42,15 @@ class VeracodeIntegrator(BaseIntegrator):
             print item['description'][:120]
 
 def main(argv):
-    vcInt = VeracodeIntegrator({'method':'https','server':'newcastle.sdelements.com','debug_level':3,'username':'geoff@sdelements.com','password':'xxxxx'})
-    vcInt.load_mapping_from_csv(argv[1])
+    ret = config.parse_args(argv)
+    if not ret:
+        sys.exit(1)
+    vcInt = VeracodeIntegrator(config)
+    vcInt.load_mapping_from_csv(config['targets'][0])
     vcInt.output_mapping()
-    vcInt.parse(argv[2])
+    vcInt.parse(config['targets'][1])
     vcInt.map_findings()
-    vcInt.apply_findings(136, "geoff@sdelements.com", "!B00Bl3ss")
+    vcInt.apply_findings(136)
 
 if __name__ == "__main__":
     main(sys.argv)

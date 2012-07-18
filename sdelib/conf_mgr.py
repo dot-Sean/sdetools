@@ -65,7 +65,7 @@ class Config:
                 return False
 
         if (len(args) < 1):
-            show_error("Missing target (e.g. use \".\" for current dir)", usage_hint=True)
+            show_error("File or path argument is missing", usage_hint=True)
             return False
 
         for path in args:
