@@ -6,6 +6,7 @@ from xml.dom import minidom
 
 REQUIRED_ATTRIBS = ['issueid', 'cweid', 'categoryid', 'categoryname', 'description', 'severity', 'module']
 LOCATION_ATTRIBS = ['sourcefilepath', 'sourcefile', 'line', 'location']
+SOURCE_ID = "VC"
 
 class VeracodeIntegrator(BaseIntegrator):
 
@@ -15,6 +16,12 @@ class VeracodeIntegrator(BaseIntegrator):
 
     def parse(self, file_name):
         base = minidom.parse(file_name)
+        detailed_reports = base.getElementsByTagName('detailedreport')
+        if len(detailed_reports) != 1:
+            raise Exception('An unexpected number of detailedreport nodes found (%d)' % (len(detailed_reports)))
+        dr = detailed_reports[0]
+        self.report_id = "%s: %s (%s-b%s) %s" % (SOURCE_ID,dr.attributes['app_name'].value,dr.attributes['app_id'].value,dr.attributes['build_id'].value,dr.attributes['generation_date'].value)
+
         for node in base.getElementsByTagName('flaw'):
             entry = {}
             for attr in REQUIRED_ATTRIBS:
@@ -45,12 +52,13 @@ def main(argv):
     ret = config.parse_args(argv)
     if not ret:
         sys.exit(1)
+    if len(config['targets']) != 2:
+        print "Please specify mapping file and veracode XML report file arguments"
+        sys.exit(1)
     vcInt = VeracodeIntegrator(config)
     vcInt.load_mapping_from_csv(config['targets'][0])
-    vcInt.output_mapping()
     vcInt.parse(config['targets'][1])
-    vcInt.map_findings()
-    vcInt.apply_findings(136)
+    vcInt.apply_findings(False)
 
 if __name__ == "__main__":
     main(sys.argv)

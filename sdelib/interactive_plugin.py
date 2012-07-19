@@ -153,10 +153,13 @@ class PlugInExperience:
 
     def add_note(self, task_id, text, filename, status):
         if not self.connected:
-            return -1, 'Not logged in'
+             self.get_and_validate_password()
+ 
+        ret_err, ret_val = self.select_project()
+        if (ret_err):
+            return ret_err, ret_val
 
-        if (not self.prj['id']):
-            return -1, 'Missing Project'
+        self.app, self.prj = ret_val
 
         return self.api.add_note("%d-%s" % (self.prj['id'], task_id), text, filename, status)
 
