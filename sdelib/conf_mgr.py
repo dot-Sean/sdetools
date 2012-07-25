@@ -9,10 +9,21 @@ from commons import show_error
 
 __all__ = ['config', 'Config']
 
-#TODO: Add local config
 DEFAULT_CONFIG_FILE = "~/.sdelint.cnf"
 
-class Config:
+class Config(object):
+    """
+    The Configuration class. The module creates a singleton instance by default.
+    However, this class can be instantiated, modified /customized, and passed to 
+    the plugin class during instantiation. This way, several configurations can
+    be used in the same execution without singleton limitations.
+
+    Note: This is a non interactive module. Convention: Use default value None to 
+    indicate that a value needs to be asked interactively.
+
+    Usage sample:
+        prj_name = config['project']
+    """
     DEFAULTS = {
             'conf_file': DEFAULT_CONFIG_FILE,
             'interactive': True,
@@ -30,6 +41,7 @@ class Config:
 
     def __init__(self):
         self.settings = self.DEFAULTS.copy()
+        self.custom_options = []
 
     def __getitem__(self, key):
         if key in self.settings:
@@ -40,6 +52,37 @@ class Config:
         if key not in self.settings:
             raise KeyError, 'Unknown configuration item: %s' % (key)
         self.settings[key] = val
+
+    def add_custom_option(self, var_name, help_title, short_form, default='', meta_var=None):
+        """
+        Use this to extend the options for your own use cases. The item is added to arguments.
+        The same var_name is parsed from config file if present.
+
+        Args:
+            <var_name>: Name of the config variable. (use lower case, numbers and underscore only)
+            <help_title>: A one or two sentence description of the config item.
+            <short_form>: a single character where -<short_form> becomes the option (e.g. 'w' for -w).
+            [<default>]: Optional. Emtpy string by default.
+            [<meta_var>]: Optional. Defaults to capital format.
+
+        Note: the long form becomes --<var_name>
+        Note: short form is case sensitive
+        Note: Do not use the base <var_names> (used in the base defaults)
+        """
+        config_item = {
+            'var_name': var_name.lower(),
+            'help_title': help_title,
+            'default': default,
+            'meta_var': meta_var,
+            'short_form': '-' + short_form,
+            'long_form': '--' + var_name.lower(),
+        }
+
+        if config_item['meta_var'] is None:
+            config_item['meta_var'] = config_item['var_name'].upper()
+
+        self.custom_options.append(config_item)
+        self.settings[config_item['var_name']] = config_item['default']
 
     def parse_config_file(self, file_name):
         if not file_name:
@@ -56,7 +99,13 @@ class Config:
             else:
                 return False, 'Config file not found.'
 
-        for key in ['debug', 'server', 'email', 'password', 'application', 'project', 'targets', 'authmode']:
+        config_keys = [
+            'debug', 'server', 'email', 'password', 'application', 'project', 
+            'targets', 'authmode']
+        for item in self.custom_options:
+            config_keys.append(item['var_name'])
+
+        for key in config_keys:
             if cnf.has_option('global', key):
                 val = cnf.get('global', key)
                 if key == 'targets':
@@ -90,6 +139,10 @@ class Config:
             help = "Skip hidden files/directories.")
         parser.add_option('-d', '--debug', metavar='LEVEL', dest='debug', default=self.DEFAULTS['debug'], type='int',
             help = "Set debug level (Default is 0, i.e. show no debug messages)")
+        for item in self.custom_options:
+            parser.add_option(
+                item['short_form'], item['long_form'], dest=item['var_name'], metavar=item['meta_var'], 
+                default=item['default'], type='string', help=item['help_title'])
 
         try:
             (opts, args) = parser.parse_args()
@@ -153,6 +206,12 @@ class Config:
             self['application'] = opts.application
         if opts.project:
             self['project'] = opts.project
+
+        for item in self.custom_options:
+            name = item['var_name']
+            val = getattr(opts, name)
+            if val:
+                self[name] = val
 
         return True
 
