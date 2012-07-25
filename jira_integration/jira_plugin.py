@@ -8,7 +8,8 @@
 
 import sys, os
 sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
-
+sys.path.append("%s\\alm_integration" % os.path.split
+                (os.path.split(os.path.abspath(__file__))[0])[0])
 from sdelib.conf_mgr import config
 from sdelib.interactive_plugin import PlugInExperience
 from sdelib.apiclient import APIBase, URLRequest

@@ -1,29 +1,6 @@
-#!/usr/bin/python
-#
-# Version 0.01
-# Rohit Sethi
-# Copyright SDElements Inc
-#
-# Proof of concept for extensible two way
-# integration with JIRA
+class JiraSettings:
 
-import sys, os
-sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
-
-from sdelib.conf_mgr import config
-from sdelib.interactive_plugin import PlugInExperience
-
-from jira_plugin import JIRATask, JIRAConnector, JIRAConfig, JIRABase 
-import logging
-
-
-def main(argv):
-
-    ret = config.parse_args(argv)
-    if not ret:
-        sys.exit(1)
-    jira_config = JIRAConfig()
-    jira_config.set_settings({
+    settings = {
               ###### JIRA settings  ######
               ######General settings######
               #Server name, includes port
@@ -34,7 +11,7 @@ def main(argv):
               # -create new issues for the project
               # -read existing issues in the project
               # -create transitions on issues (e.g. close an issue)
-              'username':'sdetest',
+              'email':'sdetest',
               
               #Password for above user. Note that this will be encrypted
               #in future versions of the plugin
@@ -42,7 +19,7 @@ def main(argv):
               
               ######Project settings######
               #JIRA project key
-              'project':'TESTG',
+              'project':'TESTO',
               
               #JIRA allows workflow customization. Customized workflows
               #may make it difficult for the plugin to close a ticket
@@ -84,20 +61,10 @@ def main(argv):
               ######Base settings, do not modify######
               'method':'https',
               'targets': None,
-              'debug_level': 0,
+              'debug': 0,
               'skip_hidden': True,
               'interactive': True,
               'askpasswd': False,
               'auth_mode': 'basic',
               'application': None,
-              })
-    
-    
-    jbase = JIRABase(jira_config)
-    sde_plugin = PlugInExperience(config)
-    jira = JIRAConnector(sde_plugin, jbase, jira_config)
-    jira.synchronize()
-              
-    
-if __name__ == "__main__":
-    main(sys.argv)
+              }

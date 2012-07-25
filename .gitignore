@@ -27,5 +27,7 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 
-#log files
-info.log
+#Configuration
+sdelint.cnf
+
+
