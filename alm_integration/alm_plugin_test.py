@@ -52,6 +52,7 @@ class TestAlmConnector(AlmConnector):
 
     def alm_connect(self):
           self.fields = ['id','priority','status']
+          #CHANGE CONFIGURATION TO self.sde_plugin['file'] 
           self.csv_file = open(self.configuration['file'], 'r+b')
 
     def alm_get_task (self, task):

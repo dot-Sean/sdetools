@@ -7,25 +7,33 @@
 # Extensible two way # integration with JIRA
 
 import sys, os
+
 sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
-sys.path.append("%s\\alm_integration" % os.path.split
-                (os.path.split(os.path.abspath(__file__))[0])[0])
 from sdelib.conf_mgr import config
 from sdelib.interactive_plugin import PlugInExperience
 from sdelib.apiclient import APIBase, URLRequest
-from alm_plugin_base import AlmException, AlmTask, AlmConnector 
+from alm_integration.alm_plugin_base import AlmTask, AlmConnector, AlmException
 from sdelib.conf_mgr import Config
 from datetime import datetime
 import logging
+import copy
 
 
 class JIRABase(APIBase):
     """ Base plugin for JIRA """
 
     def __init__(self, config):
-        APIBase.__init__(self, config)
-        self.base_uri = '%s://%s/rest/api/2' % ((self.config['method'],
-                                                    self.config['server']))
+
+        #Hack to copy over the ALM id & password for JIRA
+        #authentication without overwriting the SD Elements
+        #email & password in the config
+        alm_config = copy.deepcopy(config)
+        alm_config['email'] = alm_config['alm_id']
+        alm_config['password'] = alm_config['alm_password']
+        
+        APIBase.__init__(self, alm_config)
+        self.base_uri = '%s://%s/rest/api/2' % ((self.config['alm_method'],
+                                                    self.config['alm_server']))
         
 class JIRAConfig(Config):
 
@@ -116,8 +124,10 @@ class JIRAConnector(AlmConnector):
     def alm_get_task (self, task):
         task_id = task['title'].partition(':')[0]
         ret_err, ret_val = self.alm_plugin._call_api(
+            
             'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s\''
-                                           % (self.configuration['project'],
+                                           % (self.sde_plugin.config
+                                              ['alm_project'],
                                               task_id))
          
         if (ret_err):
@@ -152,20 +162,23 @@ class JIRAConnector(AlmConnector):
          add_err, add_result = self.alm_plugin._call_api('issue',
                                                          method=URLRequest.POST,
                                args={'fields':{'project':
-                                      {'key':self.configuration['project']},
+                                    
+                                      {'key':self.sde_plugin.config['alm_project']},
                                      'summary':task['title'],
                                      'description':task['content'],
                                      'priority':{'name':JIRATask.
                                                  translate_priority(
                                                      task['priority'])},  
-                                     'issuetype':{'id':self.
-                                                  configuration['issue_id']}}})
+                                     'issuetype':{'id':                                    
+                                                  self.sde_plugin.config
+                                                  ['jira_issue_id']}}})
 
          if (add_err):
              return None
             
          trans_err, trans_result = 0, 0
-         if (self.configuration['standard_workflow'] and
+
+         if ((self.sde_plugin.config['alm_standard_workflow']=='True') and
              ((task['status']=='DONE') or task['status']=='NA')):
              logging.debug('Attempting to set a task status to %s' %
                           task['status'])
@@ -175,8 +188,9 @@ class JIRAConnector(AlmConnector):
                                                       add_result['key'],
                                                       
                                             args={ 'transition' :
-                                            {'id':self.configuration[
-                                                 'close_transition']}},
+                                            
+                                            {'id':self.sde_plugin.config[
+                                                 'jira_close_transition']}},
                                                       
                                             method=URLRequest.POST)
              
@@ -195,8 +209,9 @@ class JIRAConnector(AlmConnector):
 
     def alm_update_task_status(self, task, status):
 
-     
-        if (not(task) or not(self.configuration['standard_workflow'])):
+        
+        if (not(task) or not(self.sde_plugin.config['alm_standard_workflow']
+                             == 'True')):
             return
 
         trans_err, trans_result = None, None
@@ -206,9 +221,9 @@ class JIRAConnector(AlmConnector):
                                                       '/%s/transitions' %
                                                       task.get_alm_id(),
                                                      
-                                            args={ 'transition' :
-                                            {'id':self.configuration[
-                                                 'close_transition']}},
+                                            args={ 'transition' : 
+                                            {'id':self.sde_plugin.config[
+                                                 'jira_close_transition']}},
                                                      
                                             method=URLRequest.POST)
         elif (status=='TODO'):
@@ -218,9 +233,9 @@ class JIRAConnector(AlmConnector):
                                                       '/%s/transitions' %
                                                       task.get_alm_id(),
                                                      
-                                            args={ 'transition' :
-                                            {'id':self.configuration[
-                                                 'reopen_transition']}},
+                                            args={ 'transition' : 
+                                            {'id':self.sde_plugin.config[
+                                                 'jira_reopen_transition']}},
                                                      
                                             method=URLRequest.POST)
         logging.debug('setting err %s and result %s' % (trans_err,
@@ -235,3 +250,40 @@ class JIRAConnector(AlmConnector):
 
     def alm_disconnect(self):
           pass
+
+def add_jira_config_options(config):
+    """ Adds JIRA specific config options to the config file"""
+    config.add_custom_option('alm_phases',
+                             'Phases of the ALM',
+                             '-alm_phases')
+    config.add_custom_option('alm_method',
+                             'HTTP or HTTPS for ALM server',
+                             '-alm_method',
+                             default='https')
+    config.add_custom_option('alm_server',
+                             'Server of the ALM',
+                             '-alm_server')
+    config.add_custom_option('alm_id',
+                             'Username for ALM Tool',
+                             '-alm_id')
+    config.add_custom_option('alm_password',
+                             'Password for ALM Tool',
+                             '-alm_password')
+    config.add_custom_option('alm_project',
+                             'Project in ALM Tool',
+                             '-alm_project')
+    config.add_custom_option('alm_standard_workflow',
+                             'Standard workflow in JIRA?',
+                             '-alm_standard_workflow')
+    config.add_custom_option('jira_issue_id',
+                             'IDs for issues raised in JIRA',
+                             '-jira_issue_id')
+    config.add_custom_option('jira_close_transition',
+                             'Close transition in JIRA',
+                             '-jira_close_transition')    
+    config.add_custom_option('jira_reopen_transition',
+                             'Re-open transiiton in JIRA',
+                             '-jira_reopen_transition')
+    config.add_custom_option('conflict_policy',
+                             'Conflict policy to use',
+                             '-conflict_policy')

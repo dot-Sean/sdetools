@@ -1,12 +1,3 @@
-#!/usr/bin/python
-#
-# Version 0.01
-# Rohit Sethi
-# Copyright SDElements Inc
-#
-# Proof of concept for extensible two way
-# integration with ALM tools
-
 import sys, os
 sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
 
@@ -74,19 +65,37 @@ class AlmConnector:
      #ALM Configuration
      configuration = None
 
-     def __init__(self, sde_plugin, alm_plugin , configuration):
+     def __init__(self, sde_plugin, alm_plugin):
           """  Initialization of the Connector
 
           Keyword arguments:
           sde_plugin  -- An SD Elements Plugin configuration object
-          configuration -- A configuration object specific to this ALM
+          alm_plugin -- A plugin to connect to the ALM tool
 
           """
           logging.basicConfig(format='%(asctime)s,%(levelname)s:%(message)s'
                               ,filename='info.log',level=logging.DEBUG)
           self.sde_plugin = sde_plugin
           self.alm_plugin = alm_plugin
-          self.configuration = configuration
+          
+
+          #Verify that the configuration options are set properly
+          if (not(self.sde_plugin.config['alm_phases'])):
+                 raise AlmException("Missing alm_phases in configuration")
+          else:
+               self.sde_plugin.config['alm_phases'] = \
+               self.sde_plugin.config['alm_phases'].split(',')
+          
+          if (not(self.sde_plugin.config['conflict_policy']) or
+              not(self.sde_plugin.config['conflict_policy'] == 'alm')): #or
+                  #self.sde_plugin.config['conflict_policy'] == 'sde' or
+                  #self.sde_plugin.config['conflict_policy'] ==
+                  #'timestamp')):
+               raise AlmException("Missing or incorrect conflict_policy " +
+                                  "in configuration. Valid values are " +
+                                  "alm, sde, or timestamp.")
+          
+
 
          
           logging.info("---------")
@@ -217,7 +226,7 @@ class AlmConnector:
             (i.e. has one of the appropriate phases)
 
           """
-          return task['phase'] in self.configuration['phases']
+          return task['phase'] in self.sde_plugin.config['alm_phases'] 
 
 
      def sde_update_task_status(self, task, status):
@@ -304,11 +313,11 @@ class AlmConnector:
                               #what takes precedence in case of a
                               #conflict of status. Start with ALM
                               precedence = 'alm'
-                              
-                              if (self.configuration['conflict_policy']
+
+                              if (self.sde_plugin.config['conflict_policy']
                                   == 'sde'):
                                   precedence = 'sde'
-                              elif (self.configuration['conflict_policy']
+                              elif (self.sde_plugin.config['conflict_policy']
                                   == 'timestamp' ):
                                    
                                    sde_time = datetime.fromtimestamp(
