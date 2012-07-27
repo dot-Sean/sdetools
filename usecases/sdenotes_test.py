@@ -24,10 +24,7 @@ from sdelib.scanner import Scanner
 def load():
     plugin = PlugInExperience(config)
 
-    ret_err, ret_val = plugin.get_compiled_task_list()
-    if ret_err:
-        show_error('Unexpected Error - code %s: %s' % (ret_err, ret_val))
-        sys.exit(1)
+    plugin.get_compiled_task_list()
         
     plugin.add_note("T21","Test note","filename","DONE")
 
