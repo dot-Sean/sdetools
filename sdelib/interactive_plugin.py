@@ -115,14 +115,14 @@ class PlugInExperience:
                 return (sel_app, sel_prj)
 
     def get_task_list(self):
+        if not self.connected:
+            self.get_and_validate_password()
+
         self.app, self.prj = self.select_project()
         
         return self.api.get_tasks(self.prj['id'])
 
     def get_compiled_task_list(self):
-        if not self.connected:
-            self.get_and_validate_password()
-
         task_list = self.get_task_list()
 
         content = Content(self.api)
