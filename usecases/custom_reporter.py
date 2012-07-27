@@ -8,39 +8,30 @@
 # Piggybacks off Ehsan's Lint tool code
 
 import sys, os
-sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import csv
 
 from sdelib.conf_mgr import config
-from sdelib.commons import show_error, json
+from sdelib.commons import show_error, json, Error
 from sdelib.interactive_plugin import PlugInExperience
 
 CSV_FILENAME = "output.csv"
 
 def test_report(plugin):
-     ret_err, ret_val = plugin.api.get_applications()
-     if ret_err:
-         return ret_err, ret_val
+     app_list = plugin.api.get_applications()
 
      csv_file = csv.writer(open(CSV_FILENAME, 'wb'))
      csv_file.writerow(['Application','Project','Task','Weakness','Status'])
-     app_list = ret_val
 
      for app_ind in xrange(len(app_list)):
           app = app_list[app_ind]
-          proj_ret_err, proj_ret_val = plugin.api.get_projects(app['id'])
-          if proj_ret_err:
-              return proj_ret_err, proj_ret_val
+          proj_list = plugin.api.get_projects(app['id'])
 
-          proj_list = proj_ret_val
           for proj_ind in xrange(len(proj_list)):
               proj = proj_list[proj_ind]
-              task_ret_err, task_ret_val = plugin.api.get_tasks(proj['id'])
-              if task_ret_err:
-                  return task_ret_err, task_ret_val
+              task_list = plugin.api.get_tasks(proj['id'])
 
-              task_list = task_ret_val
               for task_ind in xrange(len(task_list)):
                   task = task_list[task_ind]
                   csv_file.writerow([app['name'],proj['name'],task['title'],task['weakness']['title'],task['status']])
@@ -55,7 +46,10 @@ def main(argv):
     if not ret:
         sys.exit(1)
 
-    load()
+    try:
+        load()
+    except Error, e:
+        show_error(str(e))
 
 if __name__ == "__main__":
     main(sys.argv)

@@ -2,7 +2,37 @@ import urllib
 import urllib2
 import base64
 
-from commons import json
+from commons import json, Error, UsageError
+
+class APIError(Error):
+    pass
+
+class APIHTTPError(APIError):
+    def __init__(self, code, msg):
+        APIError.__init__(self, msg)
+        self.code = code
+
+    def __str__(self):
+        return '%s (Error Code: %s)' % (Error.__str__(self), self.code)
+
+class APICallError(APIHTTPError):
+    pass
+
+class APIAuthError(APIError):
+    def __init__(self):
+        APIError.__init__(self, 'Incorrect Email/Password')
+
+class ServerError(APIError):
+    """
+    Server reachability error (before HTTP is established)
+    """
+    pass
+
+class APIFormatError(APIError):
+    """
+    API return format is not a proper JSON or is missing some needed fields
+    """
+    pass
 
 class URLRequest(urllib2.Request):
     GET = 'GET'
@@ -50,6 +80,7 @@ class APIBase:
 
         """
         req_url = '%s/%s' % (self.base_uri, target)
+        auth_mode = self.auth_mode
         if not args:
             args = {}
         data = None
@@ -66,13 +97,13 @@ class APIBase:
 
         if target == 'session':
             pass
-        elif self.auth_mode == 'basic':
+        elif auth_mode == 'basic':
             encoded_auth = base64.encodestring('%s:%s' % (self.config['email'], self.config['password']))[:-1]
             authheader =  "Basic %s" % (encoded_auth)
             req.add_header("Authorization", authheader)
-        elif self.auth_mode == 'session':
+        elif auth_mode == 'session':
             if not self.session_info:
-                return -105, 'Session not setup or invalid'
+                raise UsageError('Session not setup or invalid (you need to call start_session first)')
             cookies = {self.session_info['session-cookie-name']: self.session_info['session-token']}
             if method != URLRequest.GET:
                 #TODO: This should be removed on the server side
@@ -82,16 +113,28 @@ class APIBase:
             cookie_str = '; '.join(['%s=%s' % (x, cookies[x]) for x in cookies])
             req.add_header('Cookie', cookie_str)
         else:
-            return -103, 'Unknown Authentication mode.'
+            raise UsageError('Unknown Authentication mode.')
 
+        call_success = True
         try:
             handle = self.opener.open(req)
         except IOError, e:
-            if not hasattr(e, 'code'):
-                return -101, 'Invalid server or server unreachable.'
-            if e.code == 401:
-                return e.code, 'Invalid Email/Password.'
-            return e.code, 'Unknown Error'
+            handle = e
+            call_success = False
+
+        if not call_success:
+            if not hasattr(handle, 'code'):
+                #TODO
+                raise ServerError('Invalid server or server unreachable.')
+            err_msg = 'Unknown Error'
+            try:
+                err_ret = handle.read()
+                err_msg = json.loads(err_ret)['error']
+            except:
+                pass
+            if handle.code == 401:
+                raise APIAuthError
+            raise APICallError(handle.code, err_msg)
 
         result = ''
         while True:
@@ -104,9 +147,9 @@ class APIBase:
         try:
             result = json.loads(result)
         except:
-            return -102, 'Unable to process JSON data.'
+            raise APIFormatError('Unable to process JSON data.')
 
-        return 0, result
+        return result
 
     def start_session(self):
         """ 
@@ -116,14 +159,18 @@ class APIBase:
         args = {
             'username': self.config['email'],
             'password': self.config['password']}
-        ret_err, ret_val = self._call_api('session', URLRequest.PUT, args=args)
+        try:
+            result = self._call_api('session', URLRequest.PUT, args=args)
+        except APIHTTPError, e:
+            if e.code == 400:
+                raise APIAuthError
+            raise
         for key in ['session-cookie-name', 'csrf-token', 'csrf-header-name', 
             'csrf-cookie-domain', 'csrf-cookie-name', 'session-token']:
-            if key not in ret_val:
-                return -104, 'Invalid session information structure.'
-        self.session_info = ret_val
+            if key not in result:
+                raise APIFormatError('Invalid session information structure.')
+        self.session_info = result
         self.auth_mode = 'session'
-        return 0, 'Session established.'
 
     def get_applications(self, **filters):
         """
@@ -132,10 +179,8 @@ class APIBase:
         Available Filters:
             name -> application name to be searched for
         """
-        ret_err, ret_val = self._call_api('applications', args=filters)
-        if ret_err:
-            return ret_err, ret_val
-        return 0, ret_val['applications']
+        result = self._call_api('applications', args=filters)
+        return result['applications']
     
     def get_projects(self, application, **filters):
         """
@@ -146,40 +191,29 @@ class APIBase:
         """
         args = {'application':application}
         args.update(filters)
-        ret_err, ret_val = self._call_api('projects', args=args)
-        if ret_err:
-            return ret_err, ret_val
-        return 0, ret_val['projects']
+        result = self._call_api('projects', args=args)
+        return result['projects']
 
     def get_tasks(self, project):
-        """ Gets all tasks in parameter project"""
-        ret_err, ret_val = self._call_api('tasks', args={'project':project})
-        if ret_err:
-            return ret_err, ret_val
-        return 0, ret_val['tasks']
+        result = self._call_api('tasks', args={'project':project})
+        return result['tasks']
+
 
     def get_task(self, task):
         """ Gets an individual task with parameter task id"""
-        ret_err, ret_val = self._call_api('tasks/%s' % task)
-        if ret_err:
-            return ret_err, ret_val
-        return 0, ret_val
+        result = self._call_api('tasks/%s' % task)
+        return result
 
     def add_note(self, task, text, filename, status):
-        """ Adds a note to task with given text, filename and status """
         note = {'text':text, 'filename':filename, 'status':status, 'task':task}
-        ret_err, ret_val = self._call_api('notes', URLRequest.POST, args=note)
-        if ret_err:
-            return ret_err, ret_val
-        return 0, ret_val
+        result = self._call_api('notes', URLRequest.POST, args=note)
+        return result
 
     def update_task_status(self, task, status):
         """
         Update the task status. The task ID should include the project number
         """
         #TODO: regular expression on task and status for validation
-        ret_err, ret_val = self._call_api('tasks/%s' % task, URLRequest.PUT,
+        result = self._call_api('tasks/%s' % task, URLRequest.PUT,
             args={'status':status})
-        if ret_err:
-            return ret_err, ret_val
-        return 0, ret_val['status']
+        return result['status']

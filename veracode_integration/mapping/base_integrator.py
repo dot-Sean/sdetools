@@ -1,13 +1,14 @@
 #!/usr/bin/python
 import sys, os
-
-sys.path.append("/home/geoff/sde-lint/")
-
-from sdelib.conf_mgr import config
-from sdelib.interactive_plugin import PlugInExperience
 import csv
 import re
 from datetime import datetime
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+from sdelib.conf_mgr import config
+from sdelib.apiclient import APIError
+from sdelib.interactive_plugin import PlugInExperience
 
 class BaseIntegrator:
     def __init__(self, config):
@@ -83,40 +84,42 @@ class BaseIntegrator:
             msg = "%s/%s/%s (cweid=%s,source=%s)" % (self.config['application'], self.config['project'], task_id, finding['cweid'], file_name)
 
             if commit:
-                ret_err,ret_val = self.plugin.add_note(task_id, description, file_name, "TODO")
-                if ret_err:
-                    self.log_message(severityError, "Could not add TODO note to %s" % (msg))
-                    stats_errors += 1
-                else:
+                try:
+                    self.plugin.add_note(task_id, description, file_name, "TODO")
                     self.log_message(severityMsg, "TODO note added to %s" % (msg))
                     stats_subtasks_added += 1
+                except APIError, e:
+                    self.log_message(severityError, "Could not add TODO note to %s - Reason: %s" % (msg, str(e)))
+                    stats_errors += 1
             else:
                 self.log_message(severityTestRun, "TODO note added to %s" % (msg))
                 stats_subtasks_added += 1
 
-        ret_err, ret_val = self.plugin.get_task_list()
-        if ret_err:
-            self.log_message(severityError,"Could not get task list for %s" % (self.config['project']))
+        task_list = []
+        try:
+            task_list = self.plugin.get_task_list()
+        except APIError, e:
+            self.log_message(severityError,"Could not get task list for %s - Reason: %s" % (self.config['project'], str(e)))
             stats_errors += 1
 
-        for task in ret_val:
-           task_id = re.search('(\d+)-[^\d]+(\d+)', task['id']).group(2)
+        for task in task_list:
+            task_id = re.search('(\d+)-[^\d]+(\d+)', task['id']).group(2)
 
-           msg = "%s/%s/%s" % (self.config['application'], self.config['project'], task_id)
-           description = "Analysis: %s\n\nProcess completed" % (self.report_id)
-           file_name = ''
+            msg = "%s/%s/%s" % (self.config['application'], self.config['project'], task_id)
+            description = "Analysis: %s\n\nProcess completed" % (self.report_id)
+            file_name = ''
 
-           if commit:
-               ret_err,ret_val = self.plugin.add_note("T%s" % (task_id), description, file_name, "DONE")
-               if ret_err:
-                   self.log_message(severityError, "Could not mark %s DONE (%s %s)" % (msg, ret_err, ret_val))
-                   stats_errors += 1
-               else:
-                   self.log_message(severityMsg, "Marked %s task as DONE" % (msg))
-                   stats_tasks_affected += 1
-           else:
-               self.log_message(severityTestRun, "Marked %s as DONE" % (msg))
-               stats_tasks_affected += 1
+            if commit:
+                try:
+                    self.plugin.add_note("T%s" % (task_id), description, file_name, "DONE")
+                    self.log_message(severityMsg, "Marked %s task as DONE" % (msg))
+                    stats_tasks_affected += 1
+                except APIError, e:
+                    self.log_message(severityError, "Could not mark %s DONE - Reason: %s" % (msg, str(e)))
+                    stats_errors += 1
+            else:
+                self.log_message(severityTestRun, "Marked %s as DONE" % (msg))
+                stats_tasks_affected += 1
 
         self.log_message(severityMsg, "---------------------------------------------------------")
         self.log_message(severityMsg, "%d subtasks created from %d flaws."%(stats_subtasks_added, len(self.get_findings())))
