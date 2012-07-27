@@ -33,7 +33,10 @@ def main(argv):
     if not ret:
         sys.exit(1)
 
-    load()
+    try:
+        load()
+    except Error, e:
+        show_error(str(e))
 
 if __name__ == "__main__":
     main(sys.argv)
