@@ -1,9 +1,4 @@
-#!/usr/bin/python
-#
-# Version 0.01
-# Rohit Sethi
 # Copyright SDElements Inc
-#
 # Extensible two way # integration with JIRA
 
 import sys, os
@@ -12,7 +7,8 @@ sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
 from sdelib.conf_mgr import config
 from sdelib.interactive_plugin import PlugInExperience
 from sdelib.apiclient import APIBase, URLRequest
-from alm_integration.alm_plugin_base import AlmTask, AlmConnector, AlmException
+from alm_integration.alm_plugin_base import AlmTask, AlmConnector
+from alm_integration.alm_plugin_base import AlmException, add_alm_config_options
 from sdelib.conf_mgr import Config
 from datetime import datetime
 import logging
@@ -180,8 +176,8 @@ class JIRAConnector(AlmConnector):
 
          if ((self.sde_plugin.config['alm_standard_workflow']=='True') and
              ((task['status']=='DONE') or task['status']=='NA')):
-             logging.debug('Attempting to set a task status to %s' %
-                          task['status'])
+             #logging.debug('Attempting to set a task status to %s' %
+             #             task['status'])
              trans_err,
              trans_result = self.alm_plugin._call_api('issue' +
                                                       '/%s/transitions' %
@@ -194,8 +190,6 @@ class JIRAConnector(AlmConnector):
                                                       
                                             method=URLRequest.POST)
              
-             logging.debug('setting err %s and result %s' % (trans_err,
-                                                            trans_result))
          
          if (trans_err):
              logging.info("Unable to change status of JIRA task: %s, %s" % (
@@ -238,40 +232,21 @@ class JIRAConnector(AlmConnector):
                                                  'jira_reopen_transition']}},
                                                      
                                             method=URLRequest.POST)
-        logging.debug('setting err %s and result %s' % (trans_err,
-                                                            trans_result))
+        #logging.debug('setting err %s and result %s' % (trans_err,
+        #                                                    trans_result))
         if (trans_err):
             logging.info("Unable to set task status: %s, %s" % (trans_err,
                                                                 trans_val))
-            
-             
-          
-          
+                      
 
     def alm_disconnect(self):
           pass
 
 def add_jira_config_options(config):
     """ Adds JIRA specific config options to the config file"""
-    config.add_custom_option('alm_phases',
-                             'Phases of the ALM',
-                             '-alm_phases')
-    config.add_custom_option('alm_method',
-                             'HTTP or HTTPS for ALM server',
-                             '-alm_method',
-                             default='https')
-    config.add_custom_option('alm_server',
-                             'Server of the ALM',
-                             '-alm_server')
-    config.add_custom_option('alm_id',
-                             'Username for ALM Tool',
-                             '-alm_id')
-    config.add_custom_option('alm_password',
-                             'Password for ALM Tool',
-                             '-alm_password')
-    config.add_custom_option('alm_project',
-                             'Project in ALM Tool',
-                             '-alm_project')
+
+    add_alm_config_options(config)
+
     config.add_custom_option('alm_standard_workflow',
                              'Standard workflow in JIRA?',
                              '-alm_standard_workflow')
@@ -284,6 +259,4 @@ def add_jira_config_options(config):
     config.add_custom_option('jira_reopen_transition',
                              'Re-open transiiton in JIRA',
                              '-jira_reopen_transition')
-    config.add_custom_option('conflict_policy',
-                             'Conflict policy to use',
-                             '-conflict_policy')
+    

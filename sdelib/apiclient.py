@@ -39,6 +39,16 @@ class APIBase:
         self.opener = urllib2.build_opener(handler)
 
     def _call_api(self, target, method=URLRequest.GET, args=None):
+        """
+        Internal method used to call a RESTFul API
+
+        Keywords:
+        target - the path of the API call (without host name)
+        method -  HTTP Verb, specified by the URLRequest class. Default
+                  is GET
+        args - JSON Data for arguments
+
+        """
         req_url = '%s/%s' % (self.base_uri, target)
         if not args:
             args = {}
@@ -99,6 +109,10 @@ class APIBase:
         return 0, result
 
     def start_session(self):
+        """ 
+        Starts a session with configured email & password in SD Elements
+        """
+        
         args = {
             'username': self.config['email'],
             'password': self.config['password']}
@@ -113,6 +127,8 @@ class APIBase:
 
     def get_applications(self, **filters):
         """
+        Gets all applications accessible to user 
+
         Available Filters:
             name -> application name to be searched for
         """
@@ -123,6 +139,8 @@ class APIBase:
     
     def get_projects(self, application, **filters):
         """
+        Gets all projects for parameter application
+        
         Available Filters:
             name -> project name to be searched for
         """
@@ -134,17 +152,26 @@ class APIBase:
         return 0, ret_val['projects']
 
     def get_tasks(self, project):
+        """ Gets all tasks in parameter project"""
         ret_err, ret_val = self._call_api('tasks', args={'project':project})
         if ret_err:
             return ret_err, ret_val
         return 0, ret_val['tasks']
 
+    def get_task(self, task):
+        """ Gets an individual task with parameter task id"""
+        ret_err, ret_val = self._call_api('tasks/%s' % task)
+        if ret_err:
+            return ret_err, ret_val
+        return 0, ret_val
+
     def add_note(self, task, text, filename, status):
-         note = {'text':text, 'filename':filename, 'status':status, 'task':task}
-         ret_err, ret_val = self._call_api('notes', URLRequest.POST, args=note)
-         if ret_err:
-             return ret_err, ret_val
-         return 0, ret_val
+        """ Adds a note to task with given text, filename and status """
+        note = {'text':text, 'filename':filename, 'status':status, 'task':task}
+        ret_err, ret_val = self._call_api('notes', URLRequest.POST, args=note)
+        if ret_err:
+            return ret_err, ret_val
+        return 0, ret_val
 
     def update_task_status(self, task, status):
         """

@@ -1,7 +1,3 @@
-#!/usr/bin/python
-#
-# Version 0.01
-# Rohit Sethi
 # Copyright SDElements Inc
 #
 # Plugin for two way integration with JIRA
@@ -12,7 +8,8 @@ sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
 from sdelib.conf_mgr import config
 from sdelib.interactive_plugin import PlugInExperience
 
-from jira_plugin import JIRATask, JIRAConnector, JIRAConfig, JIRABase, add_jira_config_options
+from jira_plugin import JIRATask, JIRAConnector
+from jira_plugin import JIRABase, add_jira_config_options
 
 import logging
 #import ConfigParser

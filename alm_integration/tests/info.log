@@ -1,0 +1,686 @@
+2012-07-27 10:10:19,242,INFO:---------
+2012-07-27 10:10:19,243,INFO:---------
+2012-07-27 10:10:19,243,INFO:AlmConnector initialized
+2012-07-27 10:10:20,720,INFO:---------
+2012-07-27 10:10:20,720,INFO:---------
+2012-07-27 10:10:20,720,INFO:AlmConnector initialized
+2012-07-27 10:10:20,730,INFO:---------
+2012-07-27 10:10:20,730,INFO:---------
+2012-07-27 10:10:20,730,INFO:AlmConnector initialized
+2012-07-27 10:10:25,790,INFO:---------
+2012-07-27 10:10:25,790,INFO:---------
+2012-07-27 10:10:25,792,INFO:AlmConnector initialized
+2012-07-27 10:10:25,802,INFO:---------
+2012-07-27 10:10:25,802,INFO:---------
+2012-07-27 10:10:25,802,INFO:AlmConnector initialized
+2012-07-27 10:10:30,403,INFO:Retrieved all tasks from SDE
+2012-07-27 10:10:31,017,DEBUG:Sucessfuly set note for task 558-T38
+2012-07-27 10:10:31,019,INFO:Added task 558-T38 to ALM
+2012-07-27 10:10:31,575,DEBUG:Sucessfuly set note for task 558-T101
+2012-07-27 10:10:31,575,INFO:Added task 558-T101 to ALM
+2012-07-27 10:10:32,130,DEBUG:Sucessfuly set note for task 558-T146
+2012-07-27 10:10:32,130,INFO:Added task 558-T146 to ALM
+2012-07-27 10:10:32,645,DEBUG:Sucessfuly set note for task 558-T149
+2012-07-27 10:10:32,645,INFO:Added task 558-T149 to ALM
+2012-07-27 10:10:33,164,DEBUG:Sucessfuly set note for task 558-T172
+2012-07-27 10:10:33,164,INFO:Added task 558-T172 to ALM
+2012-07-27 10:10:33,663,DEBUG:Sucessfuly set note for task 558-T173
+2012-07-27 10:10:33,664,INFO:Added task 558-T173 to ALM
+2012-07-27 10:10:34,174,DEBUG:Sucessfuly set note for task 558-T81
+2012-07-27 10:10:34,174,INFO:Added task 558-T81 to ALM
+2012-07-27 10:10:34,694,DEBUG:Sucessfuly set note for task 558-T148
+2012-07-27 10:10:34,694,INFO:Added task 558-T148 to ALM
+2012-07-27 10:10:35,214,DEBUG:Sucessfuly set note for task 558-T165
+2012-07-27 10:10:35,214,INFO:Added task 558-T165 to ALM
+2012-07-27 10:10:35,795,DEBUG:Sucessfuly set note for task 558-T72
+2012-07-27 10:10:35,796,INFO:Added task 558-T72 to ALM
+2012-07-27 10:10:36,308,DEBUG:Sucessfuly set note for task 558-T85
+2012-07-27 10:10:36,308,INFO:Added task 558-T85 to ALM
+2012-07-27 10:10:36,872,DEBUG:Sucessfuly set note for task 558-T123
+2012-07-27 10:10:36,874,INFO:Added task 558-T123 to ALM
+2012-07-27 10:10:37,387,DEBUG:Sucessfuly set note for task 558-T145
+2012-07-27 10:10:37,388,INFO:Added task 558-T145 to ALM
+2012-07-27 10:10:37,926,DEBUG:Sucessfuly set note for task 558-T179
+2012-07-27 10:10:37,926,INFO:Added task 558-T179 to ALM
+2012-07-27 10:10:38,448,DEBUG:Sucessfuly set note for task 558-T80
+2012-07-27 10:10:38,448,INFO:Added task 558-T80 to ALM
+2012-07-27 10:10:38,944,DEBUG:Sucessfuly set note for task 558-T93
+2012-07-27 10:10:38,944,INFO:Added task 558-T93 to ALM
+2012-07-27 10:10:39,463,DEBUG:Sucessfuly set note for task 558-T143
+2012-07-27 10:10:39,464,INFO:Added task 558-T143 to ALM
+2012-07-27 10:10:39,984,DEBUG:Sucessfuly set note for task 558-T157
+2012-07-27 10:10:39,986,INFO:Added task 558-T157 to ALM
+2012-07-27 10:10:40,536,DEBUG:Sucessfuly set note for task 558-T164
+2012-07-27 10:10:40,585,INFO:Added task 558-T164 to ALM
+2012-07-27 10:10:41,105,DEBUG:Sucessfuly set note for task 558-T175
+2012-07-27 10:10:41,107,INFO:Added task 558-T175 to ALM
+2012-07-27 10:10:41,625,DEBUG:Sucessfuly set note for task 558-T178
+2012-07-27 10:10:41,625,INFO:Added task 558-T178 to ALM
+2012-07-27 10:10:42,135,DEBUG:Sucessfuly set note for task 558-T61
+2012-07-27 10:10:42,135,INFO:Added task 558-T61 to ALM
+2012-07-27 10:10:42,642,DEBUG:Sucessfuly set note for task 558-T82
+2012-07-27 10:10:42,644,INFO:Added task 558-T82 to ALM
+2012-07-27 10:10:43,155,DEBUG:Sucessfuly set note for task 558-T156
+2012-07-27 10:10:43,155,INFO:Added task 558-T156 to ALM
+2012-07-27 10:10:43,674,DEBUG:Sucessfuly set note for task 558-T177
+2012-07-27 10:10:43,674,INFO:Added task 558-T177 to ALM
+2012-07-27 10:10:44,173,DEBUG:Sucessfuly set note for task 558-T49
+2012-07-27 10:10:44,173,INFO:Added task 558-T49 to ALM
+2012-07-27 10:10:44,684,DEBUG:Sucessfuly set note for task 558-T150
+2012-07-27 10:10:44,686,INFO:Added task 558-T150 to ALM
+2012-07-27 10:10:45,206,DEBUG:Sucessfuly set note for task 558-T162
+2012-07-27 10:10:45,206,INFO:Added task 558-T162 to ALM
+2012-07-27 10:10:45,734,DEBUG:Sucessfuly set note for task 558-T186
+2012-07-27 10:10:45,734,INFO:Added task 558-T186 to ALM
+2012-07-27 10:10:46,255,DEBUG:Sucessfuly set note for task 558-T4
+2012-07-27 10:10:46,255,INFO:Added task 558-T4 to ALM
+2012-07-27 10:10:46,776,DEBUG:Sucessfuly set note for task 558-T152
+2012-07-27 10:10:46,776,INFO:Added task 558-T152 to ALM
+2012-07-27 10:10:47,316,DEBUG:Sucessfuly set note for task 558-T174
+2012-07-27 10:10:47,316,INFO:Added task 558-T174 to ALM
+2012-07-27 10:10:47,845,DEBUG:Sucessfuly set note for task 558-T12
+2012-07-27 10:10:47,845,INFO:Added task 558-T12 to ALM
+2012-07-27 10:10:48,354,DEBUG:Sucessfuly set note for task 558-T153
+2012-07-27 10:10:48,355,INFO:Added task 558-T153 to ALM
+2012-07-27 10:10:48,355,INFO:Synchronization complete
+2012-07-27 10:14:11,362,INFO:---------
+2012-07-27 10:14:11,364,INFO:---------
+2012-07-27 10:14:11,364,INFO:AlmConnector initialized
+2012-07-27 10:14:12,706,INFO:---------
+2012-07-27 10:14:12,706,INFO:---------
+2012-07-27 10:14:12,707,INFO:AlmConnector initialized
+2012-07-27 10:14:12,714,INFO:---------
+2012-07-27 10:14:12,714,INFO:---------
+2012-07-27 10:14:12,714,INFO:AlmConnector initialized
+2012-07-27 10:14:17,657,INFO:---------
+2012-07-27 10:14:17,657,INFO:---------
+2012-07-27 10:14:17,657,INFO:AlmConnector initialized
+2012-07-27 10:14:17,665,INFO:---------
+2012-07-27 10:14:17,665,INFO:---------
+2012-07-27 10:14:17,665,INFO:AlmConnector initialized
+2012-07-27 10:14:22,302,INFO:Retrieved all tasks from SDE
+2012-07-27 10:14:22,305,INFO:Synchronization complete
+2012-07-27 10:15:53,069,INFO:---------
+2012-07-27 10:15:53,069,INFO:---------
+2012-07-27 10:15:53,069,INFO:AlmConnector initialized
+2012-07-27 10:15:54,395,INFO:---------
+2012-07-27 10:15:54,395,INFO:---------
+2012-07-27 10:15:54,395,INFO:AlmConnector initialized
+2012-07-27 10:15:59,234,INFO:---------
+2012-07-27 10:15:59,234,INFO:---------
+2012-07-27 10:15:59,234,INFO:AlmConnector initialized
+2012-07-27 10:16:04,081,INFO:---------
+2012-07-27 10:16:04,081,INFO:---------
+2012-07-27 10:16:04,081,INFO:AlmConnector initialized
+2012-07-27 10:16:08,937,INFO:---------
+2012-07-27 10:16:08,937,INFO:---------
+2012-07-27 10:16:08,937,INFO:AlmConnector initialized
+2012-07-27 10:16:13,698,INFO:Retrieved all tasks from SDE
+2012-07-27 10:16:13,765,INFO:Synchronization complete
+2012-07-27 10:16:59,206,INFO:---------
+2012-07-27 10:16:59,206,INFO:---------
+2012-07-27 10:16:59,206,INFO:AlmConnector initialized
+2012-07-27 10:17:00,558,INFO:---------
+2012-07-27 10:17:00,559,INFO:---------
+2012-07-27 10:17:00,559,INFO:AlmConnector initialized
+2012-07-27 10:17:05,529,INFO:---------
+2012-07-27 10:17:05,529,INFO:---------
+2012-07-27 10:17:05,529,INFO:AlmConnector initialized
+2012-07-27 10:17:10,384,INFO:---------
+2012-07-27 10:17:10,384,INFO:---------
+2012-07-27 10:17:10,385,INFO:AlmConnector initialized
+2012-07-27 10:17:15,322,INFO:---------
+2012-07-27 10:17:15,322,INFO:---------
+2012-07-27 10:17:15,322,INFO:AlmConnector initialized
+2012-07-27 10:17:19,970,INFO:Retrieved all tasks from SDE
+2012-07-27 10:17:19,974,INFO:Synchronization complete
+2012-07-27 10:17:49,220,INFO:---------
+2012-07-27 10:17:49,220,INFO:---------
+2012-07-27 10:17:49,220,INFO:AlmConnector initialized
+2012-07-27 10:17:50,569,INFO:---------
+2012-07-27 10:17:50,585,INFO:---------
+2012-07-27 10:17:50,585,INFO:AlmConnector initialized
+2012-07-27 10:17:55,582,INFO:---------
+2012-07-27 10:17:55,582,INFO:---------
+2012-07-27 10:17:55,582,INFO:AlmConnector initialized
+2012-07-27 10:18:00,499,INFO:---------
+2012-07-27 10:18:00,500,INFO:---------
+2012-07-27 10:18:00,500,INFO:AlmConnector initialized
+2012-07-27 10:18:05,438,INFO:---------
+2012-07-27 10:18:05,438,INFO:---------
+2012-07-27 10:18:05,438,INFO:AlmConnector initialized
+2012-07-27 10:18:10,032,INFO:Retrieved all tasks from SDE
+2012-07-27 10:18:10,035,INFO:Synchronization complete
+2012-07-27 10:18:49,875,INFO:---------
+2012-07-27 10:18:49,875,INFO:---------
+2012-07-27 10:18:49,875,INFO:AlmConnector initialized
+2012-07-27 10:18:51,289,INFO:---------
+2012-07-27 10:18:51,289,INFO:---------
+2012-07-27 10:18:51,289,INFO:AlmConnector initialized
+2012-07-27 10:18:56,101,INFO:---------
+2012-07-27 10:18:56,101,INFO:---------
+2012-07-27 10:18:56,101,INFO:AlmConnector initialized
+2012-07-27 10:19:01,040,INFO:---------
+2012-07-27 10:19:01,040,INFO:---------
+2012-07-27 10:19:01,040,INFO:AlmConnector initialized
+2012-07-27 10:19:05,799,INFO:---------
+2012-07-27 10:19:05,799,INFO:---------
+2012-07-27 10:19:05,801,INFO:AlmConnector initialized
+2012-07-27 10:19:10,414,INFO:Retrieved all tasks from SDE
+2012-07-27 10:19:10,418,INFO:Synchronization complete
+2012-07-27 10:20:39,308,INFO:---------
+2012-07-27 10:20:39,308,INFO:---------
+2012-07-27 10:20:39,308,INFO:AlmConnector initialized
+2012-07-27 10:20:40,667,INFO:---------
+2012-07-27 10:20:40,667,INFO:---------
+2012-07-27 10:20:40,667,INFO:AlmConnector initialized
+2012-07-27 10:20:45,292,INFO:---------
+2012-07-27 10:20:45,292,INFO:---------
+2012-07-27 10:20:45,292,INFO:AlmConnector initialized
+2012-07-27 10:20:50,233,INFO:---------
+2012-07-27 10:20:50,233,INFO:---------
+2012-07-27 10:20:50,233,INFO:AlmConnector initialized
+2012-07-27 10:21:11,809,INFO:---------
+2012-07-27 10:21:11,809,INFO:---------
+2012-07-27 10:21:11,809,INFO:AlmConnector initialized
+2012-07-27 10:21:13,174,INFO:---------
+2012-07-27 10:21:13,174,INFO:---------
+2012-07-27 10:21:13,174,INFO:AlmConnector initialized
+2012-07-27 10:21:18,078,INFO:---------
+2012-07-27 10:21:18,078,INFO:---------
+2012-07-27 10:21:18,078,INFO:AlmConnector initialized
+2012-07-27 10:21:22,937,INFO:---------
+2012-07-27 10:21:22,937,INFO:---------
+2012-07-27 10:21:22,937,INFO:AlmConnector initialized
+2012-07-27 10:21:27,832,INFO:Attempting to update task 558-T38 to NA
+2012-07-27 10:21:29,134,INFO:---------
+2012-07-27 10:21:29,135,INFO:---------
+2012-07-27 10:21:29,135,INFO:AlmConnector initialized
+2012-07-27 10:21:33,644,INFO:Retrieved all tasks from SDE
+2012-07-27 10:23:17,145,INFO:---------
+2012-07-27 10:23:17,147,INFO:---------
+2012-07-27 10:23:17,147,INFO:AlmConnector initialized
+2012-07-27 10:23:18,533,INFO:---------
+2012-07-27 10:23:18,535,INFO:---------
+2012-07-27 10:23:18,535,INFO:AlmConnector initialized
+2012-07-27 10:23:23,414,INFO:---------
+2012-07-27 10:23:23,414,INFO:---------
+2012-07-27 10:23:23,414,INFO:AlmConnector initialized
+2012-07-27 10:23:28,467,INFO:---------
+2012-07-27 10:23:28,467,INFO:---------
+2012-07-27 10:23:28,467,INFO:AlmConnector initialized
+2012-07-27 10:23:33,394,INFO:Attempting to update task 558-T38 to Done
+2012-07-27 10:23:34,312,ERROR:Unable to set task because of 400, Unknown Error
+2012-07-27 10:23:34,325,INFO:---------
+2012-07-27 10:23:34,325,INFO:---------
+2012-07-27 10:23:34,325,INFO:AlmConnector initialized
+2012-07-27 10:23:38,963,INFO:Retrieved all tasks from SDE
+2012-07-27 10:23:38,964,INFO:Attempting to update task 558-T38 to TODO
+2012-07-27 10:23:39,523,INFO:Status for task 558-T38 successfully set in SD Elements
+2012-07-27 10:23:40,036,DEBUG:Sucessfuly set note for task 558-T38
+2012-07-27 10:23:40,036,INFO:Updated status of task  558-T38 in alm
+2012-07-27 10:23:40,038,INFO:Synchronization complete
+2012-07-27 10:29:12,055,INFO:---------
+2012-07-27 10:29:12,055,INFO:---------
+2012-07-27 10:29:12,055,INFO:AlmConnector initialized
+2012-07-27 10:29:13,456,INFO:---------
+2012-07-27 10:29:13,456,INFO:---------
+2012-07-27 10:29:13,456,INFO:AlmConnector initialized
+2012-07-27 10:29:18,446,INFO:---------
+2012-07-27 10:29:18,447,INFO:---------
+2012-07-27 10:29:18,447,INFO:AlmConnector initialized
+2012-07-27 10:29:23,385,INFO:---------
+2012-07-27 10:29:23,385,INFO:---------
+2012-07-27 10:29:23,385,INFO:AlmConnector initialized
+2012-07-27 10:29:28,335,INFO:Attempting to update task 558-T38 to NA
+2012-07-27 10:29:29,355,INFO:Status for task 558-T38 successfully set in SD Elements
+2012-07-27 10:29:30,269,DEBUG:Sucessfuly set note for task 558-T38
+2012-07-27 10:29:30,280,INFO:---------
+2012-07-27 10:29:30,280,INFO:---------
+2012-07-27 10:29:30,282,INFO:AlmConnector initialized
+2012-07-27 10:29:34,947,INFO:Retrieved all tasks from SDE
+2012-07-27 10:29:34,950,INFO:Attempting to update task 558-T38 to TODO
+2012-07-27 10:29:35,536,INFO:Status for task 558-T38 successfully set in SD Elements
+2012-07-27 10:29:36,055,DEBUG:Sucessfuly set note for task 558-T38
+2012-07-27 10:29:36,055,INFO:Updated status of task  558-T38 in alm
+2012-07-27 10:29:36,058,INFO:Synchronization complete
+2012-07-27 10:30:21,562,INFO:---------
+2012-07-27 10:30:21,562,INFO:---------
+2012-07-27 10:30:21,562,INFO:AlmConnector initialized
+2012-07-27 10:30:22,911,INFO:---------
+2012-07-27 10:30:22,913,INFO:---------
+2012-07-27 10:30:22,913,INFO:AlmConnector initialized
+2012-07-27 10:30:27,901,INFO:---------
+2012-07-27 10:30:27,901,INFO:---------
+2012-07-27 10:30:27,901,INFO:AlmConnector initialized
+2012-07-27 10:30:32,644,INFO:---------
+2012-07-27 10:30:32,644,INFO:---------
+2012-07-27 10:30:32,644,INFO:AlmConnector initialized
+2012-07-27 10:30:37,605,INFO:Attempting to update task 558-T38 to NA
+2012-07-27 10:30:38,625,INFO:Status for task 558-T38 successfully set in SD Elements
+2012-07-27 10:30:39,540,DEBUG:Sucessfuly set note for task 558-T38
+2012-07-27 10:30:40,499,INFO:Attempting to update task 558-T101 to NA
+2012-07-27 10:30:41,476,INFO:Status for task 558-T101 successfully set in SD Elements
+2012-07-27 10:30:42,397,DEBUG:Sucessfuly set note for task 558-T101
+2012-07-27 10:30:43,382,INFO:Attempting to update task 558-T146 to NA
+2012-07-27 10:30:44,447,INFO:Status for task 558-T146 successfully set in SD Elements
+2012-07-27 10:30:45,359,DEBUG:Sucessfuly set note for task 558-T146
+2012-07-27 10:30:46,332,INFO:Attempting to update task 558-T149 to Done
+2012-07-27 10:30:47,250,ERROR:Unable to set task because of 400, Unknown Error
+2012-07-27 10:30:47,263,INFO:---------
+2012-07-27 10:30:47,263,INFO:---------
+2012-07-27 10:30:47,263,INFO:AlmConnector initialized
+2012-07-27 10:30:51,864,INFO:Retrieved all tasks from SDE
+2012-07-27 10:30:51,865,INFO:Attempting to update task 558-T38 to TODO
+2012-07-27 10:30:52,443,INFO:Status for task 558-T38 successfully set in SD Elements
+2012-07-27 10:30:52,944,DEBUG:Sucessfuly set note for task 558-T38
+2012-07-27 10:30:52,944,INFO:Updated status of task  558-T38 in alm
+2012-07-27 10:30:52,944,INFO:Attempting to update task 558-T101 to TODO
+2012-07-27 10:30:53,506,INFO:Status for task 558-T101 successfully set in SD Elements
+2012-07-27 10:30:54,032,DEBUG:Sucessfuly set note for task 558-T101
+2012-07-27 10:30:54,032,INFO:Updated status of task  558-T101 in alm
+2012-07-27 10:30:54,032,INFO:Attempting to update task 558-T146 to TODO
+2012-07-27 10:30:54,621,INFO:Status for task 558-T146 successfully set in SD Elements
+2012-07-27 10:30:55,132,DEBUG:Sucessfuly set note for task 558-T146
+2012-07-27 10:30:55,134,INFO:Updated status of task  558-T146 in alm
+2012-07-27 10:30:55,135,INFO:Synchronization complete
+2012-07-27 10:34:35,515,INFO:---------
+2012-07-27 10:34:35,515,INFO:---------
+2012-07-27 10:34:35,515,INFO:AlmConnector initialized
+2012-07-27 10:34:36,891,INFO:---------
+2012-07-27 10:34:36,891,INFO:---------
+2012-07-27 10:34:36,891,INFO:AlmConnector initialized
+2012-07-27 10:34:41,681,INFO:---------
+2012-07-27 10:34:41,681,INFO:---------
+2012-07-27 10:34:41,683,INFO:AlmConnector initialized
+2012-07-27 10:34:46,595,INFO:---------
+2012-07-27 10:34:46,596,INFO:---------
+2012-07-27 10:34:46,596,INFO:AlmConnector initialized
+2012-07-27 10:34:51,520,INFO:---------
+2012-07-27 10:34:51,520,INFO:---------
+2012-07-27 10:34:51,522,INFO:AlmConnector initialized
+2012-07-27 10:34:56,132,INFO:Retrieved all tasks from SDE
+2012-07-27 10:34:56,137,INFO:Synchronization complete
+2012-07-27 10:36:04,049,INFO:---------
+2012-07-27 10:36:04,049,INFO:---------
+2012-07-27 10:36:04,049,INFO:AlmConnector initialized
+2012-07-27 10:36:05,401,INFO:---------
+2012-07-27 10:36:05,401,INFO:---------
+2012-07-27 10:36:05,401,INFO:AlmConnector initialized
+2012-07-27 10:36:10,471,INFO:---------
+2012-07-27 10:36:10,471,INFO:---------
+2012-07-27 10:36:10,471,INFO:AlmConnector initialized
+2012-07-27 10:36:15,361,INFO:---------
+2012-07-27 10:36:15,361,INFO:---------
+2012-07-27 10:36:15,361,INFO:AlmConnector initialized
+2012-07-27 10:36:20,197,INFO:---------
+2012-07-27 10:36:20,197,INFO:---------
+2012-07-27 10:36:20,197,INFO:AlmConnector initialized
+2012-07-27 10:36:24,650,INFO:Retrieved all tasks from SDE
+2012-07-27 10:36:24,653,INFO:Synchronization complete
+2012-07-27 10:37:01,203,INFO:---------
+2012-07-27 10:37:01,204,INFO:---------
+2012-07-27 10:37:01,204,INFO:AlmConnector initialized
+2012-07-27 10:37:02,569,INFO:---------
+2012-07-27 10:37:02,588,INFO:---------
+2012-07-27 10:37:02,588,INFO:AlmConnector initialized
+2012-07-27 10:37:07,443,INFO:---------
+2012-07-27 10:37:07,443,INFO:---------
+2012-07-27 10:37:07,443,INFO:AlmConnector initialized
+2012-07-27 10:37:12,368,INFO:---------
+2012-07-27 10:37:12,369,INFO:---------
+2012-07-27 10:37:12,369,INFO:AlmConnector initialized
+2012-07-27 10:37:17,364,INFO:---------
+2012-07-27 10:37:17,364,INFO:---------
+2012-07-27 10:37:17,365,INFO:AlmConnector initialized
+2012-07-27 10:37:22,029,INFO:Retrieved all tasks from SDE
+2012-07-27 10:37:22,032,INFO:Synchronization complete
+2012-07-27 10:38:33,075,INFO:---------
+2012-07-27 10:38:33,075,INFO:---------
+2012-07-27 10:38:33,075,INFO:AlmConnector initialized
+2012-07-27 10:38:34,503,INFO:---------
+2012-07-27 10:38:34,503,INFO:---------
+2012-07-27 10:38:34,503,INFO:AlmConnector initialized
+2012-07-27 10:38:39,477,INFO:---------
+2012-07-27 10:38:39,477,INFO:---------
+2012-07-27 10:38:39,477,INFO:AlmConnector initialized
+2012-07-27 10:38:44,371,INFO:---------
+2012-07-27 10:38:44,371,INFO:---------
+2012-07-27 10:38:44,371,INFO:AlmConnector initialized
+2012-07-27 10:38:49,147,INFO:Testing to change status from TODO to NA for 558-T38
+2012-07-27 10:38:49,148,INFO:Attempting to update task 558-T38 to NA
+2012-07-27 10:38:50,134,INFO:Status for task 558-T38 successfully set in SD Elements
+2012-07-27 10:38:51,058,DEBUG:Sucessfuly set note for task 558-T38
+2012-07-27 10:38:52,035,INFO:Testing to change status from TODO to NA for 558-T101
+2012-07-27 10:38:52,036,INFO:Attempting to update task 558-T101 to NA
+2012-07-27 10:38:52,993,INFO:Status for task 558-T101 successfully set in SD Elements
+2012-07-27 10:38:53,894,DEBUG:Sucessfuly set note for task 558-T101
+2012-07-27 10:38:54,844,INFO:Testing to change status from TODO to NA for 558-T146
+2012-07-27 10:38:54,844,INFO:Attempting to update task 558-T146 to NA
+2012-07-27 10:38:55,930,INFO:Status for task 558-T146 successfully set in SD Elements
+2012-07-27 10:38:56,825,DEBUG:Sucessfuly set note for task 558-T146
+2012-07-27 10:38:57,792,INFO:Testing to change status from DONE to Done for 558-T149
+2012-07-27 10:38:57,792,INFO:Attempting to update task 558-T149 to Done
+2012-07-27 10:38:58,684,ERROR:Unable to set task because of 400, Unknown Error
+2012-07-27 10:38:58,694,INFO:---------
+2012-07-27 10:38:58,694,INFO:---------
+2012-07-27 10:38:58,694,INFO:AlmConnector initialized
+2012-07-27 10:39:03,262,INFO:Retrieved all tasks from SDE
+2012-07-27 10:39:03,263,INFO:Attempting to update task 558-T38 to TODO
+2012-07-27 10:39:03,825,INFO:Status for task 558-T38 successfully set in SD Elements
+2012-07-27 10:39:04,322,DEBUG:Sucessfuly set note for task 558-T38
+2012-07-27 10:39:04,322,INFO:Updated status of task  558-T38 in alm
+2012-07-27 10:39:04,322,INFO:Attempting to update task 558-T101 to TODO
+2012-07-27 10:39:04,868,INFO:Status for task 558-T101 successfully set in SD Elements
+2012-07-27 10:39:05,381,DEBUG:Sucessfuly set note for task 558-T101
+2012-07-27 10:39:05,381,INFO:Updated status of task  558-T101 in alm
+2012-07-27 10:39:05,381,INFO:Attempting to update task 558-T146 to TODO
+2012-07-27 10:39:05,956,INFO:Status for task 558-T146 successfully set in SD Elements
+2012-07-27 10:39:06,480,DEBUG:Sucessfuly set note for task 558-T146
+2012-07-27 10:39:06,480,INFO:Updated status of task  558-T146 in alm
+2012-07-27 10:39:06,480,INFO:Synchronization complete
+2012-07-27 10:43:10,296,INFO:---------
+2012-07-27 10:43:10,296,INFO:---------
+2012-07-27 10:43:10,296,INFO:AlmConnector initialized
+2012-07-27 10:43:11,644,INFO:---------
+2012-07-27 10:43:11,645,INFO:---------
+2012-07-27 10:43:11,645,INFO:AlmConnector initialized
+2012-07-27 10:43:16,559,INFO:---------
+2012-07-27 10:43:16,561,INFO:---------
+2012-07-27 10:43:16,561,INFO:AlmConnector initialized
+2012-07-27 10:43:21,358,INFO:---------
+2012-07-27 10:43:21,358,INFO:---------
+2012-07-27 10:43:21,358,INFO:AlmConnector initialized
+2012-07-27 10:43:26,022,INFO:Testing to change status from TODO to NA for 558-T38
+2012-07-27 10:43:26,023,INFO:Attempting to update task 558-T38 to NA
+2012-07-27 10:43:27,019,INFO:Status for task 558-T38 successfully set in SD Elements
+2012-07-27 10:43:27,976,DEBUG:Sucessfuly set note for task 558-T38
+2012-07-27 10:43:28,948,INFO:Testing to change status from TODO to NA for 558-T101
+2012-07-27 10:43:28,950,INFO:Attempting to update task 558-T101 to NA
+2012-07-27 10:43:29,947,INFO:Status for task 558-T101 successfully set in SD Elements
+2012-07-27 10:43:30,875,DEBUG:Sucessfuly set note for task 558-T101
+2012-07-27 10:43:31,826,INFO:Testing to change status from TODO to NA for 558-T146
+2012-07-27 10:43:31,826,INFO:Attempting to update task 558-T146 to NA
+2012-07-27 10:43:32,836,INFO:Status for task 558-T146 successfully set in SD Elements
+2012-07-27 10:43:33,750,DEBUG:Sucessfuly set note for task 558-T146
+2012-07-27 10:43:34,826,INFO:Testing to change status from DONE to TODO for 558-T149
+2012-07-27 10:43:34,828,INFO:Attempting to update task 558-T149 to TODO
+2012-07-27 10:43:35,822,INFO:Status for task 558-T149 successfully set in SD Elements
+2012-07-27 10:43:36,733,DEBUG:Sucessfuly set note for task 558-T149
+2012-07-27 10:43:37,700,INFO:Testing to change status from DONE to TODO for 558-T172
+2012-07-27 10:43:37,700,INFO:Attempting to update task 558-T172 to TODO
+2012-07-27 10:43:38,661,INFO:Status for task 558-T172 successfully set in SD Elements
+2012-07-27 10:43:39,596,DEBUG:Sucessfuly set note for task 558-T172
+2012-07-27 10:43:40,576,INFO:Testing to change status from NA to DONE for 558-T173
+2012-07-27 10:43:40,576,INFO:Attempting to update task 558-T173 to DONE
+2012-07-27 10:43:41,542,INFO:Status for task 558-T173 successfully set in SD Elements
+2012-07-27 10:43:42,464,DEBUG:Sucessfuly set note for task 558-T173
+2012-07-27 10:43:43,421,INFO:Testing to change status from TODO to NA for 558-T81
+2012-07-27 10:43:43,421,INFO:Attempting to update task 558-T81 to NA
+2012-07-27 10:43:44,378,INFO:Status for task 558-T81 successfully set in SD Elements
+2012-07-27 10:43:45,322,DEBUG:Sucessfuly set note for task 558-T81
+2012-07-27 10:43:46,318,INFO:Testing to change status from TODO to NA for 558-T144
+2012-07-27 10:43:46,319,INFO:Attempting to update task 558-T144 to NA
+2012-07-27 10:43:47,285,INFO:Status for task 558-T144 successfully set in SD Elements
+2012-07-27 10:43:48,203,DEBUG:Sucessfuly set note for task 558-T144
+2012-07-27 10:43:49,186,INFO:Testing to change status from TODO to NA for 558-T148
+2012-07-27 10:43:49,187,INFO:Attempting to update task 558-T148 to NA
+2012-07-27 10:43:50,165,INFO:Status for task 558-T148 successfully set in SD Elements
+2012-07-27 10:43:51,092,DEBUG:Sucessfuly set note for task 558-T148
+2012-07-27 10:43:52,048,INFO:Testing to change status from TODO to NA for 558-T161
+2012-07-27 10:43:52,048,INFO:Attempting to update task 558-T161 to NA
+2012-07-27 10:43:53,032,INFO:Status for task 558-T161 successfully set in SD Elements
+2012-07-27 10:43:53,950,DEBUG:Sucessfuly set note for task 558-T161
+2012-07-27 10:43:54,895,INFO:Testing to change status from TODO to NA for 558-T165
+2012-07-27 10:43:54,895,INFO:Attempting to update task 558-T165 to NA
+2012-07-27 10:43:55,921,INFO:Status for task 558-T165 successfully set in SD Elements
+2012-07-27 10:43:56,874,DEBUG:Sucessfuly set note for task 558-T165
+2012-07-27 10:43:57,826,INFO:Testing to change status from TODO to NA for 558-T72
+2012-07-27 10:43:57,826,INFO:Attempting to update task 558-T72 to NA
+2012-07-27 10:43:58,834,INFO:Status for task 558-T72 successfully set in SD Elements
+2012-07-27 10:43:59,772,DEBUG:Sucessfuly set note for task 558-T72
+2012-07-27 10:44:00,743,INFO:Testing to change status from TODO to NA for 558-T85
+2012-07-27 10:44:00,743,INFO:Attempting to update task 558-T85 to NA
+2012-07-27 10:44:01,729,INFO:Status for task 558-T85 successfully set in SD Elements
+2012-07-27 10:44:02,664,DEBUG:Sucessfuly set note for task 558-T85
+2012-07-27 10:44:03,612,INFO:Testing to change status from TODO to NA for 558-T123
+2012-07-27 10:44:03,614,INFO:Attempting to update task 558-T123 to NA
+2012-07-27 10:44:04,573,INFO:Status for task 558-T123 successfully set in SD Elements
+2012-07-27 10:44:05,493,DEBUG:Sucessfuly set note for task 558-T123
+2012-07-27 10:44:06,459,INFO:Testing to change status from TODO to NA for 558-T145
+2012-07-27 10:44:06,460,INFO:Attempting to update task 558-T145 to NA
+2012-07-27 10:44:07,440,INFO:Status for task 558-T145 successfully set in SD Elements
+2012-07-27 10:44:08,184,DEBUG:Sucessfuly set note for task 558-T145
+2012-07-27 10:44:09,141,INFO:Testing to change status from TODO to NA for 558-T179
+2012-07-27 10:44:09,141,INFO:Attempting to update task 558-T179 to NA
+2012-07-27 10:44:10,119,INFO:Status for task 558-T179 successfully set in SD Elements
+2012-07-27 10:44:11,040,DEBUG:Sucessfuly set note for task 558-T179
+2012-07-27 10:44:12,007,INFO:Testing to change status from TODO to NA for 558-T14
+2012-07-27 10:44:12,009,INFO:Attempting to update task 558-T14 to NA
+2012-07-27 10:44:12,960,INFO:Status for task 558-T14 successfully set in SD Elements
+2012-07-27 10:44:13,894,DEBUG:Sucessfuly set note for task 558-T14
+2012-07-27 10:44:14,848,INFO:Testing to change status from TODO to NA for 558-T80
+2012-07-27 10:44:14,848,INFO:Attempting to update task 558-T80 to NA
+2012-07-27 10:44:15,821,INFO:Status for task 558-T80 successfully set in SD Elements
+2012-07-27 10:44:16,913,DEBUG:Sucessfuly set note for task 558-T80
+2012-07-27 10:44:17,877,INFO:Testing to change status from TODO to NA for 558-T93
+2012-07-27 10:44:17,878,INFO:Attempting to update task 558-T93 to NA
+2012-07-27 10:44:18,838,INFO:Status for task 558-T93 successfully set in SD Elements
+2012-07-27 10:44:19,767,DEBUG:Sucessfuly set note for task 558-T93
+2012-07-27 10:44:20,733,INFO:Testing to change status from TODO to NA for 558-T143
+2012-07-27 10:44:20,733,INFO:Attempting to update task 558-T143 to NA
+2012-07-27 10:44:21,710,INFO:Status for task 558-T143 successfully set in SD Elements
+2012-07-27 10:44:22,631,DEBUG:Sucessfuly set note for task 558-T143
+2012-07-27 10:44:23,589,INFO:Testing to change status from TODO to NA for 558-T157
+2012-07-27 10:44:23,589,INFO:Attempting to update task 558-T157 to NA
+2012-07-27 10:44:24,661,INFO:Status for task 558-T157 successfully set in SD Elements
+2012-07-27 10:44:25,572,DEBUG:Sucessfuly set note for task 558-T157
+2012-07-27 10:44:26,582,INFO:Testing to change status from TODO to NA for 558-T164
+2012-07-27 10:44:26,582,INFO:Attempting to update task 558-T164 to NA
+2012-07-27 10:44:27,585,INFO:Status for task 558-T164 successfully set in SD Elements
+2012-07-27 10:44:28,530,DEBUG:Sucessfuly set note for task 558-T164
+2012-07-27 10:44:29,517,INFO:Testing to change status from TODO to NA for 558-T175
+2012-07-27 10:44:29,519,INFO:Attempting to update task 558-T175 to NA
+2012-07-27 10:44:30,510,INFO:Status for task 558-T175 successfully set in SD Elements
+2012-07-27 10:44:31,441,DEBUG:Sucessfuly set note for task 558-T175
+2012-07-27 10:44:32,408,INFO:Testing to change status from TODO to NA for 558-T178
+2012-07-27 10:44:32,410,INFO:Attempting to update task 558-T178 to NA
+2012-07-27 10:44:33,391,INFO:Status for task 558-T178 successfully set in SD Elements
+2012-07-27 10:44:34,302,DEBUG:Sucessfuly set note for task 558-T178
+2012-07-27 10:44:35,269,INFO:Testing to change status from TODO to NA for 558-T61
+2012-07-27 10:44:35,270,INFO:Attempting to update task 558-T61 to NA
+2012-07-27 10:44:36,253,INFO:Status for task 558-T61 successfully set in SD Elements
+2012-07-27 10:44:37,188,DEBUG:Sucessfuly set note for task 558-T61
+2012-07-27 10:44:38,125,INFO:Testing to change status from TODO to NA for 558-T82
+2012-07-27 10:44:38,125,INFO:Attempting to update task 558-T82 to NA
+2012-07-27 10:44:39,082,INFO:Status for task 558-T82 successfully set in SD Elements
+2012-07-27 10:44:39,997,DEBUG:Sucessfuly set note for task 558-T82
+2012-07-27 10:44:40,941,INFO:Testing to change status from TODO to NA for 558-T156
+2012-07-27 10:44:40,941,INFO:Attempting to update task 558-T156 to NA
+2012-07-27 10:44:41,977,INFO:Status for task 558-T156 successfully set in SD Elements
+2012-07-27 10:44:42,881,DEBUG:Sucessfuly set note for task 558-T156
+2012-07-27 10:44:43,971,INFO:Testing to change status from TODO to NA for 558-T177
+2012-07-27 10:44:43,971,INFO:Attempting to update task 558-T177 to NA
+2012-07-27 10:44:44,941,INFO:Status for task 558-T177 successfully set in SD Elements
+2012-07-27 10:44:45,852,DEBUG:Sucessfuly set note for task 558-T177
+2012-07-27 10:44:46,809,INFO:Testing to change status from TODO to NA for 558-T49
+2012-07-27 10:44:46,809,INFO:Attempting to update task 558-T49 to NA
+2012-07-27 10:44:47,802,INFO:Status for task 558-T49 successfully set in SD Elements
+2012-07-27 10:44:48,719,DEBUG:Sucessfuly set note for task 558-T49
+2012-07-27 10:44:49,710,INFO:Testing to change status from TODO to NA for 558-T150
+2012-07-27 10:44:49,710,INFO:Attempting to update task 558-T150 to NA
+2012-07-27 10:44:50,690,INFO:Status for task 558-T150 successfully set in SD Elements
+2012-07-27 10:44:51,601,DEBUG:Sucessfuly set note for task 558-T150
+2012-07-27 10:44:52,568,INFO:Testing to change status from TODO to NA for 558-T162
+2012-07-27 10:44:52,568,INFO:Attempting to update task 558-T162 to NA
+2012-07-27 10:44:53,532,INFO:Status for task 558-T162 successfully set in SD Elements
+2012-07-27 10:44:54,450,DEBUG:Sucessfuly set note for task 558-T162
+2012-07-27 10:44:55,415,INFO:Testing to change status from TODO to NA for 558-T176
+2012-07-27 10:44:55,417,INFO:Attempting to update task 558-T176 to NA
+2012-07-27 10:44:56,384,INFO:Status for task 558-T176 successfully set in SD Elements
+2012-07-27 10:44:57,312,DEBUG:Sucessfuly set note for task 558-T176
+2012-07-27 10:44:58,292,INFO:Testing to change status from TODO to NA for 558-T186
+2012-07-27 10:44:58,293,INFO:Attempting to update task 558-T186 to NA
+2012-07-27 10:44:59,266,INFO:Status for task 558-T186 successfully set in SD Elements
+2012-07-27 10:45:00,187,DEBUG:Sucessfuly set note for task 558-T186
+2012-07-27 10:45:01,157,INFO:Testing to change status from TODO to NA for 558-T4
+2012-07-27 10:45:01,157,INFO:Attempting to update task 558-T4 to NA
+2012-07-27 10:45:02,140,INFO:Status for task 558-T4 successfully set in SD Elements
+2012-07-27 10:45:03,072,DEBUG:Sucessfuly set note for task 558-T4
+2012-07-27 10:45:04,030,INFO:Testing to change status from TODO to NA for 558-T152
+2012-07-27 10:45:04,030,INFO:Attempting to update task 558-T152 to NA
+2012-07-27 10:45:05,015,INFO:Status for task 558-T152 successfully set in SD Elements
+2012-07-27 10:45:05,938,DEBUG:Sucessfuly set note for task 558-T152
+2012-07-27 10:45:06,901,INFO:Testing to change status from TODO to NA for 558-T174
+2012-07-27 10:45:06,901,INFO:Attempting to update task 558-T174 to NA
+2012-07-27 10:45:07,915,INFO:Status for task 558-T174 successfully set in SD Elements
+2012-07-27 10:45:08,835,DEBUG:Sucessfuly set note for task 558-T174
+2012-07-27 10:45:09,801,INFO:Testing to change status from TODO to NA for 558-T12
+2012-07-27 10:45:09,802,INFO:Attempting to update task 558-T12 to NA
+2012-07-27 10:45:10,775,INFO:Status for task 558-T12 successfully set in SD Elements
+2012-07-27 10:45:11,687,DEBUG:Sucessfuly set note for task 558-T12
+2012-07-27 10:45:12,654,INFO:Testing to change status from TODO to NA for 558-T153
+2012-07-27 10:45:12,654,INFO:Attempting to update task 558-T153 to NA
+2012-07-27 10:45:13,661,INFO:Status for task 558-T153 successfully set in SD Elements
+2012-07-27 10:45:14,572,DEBUG:Sucessfuly set note for task 558-T153
+2012-07-27 10:45:15,585,INFO:---------
+2012-07-27 10:45:15,585,INFO:---------
+2012-07-27 10:45:15,585,INFO:AlmConnector initialized
+2012-07-27 10:45:20,209,INFO:Retrieved all tasks from SDE
+2012-07-27 10:45:20,210,INFO:Attempting to update task 558-T38 to TODO
+2012-07-27 10:45:20,782,INFO:Status for task 558-T38 successfully set in SD Elements
+2012-07-27 10:45:21,283,DEBUG:Sucessfuly set note for task 558-T38
+2012-07-27 10:45:21,283,INFO:Updated status of task  558-T38 in alm
+2012-07-27 10:45:21,285,INFO:Attempting to update task 558-T101 to TODO
+2012-07-27 10:45:21,858,INFO:Status for task 558-T101 successfully set in SD Elements
+2012-07-27 10:45:22,385,DEBUG:Sucessfuly set note for task 558-T101
+2012-07-27 10:45:22,387,INFO:Updated status of task  558-T101 in alm
+2012-07-27 10:45:22,387,INFO:Attempting to update task 558-T146 to TODO
+2012-07-27 10:45:22,982,INFO:Status for task 558-T146 successfully set in SD Elements
+2012-07-27 10:45:23,540,DEBUG:Sucessfuly set note for task 558-T146
+2012-07-27 10:45:23,542,INFO:Updated status of task  558-T146 in alm
+2012-07-27 10:45:23,542,INFO:Attempting to update task 558-T149 to DONE
+2012-07-27 10:45:24,128,INFO:Status for task 558-T149 successfully set in SD Elements
+2012-07-27 10:45:24,670,DEBUG:Sucessfuly set note for task 558-T149
+2012-07-27 10:45:24,670,INFO:Updated status of task  558-T149 in alm
+2012-07-27 10:45:24,670,INFO:Attempting to update task 558-T172 to DONE
+2012-07-27 10:45:25,259,INFO:Status for task 558-T172 successfully set in SD Elements
+2012-07-27 10:45:25,815,DEBUG:Sucessfuly set note for task 558-T172
+2012-07-27 10:45:25,815,INFO:Updated status of task  558-T172 in alm
+2012-07-27 10:45:25,815,INFO:Attempting to update task 558-T173 to NA
+2012-07-27 10:45:26,394,INFO:Status for task 558-T173 successfully set in SD Elements
+2012-07-27 10:45:26,924,DEBUG:Sucessfuly set note for task 558-T173
+2012-07-27 10:45:26,924,INFO:Updated status of task  558-T173 in alm
+2012-07-27 10:45:26,924,INFO:Attempting to update task 558-T81 to TODO
+2012-07-27 10:45:27,507,INFO:Status for task 558-T81 successfully set in SD Elements
+2012-07-27 10:45:28,015,DEBUG:Sucessfuly set note for task 558-T81
+2012-07-27 10:45:28,015,INFO:Updated status of task  558-T81 in alm
+2012-07-27 10:45:28,016,INFO:Attempting to update task 558-T148 to TODO
+2012-07-27 10:45:28,575,INFO:Status for task 558-T148 successfully set in SD Elements
+2012-07-27 10:45:29,108,DEBUG:Sucessfuly set note for task 558-T148
+2012-07-27 10:45:29,108,INFO:Updated status of task  558-T148 in alm
+2012-07-27 10:45:29,109,INFO:Attempting to update task 558-T165 to TODO
+2012-07-27 10:45:29,674,INFO:Status for task 558-T165 successfully set in SD Elements
+2012-07-27 10:45:30,207,DEBUG:Sucessfuly set note for task 558-T165
+2012-07-27 10:45:30,207,INFO:Updated status of task  558-T165 in alm
+2012-07-27 10:45:30,207,INFO:Attempting to update task 558-T72 to TODO
+2012-07-27 10:45:30,778,INFO:Status for task 558-T72 successfully set in SD Elements
+2012-07-27 10:45:31,528,DEBUG:Sucessfuly set note for task 558-T72
+2012-07-27 10:45:31,529,INFO:Updated status of task  558-T72 in alm
+2012-07-27 10:45:31,529,INFO:Attempting to update task 558-T85 to TODO
+2012-07-27 10:45:32,088,INFO:Status for task 558-T85 successfully set in SD Elements
+2012-07-27 10:45:32,615,DEBUG:Sucessfuly set note for task 558-T85
+2012-07-27 10:45:32,644,INFO:Updated status of task  558-T85 in alm
+2012-07-27 10:45:32,644,INFO:Attempting to update task 558-T123 to TODO
+2012-07-27 10:45:33,233,INFO:Status for task 558-T123 successfully set in SD Elements
+2012-07-27 10:45:33,743,DEBUG:Sucessfuly set note for task 558-T123
+2012-07-27 10:45:33,743,INFO:Updated status of task  558-T123 in alm
+2012-07-27 10:45:33,743,INFO:Attempting to update task 558-T145 to TODO
+2012-07-27 10:45:34,295,INFO:Status for task 558-T145 successfully set in SD Elements
+2012-07-27 10:45:34,805,DEBUG:Sucessfuly set note for task 558-T145
+2012-07-27 10:45:34,805,INFO:Updated status of task  558-T145 in alm
+2012-07-27 10:45:34,805,INFO:Attempting to update task 558-T179 to TODO
+2012-07-27 10:45:35,369,INFO:Status for task 558-T179 successfully set in SD Elements
+2012-07-27 10:45:35,894,DEBUG:Sucessfuly set note for task 558-T179
+2012-07-27 10:45:35,895,INFO:Updated status of task  558-T179 in alm
+2012-07-27 10:45:35,895,INFO:Attempting to update task 558-T80 to TODO
+2012-07-27 10:45:36,463,INFO:Status for task 558-T80 successfully set in SD Elements
+2012-07-27 10:45:36,992,DEBUG:Sucessfuly set note for task 558-T80
+2012-07-27 10:45:36,993,INFO:Updated status of task  558-T80 in alm
+2012-07-27 10:45:36,993,INFO:Attempting to update task 558-T93 to TODO
+2012-07-27 10:45:37,571,INFO:Status for task 558-T93 successfully set in SD Elements
+2012-07-27 10:45:38,115,DEBUG:Sucessfuly set note for task 558-T93
+2012-07-27 10:45:38,117,INFO:Updated status of task  558-T93 in alm
+2012-07-27 10:45:38,117,INFO:Attempting to update task 558-T143 to TODO
+2012-07-27 10:45:38,667,INFO:Status for task 558-T143 successfully set in SD Elements
+2012-07-27 10:45:39,176,DEBUG:Sucessfuly set note for task 558-T143
+2012-07-27 10:45:39,177,INFO:Updated status of task  558-T143 in alm
+2012-07-27 10:45:39,177,INFO:Attempting to update task 558-T157 to TODO
+2012-07-27 10:45:39,789,INFO:Status for task 558-T157 successfully set in SD Elements
+2012-07-27 10:45:40,306,DEBUG:Sucessfuly set note for task 558-T157
+2012-07-27 10:45:40,306,INFO:Updated status of task  558-T157 in alm
+2012-07-27 10:45:40,308,INFO:Attempting to update task 558-T164 to TODO
+2012-07-27 10:45:40,880,INFO:Status for task 558-T164 successfully set in SD Elements
+2012-07-27 10:45:41,382,DEBUG:Sucessfuly set note for task 558-T164
+2012-07-27 10:45:41,382,INFO:Updated status of task  558-T164 in alm
+2012-07-27 10:45:41,384,INFO:Attempting to update task 558-T175 to TODO
+2012-07-27 10:45:41,953,INFO:Status for task 558-T175 successfully set in SD Elements
+2012-07-27 10:45:42,474,DEBUG:Sucessfuly set note for task 558-T175
+2012-07-27 10:45:42,474,INFO:Updated status of task  558-T175 in alm
+2012-07-27 10:45:42,476,INFO:Attempting to update task 558-T178 to TODO
+2012-07-27 10:45:43,043,INFO:Status for task 558-T178 successfully set in SD Elements
+2012-07-27 10:45:43,584,DEBUG:Sucessfuly set note for task 558-T178
+2012-07-27 10:45:43,584,INFO:Updated status of task  558-T178 in alm
+2012-07-27 10:45:43,584,INFO:Attempting to update task 558-T61 to TODO
+2012-07-27 10:45:44,177,INFO:Status for task 558-T61 successfully set in SD Elements
+2012-07-27 10:45:44,683,DEBUG:Sucessfuly set note for task 558-T61
+2012-07-27 10:45:44,683,INFO:Updated status of task  558-T61 in alm
+2012-07-27 10:45:44,684,INFO:Attempting to update task 558-T82 to TODO
+2012-07-27 10:45:45,240,INFO:Status for task 558-T82 successfully set in SD Elements
+2012-07-27 10:45:45,766,DEBUG:Sucessfuly set note for task 558-T82
+2012-07-27 10:45:45,766,INFO:Updated status of task  558-T82 in alm
+2012-07-27 10:45:45,766,INFO:Attempting to update task 558-T156 to TODO
+2012-07-27 10:45:46,382,INFO:Status for task 558-T156 successfully set in SD Elements
+2012-07-27 10:45:46,884,DEBUG:Sucessfuly set note for task 558-T156
+2012-07-27 10:45:46,884,INFO:Updated status of task  558-T156 in alm
+2012-07-27 10:45:46,884,INFO:Attempting to update task 558-T177 to TODO
+2012-07-27 10:45:47,444,INFO:Status for task 558-T177 successfully set in SD Elements
+2012-07-27 10:45:47,970,DEBUG:Sucessfuly set note for task 558-T177
+2012-07-27 10:45:47,971,INFO:Updated status of task  558-T177 in alm
+2012-07-27 10:45:47,971,INFO:Attempting to update task 558-T49 to TODO
+2012-07-27 10:45:48,553,INFO:Status for task 558-T49 successfully set in SD Elements
+2012-07-27 10:45:49,125,DEBUG:Sucessfuly set note for task 558-T49
+2012-07-27 10:45:49,125,INFO:Updated status of task  558-T49 in alm
+2012-07-27 10:45:49,125,INFO:Attempting to update task 558-T150 to TODO
+2012-07-27 10:45:49,684,INFO:Status for task 558-T150 successfully set in SD Elements
+2012-07-27 10:45:50,203,DEBUG:Sucessfuly set note for task 558-T150
+2012-07-27 10:45:50,203,INFO:Updated status of task  558-T150 in alm
+2012-07-27 10:45:50,204,INFO:Attempting to update task 558-T162 to TODO
+2012-07-27 10:45:50,763,INFO:Status for task 558-T162 successfully set in SD Elements
+2012-07-27 10:45:51,328,DEBUG:Sucessfuly set note for task 558-T162
+2012-07-27 10:45:51,328,INFO:Updated status of task  558-T162 in alm
+2012-07-27 10:45:51,328,INFO:Attempting to update task 558-T186 to TODO
+2012-07-27 10:45:51,888,INFO:Status for task 558-T186 successfully set in SD Elements
+2012-07-27 10:45:52,414,DEBUG:Sucessfuly set note for task 558-T186
+2012-07-27 10:45:52,414,INFO:Updated status of task  558-T186 in alm
+2012-07-27 10:45:52,415,INFO:Attempting to update task 558-T4 to TODO
+2012-07-27 10:45:52,983,INFO:Status for task 558-T4 successfully set in SD Elements
+2012-07-27 10:45:53,513,DEBUG:Sucessfuly set note for task 558-T4
+2012-07-27 10:45:53,513,INFO:Updated status of task  558-T4 in alm
+2012-07-27 10:45:53,513,INFO:Attempting to update task 558-T152 to TODO
+2012-07-27 10:45:54,086,INFO:Status for task 558-T152 successfully set in SD Elements
+2012-07-27 10:45:54,596,DEBUG:Sucessfuly set note for task 558-T152
+2012-07-27 10:45:54,596,INFO:Updated status of task  558-T152 in alm
+2012-07-27 10:45:54,598,INFO:Attempting to update task 558-T174 to TODO
+2012-07-27 10:45:55,190,INFO:Status for task 558-T174 successfully set in SD Elements
+2012-07-27 10:45:55,716,DEBUG:Sucessfuly set note for task 558-T174
+2012-07-27 10:45:55,716,INFO:Updated status of task  558-T174 in alm
+2012-07-27 10:45:55,717,INFO:Attempting to update task 558-T12 to TODO
+2012-07-27 10:45:56,279,INFO:Status for task 558-T12 successfully set in SD Elements
+2012-07-27 10:45:56,803,DEBUG:Sucessfuly set note for task 558-T12
+2012-07-27 10:45:56,803,INFO:Updated status of task  558-T12 in alm
+2012-07-27 10:45:56,803,INFO:Attempting to update task 558-T153 to TODO
+2012-07-27 10:45:57,388,INFO:Status for task 558-T153 successfully set in SD Elements
+2012-07-27 10:45:57,921,DEBUG:Sucessfuly set note for task 558-T153
+2012-07-27 10:45:57,923,INFO:Updated status of task  558-T153 in alm
+2012-07-27 10:45:57,923,INFO:Synchronization complete

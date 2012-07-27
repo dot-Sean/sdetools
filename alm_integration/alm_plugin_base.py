@@ -154,7 +154,7 @@ class AlmConnector:
 
           Keyword arguments:
           task  -- An AlmTask representing the task to be updated
-          status -- A string specifying the new status. Either 'Done', 'TODO',
+          status -- A string specifying the new status. Either 'DONE', 'TODO',
                     or 'NA'
 
           """
@@ -186,6 +186,11 @@ class AlmConnector:
                               "Please review URL, id, and password in " +
                               "configuration file.")
           
+     def is_sde_connected(self):
+          """ Returns true if currently connected to SD Elements"""
+          if (self.sde_plugin == None):
+               return False
+          return self.sde_plugin.connected
 
 
      def sde_get_tasks(self):
@@ -197,8 +202,6 @@ class AlmConnector:
           
           if (self.sde_plugin == None):            
                raise AlmException("Requires initialization")
-
-          #Filter by phases if configured if (configuration['phases']):
           
           retval = self.sde_plugin.get_task_list()
           
@@ -209,9 +212,30 @@ class AlmConnector:
                                   "permission to access the project")
 
           return retval[1]
+
+     def sde_get_task(self, task_id):
+          """ Returns a single task from SD Elements w given task_id
+
+          Raises an AlmException if task doesn't exist or any other error
+
+          """
+          if (self.sde_plugin == None):            
+               raise AlmException("Requires initialization")          
+
+          retval = self.sde_plugin.api.get_task(task_id)
+
+          if (retval[0]):
+               logging.error("Unable to get task because of %s, %s" %
+                             (retval[0],retval[1]))
+               raise AlmException("Unable to get task in SD Elements")
+
+          return retval[1]
      
      def __add_note(self, task_id, note_msg, filename, status):
           """ Convenience method to add note """
+          if (self.sde_plugin == None):            
+               raise AlmException("Requires initialization") 
+
           retval = self.sde_plugin.api.add_note(task_id, note_msg,
                                                 filename, status)
           if (retval[0]):
@@ -235,8 +259,8 @@ class AlmConnector:
           Raises an AlmException on encountering an error
 
           Keyword arguments:
-          task  -- An AlmTask representing the task to be updated
-          status -- A string specifying the new status. Either 'Done', 'TODO',
+          task  -- An SD Elements task representing the task to be updated
+          status -- A string specifying the new status. Either 'DONE', 'TODO',
                     or 'NA'
 
           """
@@ -246,11 +270,12 @@ class AlmConnector:
                raise AlmException("Requires initialization")
           
 
-          logging.info('Attempting to update task %s to %s' % (task['id'],
-                                                               status))
+          logging.info('Attempting to update task %s to %s' %
+                       (task['id'], status))
           
 
-          retval = self.sde_plugin.api.update_task_status(task['id'], status)
+          retval = self.sde_plugin.api.update_task_status(task['id'],
+                                                          status)
           
           if (retval[0]):
                logging.error("Unable to set task because of %s, %s" %
@@ -364,6 +389,30 @@ class AlmConnector:
                     logging.error("Unable to disconnect from ALM")
                print "error was encountered, please see log"
 
+def add_alm_config_options(config):
+     """ Adds ALM config options to the config file"""
+     config.add_custom_option('alm_phases',
+                             'Phases of the ALM',
+                             '-alm_phases')
+     config.add_custom_option('alm_method',
+                             'HTTP or HTTPS for ALM server',
+                             '-alm_method',
+                             default='https')
+     config.add_custom_option('alm_server',
+                             'Server of the ALM',
+                             '-alm_server')
+     config.add_custom_option('alm_id',
+                             'Username for ALM Tool',
+                             '-alm_id')
+     config.add_custom_option('alm_password',
+                             'Password for ALM Tool',
+                             '-alm_password')
+     config.add_custom_option('alm_project',
+                             'Project in ALM Tool',
+                             '-alm_project')
+     config.add_custom_option('conflict_policy',
+                             'Conflict policy to use',
+                             '-conflict_policy')
 
 
 
