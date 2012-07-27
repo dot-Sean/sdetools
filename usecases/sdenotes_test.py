@@ -6,7 +6,7 @@
 #
 
 import sys, os
-sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from sdelib.conf_mgr import config
 from sdelib.commons import show_error, json, Error
