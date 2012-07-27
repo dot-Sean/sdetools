@@ -9,17 +9,8 @@ import sys, os
 sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
 
 from sdelib.conf_mgr import config
-from sdelib.commons import show_error, json
+from sdelib.commons import show_error, json, Error
 from sdelib.interactive_plugin import PlugInExperience
-from sdelib.scanner import Scanner
-
-"""
-    def read_config(self):
-        import ConfigParser
-        cnf = ConfigParser.ConfigParser()
-        cnf.read(self.config['cnf'])
-        self.ID = cnf.get('mysqld', 'server-id')
-"""
 
 def load():
     plugin = PlugInExperience(config)
