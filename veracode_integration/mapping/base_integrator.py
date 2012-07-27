@@ -115,7 +115,6 @@ class BaseIntegrator:
                     self.log_message(severityMsg, "Marked %s task as DONE" % (msg))
                     stats_tasks_affected += 1
                 except APIError, e:
-                    result_stat = False
                     self.log_message(severityError, "Could not mark %s DONE - Reason: %s" % (msg, str(e)))
                     stats_errors += 1
             else:
