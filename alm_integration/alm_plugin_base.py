@@ -3,6 +3,7 @@ sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
 
 import csv
 
+from sdelib.apiclient import APIError
 from sdelib.conf_mgr import config
 from sdelib.commons import show_error, json
 from sdelib.interactive_plugin import PlugInExperience
@@ -178,10 +179,9 @@ class AlmConnector:
           """
           if (self.sde_plugin == None):         
                raise AlmException("Requires initialization")
-          
-          retval = self.sde_plugin.connect()
-          
-          if (retval[0]):
+          try:
+               self.sde_plugin.connect()
+          except APIError as err:
                raise AlmException("Unable to connect to SD Elements." +
                               "Please review URL, id, and password in " +
                               "configuration file.")
@@ -202,16 +202,16 @@ class AlmConnector:
           
           if (self.sde_plugin == None):            
                raise AlmException("Requires initialization")
+          try:
+               return self.sde_plugin.get_task_list()
           
-          retval = self.sde_plugin.get_task_list()
-          
-          if (retval[0]):
+          except APIError as err:
+               logging.error(err)
                raise AlmException("Unable to get tasks from SD Elements." +
                               "Please ensure the application and project " +
                               "are valid and that the user has sufficient " +
                                   "permission to access the project")
 
-          return retval[1]
 
      def sde_get_task(self, task_id):
           """ Returns a single task from SD Elements w given task_id
@@ -222,28 +222,28 @@ class AlmConnector:
           if (self.sde_plugin == None):            
                raise AlmException("Requires initialization")          
 
-          retval = self.sde_plugin.api.get_task(task_id)
+          try:
+               return self.sde_plugin.api.get_task(task_id)
 
-          if (retval[0]):
-               logging.error("Unable to get task because of %s, %s" %
-                             (retval[0],retval[1]))
+          except APIError as err:
+               logging.error(err)
                raise AlmException("Unable to get task in SD Elements")
-
-          return retval[1]
      
      def __add_note(self, task_id, note_msg, filename, status):
           """ Convenience method to add note """
           if (self.sde_plugin == None):            
                raise AlmException("Requires initialization") 
 
-          retval = self.sde_plugin.api.add_note(task_id, note_msg,
+          try:
+               self.sde_plugin.api.add_note(task_id, note_msg,
                                                 filename, status)
-          if (retval[0]):
-               logging.error("Unable to add note because of %s, %s" %
-                             (retval[0],retval[1]))
+               logging.debug("Sucessfuly set note for task %s" % task_id)
+               
+          except APIError as err:
+               logging.error(err)
                raise AlmException("Unable to add note in SD Elements")
 
-          logging.debug("Sucessfuly set note for task %s" % task_id)
+          
 
      def in_scope(self, task):
           """ Check to see if an SDE task is in scope
@@ -270,16 +270,16 @@ class AlmConnector:
                raise AlmException("Requires initialization")
           
 
-          logging.info('Attempting to update task %s to %s' %
+          logging.debug('Attempting to update task %s to %s' %
                        (task['id'], status))
           
 
-          retval = self.sde_plugin.api.update_task_status(task['id'],
-                                                          status)
+          try:
+               self.sde_plugin.api.update_task_status(task['id'],
+                                                     status)
           
-          if (retval[0]):
-               logging.error("Unable to set task because of %s, %s" %
-                             (retval[0],retval[1]))
+          except APIError as err:
+               logging.error(err)
                raise AlmException("Unable to update the task status in SD" +
                                   " Elements. Either the task no longer " +
                                   "exists, there was a problem connecting " +
@@ -288,7 +288,11 @@ class AlmConnector:
 
           note_msg = "Task status changed via %s" % self.alm_name()
 
-          self.__add_note(task['id'], note_msg, '', status)
+          try:
+               self.__add_note(task['id'], note_msg, '', status)
+          except APIError as err:
+               logging.info("Unable to set a note to mark status " +
+                            "for %s to %s" % (task['id'], status))
           
           
 

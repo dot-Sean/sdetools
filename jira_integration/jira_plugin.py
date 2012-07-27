@@ -6,7 +6,7 @@ import sys, os
 sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
 from sdelib.conf_mgr import config
 from sdelib.interactive_plugin import PlugInExperience
-from sdelib.apiclient import APIBase, URLRequest
+from sdelib.apiclient import APIBase, URLRequest, APIError
 from alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from alm_integration.alm_plugin_base import AlmException, add_alm_config_options
 from sdelib.conf_mgr import Config
@@ -119,24 +119,25 @@ class JIRAConnector(AlmConnector):
 
     def alm_get_task (self, task):
         task_id = task['title'].partition(':')[0]
-        ret_err, ret_val = self.alm_plugin._call_api(
-            
-            'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s\''
+        result = None
+        try:
+            result = self.alm_plugin._call_api(
+                'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s\''
                                            % (self.sde_plugin.config
                                               ['alm_project'],
                                               task_id))
          
-        if (ret_err):
-            logging.info("Error return: %s, %s" % (ret_err, ret_val))
-            raise AlmException("Unable to get task %s from JIRA" % task['id'])
+        except APIError as err: 
+            logging.info(err)
+            raise AlmException("Unable to get task %s from JIRA" % task_id)
 
-        num_results = ret_val['total']
+        num_results = result['total']
         if (num_results == 0):
             #No result was found from query
             return None
         else:
             #We will use the first result from the query
-            jtask = ret_val['issues'][0]
+            jtask = result['issues'][0]
 
             resolution = None
 
@@ -155,7 +156,9 @@ class JIRAConnector(AlmConnector):
           
     def alm_add_task(self, task):
          #Add task
-         add_err, add_result = self.alm_plugin._call_api('issue',
+         add_result = None
+         try:
+             add_result = self.alm_plugin._call_api('issue',
                                                          method=URLRequest.POST,
                                args={'fields':{'project':
                                     
@@ -169,17 +172,15 @@ class JIRAConnector(AlmConnector):
                                                   self.sde_plugin.config
                                                   ['jira_issue_id']}}})
 
-         if (add_err):
+         except APIError as err:
              return None
             
-         trans_err, trans_result = 0, 0
+         trans_result = None
 
          if ((self.sde_plugin.config['alm_standard_workflow']=='True') and
              ((task['status']=='DONE') or task['status']=='NA')):
-             #logging.debug('Attempting to set a task status to %s' %
-             #             task['status'])
-             trans_err,
-             trans_result = self.alm_plugin._call_api('issue' +
+             try:
+                 trans_result = self.alm_plugin._call_api('issue' +
                                                       '/%s/transitions' %
                                                       add_result['key'],
                                                       
@@ -191,13 +192,13 @@ class JIRAConnector(AlmConnector):
                                             method=URLRequest.POST)
              
          
-         if (trans_err):
-             logging.info("Unable to change status of JIRA task: %s, %s" % (
-                 trans_err, trans_val))
+             except APIError as err:
+                 logging.error('Unable to change status of JIRA task: %s'
+                               % err)
          
             
          #Return a unique identifier to this task in JIRA 
-         return "Issue %s" % add_result['key']
+         return 'Issue %s' % add_result['key']
 
         
 
@@ -208,10 +209,10 @@ class JIRAConnector(AlmConnector):
                              == 'True')):
             return
 
-        trans_err, trans_result = None, None
-        if ((status=='DONE') or (status=='NA')):
-            trans_err,
-            trans_result = self.alm_plugin._call_api('issue' +
+        trans_result = None
+        try:
+            if ((status=='DONE') or (status=='NA')):
+                trans_result = self.alm_plugin._call_api('issue' +
                                                       '/%s/transitions' %
                                                       task.get_alm_id(),
                                                      
@@ -220,23 +221,20 @@ class JIRAConnector(AlmConnector):
                                                  'jira_close_transition']}},
                                                      
                                             method=URLRequest.POST)
-        elif (status=='TODO'):
+            elif (status=='TODO'):
             #We are updating a closed task to TODO
-            trans_err,
-            trans_result = self.alm_plugin._call_api('issue' +
-                                                      '/%s/transitions' %
-                                                      task.get_alm_id(),
+                trans_result = self.alm_plugin._call_api('issue' +
+                                        '/%s/transitions' %
+                                        task.get_alm_id(),
                                                      
                                             args={ 'transition' : 
                                             {'id':self.sde_plugin.config[
                                                  'jira_reopen_transition']}},
                                                      
                                             method=URLRequest.POST)
-        #logging.debug('setting err %s and result %s' % (trans_err,
-        #                                                    trans_result))
-        if (trans_err):
-            logging.info("Unable to set task status: %s, %s" % (trans_err,
-                                                                trans_val))
+        
+        except APIError as err:
+            logging.info("Unable to set task status: %s" % err)
                       
 
     def alm_disconnect(self):
