@@ -13,7 +13,7 @@ sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
 import csv
 
 from sdelib.conf_mgr import config
-from sdelib.commons import show_error, json
+from sdelib.commons import show_error, json, Error
 from sdelib.interactive_plugin import PlugInExperience
 
 CSV_FILENAME = "output.csv"
@@ -46,7 +46,10 @@ def main(argv):
     if not ret:
         sys.exit(1)
 
-    load()
+    try:
+        load()
+    except Error, e:
+        show_error(str(e))
 
 if __name__ == "__main__":
     main(sys.argv)
