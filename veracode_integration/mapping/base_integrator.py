@@ -1,13 +1,13 @@
 #!/usr/bin/python
 import sys, os
-
-sys.path.append("/home/geoff/sde-lint/")
-
-from sdelib.conf_mgr import config
-from sdelib.interactive_plugin import PlugInExperience
 import csv
 import re
 from datetime import datetime
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+from sdelib.conf_mgr import config
+from sdelib.interactive_plugin import PlugInExperience
 
 class BaseIntegrator:
     def __init__(self, config):
