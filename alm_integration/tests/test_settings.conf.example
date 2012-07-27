@@ -1,0 +1,67 @@
+[global]
+###### SD ELements settings  ######
+#SD Elements server name, includes port
+server = m1.sdelements.com
+
+#SD Elements user login email
+email = apitest@example.org
+
+#SD Elements user password
+password = sde_password
+
+#SD Elements application
+application = JIRA Test
+
+#SD Elements project
+project = V1
+
+###### ALM settings  ######
+#ALM Server name, includes port
+alm_server = sdetest.atlassian.net
+
+#HTTP or HTTPs protocol
+alm_method = https
+              
+#Username for JIRA user that can:
+# -create new issues for the project
+# -read existing issues in the project
+# -create transitions on issues (e.g. close an issue)
+alm_id = sdetest
+              
+#Password for above user. Note that this will be encrypted
+#in future versions of the plugin
+alm_password = alm_password
+              
+######Project settings######
+#ALM project key
+alm_project = ALM_PROJECT_KEY_GOES_HERE
+          
+#SD Elements task phases that are in scope.
+#Valid values: comma separated list-
+#requirements,architecture-design,development,testing
+#NOTE: please do not include any spaces in task names
+alm_phases = requirements,development,testing
+
+#Which system takes precedence in case of
+#confliciting status. For example, if you mark
+#an issue as Closed in JIRA and the task is TODO in
+#SD Elements, it will be changed to DONE in SD Elemenets.
+#If you mark a task as Done in SD Elements, but it's still
+#Open in JIRA, the task will automatically revert back
+#to TODO in SD Elements.
+#Valid values:
+#alm -> ALM tool (i.e JIRA) takes precedence
+#sde -> SDE takes precedence
+#Note that timezone is currently unsupported
+#since JIRA does not provide timezone support
+conflict_policy = alm
+
+
+######Base settings, do not modify######
+method = https
+targets =  .
+debug =  0
+skip_hidden = True
+interactive =True
+askpasswd = False
+auth_mode = basic
