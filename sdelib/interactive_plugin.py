@@ -1,9 +1,12 @@
 import sys
 import getpass
 
-from commons import show_error
+from commons import show_error, Error
 import apiclient
 from content import Content
+
+class PluginError(Error):
+    pass
 
 class PlugInExperience:
     def __init__(self, config):
@@ -44,15 +47,15 @@ class PlugInExperience:
 
         if (self.config['application']):
             if (not app_list):
-                raise 'Specified Application not found -> %s' % (self.config['application'])
+                raise PluginError('Specified Application not found -> %s' % (self.config['application']))
             elif (len(app_list) == 1):
                 return app_list[0]
 
         if (not self.config['interactive']):
-            raise 'Missing Application (either use Interactive mode, or specify the exact name of an Application)'
+            raise PluginError('Missing Application (either use Interactive mode, or specify the exact name of an Application)')
 
         if (not app_list):
-            raise 'No Applications to choose from'
+            raise PluginError('No Applications to choose from')
 
         sel_app = None
         while sel_app is None:
@@ -103,12 +106,12 @@ class PlugInExperience:
 
             if (self.config['project']):
                 if (not prj_list):
-                    raise 'Specified Project not found -> %s' % (self.config['project'])
+                    raise PluginError('Specified Project not found -> %s' % (self.config['project']))
                 elif (len(prj_list) == 1):
                     return (sel_app, prj_list[0])
 
             if (not self.config['interactive']):
-                raise 'Missing Project (either use Interactive mode, or specify the exact name of an Project)'
+                raise PluginError('Missing Project (either use Interactive mode, or specify the exact name of an Project)')
 
             sel_prj = self._select_project_from_list(prj_list)
             if sel_prj is not None:
