@@ -29,7 +29,8 @@ def show_error(err_msg, usage_hint=False):
 
 def get_password():
     password = getpass.getpass()
-    if('\x03' in password):
+    # Handle Control-C or Control-Z
+    if(password is not None and (password.find('\x03') >= 0 or password.find('\x1a') >= 0)):
         raise KeyboardInterrupt
     return password
 
