@@ -1,4 +1,6 @@
-__all__ = ['json', 'Error', 'show_error']
+__all__ = ['json', 'Error', 'show_error', 'get_password']
+
+import getpass
 
 try:
     import json
@@ -24,3 +26,10 @@ def show_error(err_msg, usage_hint=False):
     if usage_hint:
         print "Try -h to see the usage"
     print
+
+def get_password():
+    password = getpass.getpass()
+    if('\x03' in password):
+        raise KeyboardInterrupt
+    return password
+

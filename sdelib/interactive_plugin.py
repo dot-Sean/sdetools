@@ -1,7 +1,7 @@
 import sys
 import getpass
 
-from commons import show_error, Error
+from commons import show_error, Error, get_password
 import apiclient
 from content import Content
 
@@ -29,7 +29,7 @@ class PlugInExperience:
         while not self.connected:
             if askpasswd:
                 print "Enter the password for account: %s" % (self.config['email'])
-                self.config['password'] = getpass.getpass()
+                self.config['password'] = get_password()
             try:
                 self.connect()
             except apiclient.APIAuthError, e:
