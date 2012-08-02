@@ -13,21 +13,23 @@ from sdelib.commons import show_error, json, Error
 from sdelib.interactive_plugin import PlugInExperience
 from sdelib.scanner import Scanner
 
-def load():
+def load(scanner):
     plugin = PlugInExperience(config)
 
     content = plugin.get_compiled_task_list()
         
-    scanner = Scanner(config, content)
+    scanner.set_content(content)
     scanner.scan()
 
 def main(argv):
+    scanner = Scanner(config)
+
     ret = config.parse_args(argv)
     if not ret:
         sys.exit(1)
 
     try:
-        load()
+        load(scanner)
     except Error, e:
         show_error(str(e))
 

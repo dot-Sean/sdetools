@@ -35,12 +35,18 @@ class Config(object):
             'project': None,
             'skip_hidden': True,
             'debug': 0,
-            'targets': None,
         }
 
     def __init__(self):
         self.settings = self.DEFAULTS.copy()
         self.custom_options = []
+        self.custom_args = {
+            'var_name': None,
+            'syntax_text': '',
+            'help_text': '',
+            'validator_func': None,
+            'validator_args': {},
+        }
 
     def __getitem__(self, key):
         if key in self.settings:
@@ -83,6 +89,28 @@ class Config(object):
         self.custom_options.append(config_item)
         self.settings[config_item['var_name']] = config_item['default']
 
+    def set_custom_args(self, var_name, syntax_text, help_text, validator_func, validator_args={}):
+        """
+        Use this to tell the config manager to use the command arguments.
+        Args:
+            <var_name>: Name of the config variable. (use lower case, numbers and underscore only)
+            <syntax_text>: The text for syntax of the arguments (e.g. target [option1])
+            <help_text>: A multi-line capable blob of text help
+            <validator_func>: A callback function to validate the arguments
+                Syntax: myfunc(config, args, **<validator_args>)
+            [<validator_args>]: A set of arguments to pass to validator function for state-keeping
+        
+        Note: The special variable in config is parsed the exact same way 
+            a command line is parsed (quotes and what not)
+        Note: Arguments are useful specially in the case where a list of input is passed to it
+        """
+        self.custom_args['var_name'] = var_name.lower()
+        self.custom_args['syntax_text'] = syntax_text
+        self.custom_args['help_text'] = help_text
+        self.custom_args['validator_func'] = validator_func
+        self.custom_args['validator_args'] = validator_args
+        self.settings[self.custom_args['var_name']] = None
+
     def parse_config_file(self, file_name):
         if not file_name:
             return True, 'Empty file.'
@@ -98,16 +126,17 @@ class Config(object):
             else:
                 return False, 'Config file not found.'
 
-        config_keys = [
-            'debug', 'server', 'email', 'password', 'application', 'project', 
-            'targets', 'authmode']
+        config_keys = ['debug', 'server', 'email', 'password', 'application', 'project', 'authmode']
+        if self.custom_args['var_name']:
+            config_keys.append(self.custom_args['var_name'])
+
         for item in self.custom_options:
             config_keys.append(item['var_name'])
 
         for key in config_keys:
             if cnf.has_option('global', key):
                 val = cnf.get('global', key)
-                if key == 'targets':
+                if key == self.custom_args['var_name']:
                     val = list(shlex.shlex(val, posix=True))
                 if key == 'password':
                     if not val:
@@ -116,7 +145,7 @@ class Config(object):
         return True, 'Config File Parsed'
 
     def parse_args(self, arvg):
-        usage = "%prog [options...] target1 [target2 ...]\n\ntarget(s) are the directory/file to be scanned."
+        usage = "%%prog [options...] %s\n\n%s\n" % (self.custom_args['syntax_text'], self.custom_args['help_text'])
 
         parser = optparse.OptionParser(usage)
         parser.add_option('-c', '--config', metavar='CONFIG_FILE', dest='conf_file', default=self.DEFAULTS['conf_file'], type='string',
@@ -167,16 +196,19 @@ class Config(object):
             show_error("Unable to read or process configuration file.\n Reason: %s" % (ret_val))
             return False
 
-        if args:
-            self['targets'] = args
-
-        if not self['targets']:
-            show_error("Missing target (e.g. use \".\" for current dir)", usage_hint=True)
-            return False
-
-        for path in self['targets']:
-            if not os.path.exists(path):
-                show_error("Unable to locate or access the path: %s" % path)
+        if (self.custom_args['var_name'] is None):
+            if args:
+                show_error("Unknown arguments in the command line.", usage_hint=True)
+                return False
+        else:
+            if args:
+                self[self.custom_args['var_name']] = args
+            ret = self.custom_args['validator_func'](
+                self,
+                self[self.custom_args['var_name']],
+                **self.custom_args['validator_args'])
+            if ret:
+                show_error(ret, usage_hint=True)
                 return False
 
         # No more errors, lets apply the changes

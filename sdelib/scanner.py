@@ -1,6 +1,8 @@
 import re
 import os
 
+from commons import UsageError
+
 LINE_SEP_RE = re.compile('\n')
 SHOW_LINES = 1
 
@@ -125,16 +127,41 @@ class FileScanner:
                     
         return
 
+def args_validator(config, args):
+    if not args:
+        return "Missing target (e.g. use \".\" for current dir)"
+
+    for path in args:
+        if not os.path.exists(path):
+            return "Unable to locate or access the path: %s" % (path)
+
+    return None
+
 class Scanner:
-    def __init__(self, config, content):
+    def __init__(self, config):
         self.config = config
+        self.content = None
+        self._init_config()
+    
+    def _init_config(self):
+        self.config.set_custom_args(
+            'targets',
+            'target1 [target2 ...]',
+            'target(s) are the directory/file to be scanned.',
+            args_validator)
+
+    def set_content(self, content):
         self.content = content
 
     def scan_file(self, file_path):
+        if self.content is None:
+            raise UsageError('Missing content: Set content before using scanner.')
         file_scanner = FileScanner(self.config, self.content, file_path)
         file_scanner.scan()
 
     def scan(self):
+        if self.content is None:
+            raise UsageError('Missing content: Set content before using scanner.')
         file_paths = []
         for target in self.config['targets']:
             if not os.path.isdir(target):
