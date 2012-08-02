@@ -128,6 +128,10 @@ class FileScanner:
         return
 
 def args_validator(config, args):
+    """
+    Validator helper for argument parsing. Returns error description in case of error,
+    or None if validate passed.
+    """
     if not args:
         return "Missing target (e.g. use \".\" for current dir)"
 

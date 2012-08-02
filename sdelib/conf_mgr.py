@@ -98,6 +98,7 @@ class Config(object):
             <help_text>: A multi-line capable blob of text help
             <validator_func>: A callback function to validate the arguments
                 Syntax: myfunc(config, args, **<validator_args>)
+                Return: None => Pass, <Error String> => Fail
             [<validator_args>]: A set of arguments to pass to validator function for state-keeping
         
         Note: The special variable in config is parsed the exact same way 
