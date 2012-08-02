@@ -28,9 +28,18 @@ def show_error(err_msg, usage_hint=False):
     print
 
 def get_password():
-    password = getpass.getpass()
-    # Handle Control-C or Control-Z
-    if(password is not None and (password.find('\x03') >= 0 or password.find('\x1a') >= 0)):
+    try:
+        password = getpass.getpass()
+    except EOFError:
+        # Handle Ctrl+D
+        raise KeyboardInterrupt
+    if (password is None):
+        return password
+    # Handle Ctrl+C
+    if '\x03' in password:
+        raise KeyboardInterrupt
+    # Handle Ctrl+Z
+    if '\x1a' in password:
         raise KeyboardInterrupt
     return password
 
