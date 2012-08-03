@@ -1,6 +1,6 @@
 # Copyright SDElements Inc
 #
-# Plugin for two way integration with JIRA
+# Plugin for two way integration with Mingle
 
 import sys, os
 sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
@@ -8,25 +8,25 @@ sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
 from sdelib.conf_mgr import config
 from sdelib.interactive_plugin import PlugInExperience
 
-from jira_integration.bin.jira_plugin import JIRATask, JIRAConnector
-from jira_integration.bin.jira_plugin import JIRABase, add_jira_config_options
+from mingle_integration.bin.mingle_plugin import MingleTask, MingleConnector
+from mingle_integration.bin.mingle_plugin import add_mingle_config_options
+from mingle_integration.bin.mingle_apiclient import MingleAPIBase
 
 import logging
-#import ConfigParser
-
 
 def main(argv):
 
-    add_jira_config_options(config)
+    add_mingle_config_options(config)
     ret = config.parse_args(argv)
     
     if not ret:
         sys.exit(1)
     
     sde_plugin = PlugInExperience(config)
-    jbase = JIRABase(config)    
-    jira = JIRAConnector(sde_plugin, jbase)
-    jira.synchronize()          
+    mbase = MingleAPIBase(config)    
+    mingle = MingleConnector(sde_plugin, mbase)
+    mingle.synchronize()
+ 
     
 if __name__ == "__main__":
     main(sys.argv)

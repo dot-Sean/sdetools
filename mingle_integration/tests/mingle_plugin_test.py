@@ -11,19 +11,20 @@ from sdelib.conf_mgr import config
 from sdelib.interactive_plugin import PlugInExperience
 import logging
 
-from jira_integration.bin.jira_plugin import JIRATask, JIRAConnector
-from jira_integration.bin.jira_plugin import JIRABase, add_jira_config_options
+from mingle_integration.bin.mingle_plugin import MingleTask, MingleConnector
+from mingle_integration.bin.mingle_plugin import add_mingle_config_options
+from mingle_integration.bin.mingle_apiclient import MingleAPIBase
 
 
 CONF_FILE_LOCATION = 'test_settings.conf'
 
-class TestJiraCase(unittest.TestCase):
+class TestMingleCase(unittest.TestCase):
      def setUp(self):
-          add_jira_config_options(config)
+          add_mingle_config_options(config)
           config.parse_config_file(CONF_FILE_LOCATION)
           self.plugin = PlugInExperience(config)
-          jbase = JIRABase(config)
-          self.tac = JIRAConnector(self.plugin, jbase)
+          mbase = MingleAPIBase(config)
+          self.tac = MingleConnector(self.plugin, mbase)
           self.sde_tasks = None
           self.alm_tasks = None
     
@@ -33,7 +34,7 @@ class TestJiraCase(unittest.TestCase):
           self.tac.sde_connect()
           self.assertTrue(self.tac.is_sde_connected())
 
-     def test_jira_get_task(self):
+     def test_mingle_get_task(self):
           """First get all SD ELements tasks"""
           self.sde_tasks = self.tac.sde_get_tasks()
           self.assertTrue(len(self.sde_tasks) > 0)
@@ -79,22 +80,22 @@ class TestJiraCase(unittest.TestCase):
           
           
           
-     def test_jira_add_task(self):
+     def test_mingle_add_task(self):
           test_task = self.__create_test_task()
           alm_key = self.tac.alm_add_task(test_task)
 
-     def test_jira_update_task_status(self):
+     def test_mingle_update_task_status(self):
           test_task = self.__create_test_task()
           self.tac.alm_add_task(test_task)
-          jira_task = self.tac.alm_get_task(test_task)
+          mingle_task = self.tac.alm_get_task(test_task)
 
           current_note_count = test_task['note_count']
 
-          self.tac.alm_update_task_status(jira_task,'DONE')
-          self.tac.alm_update_task_status(jira_task,'TODO')
+          self.tac.alm_update_task_status(mingle_task,'DONE')
+          self.tac.alm_update_task_status(mingle_task,'TODO')
           logging.info('Attempt to set task status for %s to NA' %
-                       jira_task.get_alm_id())
-          self.tac.alm_update_task_status(jira_task,'NA')
+                       mingle_task.get_alm_id())
+          self.tac.alm_update_task_status(mingle_task,'NA')
 
           
      def test_synchronize(self):
