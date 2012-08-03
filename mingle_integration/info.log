@@ -1,0 +1,130 @@
+2012-08-03 16:41:43,315,INFO:---------
+2012-08-03 16:41:43,316,INFO:---------
+2012-08-03 16:41:43,316,INFO:AlmConnector initialized
+2012-08-03 16:41:48,006,INFO:Retrieved all tasks from SDE
+2012-08-03 16:42:08,451,INFO:---------
+2012-08-03 16:42:08,451,INFO:---------
+2012-08-03 16:42:08,451,INFO:AlmConnector initialized
+2012-08-03 16:42:13,046,INFO:Retrieved all tasks from SDE
+2012-08-03 16:42:17,405,INFO:Status for task 582-T149 successfully set in SD Elements
+2012-08-03 16:42:17,809,INFO:Updated status of task  582-T149 in alm
+2012-08-03 16:42:20,618,INFO:Unable to set task status: Incorrect Email/Password
+2012-08-03 16:42:20,994,INFO:Added task 582-T165 to ALM
+2012-08-03 16:42:23,813,INFO:Unable to set task status: Incorrect Email/Password
+2012-08-03 16:42:24,200,INFO:Added task 582-T179 to ALM
+2012-08-03 16:42:27,033,INFO:Unable to set task status: Incorrect Email/Password
+2012-08-03 16:42:27,427,INFO:Added task 582-T143 to ALM
+2012-08-03 16:42:30,690,INFO:Unable to set task status: Incorrect Email/Password
+2012-08-03 16:42:31,076,INFO:Added task 582-T157 to ALM
+2012-08-03 16:42:47,592,INFO:Added task 582-T164 to ALM
+2012-08-03 16:42:50,217,INFO:Added task 582-T178 to ALM
+2012-08-03 16:42:53,131,INFO:Added task 582-T156 to ALM
+2012-08-03 16:42:55,828,INFO:Added task 582-T177 to ALM
+2012-08-03 16:42:58,464,INFO:Added task 582-T186 to ALM
+2012-08-03 16:43:01,065,INFO:Added task 582-T4 to ALM
+2012-08-03 16:43:03,842,INFO:Added task 582-T152 to ALM
+2012-08-03 16:43:06,553,INFO:Added task 582-T188 to ALM
+2012-08-03 16:43:09,358,INFO:Added task 582-T12 to ALM
+2012-08-03 16:43:09,359,INFO:Synchronization complete
+2012-08-03 16:44:21,293,INFO:---------
+2012-08-03 16:44:21,293,INFO:---------
+2012-08-03 16:44:21,293,INFO:AlmConnector initialized
+2012-08-03 16:44:25,904,INFO:Retrieved all tasks from SDE
+2012-08-03 16:44:28,742,INFO:Added task 582-T149 to ALM
+2012-08-03 16:44:31,542,INFO:Unable to set task status: Incorrect Email/Password
+2012-08-03 16:44:31,928,INFO:Added task 582-T165 to ALM
+2012-08-03 16:44:38,960,INFO:Unable to set task status: Incorrect Email/Password
+2012-08-03 16:44:39,368,INFO:Added task 582-T179 to ALM
+2012-08-03 16:44:54,332,INFO:Unable to set task status: Incorrect Email/Password
+2012-08-03 16:44:54,706,INFO:Added task 582-T143 to ALM
+2012-08-03 16:44:57,694,INFO:Unable to set task status: Incorrect Email/Password
+2012-08-03 16:44:58,095,INFO:Added task 582-T157 to ALM
+2012-08-03 16:45:00,845,INFO:Added task 582-T164 to ALM
+2012-08-03 16:45:03,673,INFO:Added task 582-T178 to ALM
+2012-08-03 16:45:06,533,INFO:Added task 582-T156 to ALM
+2012-08-03 16:45:09,223,INFO:Added task 582-T177 to ALM
+2012-08-03 16:45:11,917,INFO:Added task 582-T186 to ALM
+2012-08-03 16:45:14,562,INFO:Added task 582-T4 to ALM
+2012-08-03 16:45:17,203,INFO:Added task 582-T152 to ALM
+2012-08-03 16:45:19,861,INFO:Added task 582-T188 to ALM
+2012-08-03 16:45:22,490,INFO:Added task 582-T12 to ALM
+2012-08-03 16:45:22,490,INFO:Synchronization complete
+2012-08-03 16:45:53,196,INFO:---------
+2012-08-03 16:45:53,196,INFO:---------
+2012-08-03 16:45:53,196,INFO:AlmConnector initialized
+2012-08-03 16:45:57,894,INFO:Retrieved all tasks from SDE
+2012-08-03 16:46:00,803,INFO:Added task 582-T149 to ALM
+2012-08-03 16:46:06,474,INFO:Added task 582-T165 to ALM
+2012-08-03 16:46:12,361,INFO:Added task 582-T179 to ALM
+2012-08-03 16:46:17,944,INFO:Added task 582-T143 to ALM
+2012-08-03 16:46:23,980,INFO:Added task 582-T157 to ALM
+2012-08-03 16:46:26,773,INFO:Added task 582-T164 to ALM
+2012-08-03 16:46:29,510,INFO:Added task 582-T178 to ALM
+2012-08-03 16:46:32,401,INFO:Added task 582-T156 to ALM
+2012-08-03 16:46:35,092,INFO:Added task 582-T177 to ALM
+2012-08-03 16:46:39,776,INFO:Added task 582-T186 to ALM
+2012-08-03 16:46:53,625,INFO:Added task 582-T4 to ALM
+2012-08-03 16:46:56,243,INFO:Added task 582-T152 to ALM
+2012-08-03 16:46:58,927,INFO:Added task 582-T188 to ALM
+2012-08-03 16:47:01,621,INFO:Added task 582-T12 to ALM
+2012-08-03 16:47:01,621,INFO:Synchronization complete
+2012-08-03 16:57:00,490,INFO:---------
+2012-08-03 16:57:00,490,INFO:---------
+2012-08-03 16:57:00,490,INFO:AlmConnector initialized
+2012-08-03 16:57:05,134,INFO:Retrieved all tasks from SDE
+2012-08-03 16:57:08,364,INFO:Added task 582-T149 to ALM
+2012-08-03 16:57:12,125,INFO:Added task 582-T165 to ALM
+2012-08-03 16:57:16,124,INFO:Added task 582-T179 to ALM
+2012-08-03 16:57:19,864,INFO:Added task 582-T143 to ALM
+2012-08-03 16:57:23,694,INFO:Added task 582-T157 to ALM
+2012-08-03 16:57:26,483,INFO:Added task 582-T164 to ALM
+2012-08-03 16:57:29,108,INFO:Added task 582-T178 to ALM
+2012-08-03 16:57:31,953,INFO:Added task 582-T156 to ALM
+2012-08-03 16:57:34,578,INFO:Added task 582-T177 to ALM
+2012-08-03 16:57:37,263,INFO:Added task 582-T186 to ALM
+2012-08-03 16:57:39,842,INFO:Added task 582-T4 to ALM
+2012-08-03 16:57:42,543,INFO:Added task 582-T152 to ALM
+2012-08-03 16:57:45,404,INFO:Added task 582-T188 to ALM
+2012-08-03 16:57:48,282,INFO:Added task 582-T12 to ALM
+2012-08-03 16:57:48,283,INFO:Synchronization complete
+2012-08-03 17:03:13,036,INFO:---------
+2012-08-03 17:03:13,038,INFO:---------
+2012-08-03 17:03:13,038,INFO:AlmConnector initialized
+2012-08-03 17:03:17,608,INFO:Retrieved all tasks from SDE
+2012-08-03 17:05:55,046,INFO:---------
+2012-08-03 17:05:55,068,INFO:---------
+2012-08-03 17:05:55,068,INFO:AlmConnector initialized
+2012-08-03 17:05:59,572,INFO:Retrieved all tasks from SDE
+2012-08-03 17:07:55,688,INFO:---------
+2012-08-03 17:07:55,688,INFO:---------
+2012-08-03 17:07:55,688,INFO:AlmConnector initialized
+2012-08-03 17:08:00,128,INFO:Retrieved all tasks from SDE
+2012-08-03 17:08:01,270,INFO:Status for task 582-T149 successfully set in SD Elements
+2012-08-03 17:08:01,648,INFO:Updated status of task  582-T149 in alm
+2012-08-03 17:08:09,283,INFO:Synchronization complete
+2012-08-03 17:08:27,259,INFO:---------
+2012-08-03 17:08:27,259,INFO:---------
+2012-08-03 17:08:27,259,INFO:AlmConnector initialized
+2012-08-03 17:08:31,808,INFO:Retrieved all tasks from SDE
+2012-08-03 17:08:35,443,INFO:Added task 582-T149 to ALM
+2012-08-03 17:08:38,868,INFO:Added task 582-T165 to ALM
+2012-08-03 17:08:42,558,INFO:Added task 582-T179 to ALM
+2012-08-03 17:08:46,144,INFO:Added task 582-T143 to ALM
+2012-08-03 17:08:49,802,INFO:Added task 582-T157 to ALM
+2012-08-03 17:08:52,697,INFO:Added task 582-T164 to ALM
+2012-08-03 17:08:55,391,INFO:Added task 582-T178 to ALM
+2012-08-03 17:08:58,207,INFO:Added task 582-T156 to ALM
+2012-08-03 17:09:00,960,INFO:Added task 582-T177 to ALM
+2012-08-03 17:09:03,809,INFO:Added task 582-T186 to ALM
+2012-08-03 17:09:06,697,INFO:Added task 582-T4 to ALM
+2012-08-03 17:09:16,848,INFO:Added task 582-T152 to ALM
+2012-08-03 17:09:24,318,INFO:Added task 582-T188 to ALM
+2012-08-03 17:09:26,986,INFO:Added task 582-T12 to ALM
+2012-08-03 17:09:26,987,INFO:Synchronization complete
+2012-08-03 17:13:30,789,INFO:---------
+2012-08-03 17:13:30,799,INFO:---------
+2012-08-03 17:13:30,799,INFO:AlmConnector initialized
+2012-08-03 17:13:35,275,INFO:Retrieved all tasks from SDE
+2012-08-03 17:13:39,334,INFO:Status for task 582-T164 successfully set in SD Elements
+2012-08-03 17:13:39,721,INFO:Updated status of task  582-T164 in alm
+2012-08-03 17:13:47,759,INFO:Synchronization complete

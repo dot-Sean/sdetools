@@ -71,16 +71,10 @@ mingle_card_type = Story
 #Initial 'status' to set for a new card
 mingle_new_status = Ready for Analysis
 
-#a comma delimited list of tranisition ids for closing a new story in Mingle
-
-#Default Scrum template transitions: 
-#71 to Start Analysis -> 72 to Complete Analysis -> 77 to Start Development ->
-#73 to Complete Development -> 75 to Start Testing -> 76 to Complete Testing -> 74 to Accepted
-mingle_close_transitions = Start Analysis,Complete Analysis,Start Development,Complete Development
-
-#a comma delimited list of tranisition id for re-opening a closed story in Mingle
-#Not supported by default in Mingle. Leave commented by default
-mingle_reopen_transitions = 
+#a comma delimited list of statuses that signify a task is Done in Mingle
+#Note the first one will be used by SD Elements when representing a Done task
+#in SD Elements inside of Mingle
+mingle_done_statuses = Ready for Testing,In Testing,Ready for Signoff,Accepted
 
 #SD Elements task phases that are in scope.
 #Valid values: comma separated list-
