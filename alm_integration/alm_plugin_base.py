@@ -75,33 +75,44 @@ class AlmConnector:
 
           """
           logging.basicConfig(format='%(asctime)s,%(levelname)s:%(message)s'
-                              ,filename='info.log',level=logging.DEBUG)
+                              ,filename='info.log',level=logging.INFO)
           self.sde_plugin = sde_plugin
           self.alm_plugin = alm_plugin
           
 
           #Verify that the configuration options are set properly
           if (not(self.sde_plugin.config['alm_phases'])):
-                 raise AlmException("Missing alm_phases in configuration")
+                 raise AlmException('Missing alm_phases in configuration')
           else:
                self.sde_plugin.config['alm_phases'] = \
                self.sde_plugin.config['alm_phases'].split(',')
+
+
+          if (not(self.sde_plugin.config['sde_statuses_in_scope'])):
+                 raise AlmException('Missing the SD Elements statuses in scope')
+          else:
+               self.sde_plugin.config['sde_statuses_in_scope'] = \
+               self.sde_plugin.config['sde_statuses_in_scope'].split(',')
+               for status in self.sde_plugin.config['sde_statuses_in_scope']:
+                    if status not in('TODO','DONE','NA'):
+                         raise AlmException('Invalid status specified in ' +
+                                            'sde_statuses_in_scope')
           
           if (not(self.sde_plugin.config['conflict_policy']) or
-              not(self.sde_plugin.config['conflict_policy'] == 'alm')): #or
-                  #self.sde_plugin.config['conflict_policy'] == 'sde' or
-                  #self.sde_plugin.config['conflict_policy'] ==
-                  #'timestamp')):
-               raise AlmException("Missing or incorrect conflict_policy " +
-                                  "in configuration. Valid values are " +
-                                  "alm, sde, or timestamp.")
+              not(self.sde_plugin.config['conflict_policy'] == 'alm' or
+                  self.sde_plugin.config['conflict_policy'] == 'sde' or
+                  self.sde_plugin.config['conflict_policy'] ==
+                  'timestamp')):
+               raise AlmException('Missing or incorrect conflict_policy ' +
+                                  'in configuration. Valid values are ' +
+                                  'alm, sde, or timestamp.')
           
 
 
          
-          logging.info("---------")
-          logging.info("---------")
-          logging.info("AlmConnector initialized")
+          logging.info('---------')
+          logging.info('---------')
+          logging.info('AlmConnector initialized')
 
      @abstractmethod
      def alm_name(self):
@@ -178,13 +189,13 @@ class AlmConnector:
 
           """
           if (self.sde_plugin == None):         
-               raise AlmException("Requires initialization")
+               raise AlmException('Requires initialization')
           try:
                self.sde_plugin.connect()
           except APIError as err:
-               raise AlmException("Unable to connect to SD Elements." +
-                              "Please review URL, id, and password in " +
-                              "configuration file.")
+               raise AlmException('Unable to connect to SD Elements.' +
+                              'Please review URL, id, and password in ' +
+                              'configuration file.')
           
      def is_sde_connected(self):
           """ Returns true if currently connected to SD Elements"""
@@ -201,16 +212,16 @@ class AlmConnector:
           """
           
           if (self.sde_plugin == None):            
-               raise AlmException("Requires initialization")
+               raise AlmException('Requires initialization')
           try:
                return self.sde_plugin.get_task_list()
           
           except APIError as err:
                logging.error(err)
-               raise AlmException("Unable to get tasks from SD Elements." +
-                              "Please ensure the application and project " +
-                              "are valid and that the user has sufficient " +
-                                  "permission to access the project")
+               raise AlmException('Unable to get tasks from SD Elements.' +
+                              'Please ensure the application and project ' +
+                              'are valid and that the user has sufficient ' +
+                                  'permission to access the project')
 
 
      def sde_get_task(self, task_id):
@@ -220,28 +231,28 @@ class AlmConnector:
 
           """
           if (self.sde_plugin == None):            
-               raise AlmException("Requires initialization")          
+               raise AlmException('Requires initialization')          
 
           try:
                return self.sde_plugin.api.get_task(task_id)
 
           except APIError as err:
                logging.error(err)
-               raise AlmException("Unable to get task in SD Elements")
+               raise AlmException('Unable to get task in SD Elements')
      
      def __add_note(self, task_id, note_msg, filename, status):
           """ Convenience method to add note """
           if (self.sde_plugin == None):            
-               raise AlmException("Requires initialization") 
+               raise AlmException('Requires initialization') 
 
           try:
                self.sde_plugin.api.add_note(task_id, note_msg,
                                                 filename, status)
-               logging.debug("Sucessfuly set note for task %s" % task_id)
+               logging.debug('Sucessfuly set note for task %s' % task_id)
                
           except APIError as err:
                logging.error(err)
-               raise AlmException("Unable to add note in SD Elements")
+               raise AlmException('Unable to add note in SD Elements')
 
           
 
@@ -250,7 +261,8 @@ class AlmConnector:
             (i.e. has one of the appropriate phases)
 
           """
-          return task['phase'] in self.sde_plugin.config['alm_phases'] 
+          return (task['phase'] in self.sde_plugin.config['alm_phases']  and
+                  task['status'] in self.sde_plugin.config['sde_statuses_in_scope'])
 
 
      def sde_update_task_status(self, task, status):
@@ -266,8 +278,8 @@ class AlmConnector:
           """
           
           if (self.sde_plugin == None):
-               logging.error("Incorrect initialization")             
-               raise AlmException("Requires initialization")
+               logging.error('Incorrect initialization')             
+               raise AlmException('Requires initialization')
           
 
           logging.debug('Attempting to update task %s to %s' %
@@ -280,21 +292,42 @@ class AlmConnector:
           
           except APIError as err:
                logging.error(err)
-               raise AlmException("Unable to update the task status in SD" +
-                                  " Elements. Either the task no longer " +
-                                  "exists, there was a problem connecting " +
-                                  " to the server, or the status was invalid")
-          logging.info("Status for task %s successfully set in SD Elements" % task['id'])
+               raise AlmException('Unable to update the task status in SD' +
+                                  ' Elements. Either the task no longer ' +
+                                  'exists, there was a problem connecting ' +
+                                  ' to the server, or the status was invalid')
+          logging.info('Status for task %s successfully set in SD Elements' % task['id'])
 
-          note_msg = "Task status changed via %s" % self.alm_name()
+          note_msg = 'Task status changed via %s' % self.alm_name()
 
           try:
                self.__add_note(task['id'], note_msg, '', status)
           except APIError as err:
-               logging.info("Unable to set a note to mark status " +
-                            "for %s to %s" % (task['id'], status))
+               logging.info('Unable to set a note to mark status ' +
+                            'for %s to %s' % (task['id'], status))
           
-          
+     def sde_get_task_content(self, task):
+          """ Convenience method that returns the text that should go into
+          contents of an ALM ticket/defect/story for a given task.
+
+          Raises an AlmException on encountering an error
+
+          Keyword arguments:
+          task  -- An SD Elements task representing the task to enter in the
+                   ALM
+          """
+          contents = '%s\n\nImported from SD Elements: %s' % (
+               task['content'], task['url'])
+
+          if (self.sde_plugin.config['how_tos_in_scope'] == 'True'):
+              if (task['implementations']):
+                   contents = contents + '\n\nHow Tos:\n\n'
+                   for implementation in task['implementations']:
+                        contents = contents + implementation['title'] + '\n\n'
+                        contents = contents + implementation['content'] + '\n\n'
+                        
+          return contents
+
 
      def synchronize(self):
           """ Synchronizes SDE project with ALM project.
@@ -320,7 +353,7 @@ class AlmConnector:
 
           try:
                if (self.sde_plugin == None):
-                    raise AlmException("Requires initialization")
+                    raise AlmException('Requires initialization')
 
                #Attempt to connect to SDE & ALM
                self.sde_connect()
@@ -328,7 +361,7 @@ class AlmConnector:
 
                #Attempt to get all tasks
                tasks = self.sde_get_tasks()
-               logging.info("Retrieved all tasks from SDE")
+               logging.info('Retrieved all tasks from SDE')
 
                for task in tasks:
                     if not(self.in_scope(task)):
@@ -368,36 +401,43 @@ class AlmConnector:
                               else:
                                    self.alm_update_task_status(alm_task,
                                                               task['status'])
-                              logging.info("Updated status of task " +
-                                               " %s in %s"
+                              logging.info('Updated status of task ' +
+                                               ' %s in %s'
                                                % (task['id'],precedence))    
                     else:
                          #Only exists in SD Elements, add it to ALM
                          ref = self.alm_add_task(task)
-                         note_msg = "Task synchronized in %s" % self.alm_name()
+                         note_msg = 'Task synchronized in %s' % self.alm_name()
                          if (ref):
-                              note_msg += ". Reference: %s" % (ref)
+                              note_msg += '. Reference: %s' % (ref)
                          self.__add_note(task['id'], note_msg, '', task['status'])                                   
-                         logging.info("Added task %s to ALM" % (task['id']))
+                         logging.info('Added task %s to ALM' % (task['id']))
 
-               logging.info("Synchronization complete")
+               logging.info('Synchronization complete')
                self.alm_disconnect()
 
-               print "Synchronization completed without errors"
+               print 'Synchronization completed without errors'
                     
           except AlmException as err:
-               logging.error("%s" % err)
+               logging.error('%s' % err)
                try:
                     self.alm_disconnect()
                except AlmException as err2:
-                    logging.error("Unable to disconnect from ALM")
-               print "error was encountered, please see log"
+                    logging.error('Unable to disconnect from ALM')
+               print 'error was encountered, please see log'
 
 def add_alm_config_options(config):
      """ Adds ALM config options to the config file"""
      config.add_custom_option('alm_phases',
                              'Phases of the ALM',
                              '-alm_phases')
+     config.add_custom_option('sde_statuses_in_scope',
+                             'SDE statuses that are in scope',
+                             '-sde_statuses_in_scope')
+     #how_tos_in_scope
+     config.add_custom_option('how_tos_in_scope',
+                             'Whether or not HowTos should be included',
+                             '-how_tos_in_scope')
      config.add_custom_option('alm_method',
                              'HTTP or HTTPS for ALM server',
                              '-alm_method',

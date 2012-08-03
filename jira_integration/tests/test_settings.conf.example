@@ -7,13 +7,13 @@ server = m1.sdelements.com
 email = apitest@example.org
 
 #SD Elements user password
-password = sde_password
+password = SDE_PASSWORD_GOES_HERE
 
 #SD Elements application
-application = JIRA Test
+application = APP_NAME_GOES_HERE
 
 #SD Elements project
-project = V1
+project = PROJECT_GOES_HERE
 
 ###### JIRA settings  ######
 #JIRA Server name, includes port
@@ -30,11 +30,26 @@ alm_id = sdetest
               
 #Password for above user. Note that this will be encrypted
 #in future versions of the plugin
-alm_password = alm_password
+alm_password = JIRA_PASSWORD_GOES_HERE
               
 ######Project settings######
 #JIRA project key
-alm_project = TESTP
+alm_project = JIRA_PROJECT_KEY_GOES_HERE
+
+#A comma-delimited list of statuses for tasks
+#that you wish to import into the ALM.
+#For example, if you only want to synchronize
+#tasks that are currently TODO in SD Elements
+#then just enter TODO
+#Valid values are:
+#TODO,DONE,NA
+sde_statuses_in_scope = TODO,DONE,NA
+
+#Should HowTos be included in what's added
+#to the ALM tools?
+#Valid values are:
+#True or False
+how_tos_in_scope = True
           
 #JIRA allows workflow customization. Customized workflows
 #may make it difficult for the plugin to close a ticket
