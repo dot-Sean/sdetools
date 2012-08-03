@@ -3,12 +3,16 @@ import sys, os
 import csv
 import re
 from datetime import datetime
-
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
+from sdelib.commons import Error
 from sdelib.conf_mgr import config
 from sdelib.apiclient import APIError
 from sdelib.interactive_plugin import PlugInExperience
+from xml.dom import minidom
+
+class IntegrationError(Error):
+    pass
 
 class BaseIntegrator:
     def __init__(self, config):
@@ -17,12 +21,47 @@ class BaseIntegrator:
         self.mapping = {}
         self.report_id = ""
         self.config = config
+        self.plugin = None
+        self._init_config()
+
+    def _init_config(self):
+        self.config.add_custom_option("mapping_file", "Task ID -> CWE mapping in XML format", "m")
+
+    def parse_args(self, argv):
+        ret = self.config.parse_args(argv)
+        if not ret:
+            raise IntegrationError("Error parsing arguments")
         self.plugin = PlugInExperience(config)
 
-    def load_mapping_from_csv(self, csv_file):
+    def load_mapping_from_xml(self):
+        try:
+            base = minidom.parse(config['mapping_file'])
+        except KeyError, ke:
+            raise IntegrationError("Missing configuration option 'mapping_file'")
+        except Exception, e:
+            raise IntegrationError("An error occured opening mapping file '%s'" % config['mapping_file'])
+
+        cwe_mapping = {}
+        for task in base.getElementsByTagName('task'):
+            for cwe in task.getElementsByTagName('cwe'):
+                 tasks = []
+                 if (cwe_mapping.has_key(cwe.attributes['id'].value)):
+                     tasks = cwe_mapping[cwe.attributes['id'].value]
+                 tasks.append(task.attributes['id'].value)
+                 cwe_mapping[cwe.attributes['id'].value] = tasks
+
+        self.mapping = cwe_mapping
+
+    def load_mapping_from_csv(self):
         csv_mapping = {}
-        mappingReader = csv.reader(open(csv_file),delimiter=',',quotechar='"')
-        for row in mappingReader:
+        try:
+            mapping_reader = csv.reader(open(csv_file),delimiter=',',quotechar='"')
+        except KeyError, ke:
+             raise IntegrationError("Missing configuration option 'mapping_file'")
+        except Exception, e:
+             raise IntegrationError("An error occured opening mapping file '%s'" % csv_file)
+
+        for row in mapping_reader:
             tasks = []
             if (csv_mapping.has_key(row[5])):
                tasks = csv_mapping[row[5]]
@@ -51,16 +90,18 @@ class BaseIntegrator:
                 unique_findings['nomap'].append(finding['cweid'])
                 continue
 
+            flaws = {}
             for mapped_task_id in mapped_tasks:
-                flaw = {}
                 if(unique_findings.has_key(mapped_task_id)):
-                    flaw = unique_findings[mapped_task_id]
+                    flaws = unique_findings[mapped_task_id]
                 else:
-                    flaw = {}
-                    flaw['count'] = 0
-                flaw['count'] += 1
-                flaw['cweid'] =  finding['cweid']
-                unique_findings[mapped_task_id]=flaw
+                    flaws = {}
+                    flaws['cwes'] = []
+                    flaws['count'] = 0
+                flaws['count'] += 1
+                flaws['cwes'].append(finding['cweid'])
+                flaws['related_tasks'] = mapped_tasks
+                unique_findings[mapped_task_id]=flaws
         return unique_findings
 
     def output_findings(self):
@@ -104,6 +145,7 @@ class BaseIntegrator:
         severityTestRun = "TEST_RUN"        
 
         self.log_message(severityMsg, "Integration underway: %s" % (self.report_id))
+        self.log_message(severityMsg, "Mapped application/project: %s/%s" % (self.config['application'],self.config['project']))
 
         task_list = []
         tasks_found = []
@@ -119,7 +161,9 @@ class BaseIntegrator:
 
         stats_total_flaws = 0
 
-        for task_id in unique_findings.iterkeys():
+        task_ids = sorted(unique_findings.iterkeys())
+
+        for task_id in task_ids:
             finding = unique_findings[task_id]
             stats_total_flaws += finding['count']
 
@@ -131,11 +175,9 @@ class BaseIntegrator:
 
             file_name = ''
             description  = "Analysis: %s\n\n" % (self.report_id)
-            description += "CWE: http://cwe.mitre.org/data/definitions/%s.html\n\n" % (finding['cweid'])
-            description += "Flaws found: %d" % (finding['count'])
+            description += "Process completed with %d flaws found." % (finding['count'])
 
-
-            msg = "%s/%s/%s (cweid=%s,source=%s)" % (self.config['application'], self.config['project'], task_id, finding['cweid'], file_name)
+            msg = "%s" % task_id
 
             if commit:
                 try:
@@ -150,18 +192,26 @@ class BaseIntegrator:
                 stats_subtasks_added += 1
 
         stats_unaffected_tasks=0
+        stats_test_tasks=0
 
+        task_ids = []
         for task in task_list:
             if(task['phase'] in self.phase_exceptions):
+                stats_test_tasks+=1
                 continue
 
             task_id = re.search('(\d+)-[^\d]+(\d+)', task['id']).group(2)
             if(unique_findings.has_key(task_id)):
                 continue
-            
+           
+            task_ids.append(int(task_id))
+
+        task_ids = sorted(task_ids)
+
+        for task_id in task_ids:
             stats_unaffected_tasks+=1
 
-            msg = "%s/%s/%s" % (self.config['application'], self.config['project'], task_id)
+            msg = "T%s" % task_id
             description = "Analysis: %s\n\nProcess completed with 0 flaws found." % (self.report_id)
             file_name = ''
 
@@ -177,22 +227,23 @@ class BaseIntegrator:
                 self.log_message(severityTestRun, "Marked %s as DONE" % (msg))
                 stats_tasks_affected += 1
 
-        self.log_message(severityMsg, "These CWEs were not mapped: "+ ",".join(missing_cwe_map))
+        self.log_message(severityError, "These CWEs could not be mapped: "+ ",".join(missing_cwe_map))
         self.log_message(severityMsg, "---------------------------------------------------------")
         self.log_message(severityMsg, "%d subtasks created from %d flaws."%(stats_subtasks_added, stats_total_flaws))
         self.log_message(severityMsg, "%d flaws could not be mapped." %(len(missing_cwe_map)))
         self.log_message(severityMsg, "%d errors encountered." % (stats_errors))
-        self.log_message(severityMsg, "%d project tasks had 0 flaws." %(stats_unaffected_tasks))
+        self.log_message(severityMsg, "%d/%d project tasks had 0 flaws." %(stats_unaffected_tasks,len(task_list)-(stats_test_tasks)))
         self.log_message(severityMsg, "---------------------------------------------------------")
         self.log_message(severityMsg, "Completed")
 
 def main(argv):
-    ret = config.parse_args(argv)
-    if not ret:
+    base = BaseIntegrator(config)
+    try:
+        base.parse_args(argv)
+    except:
         sys.exit(1)
 
-    base = BaseIntegrator(config)
-    base.load_mapping_from_csv(config['targets'][0])
+    base.load_mapping_from_xml()
     base.output_mapping()
 
 if __name__ == "__main__":
