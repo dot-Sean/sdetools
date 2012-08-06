@@ -8,9 +8,9 @@ sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
 from sdelib.conf_mgr import config
 from sdelib.interactive_plugin import PlugInExperience
 
-from mingle_integration.bin.mingle_plugin import MingleTask, MingleConnector
-from mingle_integration.bin.mingle_plugin import add_mingle_config_options
-from mingle_integration.bin.mingle_apiclient import MingleAPIBase
+from mingle_integration.lib.mingle_plugin import MingleTask, MingleConnector
+from mingle_integration.lib.mingle_plugin import add_mingle_config_options
+from mingle_integration.lib.mingle_apiclient import MingleAPIBase
 from alm_integration.alm_plugin_base import AlmException
 from sdelib.interactive_plugin import PluginError
 

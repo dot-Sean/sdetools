@@ -3,16 +3,14 @@
 
 import sys, os, unittest
 sys.path.append(os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0])
-#sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
-
 import csv, random
 
 from sdelib.conf_mgr import config
 from sdelib.interactive_plugin import PlugInExperience
 import logging
 
-from jira_integration.bin.jira_plugin import JIRATask, JIRAConnector
-from jira_integration.bin.jira_plugin import JIRABase, add_jira_config_options
+from jira_integration.lib.jira_plugin import JIRATask, JIRAConnector
+from jira_integration.lib.jira_plugin import JIRABase, add_jira_config_options
 
 
 CONF_FILE_LOCATION = 'test_settings.conf'
@@ -26,13 +24,13 @@ class TestJiraCase(unittest.TestCase):
           self.tac = JIRAConnector(self.plugin, jbase)
           self.sde_tasks = None
           self.alm_tasks = None
-    
-     def test_connect(self):
           """Tests that we can connect to SD Elements """
           self.assertNotEqual(self.tac, None)
           self.tac.sde_connect()
+          self.tac.alm_connect()
           self.assertTrue(self.tac.is_sde_connected())
 
+          
      def test_jira_get_task(self):
           """First get all SD ELements tasks"""
           self.sde_tasks = self.tac.sde_get_tasks()
@@ -47,10 +45,7 @@ class TestJiraCase(unittest.TestCase):
                task['id']
                task['priority']
                task['note_count']
-
-          alm_task = self.tac.alm_get_task(self.sde_tasks[0])
      
-
      def __create_test_task(self):
           random_id = 'T%d' % random.randint(1, 999999999)
           random_title = '%s: Test task' % (random_id)
@@ -82,19 +77,30 @@ class TestJiraCase(unittest.TestCase):
      def test_jira_add_task(self):
           test_task = self.__create_test_task()
           alm_key = self.tac.alm_add_task(test_task)
+          test_task_result = self.tac.alm_get_task(test_task)
+          self.assertFalse(test_task_result == None)
 
      def test_jira_update_task_status(self):
           test_task = self.__create_test_task()
           self.tac.alm_add_task(test_task)
-          jira_task = self.tac.alm_get_task(test_task)
+          mingle_task = self.tac.alm_get_task(test_task)
 
-          current_note_count = test_task['note_count']
+          self.tac.alm_update_task_status(mingle_task,'DONE')
+          test_task_result = self.tac.alm_get_task(test_task)
+          self.assertTrue (test_task_result.get_status() == 'DONE')
 
-          self.tac.alm_update_task_status(jira_task,'DONE')
-          self.tac.alm_update_task_status(jira_task,'TODO')
-          logging.info('Attempt to set task status for %s to NA' %
-                       jira_task.get_alm_id())
-          self.tac.alm_update_task_status(jira_task,'NA')
+          test_task2 = self.__create_test_task()
+          self.tac.alm_add_task(test_task2)
+          mingle_task2 = self.tac.alm_get_task(test_task2)
+
+          self.tac.alm_update_task_status(mingle_task2,'NA')
+          test_task2_result = self.tac.alm_get_task(test_task2)
+          self.assertTrue ((test_task2_result.get_status() == 'DONE') or
+                           (test_task2_result.get_status() == 'NA'))
+
+          self.tac.alm_update_task_status(mingle_task2,'TODO')
+          test_task2_result = self.tac.alm_get_task(test_task2)
+          self.assertTrue (test_task2_result.get_status() == 'TODO')
 
           
      def test_synchronize(self):

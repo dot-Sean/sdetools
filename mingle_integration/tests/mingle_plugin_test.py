@@ -9,9 +9,9 @@ from sdelib.conf_mgr import config
 from sdelib.interactive_plugin import PlugInExperience
 import logging
 
-from mingle_integration.bin.mingle_plugin import MingleTask, MingleConnector
-from mingle_integration.bin.mingle_plugin import add_mingle_config_options
-from mingle_integration.bin.mingle_apiclient import MingleAPIBase
+from mingle_integration.lib.mingle_plugin import MingleTask, MingleConnector
+from mingle_integration.lib.mingle_plugin import add_mingle_config_options
+from mingle_integration.lib.mingle_apiclient import MingleAPIBase
 
 
 CONF_FILE_LOCATION = 'test_settings.conf'
@@ -25,12 +25,11 @@ class TestMingleCase(unittest.TestCase):
           self.tac = MingleConnector(self.plugin, mbase)
           self.sde_tasks = None
           self.alm_tasks = None
-    
-     def test_connect(self):
           """Tests that we can connect to SD Elements """
           self.assertNotEqual(self.tac, None)
           self.tac.sde_connect()
           self.assertTrue(self.tac.is_sde_connected())
+
 
      def test_sde_get_tasks(self):
           """First get all SD ELements tasks"""

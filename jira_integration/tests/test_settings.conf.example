@@ -1,23 +1,28 @@
 [global]
-###### SD ELements settings  ######
+###################################################
+#### SD Elements server and project settings  #####
+###################################################
 #SD Elements server name, includes port
 server = m1.sdelements.com
 
 #SD Elements user login email
-email = apitest@example.org
+email = user@example.org
 
 #SD Elements user password
-password = SDE_PASSWORD_GOES_HERE
+password = userpassword
 
 #SD Elements application
-application = APP_NAME_GOES_HERE
+application = SDEapp
 
 #SD Elements project
-project = PROJECT_GOES_HERE
+project = SDEproj
 
-###### JIRA settings  ######
+###################################################
+#### JIRA server and project settings         #####
+###################################################
+
 #JIRA Server name, includes port
-alm_server = sdetest.atlassian.net
+alm_server = jira_server
 
 #HTTP or HTTPs protocol
 alm_method = https
@@ -26,16 +31,15 @@ alm_method = https
 # -create new issues for the project
 # -read existing issues in the project
 # -create transitions on issues (e.g. close an issue)
-alm_id = sdetest
+alm_id = jira_user
               
 #Password for above user. Note that this will be encrypted
 #in future versions of the plugin
-alm_password = JIRA_PASSWORD_GOES_HERE
+alm_password = jira_passsword
               
-######Project settings######
 #JIRA project key
-alm_project = JIRA_PROJECT_KEY_GOES_HERE
-
+alm_project = JIRAPROJECT
+          
 #A comma-delimited list of statuses for tasks
 #that you wish to import into the ALM.
 #For example, if you only want to synchronize
@@ -45,33 +49,11 @@ alm_project = JIRA_PROJECT_KEY_GOES_HERE
 #TODO,DONE,NA
 sde_statuses_in_scope = TODO,DONE,NA
 
-#Should HowTos be included in what's added
-#to the ALM tools?
-#Valid values are:
-#True or False
-how_tos_in_scope = True
-          
-#JIRA allows workflow customization. Customized workflows
-#may make it difficult for the plugin to close a ticket
-#in JIRA. Thus, if the workflow is non-standard then
-#the plugin will not create transitions on issues
-#Valid values: True, False
-alm_standard_workflow = True
-
-#issue type for new issues raised by SD Elements
-jira_issue_id = 1
-
-#tranisition id for a closed ticket in JIRA
-jira_close_transition = 2
-
-#transition id for a re-opened ticket in JIRA
-jira_reopen_transition = 3
-
 #SD Elements task phases that are in scope.
 #Valid values: comma separated list-
 #requirements,architecture-design,development,testing
 #NOTE: please do not include any spaces in task names
-alm_phases = requirements,development,testing
+alm_phases = requirements
 
 #Which system takes precedence in case of
 #confliciting status. For example, if you mark
@@ -87,11 +69,40 @@ alm_phases = requirements,development,testing
 #since JIRA does not provide timezone support
 conflict_policy = alm
 
+#Should HowTos be included in what's added
+#to the ALM tools?
+#Valid values are:
+#True or False
+how_tos_in_scope = True
+
+###################################################
+#### Advanced JIRA Settings                   #####
+###################################################
+          
+#JIRA allows workflow customization. Customized workflows
+#may make it difficult for the plugin to close a ticket
+#in JIRA. Thus, if the workflow is non-standard then
+#the plugin will not create transitions on issues
+#Valid values: True, False
+alm_standard_workflow = True
+
+#issue type for new issues raised by SD Elements
+jira_issue_type = Bug
+
+#tranisition for a closed issue in JIRA
+jira_close_transition = Close Issue
+
+#transition for a re-opened issue in JIRA
+jira_reopen_transition = Reopen Issue
+
+#a comma delimited list of statuses that signify a task is 
+#Done in JIRA
+jira_done_statuses = Resolved,Closed
 
 ######Base settings, do not modify######
 method = https
 targets =  .
-debug =  0
+debug =  1
 skip_hidden = True
 interactive =True
 askpasswd = False
