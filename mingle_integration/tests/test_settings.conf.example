@@ -1,5 +1,7 @@
 [global]
-###### SD ELements settings  ######
+###################################################
+#### SD Elements server and project settings  #####
+###################################################
 #SD Elements server name, includes port
 server = m1.sdelements.com
 
@@ -7,34 +9,36 @@ server = m1.sdelements.com
 email = user@example.org
 
 #SD Elements user password
-password = sde_passwords_goes_here
+password = userpassword
 
 #SD Elements application
-application = Mingle Test
+application = SDEApp
 
 #SD Elements project
-project = V2
+project = SDEProject
 
-###### Mingle settings  ######
+###################################################
+#### Mingle server and project settings       #####
+###################################################
+
 #Mingle Server name, includes port
-alm_server = eval.thoughtworks-studios.com/security-compass
+alm_server = mingleserver/org_name
 
 #HTTP or HTTPs protocol
-alm_method = http
+alm_method = https
               
 #Username for Mingle user that can:
 # -create new issues for the project
 # -read existing issues in the project
 # -create transitions on issues (e.g. close an issue)
-alm_id = alm_user_name
+alm_id = mingle_user_name
               
 #Password for above user. Note that this will be encrypted
 #in future versions of the plugin
-alm_password = alm_password
+alm_password = minglepassword
               
-######Project settings######
 #Mingle project identifier
-alm_project = project_id
+alm_project = alm_project_id
 
 #A comma-delimited list of statuses for tasks
 #that you wish to import into the ALM.
@@ -45,36 +49,11 @@ alm_project = project_id
 #TODO,DONE,NA
 sde_statuses_in_scope = TODO,DONE,NA
 
-
 #Should HowTos be included in what's added
 #to the ALM tools?
 #Valid values are:
 #True or False
 how_tos_in_scope = True
-
-          
-#SD Elements has the ability to map status 
-#of a Mingle story to an SD Elements task.
-#This can be non-trivial if workflow is
-#customized. If this value is set to True
-#then the plugin will attempt to synchronize
-#task statuses. If not, then the plugin
-#will simply add new tasks from SD Element
-#into the Mingle project without attempting
-#to synchronized task status
-#Valid values: True, False
-alm_standard_workflow = True
-
-#card type for new cards created by SD Elements
-mingle_card_type = Story
-
-#Initial 'status' to set for a new card
-mingle_new_status = Ready for Analysis
-
-#a comma delimited list of statuses that signify a task is Done in Mingle
-#Note the first one will be used by SD Elements when representing a Done task
-#in SD Elements inside of Mingle
-mingle_done_statuses = Ready for Testing,In Testing,Ready for Signoff,Accepted
 
 #SD Elements task phases that are in scope.
 #Valid values: comma separated list-
@@ -92,11 +71,73 @@ alm_phases = requirements
 #Valid values:
 #alm -> ALM tool (i.e Mingle) takes precedence
 #sde -> SDE takes precedence
-#timestamp -> Last modified system takes precedence. NOTE:
-#support for timestamp is still expirimental because of lack
-#timezone support
 conflict_policy = alm
 
+
+###################################################
+#### Advanced Mingle Settings                 #####
+###################################################
+
+          
+#SD Elements has the ability to map status 
+#of a Mingle story to an SD Elements task.
+#This can be non-trivial if workflow is
+#customized. If this value is set to True
+#then the plugin will attempt to synchronize
+#task statuses. If not, then the plugin
+#will simply add new tasks from SD Element
+#into the Mingle project without attempting
+#to synchronized task status
+#Valid values: True, False
+alm_standard_workflow = True
+
+###################################################
+#### The following settings work for standard #####
+#### Mingle templates:                        #####
+####  * Scrum (12.1)                          #####                 
+####  * Agile hybrid template (12.1)          #####  
+####  * Agile hybrid with tasks (12.1)        #####
+###################################################
+#card type for new cards created by SD Elements
+mingle_card_type = Story
+
+#Initial 'status' to set for a new card
+mingle_new_status = Ready for Analysis
+
+#a comma delimited list of statuses that signify a task is Done in Mingle
+#Note the first one will be used by SD Elements when representing a Done task
+#in SD Elements inside of Mingle
+mingle_done_statuses = Ready for Testing,In Testing,Ready for Signoff,Accepted
+
+
+
+###################################################
+#### The following settings work for standard #####
+#### Mingle templates:                        #####
+#### * XP template (12.1)                     #####               
+###################################################
+#mingle_card_type = Story
+#mingle_new_status = New
+#mingle_done_statuses = Done
+
+
+###################################################
+#### The following settings work for standard #####
+#### Mingle templates:                        #####
+#### * Simple template (12.1)                 #####               
+###################################################
+#mingle_card_type = Story
+#mingle_new_status = New
+#mingle_done_statuses = Complete
+
+###################################################
+#### The following settings work for standard #####
+#### Mingle templates:                        #####
+#### * Lean template (12.1)                   #####               
+###################################################
+#mingle_card_type = Story
+#mingle_new_status = New Customer Request
+#mingle_done_statuses = Testing Buffer,Testing Pipeline,Signoff Buffer,Deployment Buffer,Deployed
 
 ######Base settings, do not modify######
 method = https
