@@ -9,7 +9,7 @@ from sdelib.interactive_plugin import PlugInExperience
 from sdelib.apiclient import APIBase, URLRequest, APIError
 from alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from alm_integration.alm_plugin_base import AlmException, add_alm_config_options
-from mingle_integration.bin.mingle_apiclient import MingleAPIBase
+from mingle_integration.lib.mingle_apiclient import MingleAPIBase
 from sdelib.conf_mgr import Config
 from datetime import datetime
 import logging
