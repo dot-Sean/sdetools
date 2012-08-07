@@ -75,7 +75,7 @@ class AlmConnector:
 
           """
           logging.basicConfig(format='%(asctime)s,%(levelname)s:%(message)s'
-                              ,filename='info.log',level=logging.INFO)
+                              ,filename='info.log',level=logging.DEBUG)
           self.sde_plugin = sde_plugin
           self.alm_plugin = alm_plugin
           
@@ -401,7 +401,7 @@ class AlmConnector:
                               else:
                                    self.alm_update_task_status(alm_task,
                                                               task['status'])
-                              logging.info('Updated status of task ' +
+                              logging.debug('Updated status of task ' +
                                                ' %s in %s'
                                                % (task['id'],precedence))    
                     else:
@@ -411,21 +411,14 @@ class AlmConnector:
                          if (ref):
                               note_msg += '. Reference: %s' % (ref)
                          self.__add_note(task['id'], note_msg, '', task['status'])                                   
-                         logging.info('Added task %s to ALM' % (task['id']))
 
                logging.info('Synchronization complete')
                self.alm_disconnect()
-
-               print 'Synchronization completed without errors'
                     
           except AlmException as err:
-               logging.error('%s' % err)
-               try:
-                    self.alm_disconnect()
-               except AlmException as err2:
-                    logging.error('Unable to disconnect from ALM')
-               print 'error was encountered, please see log'
-
+               self.alm_disconnect()
+               raise err
+               
 def add_alm_config_options(config):
      """ Adds ALM config options to the config file"""
      config.add_custom_option('alm_phases',

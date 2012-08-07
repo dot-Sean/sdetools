@@ -8,24 +8,26 @@ sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
 from sdelib.conf_mgr import config
 from sdelib.interactive_plugin import PlugInExperience
 
-from mingle_integration.bin.mingle_plugin import MingleTask, MingleConnector
-from mingle_integration.bin.mingle_plugin import add_mingle_config_options
-from mingle_integration.bin.mingle_apiclient import MingleAPIBase
+from mingle_integration.lib.mingle_plugin import MingleTask, MingleConnector
+from mingle_integration.lib.mingle_plugin import add_mingle_config_options
+from mingle_integration.lib.mingle_apiclient import MingleAPIBase
+from alm_integration.alm_plugin_base import AlmException
+from sdelib.interactive_plugin import PluginError
 
 import logging
 
 def main(argv):
-
-    add_mingle_config_options(config)
-    ret = config.parse_args(argv)
-    
-    if not ret:
-        sys.exit(1)
-    
-    sde_plugin = PlugInExperience(config)
-    mbase = MingleAPIBase(config)    
-    mingle = MingleConnector(sde_plugin, mbase)
-    mingle.synchronize()
+    try:
+        add_mingle_config_options(config)
+        ret = config.parse_args(argv)
+        if not ret:
+            sys.exit(1)
+        sde_plugin = PlugInExperience(config)
+        mbase = MingleAPIBase(config)
+        mingle = MingleConnector(sde_plugin, mbase)
+        mingle.synchronize()
+    except (AlmException, PluginError) as e:
+        print 'The following error was encountered: %s' % e
  
     
 if __name__ == "__main__":
