@@ -79,17 +79,16 @@ how_tos_in_scope = True
 #### Advanced JIRA Settings                   #####
 ###################################################
           
-#JIRA allows workflow customization. Customized workflows
-#may make it difficult for the plugin to close a ticket
-#in JIRA. Thus, if the workflow is non-standard then
-#the plugin will not create transitions on issues
-#Valid values: True, False
+#This value indicates whether or not task status
+#should be synchronized. In cases of difficult
+#custom workflow that can't easily be integrated,
+#you may wish to set this to False.
 alm_standard_workflow = True
 
 #issue type for new issues raised by SD Elements
 jira_issue_type = Bug
 
-#tranisition for a closed issue in JIRA
+#transition for a closed issue in JIRA
 jira_close_transition = Close Issue
 
 #transition for a re-opened issue in JIRA
