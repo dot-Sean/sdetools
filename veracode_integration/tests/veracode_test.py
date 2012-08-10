@@ -17,24 +17,7 @@ class TestVeracode(unittest.TestCase):
           self.integrator.init_plugin()
           self.assertTrue(True)
 
-     def test_load_xml_mapping(self):
-         self.integrator.load_mapping_from_xml()
-         # No exception thrown implies success
-         self.assertTrue(True)
-
-     def test_parse_result(self):
-          self.integrator.load_mapping_from_xml()
-          self.integrator.parse()
-          findings = self.integrator.get_findings()
-          xml_findings_count=0
-          try:
-              base = minidom.parse(config['report_xml'])
-              xml_findings_count = len(base.getElementsByTagName('flaw'))
-          except:
-              self.assertTrue(False)
-          self.assertTrue( xml_findings_count == len(findings)  )
-
-     def execute_save_findings(self, commit):
+     def execute_import_findings(self, commit):
 
           try:
               task_list = self.integrator.plugin.get_task_list()
@@ -50,6 +33,14 @@ class TestVeracode(unittest.TestCase):
           self.integrator.load_mapping_from_xml()
           self.integrator.parse()
           findings = self.integrator.get_findings()
+          xml_findings_count=0
+          try:
+              base = minidom.parse(config['report_xml'])
+              xml_findings_count = len(base.getElementsByTagName('flaw'))
+          except:
+              self.assertTrue(False)
+          self.assertTrue( xml_findings_count == len(findings)  )
+
           result = self.integrator.import_findings(commit)
           self.assertTrue(result.error_count==0)
           all_tasks_sanity_check = (len(result.noflaw_tasks)+len(result.affected_tasks)) == total_nontest_tasks
@@ -73,11 +64,11 @@ class TestVeracode(unittest.TestCase):
               self.assertTrue(last_note['text'].find(result.import_datetime) > -1 )
               self.assertTrue(last_note['status'] == "TODO")
 
-     def run_uncommitted(self):
+     def test_run_uncommitted(self):
           self.execute_import_findings(False)
 
      def test_run_commit(self):
-          self.execute_save_findings(True)
+          self.execute_import_findings(True)
     
 if __name__ == "__main__":
     unittest.main()
