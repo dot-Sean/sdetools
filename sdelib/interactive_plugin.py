@@ -140,3 +140,10 @@ class PlugInExperience:
 
         return self.api.add_note("%d-%s" % (self.prj['id'], task_id), text, filename, status)
 
+    def get_notes(self, task_id):
+        if not self.connected:
+             self.get_and_validate_password()
+
+        self.app, self.prj = self.select_project()
+ 
+        return self.api.get_notes("%d-%s" % (self.prj['id'], task_id))       

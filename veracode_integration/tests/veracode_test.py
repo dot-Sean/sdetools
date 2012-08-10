@@ -3,9 +3,6 @@
 
 import sys, os, unittest
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.abspath(__file__))
 
 from veracode_integration.veracode_integrator import VeracodeIntegrator
 from sdelib.conf_mgr import config

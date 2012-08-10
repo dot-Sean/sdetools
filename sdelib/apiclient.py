@@ -208,6 +208,9 @@ class APIBase:
         result = self._call_api('notes', URLRequest.POST, args=note)
         return result
 
+    def get_notes(self, task):
+        return self._call_api('notes',args={'task':task})
+
     def update_task_status(self, task, status):
         """
         Update the task status. The task ID should include the project number

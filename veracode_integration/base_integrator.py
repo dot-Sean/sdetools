@@ -3,7 +3,7 @@ import sys, os
 import csv
 import re
 from datetime import datetime
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from sdelib.commons import Error
 from sdelib.conf_mgr import config
@@ -11,8 +11,18 @@ from sdelib.apiclient import APIError
 from sdelib.interactive_plugin import PlugInExperience
 from xml.dom import minidom
 
+__all__ = ['BaseIntegrator, IntegrationError, IntegrationResult']
+
 class IntegrationError(Error):
     pass
+
+class IntegrationResult:
+    def __init__(self):
+        self.import_datetime=''
+        self.total_unaffected_tasks=0
+        self.total_affected_tasks=0
+        self.error_count=0
+        self.error_cwes_unmapped=0
 
 class BaseIntegrator:
     def __init__(self, config):
@@ -26,11 +36,15 @@ class BaseIntegrator:
 
     def _init_config(self):
         self.config.add_custom_option("mapping_file", "Task ID -> CWE mapping in XML format", "m")
+        self.config.add_custom_option("logging", "Logging level: on | off", "l", "off")
 
     def parse_args(self, argv):
         ret = self.config.parse_args(argv)
         if not ret:
             raise IntegrationError("Error parsing arguments")
+        self.init_plugin()
+
+    def init_plugin(self):
         self.plugin = PlugInExperience(config)
 
     def load_mapping_from_xml(self):
@@ -51,6 +65,8 @@ class BaseIntegrator:
                  cwe_mapping[cwe.attributes['id'].value] = tasks
 
         self.mapping = cwe_mapping
+        if(len(self.mapping) == 0):
+            raise IntegrationError("No mapping was found in file '%s'" % config['mapping_file'])
 
     def load_mapping_from_csv(self):
         csv_mapping = {}
@@ -70,6 +86,7 @@ class BaseIntegrator:
         self.mapping = csv_mapping
 
     def get_findings(self):
+        self.generate_findings()
         return self.findings
 
     def generate_findings(self):
@@ -79,6 +96,13 @@ class BaseIntegrator:
         print self.mapping
 
     def unique_findings(self):
+        """
+        Return a map (task_id=> *flaw) based on list of findings (cwe)
+
+        Where flaw is defined as:
+            flaw[cwes]
+            flaw[related_tasks]
+        """
         unique_findings = {}
         unique_findings['nomap'] = []
         for finding in self.get_findings():
@@ -97,8 +121,6 @@ class BaseIntegrator:
                 else:
                     flaws = {}
                     flaws['cwes'] = []
-                    flaws['count'] = 0
-                flaws['count'] += 1
                 flaws['cwes'].append(finding['cweid'])
                 flaws['related_tasks'] = mapped_tasks
                 unique_findings[mapped_task_id]=flaws
@@ -111,6 +133,8 @@ class BaseIntegrator:
     def lookup_task(self, cwe_id):
         if(self.mapping.has_key(cwe_id)):
             return self.mapping[cwe_id]
+        if(self.mapping.has_key('*')):
+            return self.mapping['*']
         return None
 
     def task_exists(self, needle_task_id, haystack_tasks):
@@ -127,15 +151,20 @@ class BaseIntegrator:
         return False
 
     def log_message (self, severity, message):
-        now = datetime.now().isoformat(' ')
-        print "%s - %s - %s" % (now, severity, message)
+        if(config['logging'] == 'on'):
+            now = datetime.now().isoformat(' ')
+            print "%s - %s - %s" % (now, severity, message)
 
-    def save_findings(self, commit=True):
+    def import_findings(self, commit):
 
         stats_subtasks_added = 0
         stats_tasks_affected = 0
-        stats_errors = 0
+        stats_api_errors = 0
         stats_missing_maps = 0
+        stats_total_skips = 0
+        stats_total_skips_findings = 0
+
+        import_datetime = datetime.now().isoformat(' ')
 
         self.generate_findings()
 
@@ -144,8 +173,9 @@ class BaseIntegrator:
         severityMsg = "INFO"
         severityTestRun = "TEST_RUN"        
 
-        self.log_message(severityMsg, "Integration underway: %s" % (self.report_id))
+        self.log_message(severityMsg, "Integration underway for: %s" % (self.report_id))
         self.log_message(severityMsg, "Mapped application/project: %s/%s" % (self.config['application'],self.config['project']))
+        self.log_message(severityMsg, "Unique import identifier: %s" % import_datetime)
 
         task_list = []
         tasks_found = []
@@ -153,48 +183,68 @@ class BaseIntegrator:
             task_list = self.plugin.get_task_list()
         except APIError, e:
             self.log_message(severityError,"Could not get task list for %s - Reason: %s" % (self.config['project'], str(e)))
-            stats_errors += 1
+            stats_api_errors += 1
 
         unique_findings = self.unique_findings()
         missing_cwe_map = unique_findings['nomap']
         del unique_findings['nomap']
 
-        stats_total_flaws = 0
-
         task_ids = sorted(unique_findings.iterkeys())
 
         for task_id in task_ids:
             finding = unique_findings[task_id]
-            stats_total_flaws += finding['count']
 
             if (not self.task_exists( task_id, task_list)):
-                self.log_message(severityMsg, "Task %s was not found in the project task list, skipping." % (task_id))
+                mapped_tasks = self.lookup_task("*")
+                if(mapped_tasks <> None and len(mapped_tasks)>0):
+                    new_task_id = mapped_tasks[0] # use the first one
+                    if (task_id <> new_task_id):
+                        self.log_message(severityWarn, "Task %s was not found in the project, mapping it to the default task %s." % (task_id, new_task_id))
+                        task_id=new_task_id
+
+            if (not self.task_exists( task_id, task_list)):
+                self.log_message(severityError, "Task %s was not found in the project, skipping %d findings." % (task_id, len(finding['cwes'])))
+                stats_total_skips += 1
+                stats_total_skips_findings += len(finding['cwes'])
                 continue
 
             task_id = "T%s" % (task_id)
 
             file_name = ''
-            description  = "Analysis: %s\n\n" % (self.report_id)
-            description += "Process completed with %d flaws found." % (finding['count'])
+            description  = "Update from external analysis: %s\n" % (self.report_id)
+            description += "Imported on: %s\n\n" % (import_datetime)
+
+            if (len(finding['cwes']) > 0):
+                description += "Analysis did not complete successfully: %d flaws were identified related to this task. " % len(finding['cwes'])
+                description += "The flaws are associated to the following common weakness:\n"
+            else:
+                description += "Analysis did not complete successfully: 1 flaw was identified that relates to this task. "
+                description += "The flaw is associated to the common weakness:\n"
+ 
+            for cwe in set(finding['cwes']):
+                description += "http://cwe.mitre.org/data/definitions/"+cwe
+
+            description = description[:500]
 
             msg = "%s" % task_id
 
             if commit:
                 try:
-                    self.plugin.add_note(task_id, description, file_name, "TODO")
+                    api_result = self.plugin.add_note(task_id, description, file_name, "TODO")
                     self.log_message(severityMsg, "TODO note added to %s" % (msg))
                     stats_subtasks_added += 1
                 except APIError, e:
                     self.log_message(severityError, "Could not add TODO note to %s - Reason: %s" % (msg, str(e)))
-                    stats_errors += 1
+                    stats_api_errors += 1
             else:
                 self.log_message(severityTestRun, "TODO note added to %s" % (msg))
                 stats_subtasks_added += 1
 
-        stats_unaffected_tasks=0
+        stats_noflaw_notes_added=0
         stats_test_tasks=0
 
-        task_ids = []
+        affected_tasks = []
+        noflaw_tasks = []
         for task in task_list:
             if(task['phase'] in self.phase_exceptions):
                 stats_test_tasks+=1
@@ -202,39 +252,55 @@ class BaseIntegrator:
 
             task_id = re.search('(\d+)-[^\d]+(\d+)', task['id']).group(2)
             if(unique_findings.has_key(task_id)):
+                affected_tasks.append(int(task_id))
                 continue
-           
-            task_ids.append(int(task_id))
 
-        task_ids = sorted(task_ids)
+            noflaw_tasks.append(int(task_id))
 
-        for task_id in task_ids:
-            stats_unaffected_tasks+=1
+        noflaw_tasks = sorted(noflaw_tasks)
+
+        for task_id in noflaw_tasks:
 
             msg = "T%s" % task_id
-            description = "Analysis: %s\n\nProcess completed with 0 flaws found." % (self.report_id)
+            description  = "Update from external analysis: %s\n" % (self.report_id)
+            description += "Imported on: %s\n\n" % (import_datetime)
+            description += "Analysis completed successfully: no flaws could be identified for this task."
+
             file_name = ''
 
             if commit:
                 try:
                     self.plugin.add_note("T%s" % (task_id), description, file_name, "DONE")
                     self.log_message(severityMsg, "Marked %s task as DONE" % (msg))
-                    stats_tasks_affected += 1
+                    stats_noflaw_notes_added += 1
                 except APIError, e:
                     self.log_message(severityError, "Could not mark %s DONE - Reason: %s" % (msg, str(e)))
-                    stats_errors += 1
+                    stats_api_errors += 1
             else:
                 self.log_message(severityTestRun, "Marked %s as DONE" % (msg))
-                stats_tasks_affected += 1
+                stats_noflaw_notes_added += 1
 
-        self.log_message(severityError, "These CWEs could not be mapped: "+ ",".join(missing_cwe_map))
         self.log_message(severityMsg, "---------------------------------------------------------")
-        self.log_message(severityMsg, "%d subtasks created from %d flaws."%(stats_subtasks_added, stats_total_flaws))
-        self.log_message(severityMsg, "%d flaws could not be mapped." %(len(missing_cwe_map)))
-        self.log_message(severityMsg, "%d errors encountered." % (stats_errors))
-        self.log_message(severityMsg, "%d/%d project tasks had 0 flaws." %(stats_unaffected_tasks,len(task_list)-(stats_test_tasks)))
+        if (len(missing_cwe_map) > 0):
+            self.log_message(severityError, "These CWEs could not be mapped: "+ ",".join(missing_cwe_map))
+            self.log_message(severityError, "%d total flaws could not be mapped." %(len(missing_cwe_map)))
+        else:
+             self.log_message(severityMsg, "All CWEs successfully mapped to a task.")
+        self.log_message(severityMsg, "%d subtasks created from %d flaws."%(stats_subtasks_added, len(self.findings)))
+        self.log_message(severityMsg, "%d/%d project tasks had 0 flaws." %(len(noflaw_tasks),len(task_list)-(stats_test_tasks)))
+        if (stats_total_skips > 0):
+            self.log_message(severityError, "%d flaws were mapped to %d tasks not found in the project. Skipped"%(stats_total_skips_findings,stats_total_skips))
+        self.log_message(severityMsg, "%d total api errors encountered." % (stats_api_errors))
         self.log_message(severityMsg, "---------------------------------------------------------")
         self.log_message(severityMsg, "Completed")
+
+        result = IntegrationResult()
+        result.import_datetime=import_datetime
+        result.affected_tasks=affected_tasks
+        result.noflaw_tasks=noflaw_tasks
+        result.error_count=stats_api_errors
+        result.error_cwes_unmapped=len(missing_cwe_map)
+        return result
 
 def main(argv):
     base = BaseIntegrator(config)

@@ -8,6 +8,8 @@ REQUIRED_ATTRIBS = ['issueid', 'cweid', 'categoryid', 'categoryname', 'descripti
 LOCATION_ATTRIBS = ['sourcefilepath', 'sourcefile', 'line', 'location']
 SOURCE_ID = "VC"
 
+__all__ = ['VeracodeIntegrator']
+
 def args_validator(config, args):
     """
     Validator helper for argument parsing. Returns error description in case of error,
@@ -88,20 +90,20 @@ class VeracodeIntegrator(BaseIntegrator):
             self.findings.append( finding )
 
 def main(argv):
-    vcInt = VeracodeIntegrator(config)
+    vc_integrator = VeracodeIntegrator(config)
 
     try:
-        vcInt.parse_args(argv)
+        vc_integrator.parse_args(argv)
     except:
         sys.exit(1)
 
-    vcInt.load_mapping_from_xml()
-    vcInt.parse()
+    vc_integrator.load_mapping_from_xml()
+    vc_integrator.parse()
 
     commit = False
     if(config['commit'] == 'true'):
 	commit = True
-    vcInt.save_findings(commit)
+    vc_integrator.import_findings(commit)
 
 if __name__ == "__main__":
     main(sys.argv)
