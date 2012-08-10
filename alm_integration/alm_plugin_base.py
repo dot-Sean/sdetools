@@ -114,6 +114,9 @@ class AlmConnector:
           logging.info('---------')
           logging.info('AlmConnector initialized')
 
+     def carriage_return(self):
+          return '\n'
+
      @abstractmethod
      def alm_name(self):
           """ Returns a string representation of the ALM, e.g. 'JIRA' """
@@ -316,15 +319,23 @@ class AlmConnector:
           task  -- An SD Elements task representing the task to enter in the
                    ALM
           """
-          contents = '%s\n\nImported from SD Elements: %s' % (
-               task['content'], task['url'])
+          contents = '%s%s%sImported from SD Elements: %s' % (
+               task['content'], self.carriage_return(),
+               self.carriage_return(), task['url'])
 
           if (self.sde_plugin.config['how_tos_in_scope'] == 'True'):
               if (task['implementations']):
-                   contents = contents + '\n\nHow Tos:\n\n'
+                   contents = '%s%s%sHow Tos:%s' % (contents,
+                                                  self.carriage_return(),
+                                                  self.carriage_return(),
+                                                  self.carriage_return())
                    for implementation in task['implementations']:
-                        contents = contents + implementation['title'] + '\n\n'
-                        contents = contents + implementation['content'] + '\n\n'
+                        contents = '%s%s%s%s%s%s' % (contents,
+                                               implementation['title'],
+                                               self.carriage_return(),
+                                               implementation['content'],
+                                                   self.carriage_return(),
+                                                  self.carriage_return())
                         
           return contents
 
