@@ -100,9 +100,7 @@ def main(argv):
     vc_integrator.load_mapping_from_xml()
     vc_integrator.parse()
 
-    commit = False
-    if(config['commit'] == 'true'):
-	commit = True
+    commit = (config['commit'] == 'true')
     vc_integrator.import_findings(commit)
 
 if __name__ == "__main__":
