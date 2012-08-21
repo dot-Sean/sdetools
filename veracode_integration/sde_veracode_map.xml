@@ -35,7 +35,7 @@
 		<cwe id="196" title="Unsigned to Signed Conversion Error"/>
 		<cwe id="192" title="Integer Coercion Error"/>
 	</task>
-	<task id="190" title="Validate all untrusted XML input against a schema">
+	<task id="55" title="Validate all untrusted XML input">
 		<cwe id="112" title="Missing XML Validation"/>
 	</task>
 	<task id="193" title="Review non-categorized/miscellaneous findings from static code analysis">
