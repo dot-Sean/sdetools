@@ -222,9 +222,9 @@ class BaseIntegrator:
                 description += "The flaw is associated to the common weakness:\n"
  
             for cwe in set(finding['cwes']):
-                description += "http://cwe.mitre.org/data/definitions/"+cwe
+                description += "http://cwe.mitre.org/data/definitions/"+cwe+"\n"
 
-            description = description[:500]
+            description = description[:800]
 
             msg = "%s" % task_id
 

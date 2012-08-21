@@ -101,7 +101,8 @@ def main(argv):
     vc_integrator.parse()
 
     commit = False
-    if(config['commit'] == 'true'):
+    args = config['commit']
+    if(args[0] == 'true'):
 	commit = True
     vc_integrator.import_findings(commit)
 
