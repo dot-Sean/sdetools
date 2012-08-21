@@ -10,18 +10,6 @@ SOURCE_ID = "VC"
 
 __all__ = ['VeracodeIntegrator']
 
-def args_validator(config, args):
-    """
-    Validator helper for argument parsing. Returns error description in case of error,
-    or None if validate passed.
-    """
-    if not args:
-        return "Missing commit argument"
-    if args[0] <> 'true' and args[0] != 'false':
-        return "Invalid value for commit '%s'. Specify 'true' or 'false'" % (args[0])
-
-    return None
-
 class VeracodeIntegrationError(IntegrationError):
     pass
 
@@ -34,11 +22,6 @@ class VeracodeIntegrator(BaseIntegrator):
     def _init_config(self):
         BaseIntegrator._init_config(self)
         self.config.add_custom_option("report_xml", "Veracode Report XML", "x")
-        self.config.set_custom_args(
-            'commit',
-            'commit (true|false)',
-            "'true'=commit new tasks or 'false'=test run only",
-            args_validator)
 
     def parse(self):
         try:
@@ -99,12 +82,7 @@ def main(argv):
 
     vc_integrator.load_mapping_from_xml()
     vc_integrator.parse()
-
-    commit = False
-    args = config['commit']
-    if(args[0] == 'true'):
-	commit = True
-    vc_integrator.import_findings(commit)
+    vc_integrator.import_findings()
 
 if __name__ == "__main__":
     main(sys.argv)

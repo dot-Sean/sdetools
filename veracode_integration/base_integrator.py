@@ -37,6 +37,7 @@ class BaseIntegrator:
     def _init_config(self):
         self.config.add_custom_option("mapping_file", "Task ID -> CWE mapping in XML format", "m")
         self.config.add_custom_option("logging", "Logging level: on | off", "l", "off")
+        self.config.add_custom_option("trial_run", "Trial run only: 'true' or 'false' (default)", "t", "false")
 
     def parse_args(self, argv):
         ret = self.config.parse_args(argv)
@@ -155,7 +156,9 @@ class BaseIntegrator:
             now = datetime.now().isoformat(' ')
             print "%s - %s - %s" % (now, severity, message)
 
-    def import_findings(self, commit):
+    def import_findings(self):
+
+        commit = (config['trial_run'] != 'true')
 
         stats_subtasks_added = 0
         stats_tasks_affected = 0
