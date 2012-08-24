@@ -33,13 +33,8 @@ def get_password():
     except EOFError:
         # Handle Ctrl+D
         raise KeyboardInterrupt
-    if (password is None):
-        return password
-    # Handle Ctrl+C
-    if '\x03' in password:
-        raise KeyboardInterrupt
-    # Handle Ctrl+Z
-    if '\x1a' in password:
+    # Handle Ctrl+C and Ctrl+Z
+    if password and ('\x03' in password or '\x1a' in password):
         raise KeyboardInterrupt
     return password
 
