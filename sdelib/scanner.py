@@ -11,10 +11,8 @@ class FileScanner:
         self.config = config
         self.content = content
         self.file_path = file_path
-        self.file_name = self.file_path.rsplit('/', 1)[-1]
-        self.file_type = ''
-        if '.' in self.file_name:
-            self.file_type = self.file_name.rsplit('.', 1)[-1]
+        self.file_name = os.path.basename(self.file_path)
+        self.file_type = os.path.splitext(self.file_name)
         self.match_list = {}
         self.fval = None
         self.line_info = []
@@ -124,7 +122,7 @@ class FileScanner:
                 print "  %s" % (self.content.content[item]['title'])
                 print "  Reasons: %s" % (self.match_list[item][0])
                 print
-                    
+
         return
 
 def args_validator(config, args):
@@ -146,7 +144,7 @@ class Scanner:
         self.config = config
         self.content = None
         self._init_config()
-    
+
     def _init_config(self):
         self.config.set_custom_args(
             'targets',
