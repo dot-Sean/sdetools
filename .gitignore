@@ -29,4 +29,7 @@ pip-log.txt
 
 #Configuration
 sdelint.cnf
+veracode_integration/tests/test_settings.conf
 
+#generated data
+usecases/output.csv
