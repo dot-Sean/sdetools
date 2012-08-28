@@ -12,7 +12,7 @@ class FileScanner:
         self.content = content
         self.file_path = file_path
         self.file_name = os.path.basename(self.file_path)
-        self.file_type = os.path.splitext(self.file_name)
+        self.file_type = os.path.splitext(self.file_name)[1].lstrip('.')
         self.match_list = {}
         self.fval = None
         self.line_info = []
