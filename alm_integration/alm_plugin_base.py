@@ -21,7 +21,7 @@ class AlmException(Exception):
     def __str__(self):
         return repr(self.value)
 
-class AlmTask:
+class AlmTask(object):
     """
          Abstract base class to represent a task in an ALM. This should be
          subclassed by an implementation for a specific ALM that can
@@ -54,7 +54,7 @@ class AlmTask:
         """ Returns a datetime.datetime object of last modified time """
         pass
 
-class AlmConnector:
+class AlmConnector(object):
     """
          Abstract base class for connectors to Application Lifecycle
          Management tools such as JIRA, Team Foundation Server, Rally, etc.

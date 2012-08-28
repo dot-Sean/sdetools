@@ -14,8 +14,6 @@ from mingle_integration.lib.mingle_apiclient import MingleAPIBase
 from alm_integration.alm_plugin_base import AlmException
 from sdelib.interactive_plugin import PluginError
 
-import logging
-
 def main(argv):
     try:
         add_mingle_config_options(config)
@@ -28,7 +26,6 @@ def main(argv):
         mingle.synchronize()
     except (AlmException, PluginError) as e:
         print 'The following error was encountered: %s' % e
- 
-    
+
 if __name__ == "__main__":
     main(sys.argv)

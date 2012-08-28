@@ -26,7 +26,7 @@ class JIRABase(APIBase):
         alm_config['email'] = alm_config['alm_id']
         alm_config['password'] = alm_config['alm_password']
         # Call parent constructor, and perform other configuration
-        super(JIRAConfig, self).__init__(config)
+        super(JIRABase, self).__init__(config)
         self.base_uri = '%s://%s/rest/api/2' % (self.config['alm_method'],
                                                 self.config['alm_server'])
 
@@ -58,7 +58,7 @@ class JIRATask(AlmTask):
 
     def get_status(self):
         """ Translates JIRA priority into SDE priority """
-        return 'DONE' if self.status in self.done_statuses else: 'TODO'
+        return 'DONE' if self.status in self.done_statuses else 'TODO'
 
     def get_timestamp(self):
         """ Returns a datetime object """
@@ -89,14 +89,14 @@ class JIRAConnector(AlmConnector):
 
     def __init__(self, sde_plugin, alm_plugin):
         """ Initializes connection to JIRA """
-        AlmConnector.__init__(self, sde_plugin, alm_plugin)
+        super(JIRAConnector, self).__init__(sde_plugin, alm_plugin)
 
         #Verify that the configuration options are set properly
         if (not self.sde_plugin.config['jira_done_statuses'] or
             len(self.sde_plugin.config['jira_done_statuses']) < 1):
             raise AlmException('Missing jira_done_statuses in configuration')
 
-        (self.sde_plugin.config['jira_done_statuses'] =
+        self.sde_plugin.config['jira_done_statuses'] = (
                 self.sde_plugin.config['jira_done_statuses'].split(','))
 
         if not self.sde_plugin.config['alm_standard_workflow']:
@@ -157,7 +157,7 @@ class JIRAConnector(AlmConnector):
         except APIError as err:
             logging.info(err)
             raise AlmException("Unable to get task %s from JIRA" % task_id)
-        if not result['total']
+        if not result['total']:
             #No result was found from query
             return None
         #We will use the first result from the query

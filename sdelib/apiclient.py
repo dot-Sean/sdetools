@@ -51,7 +51,7 @@ class URLRequest(urllib2.Request):
 
         return urllib2.Request.get_method(self)
 
-class APIBase:
+class APIBase(object):
     def __init__(self, config):
         self.config = config
         self.base_uri = '%s://%s/api' % (self.config['method'], self.config['server'])
@@ -152,10 +152,10 @@ class APIBase:
         return result
 
     def start_session(self):
-        """ 
+        """
         Starts a session with configured email & password in SD Elements
         """
-        
+
         args = {
             'username': self.config['email'],
             'password': self.config['password']}
@@ -165,7 +165,7 @@ class APIBase:
             if e.code == 400:
                 raise APIAuthError
             raise
-        for key in ['session-cookie-name', 'csrf-token', 'csrf-header-name', 
+        for key in ['session-cookie-name', 'csrf-token', 'csrf-header-name',
             'csrf-cookie-domain', 'csrf-cookie-name', 'session-token']:
             if key not in result:
                 raise APIFormatError('Invalid session information structure.')
@@ -174,18 +174,18 @@ class APIBase:
 
     def get_applications(self, **filters):
         """
-        Gets all applications accessible to user 
+        Gets all applications accessible to user
 
         Available Filters:
             name -> application name to be searched for
         """
         result = self._call_api('applications', args=filters)
         return result['applications']
-    
+
     def get_projects(self, application, **filters):
         """
         Gets all projects for parameter application
-        
+
         Available Filters:
             name -> project name to be searched for
         """
