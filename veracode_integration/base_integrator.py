@@ -64,7 +64,7 @@ class BaseIntegrator:
             raise IntegrationError("An error occurred opening mapping file '%s'" % config['mapping_file'])
 
         cwe_mapping = collections.defaultdict(list)
-        self.cwe_detail = {}
+        self.cwe_title = {}
         for task in base.getElementsByTagName('task'):
             for cwe in task.getElementsByTagName('cwe'):
                 cwe_id = cwe.attributes['id'].value
