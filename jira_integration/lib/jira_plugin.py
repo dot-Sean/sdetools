@@ -19,14 +19,14 @@ class JIRABase(APIBase):
     """ Base plugin for JIRA """
 
     def __init__(self, config):
-        # Hack to copy over the ALM id & password for JIRA
+        # Workaroud to copy over the ALM id & password for JIRA
         # authentication without overwriting the SD Elements
         # email & password in the config.
         alm_config = copy.deepcopy(config)
         alm_config['email'] = alm_config['alm_id']
         alm_config['password'] = alm_config['alm_password']
         # Call parent constructor, and perform other configuration
-        super(JIRABase, self).__init__(config)
+        super(JIRABase, self).__init__(alm_config)
         self.base_uri = '%s://%s/rest/api/2' % (self.config['alm_method'],
                                                 self.config['alm_server'])
 
