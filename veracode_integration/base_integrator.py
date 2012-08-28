@@ -18,16 +18,14 @@ class IntegrationError(Error):
     pass
 
 class IntegrationResult:
-    def __init__(self, import_datetime, affected_tasks, noflaw_tasks,
+    def __init__(self, import_start_datetime, import_finish_datetime, affected_tasks, noflaw_tasks,
             error_count, error_cwes_unmapped):
-        self.import_datetime = import_datetime
+        self.import_start_datetime = import_start_datetime
+        self.import_finish_datetime = import_finish_datetime
         self.affected_tasks = affected_tasks
         self.noflaw_tasks = noflaw_tasks
         self.error_count = error_count
         self.error_cwes_unmapped = error_cwes_unmapped
-        # TODO: Do we need / use these?
-        # self.total_affected_tasks = 0
-        # self.total_unaffected_tasks = 0
 
 class BaseIntegrator:
     def __init__(self, config):
@@ -37,6 +35,7 @@ class BaseIntegrator:
         self.report_id = ""
         self.config = config
         self.plugin = None
+        self.cwe_title = {}
         self._init_config()
 
     def _init_config(self):
@@ -54,8 +53,7 @@ class BaseIntegrator:
         self.init_plugin()
 
     def init_plugin(self):
-        # TODO: Should this be config, or self.config?
-        self.plugin = PlugInExperience(config)
+        self.plugin = PlugInExperience(self.config)
 
     def load_mapping_from_xml(self):
         try:
@@ -66,40 +64,19 @@ class BaseIntegrator:
             raise IntegrationError("An error occurred opening mapping file '%s'" % config['mapping_file'])
 
         cwe_mapping = collections.defaultdict(list)
+        self.cwe_detail = {}
         for task in base.getElementsByTagName('task'):
             for cwe in task.getElementsByTagName('cwe'):
                 cwe_id = cwe.attributes['id'].value
                 cwe_mapping[cwe_id].append(task.attributes['id'].value)
+                self.cwe_title[cwe_id] = cwe.attributes['title'].value
 
         self.mapping = cwe_mapping
         if not self.mapping:
             raise IntegrationError("No mapping was found in file '%s'" % config['mapping_file'])
 
-    def load_mapping_from_csv(self):
-        try:
-            mapping_reader = csv.reader(open(csv_file),delimiter=',',quotechar='"')
-        except KeyError, ke:
-             raise IntegrationError("Missing configuration option 'mapping_file'")
-        except Exception, e:
-             raise IntegrationError("An error occured opening mapping file '%s'" % csv_file)
-
-        csv_mapping = collections.defaultdict(list)
-        for row in mapping_reader:
-            # TODO: what is row[5]? what is row[3]?
-            key = row[5]
-            csv_mapping[key].append(row[3])
-        self.mapping = csv_mapping
-
-    def get_findings(self):
-        # TODO: Do we really need get_findings() and generate_findings(). The
-        #       later seems to be what we want. I'm also not a fan of get_xyz
-        #       methods with side effects. Do we want to rebuild the findings
-        #       everytime this is called?
-        self.generate_findings()
-        return self.findings
-
     def generate_findings(self):
-        self.findings[:] = []
+        return []
 
     def output_mapping(self):
         print self.mapping
@@ -113,7 +90,7 @@ class BaseIntegrator:
             flaw[related_tasks]
         """
         unique_findings = {'nomap': []}
-        for finding in self.get_findings():
+        for finding in self.generate_findings():
             cwe_id = finding['cweid']
             mapped_tasks = self.lookup_task(cwe_id)
             if not mapped_tasks:
@@ -154,10 +131,13 @@ class BaseIntegrator:
         return False
 
     def log_message (self, severity, message):
-        # TODO: We should use python's built in logger.
+        # TODO: Integrate with future logging component
         if config['logging'] == 'on':
             now = datetime.now().isoformat(' ')
             print "%s - %s - %s" % (now, severity, message)
+
+    def get_tool_name(self):
+        return 'External tool'
 
     def import_findings(self):
         commit = (config['trial_run'] != 'true')
@@ -168,21 +148,17 @@ class BaseIntegrator:
         stats_missing_maps = 0
         stats_total_skips = 0
         stats_total_skips_findings = 0
-        import_datetime = datetime.now().isoformat(' ')
+        import_start_datetime = datetime.now()
+        file_name = '' # Needed for Notes API. All notes will have an empty filename.
 
-        self.generate_findings()
-
-        # TODO: There must be a better place to declare these. When a sub
-        #       class wants to log a message it would have to redeclare these
-        #       values.
+        # TODO: Temporary values defined below. These will be removed when shared logging facility is used.
         severityError = "ERROR"
         severityWarn = "WARN"
         severityMsg = "INFO"
         severityTestRun = "TEST_RUN"
 
         self.log_message(severityMsg, "Integration underway for: %s" % (self.report_id))
-        self.log_message(severityMsg, "Mapped application/project: %s/%s" % (self.config['application'],self.config['project']))
-        self.log_message(severityMsg, "Unique import identifier: %s" % import_datetime)
+        self.log_message(severityMsg, "Mapped SD application/project: %s/%s" % (self.config['application'],self.config['project']))
 
         task_list = []
         tasks_found = []
@@ -217,24 +193,21 @@ class BaseIntegrator:
 
             task_id = "T%s" % (task_id)
 
-            description  = "Update from external analysis: %s\n" % (self.report_id)
-            description += "Imported on: %s\n\n" % (import_datetime)
-            if finding['cwes']:
-                description += "Analysis did not complete successfully: %d flaws were identified related to this task. " % len(finding['cwes'])
-                description += "The flaws are associated to the following common weakness:\n"
-            else:
-                description += "Analysis did not complete successfully: 1 flaw was identified that relates to this task. "
-                description += "The flaw is associated to the common weakness:\n"
+            description  = "Automated analysis tool %s identified %d potential vulnerabilities for this task.\n" % (self.get_tool_name(), len(finding['cwes']))
+            description += "%s Reference: %s\n\n" % (self.get_tool_name(), self.report_id)
+            description += "Referenced Weaknesses:\n"
 
-            for cwe in set(finding['cwes']):
-                description += "http://cwe.mitre.org/data/definitions/" + cwe + "\n"
+            for cwe in sorted(set(finding['cwes'])):
+                if self.cwe_title.has_key(cwe):
+                   description += "CWE #%s: %s\n" % ( cwe, self.cwe_title[cwe] )
+                else:
+                   description += "CWE #%s\n" % ( cwe )
 
             description = description[:800]
 
             msg = "%s" % task_id
 
             if commit:
-                file_name = ''  # Currently required to indicate note was created via API.
                 try:
                     api_result = self.plugin.add_note(task_id, description, file_name, "TODO")
                     self.log_message(severityMsg, "TODO note added to %s" % (msg))
@@ -264,11 +237,9 @@ class BaseIntegrator:
 
         for task_id in noflaw_tasks:
             msg = "T%s" % task_id
-            description  = "Update from external analysis: %s\n" % (self.report_id)
-            description += "Imported on: %s\n\n" % (import_datetime)
-            description += "Analysis completed successfully: no flaws could be identified for this task."
+            description  = "Automated analysis tool %s did not identify any potential vulnerabilities for this task.\n" % (self.get_tool_name())
+            description += "%s Reference: %s\n\n" % (self.get_tool_name(), self.report_id)
 
-            file_name = ''  # Currently required to indicate note was created via API.
             if commit:
                 try:
                     self.plugin.add_note("T%s" % (task_id), description, file_name, "DONE")
@@ -295,7 +266,8 @@ class BaseIntegrator:
         self.log_message(severityMsg, "---------------------------------------------------------")
         self.log_message(severityMsg, "Completed")
 
-        return IntegrationResult(import_datetime=import_datetime,
+        return IntegrationResult(import_start_datetime=import_start_datetime,
+                                 import_finish_datetime=datetime.now(),
                                  affected_tasks=affected_tasks,
                                  noflaw_tasks=noflaw_tasks,
                                  error_count=stats_api_errors,
@@ -303,12 +275,7 @@ class BaseIntegrator:
 
 def main(argv):
     base = BaseIntegrator(config)
-    try:
-        base.parse_args(argv)
-    except:
-        # TODO: We should catch an actual exception, or remove this code.
-        sys.exit(1)
-
+    base.parse_args(argv)
     base.load_mapping_from_xml()
     base.output_mapping()
 

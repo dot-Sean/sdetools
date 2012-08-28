@@ -6,7 +6,7 @@ from xml.dom import minidom
 
 REQUIRED_ATTRIBS = ['issueid', 'cweid', 'categoryid', 'categoryname', 'description', 'severity', 'module']
 LOCATION_ATTRIBS = ['sourcefilepath', 'sourcefile', 'line', 'location']
-SOURCE_ID = "VC"
+SOURCE_NAME = "Veracode"
 
 __all__ = ['VeracodeIntegrator']
 
@@ -37,6 +37,9 @@ class VeracodeIntegrator(BaseIntegrator):
                 entry[attr] = node.attributes[attr].value
         return entry
 
+    def get_tool_name(self):
+        return SOURCE_NAME
+
     def parse(self):
         try:
             base = minidom.parse(config['report_xml'])
@@ -49,12 +52,10 @@ class VeracodeIntegrator(BaseIntegrator):
         if len(detailed_reports) != 1:
             raise VeracodeIntegrationError('An unexpected number of detailedreport nodes found (%d)' % len(detailed_reports))
         dr = detailed_reports[0]
-        self.report_id = "%s-%s (%s-b%s) %s" % (
-                SOURCE_ID,
+        self.report_id = "%s (%s-b%s)" % (
                 dr.attributes['app_name'].value,
                 dr.attributes['app_id'].value,
-                dr.attributes['build_id'].value,
-                dr.attributes['generation_date'].value)
+                dr.attributes['build_id'].value )
 
         self.raw_findings[:] = [self._make_raw_finding(node)
                                 for node in base.getElementsByTagName('flaw')]
@@ -78,14 +79,11 @@ class VeracodeIntegrator(BaseIntegrator):
         return finding
 
     def generate_findings(self):
-        self.findings[:] = [self._make_finding(item) for item in self.get_raw_findings()]
+        return [self._make_finding(item) for item in self.get_raw_findings()]
 
 def main(argv):
     vc_integrator = VeracodeIntegrator(config)
-    try:
-        vc_integrator.parse_args(argv)
-    except:
-        sys.exit(1)
+    vc_integrator.parse_args(argv)
     vc_integrator.load_mapping_from_xml()
     vc_integrator.parse()
     vc_integrator.import_findings()
