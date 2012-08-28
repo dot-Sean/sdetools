@@ -35,38 +35,38 @@ class JIRAConfig(Config):
         self.settings = config.copy()
 
 class JIRATask(AlmTask):
-     """ Representation of a task in JIRA """
+    """ Representation of a task in JIRA """
 
-     def __init__(self, task_id, alm_id, priority, status, resolution,
-                  timestamp, done_statuses):
-          self.task_id = task_id
-          self.alm_id = alm_id
-          self.priority = priority
-          self.status = status
-          self.resolution = resolution
-          self.timestamp = timestamp
-          self.done_statuses = done_statuses  # comma-separated list
+    def __init__(self, task_id, alm_id, priority, status, resolution,
+                 timestamp, done_statuses):
+        self.task_id = task_id
+        self.alm_id = alm_id
+        self.priority = priority
+        self.status = status
+        self.resolution = resolution
+        self.timestamp = timestamp
+        self.done_statuses = done_statuses  # comma-separated list
 
-     def get_task_id(self):
-          return self.task_id
+    def get_task_id(self):
+        return self.task_id
 
-     def get_alm_id(self):
-          return self.alm_id
+    def get_alm_id(self):
+        return self.alm_id
 
-     def get_priority(self):
-         return self.priority
+    def get_priority(self):
+        return self.priority
 
-     def get_status(self):
-         """ Translates JIRA priority into SDE priority """
-         return 'DONE' if self.status in self.done_statuses else: 'TODO'
+    def get_status(self):
+        """ Translates JIRA priority into SDE priority """
+        return 'DONE' if self.status in self.done_statuses else: 'TODO'
 
-     def get_timestamp(self):
-          """ Returns a datetime object """
-          return datetime.strptime(self.timestamp.split('.')[0],
-                                   '%Y-%m-%dT%H:%M:%S')
+    def get_timestamp(self):
+        """ Returns a datetime object """
+        return datetime.strptime(self.timestamp.split('.')[0],
+                                 '%Y-%m-%dT%H:%M:%S')
 
-     @classmethod
-     def translate_priority(cls, priority):
+    @classmethod
+    def translate_priority(cls, priority):
         """ Translates an SDE priority into a JIRA priority """
         try:
             priority = int(priority)
@@ -113,7 +113,7 @@ class JIRAConnector(AlmConnector):
         self.jira_issue_type_id = None
 
     def alm_name(self):
-          return "JIRA"
+        return "JIRA"
 
     def alm_connect(self):
         """ Verifies that JIRA connection works """
@@ -174,35 +174,35 @@ class JIRAConnector(AlmConnector):
                         self.sde_plugin.config['jira_done_statuses'])
 
     def alm_add_task(self, task):
-         #Add task
-         add_result = None
-         args= {
-            'fields': {
-                'project': {
-                    'key':self.sde_plugin.config['alm_project']
-                },
-                'summary':task['title'],
-                'description':task['content'],
-                'priority': {
-                    'name':JIRATask.translate_priority(task['priority'])
-                },
-                'issuetype':{
-                    'id': self.jira_issue_type_id
-                }
-            }
-         }
-         try:
-             add_result = self.alm_plugin._call_api('issue',
-                     method=URLRequest.POST, args=args)
-         except APIError as err:
-             return None
+        #Add task
+        add_result = None
+        args= {
+           'fields': {
+               'project': {
+                   'key':self.sde_plugin.config['alm_project']
+               },
+               'summary':task['title'],
+               'description':task['content'],
+               'priority': {
+                   'name':JIRATask.translate_priority(task['priority'])
+               },
+               'issuetype':{
+                   'id': self.jira_issue_type_id
+               }
+           }
+        }
+        try:
+            add_result = self.alm_plugin._call_api('issue',
+                    method=URLRequest.POST, args=args)
+        except APIError as err:
+            return None
 
-         if (self.sde_plugin.config['alm_standard_workflow'] == 'True' and
-             (task['status'] == 'DONE' or task['status'] == 'NA')):
-             self.alm_update_task_status(self.alm_get_task(task), task['status'])
+        if (self.sde_plugin.config['alm_standard_workflow'] == 'True' and
+            (task['status'] == 'DONE' or task['status'] == 'NA')):
+            self.alm_update_task_status(self.alm_get_task(task), task['status'])
 
-         #Return a unique identifier to this task in JIRA
-         return 'Issue %s' % add_result['key']
+        #Return a unique identifier to this task in JIRA
+        return 'Issue %s' % add_result['key']
 
     def alm_update_task_status(self, task, status):
         if (not task or
@@ -250,7 +250,7 @@ class JIRAConnector(AlmConnector):
             raise AlmException("Unable to set task status: %s" % err)
 
     def alm_disconnect(self):
-          pass
+        pass
 
 def add_jira_config_options(config):
     """ Adds JIRA specific config options to the config file"""
@@ -272,4 +272,3 @@ def add_jira_config_options(config):
     config.add_custom_option('jira_done_statuses',
                              'Done statuses in JIRA',
                              '-jira_done_statuses')
-
