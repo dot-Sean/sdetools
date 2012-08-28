@@ -27,11 +27,11 @@ class MingleAPIBase(APIBase):
                                                        'alm_password'],
                                         self.config['alm_server'])
         burp_proxy = 'http://localhost:8080'
-        
+
         proxy_support = urllib2.ProxyHandler({self.config['method']:
                                               burp_proxy})
-        
-                                            
+
+
         if self.config['method'] == 'https':
             handler_func = urllib2.HTTPSHandler
         else:
@@ -55,7 +55,7 @@ class MingleAPIBase(APIBase):
 
         """
         req_url = '%s/%s' % (self.base_uri, target)
-        
+
         if not args:
             args = {}
         data = None
@@ -107,5 +107,3 @@ class MingleAPIBase(APIBase):
             #This means that the result doesn't have XML
             pass
         return result
-
-
