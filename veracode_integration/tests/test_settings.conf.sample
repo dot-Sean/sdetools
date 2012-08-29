@@ -1,0 +1,35 @@
+###################################################
+#### SD Elements server and project settings  #####
+###################################################
+
+[global]
+#SD Elements server name, includes port
+server = newcastle.sdelements.com
+
+#SD Elements user login email
+email = user@server.com
+
+#SD Elements user password
+password = userpassword
+
+#SD Elements application
+application = sde_app
+
+#SD Elements project
+project = sde project
+
+###################################################
+#### Veracode integration settings            #####
+###################################################
+
+#Veracode result
+report_xml = sample_result.xml
+
+#SDE->Veracode mapping file
+mapping_file = ../sde_veracode_map.xml
+
+#Logging 'on' or 'off' (default)
+logging = off
+
+#API debugging
+#debug = 0

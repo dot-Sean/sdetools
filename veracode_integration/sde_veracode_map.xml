@@ -35,7 +35,7 @@
 		<cwe id="196" title="Unsigned to Signed Conversion Error"/>
 		<cwe id="192" title="Integer Coercion Error"/>
 	</task>
-	<task id="190" title="Validate all untrusted XML input against a schema">
+	<task id="55" title="Validate all untrusted XML input">
 		<cwe id="112" title="Missing XML Validation"/>
 	</task>
 	<task id="193" title="Review non-categorized/miscellaneous findings from static code analysis">
@@ -62,7 +62,13 @@
 		<cwe id="470" title="Use of Externally-Controlled Input to Select Classes or Code (Unsafe Reflection)"/>
 		<cwe id="88" title="Argument Injection or Modification"/>
 		<cwe id="479" title="Signal Handler Use of a Non-Reentrant Function"/>
-	</task>
+		<cwe id="287" title="Improper Authentication"/>
+		<cwe id="311" title="Missing Encryption of Sensitive Data"/>	
+		<cwe id="312" title="Cleartext Storage of Sensitive Information"/>
+		<cwe id="313" title="Plaintext Storage in a File or on Disk"/>
+	        <cwe id="*" title="Unmapped CWE"/>
+        </task>
+
 	<task id="192" title="Follow best practices when accessing memory">
 		<cwe id="415" title="Double Free"/>
 		<cwe id="193" title="Off-by-One Error"/>
@@ -86,9 +92,6 @@
 	</task>
 	<task id="176" title="Apply principles of privacy when handling personal information">
 		<cwe id="359" title="Privacy Violation"/>
-	</task>
-	<task id="138" title="Authenticate end users">
-		<cwe id="287" title="Improper Authentication"/>
 	</task>
 	<task id="27" title="Turn off session rewriting">
 		<cwe id="384" title="Session Fixation"/>
@@ -135,22 +138,6 @@
 	</task>
 	<task id="189" title="Avoid usage of unmanaged code">
 		<cwe id="111" title="Direct Use of Unsafe JNI"/>
-	</task>
-	<task id="68" title="Encrypt credit card PANs in storage">
-		<cwe id="311" title="Missing Encryption of Sensitive Data"/>	
-		<cwe id="312" title="Cleartext Storage of Sensitive Information"/>
-		<cwe id="313" title="Plaintext Storage in a File or on Disk"/>
-	</task>
-	<task id="137" title="Encrypt protected health information in storage">
-		<cwe id="311" title="Missing Encryption of Sensitive Data"/>	
-		<cwe id="312" title="Cleartext Storage of Sensitive Information"/>
-		<cwe id="313" title="Plaintext Storage in a File or on Disk"/>
-	</task>
-	<task id="146" title="Use encryption for network communications in mobile environment">
-		<cwe id="311" title="Missing Encryption of Sensitive Data"/>	
-	</task>
-	<task id="139" title="Use SSL to encrypt protected health information on the Internet">
-		<cwe id="311" title="Missing Encryption of Sensitive Data"/>	
 	</task>
 	<task id="76" title="Do not hard code passwords">
 		<cwe id="259" title="Use of Hard-coded Password"/>
