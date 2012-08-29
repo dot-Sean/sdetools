@@ -46,8 +46,8 @@ class URLRequest(urllib2.Request):
 
     def __init__(self, url, data=None, headers={},
                  origin_req_host=None, unverifiable=False, method=None):
-       urllib2.Request.__init__(self, url, data, headers, origin_req_host, unverifiable)
-       self.method = method
+        urllib2.Request.__init__(self, url, data, headers, origin_req_host, unverifiable)
+        self.method = method
 
     def get_method(self):
         if self.method:
@@ -127,13 +127,12 @@ class APIBase:
         call_success = True
         try:
             handle = self.opener.open(req)
-        except IOError, e:
-            handle = e
+        except IOError, err:
+            handle = err
             call_success = False
 
         if not call_success:
             if not hasattr(handle, 'code'):
-                #TODO
                 raise ServerError('Invalid server or server unreachable.')
             err_msg = 'Unknown Error'
             try:
@@ -170,8 +169,8 @@ class APIBase:
             'password': self.config['password']}
         try:
             result = self._call_api('session', URLRequest.PUT, args=args)
-        except APIHTTPError, e:
-            if e.code == 400:
+        except APIHTTPError, err:
+            if err.code == 400:
                 raise APIAuthError
             raise
         for key in ['session-cookie-name', 'csrf-token', 'csrf-header-name', 
@@ -218,7 +217,7 @@ class APIBase:
         return result
 
     def get_notes(self, task):
-        return self._call_api('notes',args={'task':task})
+        return self._call_api('notes', args={'task':task})
 
     def update_task_status(self, task, status):
         """
