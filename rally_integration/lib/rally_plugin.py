@@ -48,7 +48,6 @@ class RallyTask(AlmTask):
         self.status = status
         self.timestamp = timestamp
         self.done_statuses = done_statuses #comma-separated list
-        self.carriage_return = '<br/>' 
 
     def get_task_id(self):
         return self.task_id
@@ -68,7 +67,7 @@ class RallyTask(AlmTask):
 
     def get_timestamp(self):
         """ Returns a datetime object """
-        return datetime.strptime(self.timestamp,'%Y-%m-%dT%H:%M:%SZ')
+        return datetime.strptime(self.timestamp, '%Y-%m-%dT%H:%M:%SZ')
 
 class RallyConnector(AlmConnector):
     """Connects SD Elements to Rally"""
@@ -197,12 +196,12 @@ class RallyConnector(AlmConnector):
             pass
         try:
             create_args = { 
-                    'HierarchicalRequirement' : {
-                            'Name': task['title'],
-                            'Description': self.sde_get_task_content(task),
-                            'Workspace': self.workspace_ref,
-                            'Project': self.project_ref
-                    }
+                'HierarchicalRequirement' : {
+                    'Name': task['title'],
+                    'Description': self.sde_get_task_content(task),
+                    'Workspace': self.workspace_ref,
+                    'Project': self.project_ref
+                }
             }
             rsp = self.alm_plugin._call_api('hierarchicalrequirement/create.js',
                                             method = URLRequest.POST,
@@ -256,10 +255,10 @@ class RallyConnector(AlmConnector):
         elif status == 'TODO':
             try:
                 trans_args = {
-                        'HierarchicalRequirement' : {
-                                'ScheduleState': 
-                                        self.sde_plugin.config['rally_new_status']
-                        }
+                    'HierarchicalRequirement' : {
+                        'ScheduleState': 
+                            self.sde_plugin.config['rally_new_status']
+                    }
                 }
                 self.alm_plugin._call_api(task.get_alm_task_ref(),
                                           args = trans_args,
