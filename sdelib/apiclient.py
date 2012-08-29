@@ -4,6 +4,10 @@ import base64
 
 from commons import json, Error, UsageError
 
+import log_mgr
+import logging
+logger = logging.getLogger(__name__)
+
 class APIError(Error):
     pass
 
@@ -65,7 +69,10 @@ class APIBase:
         else:
             handler_func = urllib2.HTTPHandler
 
-        handler = handler_func(debuglevel=config['debug'])
+        urllib_debuglevel = 0
+        if config['log_level'] <= logging.DEBUG:
+            urllib_debuglevel = 1
+        handler = handler_func(debuglevel=urllib_debuglevel)
         self.opener = urllib2.build_opener(handler)
 
     def _call_api(self, target, method=URLRequest.GET, args=None):
@@ -79,6 +86,8 @@ class APIBase:
         args - JSON Data for arguments
 
         """
+        logger.info('Calling API: %s %s' % (method, target))
+        logger.debug('    Args: %s' % ((repr(args)[:200]) + (repr(args)[:200] and '...')))
         req_url = '%s/%s' % (self.base_uri, target)
         auth_mode = self.auth_mode
         if not args:

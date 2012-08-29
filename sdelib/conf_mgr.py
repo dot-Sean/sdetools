@@ -3,6 +3,9 @@ import os
 import optparse
 import ConfigParser
 import shlex
+import logging
+
+import log_mgr
 
 from commons import show_error
 
@@ -34,7 +37,7 @@ class Config(object):
             'application': None,
             'project': None,
             'skip_hidden': True,
-            'debug': 0,
+            'log_level': logging.WARNING,
         }
 
     def __init__(self):
@@ -127,7 +130,7 @@ class Config(object):
             else:
                 return False, 'Config file not found.'
 
-        config_keys = ['debug', 'server', 'email', 'password', 'application', 'project', 'authmode']
+        config_keys = ['log_level', 'server', 'email', 'password', 'application', 'project', 'authmode']
         if self.custom_args['var_name']:
             config_keys.append(self.custom_args['var_name'])
 
@@ -166,8 +169,9 @@ class Config(object):
         parser.add_option('-j', '--project', dest='project', default='', help="SDE Project to use")
         parser.add_option('-H', '--skiphidden', dest='skip_hidden', default=self.DEFAULTS['skip_hidden'], action='store_false',
             help = "Skip hidden files/directories.")
-        parser.add_option('-d', '--debug', metavar='LEVEL', dest='debug', default=self.DEFAULTS['debug'], type='int',
-            help = "Set debug level (Default is 0, i.e. show no debug messages)")
+        parser.add_option('-d', '--debug', dest='debug', action='store_true', help = "Set logging to debug level")
+        parser.add_option('-v', '--verbose', dest='verbose', action='store_true', help = "Verbose output")
+        parser.add_option('-q', '--quiet', dest='quiet', action='store_true', help = "Silent output (except for unrecoverable errors)")
         for item in self.custom_options:
             parser.add_option(
                 item['short_form'], item['long_form'], dest=item['var_name'], metavar=item['meta_var'], 
@@ -213,7 +217,14 @@ class Config(object):
                 return False
 
         # No more errors, lets apply the changes
-        self['debug'] = opts.debug
+        if opts.quiet:
+            self['log_level'] = logging.ERROR
+        if opts.verbose:
+            self['log_level'] = logging.INFO
+        if opts.debug:
+            self['log_level'] = logging.DEBUG
+        log_mgr.mods.set_all_level(self['log_level'])
+            
         self['skip_hidden'] = opts.skip_hidden
         self['interactive'] = opts.interactive
         if opts.server:
