@@ -1,8 +1,31 @@
-# You can put this file in ~/.sdelint.conf
-# OR use -c to specify the location of this file via arguments
+; You can put this file in ~/.sdelint.conf
+; OR use -c to specify the location of this file via arguments
 
 [global]
+; Specify the server to connect to
 server = newcastle.sdelements.com
+
+; Specify the email (username) to be used
 email = ehsan@sdelements.com
+
+; Password associated with the specified email
+; WARNING: DO NOT STORE PASSWORDS in files that are publicly accessible
 password = PASSWORD_PLACEHOLDER
+
+; Target files for scanning. 
+; Each terget can be a path (all files in the directory) or a single file
+; Format:
+;      target1 [[target2] target3]
 targets = .
+
+; Set the global log level here. The lever from most
+;     debug   -> Output all debug information 
+;     verbose -> Includes informative statements about progress
+;     default -> Normal output level
+;     error   -> No log is outputted except for error
+;     queit   -> No log is outputted except for fatal/unrecoverable errors
+log_level = verbose
+
+; Specifies the modules for while you want to see debug information
+; Note that this overrides the value set in <log_level> for these modules
+; debug_mods = sdelib.apiclient, sdelib.scanner

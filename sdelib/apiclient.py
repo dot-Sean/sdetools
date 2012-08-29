@@ -70,7 +70,7 @@ class APIBase:
             handler_func = urllib2.HTTPHandler
 
         urllib_debuglevel = 0
-        if config['log_level'] <= logging.DEBUG:
+        if __name__ in config['debug_mods']:
             urllib_debuglevel = 1
         handler = handler_func(debuglevel=urllib_debuglevel)
         self.opener = urllib2.build_opener(handler)
@@ -87,7 +87,7 @@ class APIBase:
 
         """
         logger.info('Calling API: %s %s' % (method, target))
-        logger.debug('    Args: %s' % ((repr(args)[:200]) + (repr(args)[:200] and '...')))
+        logger.debug('    Args: %s' % ((repr(args)[:200]) + (repr(args)[200:] and '...')))
         req_url = '%s/%s' % (self.base_uri, target)
         auth_mode = self.auth_mode
         if not args:

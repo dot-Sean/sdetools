@@ -1,3 +1,18 @@
+"""
+To use the integrated logging, here is what you need to do in your module
+
+from sdelib import log_mgr
+logger = log_mgr.mods.add_mod(__name__)
+
+...
+logger.info('...')
+...
+except:
+   logger.exception('...')
+...
+
+"""
+
 import logging
 
 class LoggerModules:
@@ -10,9 +25,10 @@ class LoggerModules:
 
     def add_mod(self, modname):
         if modname in self.modules:
-            return
+            return logging.getLogger(modname)
         self.modules.append(modname)
         self.set_level(modname, self.default_level)
+        return logging.getLogger(modname)
 
     def set_level(self, modname, level):
         if modname not in self.modules:

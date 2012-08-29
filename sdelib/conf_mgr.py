@@ -13,6 +13,13 @@ __all__ = ['config', 'Config']
 
 DEFAULT_CONFIG_FILE = "~/.sdelint.cnf"
 
+LOG_LEVELS = {
+    'debug': logging.DEBUG,
+    'verbose': logging.INFO,
+    'default': logging.WARNING,
+    'queit': logging.ERROR,
+    }
+
 class Config(object):
     """
     The Configuration class. The module creates a singleton instance by default.
@@ -38,6 +45,7 @@ class Config(object):
             'project': None,
             'skip_hidden': True,
             'log_level': logging.WARNING,
+            'debug_mods': '',
         }
 
     def __init__(self):
@@ -130,7 +138,7 @@ class Config(object):
             else:
                 return False, 'Config file not found.'
 
-        config_keys = ['log_level', 'server', 'email', 'password', 'application', 'project', 'authmode']
+        config_keys = ['log_level', 'debug_mods', 'server', 'email', 'password', 'application', 'project', 'authmode']
         if self.custom_args['var_name']:
             config_keys.append(self.custom_args['var_name'])
 
@@ -145,6 +153,11 @@ class Config(object):
                 if key == 'password':
                     if not val:
                         val = None
+                elif key == 'log_level':
+                    val = val.strip(' ')
+                    if val not in LOG_LEVELS:
+                        return False, 'Unknown log_level value in config file'
+                    val = LOG_LEVELS[val]
                 self[key] = val
         return True, 'Config File Parsed'
 
@@ -172,6 +185,8 @@ class Config(object):
         parser.add_option('-d', '--debug', dest='debug', action='store_true', help = "Set logging to debug level")
         parser.add_option('-v', '--verbose', dest='verbose', action='store_true', help = "Verbose output")
         parser.add_option('-q', '--quiet', dest='quiet', action='store_true', help = "Silent output (except for unrecoverable errors)")
+        parser.add_option('--debugmods', metavar='MOD_NAME1,[MOD_NAME2,[...]]', dest='debug_mods', default='', type='string',
+            help = "Comma-seperated List of modules to debug, e.g. sdelib.apiclient)")
         for item in self.custom_options:
             parser.add_option(
                 item['short_form'], item['long_form'], dest=item['var_name'], metavar=item['meta_var'], 
@@ -223,7 +238,13 @@ class Config(object):
             self['log_level'] = logging.INFO
         if opts.debug:
             self['log_level'] = logging.DEBUG
+        if opts.debug_mods:
+            self['debug_mods'] = opts.debug_mods
+        self['debug_mods'] = [x.strip(' ') for x in self['debug_mods'].split(',')]
+
         log_mgr.mods.set_all_level(self['log_level'])
+        for modname in self['debug_mods']:
+            log_mgr.mods.set_level(modname, logging.DEBUG)
             
         self['skip_hidden'] = opts.skip_hidden
         self['interactive'] = opts.interactive
