@@ -4,6 +4,10 @@ import base64
 
 from commons import json, Error, UsageError
 
+import log_mgr
+import logging
+logger = logging.getLogger(__name__)
+
 class APIError(Error):
     pass
 
@@ -42,8 +46,8 @@ class URLRequest(urllib2.Request):
 
     def __init__(self, url, data=None, headers={},
                  origin_req_host=None, unverifiable=False, method=None):
-       urllib2.Request.__init__(self, url, data, headers, origin_req_host, unverifiable)
-       self.method = method
+        urllib2.Request.__init__(self, url, data, headers, origin_req_host, unverifiable)
+        self.method = method
 
     def get_method(self):
         if self.method:
@@ -65,7 +69,10 @@ class APIBase(object):
         else:
             handler_func = urllib2.HTTPHandler
 
-        handler = handler_func(debuglevel=config['debug'])
+        urllib_debuglevel = 0
+        if __name__ in config['debug_mods']:
+            urllib_debuglevel = 1
+        handler = handler_func(debuglevel=urllib_debuglevel)
         self.opener = urllib2.build_opener(handler)
 
     def _call_api(self, target, method=URLRequest.GET, args=None):
@@ -79,6 +86,8 @@ class APIBase(object):
         args - JSON Data for arguments
 
         """
+        logger.info('Calling API: %s %s' % (method, target))
+        logger.debug('    Args: %s' % ((repr(args)[:200]) + (repr(args)[200:] and '...')))
         req_url = '%s/%s' % (self.base_uri, target)
         auth_mode = self.auth_mode
         if not args:
@@ -118,13 +127,12 @@ class APIBase(object):
         call_success = True
         try:
             handle = self.opener.open(req)
-        except IOError, e:
-            handle = e
+        except IOError, err:
+            handle = err
             call_success = False
 
         if not call_success:
             if not hasattr(handle, 'code'):
-                #TODO
                 raise ServerError('Invalid server or server unreachable.')
             err_msg = 'Unknown Error'
             try:
@@ -161,8 +169,8 @@ class APIBase(object):
             'password': self.config['password']}
         try:
             result = self._call_api('session', URLRequest.PUT, args=args)
-        except APIHTTPError, e:
-            if e.code == 400:
+        except APIHTTPError, err:
+            if err.code == 400:
                 raise APIAuthError
             raise
         for key in ['session-cookie-name', 'csrf-token', 'csrf-header-name',
@@ -209,7 +217,7 @@ class APIBase(object):
         return result
 
     def get_notes(self, task):
-        return self._call_api('notes',args={'task':task})
+        return self._call_api('notes', args={'task':task})
 
     def update_task_status(self, task, status):
         """

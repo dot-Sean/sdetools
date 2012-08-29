@@ -1,4 +1,5 @@
 __all__ = [
+    'log_mgr',
     'apiclient', 
     'commons', 
     'conf_mgr', 
