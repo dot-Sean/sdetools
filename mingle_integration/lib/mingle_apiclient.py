@@ -18,8 +18,8 @@ class MingleAPIBase(APIBase):
         self.proxy_uri = '%s://%s:%s@%s/' % (self.config['method'],
                 self.config['alm_id'], self.config['alm_password'],
                 self.config['alm_server'])
-        handler_func = (urllib2.HTTPSHandler if self.config['method'] == 'https' else
-                 urllib2.HTTPHandler)
+        handler_func = (urllib2.HTTPSHandler if self.config['method'] == 'https'
+                        else urllib2.HTTPHandler)
         handler = handler_func(debuglevel=config['debug'])
         self.opener = urllib2.build_opener(handler)
 
@@ -31,11 +31,11 @@ class MingleAPIBase(APIBase):
         target - the path of the API call (without host name)
         method -  HTTP Verb, specified by the URLRequest class. Default
                   is GET
-        args - A dictionary of post paramters in format { 'key1':'value1', 'key2':'value2'}
+        args - A dictionary of post paramters in format
+               { 'key1':'value1', 'key2':'value2'}
         """
         req_url = '%s/%s' % (self.base_uri, target)
-        if not args:
-            args = {}
+        args = args or {}
         data = None
         if method == URLRequest.GET:
             if args:
@@ -62,7 +62,7 @@ class MingleAPIBase(APIBase):
                 err_ret = handle.read()
             except:
                 pass
-            if (handle.code == 401 or handle.code == 404):
+            if handle.code == 401 or handle.code == 404:
                 raise APIAuthError
             raise APICallError(handle.code, "Error")
 
@@ -75,9 +75,9 @@ class MingleAPIBase(APIBase):
         handle.close()
 
         try:
-            if (result != ''):
+            if result:
                 result = minidom.parseString(result)
         except Exception as e:
-           #This means that the result doesn't have XML, not an error
+            #This means that the result doesn't have XML, not an error
             pass
         return result
