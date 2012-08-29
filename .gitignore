@@ -1,5 +1,6 @@
 *.py[co]
 *.swp
+*.bak
 
 # Packages
 *.egg
@@ -21,15 +22,19 @@ pip-log.txt
 .coverage
 .tox
 
+
 #Translations
 *.mo
 
 #Mr Developer
 .mr.developer.cfg
 
-#Configuration
+# Configuration
 sdelint.cnf
-veracode_integration/tests/test_settings.conf
 
 #generated data
 usecases/output.csv
+test_settings.conf
+
+# Test files
+info.log
