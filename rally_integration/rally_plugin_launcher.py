@@ -7,15 +7,12 @@ sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
 
 from sdelib.conf_mgr import config
 from sdelib.interactive_plugin import PlugInExperience
-from sdelib.apiclient import APIBase
 
-from rally_integration.lib.rally_plugin import RallyTask, RallyConnector
+from rally_integration.lib.rally_plugin import RallyConnector
 from rally_integration.lib.rally_plugin import add_rally_config_options
 from rally_integration.lib.rally_plugin import RallyAPIBase
 from alm_integration.alm_plugin_base import AlmException
 from sdelib.interactive_plugin import PluginError
-
-import logging
 
 def main(argv):
     try:

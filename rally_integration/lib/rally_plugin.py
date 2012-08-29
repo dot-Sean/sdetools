@@ -15,19 +15,19 @@ import copy
 API_VERSION = '1.11'
 
 class RallyAPIBase(APIBase):
-    """ Base plugin for Mingle """
+    """ Base plugin for Rally """
 
     def __init__(self, config):
-        #Workaround to copy over the ALM id & password for Mingle
+        #Workaround to copy over the ALM id & password for Rally
         #authentication without overwriting the SD Elements
         #email & password in the config
         alm_config = copy.deepcopy(config)
         alm_config['email'] = alm_config['alm_id']
         alm_config['password'] = alm_config['alm_password']
         super(RallyAPIBase, self).__init__(alm_config)
-        self.base_uri = '%s://%s/slm/webservice/%s' % ((self.config['alm_method'],
+        self.base_uri = '%s://%s/slm/webservice/%s' % (self.config['alm_method'],
                                                         self.config['alm_server'],
-                                                        API_VERSION))
+                                                        API_VERSION)
 
 class RallyConfig(Config):
     """Configuration for Rally"""
@@ -43,12 +43,12 @@ class RallyTask(AlmTask):
         self.task_id = task_id
         self.alm_id = alm_id
 
-        #A Reference URL to the task in Mingle
+        #A Reference URL to the task in Rally
         self.alm_task_ref = alm_task_ref
         self.status = status
         self.timestamp = timestamp
-        self.done_statuses = done_statuses
-        self.carriage_return = '<br/>' #comma-separated list
+        self.done_statuses = done_statuses #comma-separated list
+        self.carriage_return = '<br/>' 
 
     def get_task_id(self):
         return self.task_id
@@ -68,8 +68,7 @@ class RallyTask(AlmTask):
 
     def get_timestamp(self):
         """ Returns a datetime object """
-        return datetime.strptime(self.timestamp,
-                                 '%Y-%m-%dT%H:%M:%SZ')
+        return datetime.strptime(self.timestamp,'%Y-%m-%dT%H:%M:%SZ')
 
 class RallyConnector(AlmConnector):
     """Connects SD Elements to Rally"""
@@ -119,7 +118,7 @@ class RallyConnector(AlmConnector):
         #Now try to get workspace ID
         try:
             query_args = {
-                'query' : '(Name = \"%s\")' % self.sde_plugin.config['rally_workspace']
+                'query': '(Name = \"%s\")' % self.sde_plugin.config['rally_workspace']
             }
             workspace_ref = self.alm_plugin._call_api('workspace.js',
                                                        args=query_args)
@@ -138,15 +137,15 @@ class RallyConnector(AlmConnector):
         #Now get project ID
         try:
             query_args = {
-                'query' : '(Name = \"%s\")' % self.sde_plugin.config['alm_project']
+                'query': '(Name = \"%s\")' % self.sde_plugin.config['alm_project']
             }
             project_ref = self.alm_plugin._call_api('project.js',
                                                     args = query_args)
             num_results = project_ref['QueryResult']['TotalResultCount']
             if not num_results:
-                raise AlmException('Rally project is not valid, please check'
-                                   'config value:'
-                                   '%s' % self.sde_plugin.config['alm_project'])
+                raise AlmException('Rally project is not valid, please check '
+                                   'config value: %s' %
+                                   self.sde_plugin.config['alm_project'])
             project_ref = project_ref['QueryResult']['Results'][0]['_ref']
             self.project_ref = project_ref
 
@@ -197,16 +196,17 @@ class RallyConnector(AlmConnector):
             #This means task doesn't exist, which is expected
             pass
         try:
-            create_args = { 'HierarchicalRequirement' :
-                                {'Name':task['title'],
-                                 'Description': self.sde_get_task_content(task),
-                                 'Workspace': self.workspace_ref,
-                                 'Project': self.project_ref
-                                }
-                          }
+            create_args = { 
+                    'HierarchicalRequirement' : {
+                            'Name': task['title'],
+                            'Description': self.sde_get_task_content(task),
+                            'Workspace': self.workspace_ref,
+                            'Project': self.project_ref
+                    }
+            }
             rsp = self.alm_plugin._call_api('hierarchicalrequirement/create.js',
-                                       method=URLRequest.POST,
-                                       args = create_args)
+                                            method = URLRequest.POST,
+                                            args = create_args)
             logging.info('Response was %s', rsp)
             logging.debug('Task %s added to Rally Project', task['id'])
 
@@ -239,28 +239,28 @@ class RallyConnector(AlmConnector):
 
         if status == 'DONE' or status == 'NA':
             try:
-                trans_args = {'HierarchicalRequirement' :
-                                {'ScheduleState':
-                                    self.sde_plugin.config['rally_done_statuses'][0]
-                                }
-                             }
+                trans_args = {
+                        'HierarchicalRequirement' : {
+                                'ScheduleState':
+                                        self.sde_plugin.config['rally_done_statuses'][0]
+                        }
+                }
                 self.alm_plugin._call_api(task.get_alm_task_ref(),
                                           args = trans_args,
                                           method=URLRequest.POST)
             except APIError as err:
                 raise AlmException('Unable to update task status to DONE '
-                                   'for card: '
-                                   '%s in Rally because of %s' % (
-                                        task.get_alm_id(), err)
-                                   )
+                                   'for card: %s in Rally because of %s' % 
+                                   (task.get_alm_id(), err))
 
         elif status == 'TODO':
             try:
-                trans_args = {'HierarchicalRequirement' :
-                                {'ScheduleState':
-                                    self.sde_plugin.config['rally_new_status']
-                                }
-                             }
+                trans_args = {
+                        'HierarchicalRequirement' : {
+                                'ScheduleState': 
+                                        self.sde_plugin.config['rally_new_status']
+                        }
+                }
                 self.alm_plugin._call_api(task.get_alm_task_ref(),
                                           args = trans_args,
                                           method=URLRequest.POST)
