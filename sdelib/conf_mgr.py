@@ -17,7 +17,8 @@ LOG_LEVELS = {
     'debug': logging.DEBUG,
     'verbose': logging.INFO,
     'default': logging.WARNING,
-    'queit': logging.ERROR,
+    'error': logging.ERROR,
+    'queit': logging.CRITICAL,
     }
 
 class Config(object):
@@ -138,7 +139,8 @@ class Config(object):
             else:
                 return False, 'Config file not found.'
 
-        config_keys = ['log_level', 'debug_mods', 'server', 'email', 'password', 'application', 'project', 'authmode']
+        config_keys = ['log_level', 'debug_mods', 'server', 'email', 'password', 
+            'application', 'project', 'authmode']
         if self.custom_args['var_name']:
             config_keys.append(self.custom_args['var_name'])
 
@@ -165,7 +167,8 @@ class Config(object):
         usage = "%%prog [options...] %s\n\n%s\n" % (self.custom_args['syntax_text'], self.custom_args['help_text'])
 
         parser = optparse.OptionParser(usage)
-        parser.add_option('-c', '--config', metavar='CONFIG_FILE', dest='conf_file', default=self.DEFAULTS['conf_file'], type='string',
+        parser.add_option('-c', '--config', metavar='CONFIG_FILE', dest='conf_file', 
+            default=self.DEFAULTS['conf_file'], type='string',
             help = "Configuration File if. Ignored if -C is used. (Default is %s)" % (self.DEFAULTS['conf_file']))
         parser.add_option('-C', '--skipconfig', dest='skip_conf_file', default=False, action='store_true',
             help = "Do NOT use any configuration file")
@@ -177,15 +180,21 @@ class Config(object):
             help = "Password for SDE Accout")
         parser.add_option('-P', '--askpasswd', dest='askpasswd', default=False, action='store_true',
             help = "Prompt for SDE Accout password (interactive mode only)")
-        parser.add_option('-s', '--server', dest='server', default='', type='string', help="SDE Server instance to use")
-        parser.add_option('-a', '--application', dest='application', default='', type='string', help="SDE Application to use")
+        parser.add_option('-s', '--server', dest='server', default='', type='string', 
+            help="SDE Server instance to use")
+        parser.add_option('-a', '--application', dest='application', default='', type='string', 
+            help="SDE Application to use")
         parser.add_option('-j', '--project', dest='project', default='', help="SDE Project to use")
-        parser.add_option('-H', '--skiphidden', dest='skip_hidden', default=self.DEFAULTS['skip_hidden'], action='store_false',
+        parser.add_option('-H', '--skiphidden', dest='skip_hidden', 
+            default=self.DEFAULTS['skip_hidden'], action='store_false',
             help = "Skip hidden files/directories.")
-        parser.add_option('-d', '--debug', dest='debug', action='store_true', help = "Set logging to debug level")
+        parser.add_option('-d', '--debug', dest='debug', action='store_true', 
+            help = "Set logging to debug level")
         parser.add_option('-v', '--verbose', dest='verbose', action='store_true', help = "Verbose output")
-        parser.add_option('-q', '--quiet', dest='quiet', action='store_true', help = "Silent output (except for unrecoverable errors)")
-        parser.add_option('--debugmods', metavar='MOD_NAME1,[MOD_NAME2,[...]]', dest='debug_mods', default='', type='string',
+        parser.add_option('-q', '--quiet', dest='quiet', action='store_true', 
+            help = "Silent output (except for unrecoverable errors)")
+        parser.add_option('--debugmods', metavar='MOD_NAME1,[MOD_NAME2,[...]]', dest='debug_mods', 
+            default='', type='string',
             help = "Comma-seperated List of modules to debug, e.g. sdelib.apiclient)")
         for item in self.custom_options:
             parser.add_option(
@@ -233,7 +242,7 @@ class Config(object):
 
         # No more errors, lets apply the changes
         if opts.quiet:
-            self['log_level'] = logging.ERROR
+            self['log_level'] = logging.CRITICAL
         if opts.verbose:
             self['log_level'] = logging.INFO
         if opts.debug:
