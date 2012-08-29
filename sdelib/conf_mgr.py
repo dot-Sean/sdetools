@@ -156,7 +156,7 @@ class Config(object):
                     if not val:
                         val = None
                 elif key == 'log_level':
-                    val = val.strip(' ')
+                    val = val.strip()
                     if val not in LOG_LEVELS:
                         return False, 'Unknown log_level value in config file'
                     val = LOG_LEVELS[val]
@@ -249,7 +249,7 @@ class Config(object):
             self['log_level'] = logging.DEBUG
         if opts.debug_mods:
             self['debug_mods'] = opts.debug_mods
-        self['debug_mods'] = [x.strip(' ') for x in self['debug_mods'].split(',')]
+        self['debug_mods'] = [x.strip() for x in self['debug_mods'].split(',')]
 
         log_mgr.mods.set_all_level(self['log_level'])
         for modname in self['debug_mods']:
