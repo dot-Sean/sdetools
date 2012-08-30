@@ -7,7 +7,7 @@ sys.path.append(os.path.split(os.path.split(os.path.split(os.path.abspath(__file
 from alm_integration.tests.alm_plugin_test_helper import AlmPluginTestHelper
 from sdelib.conf_mgr import config
 from sdelib.interactive_plugin import PlugInExperience
-from jira_integration.lib.jira_plugin import JIRATask, JIRAConnector
+from jira_integration.lib.jira_plugin import JIRAConnector
 from jira_integration.lib.jira_plugin import JIRABase, add_jira_config_options
 
 CONF_FILE_LOCATION = 'test_settings.conf'

@@ -6,21 +6,20 @@ import urllib
 import urllib2
 import base64
 
-from sdelib.apiclient import APIError, APIHTTPError, APICallError, APIAuthError
-from sdelib.apiclient import APIFormatError, ServerError, URLRequest, APIBase
+from sdelib.apiclient import APICallError, APIAuthError
+from sdelib.apiclient import ServerError, URLRequest, APIBase
 from xml.dom import minidom
+import logging
+logger = logging.getLogger(__name__)
 
 class MingleAPIBase(APIBase):
     def __init__(self, config):
         self.config = config
-        self.base_uri = '%s://%s/api/v2/projects/%s' %(self.config['method'],
+        self.base_uri = '%s://%s/api/v2/projects/%s' % (self.config['method'],
                 self.config['alm_server'], self.config['alm_project'])
-        self.proxy_uri = '%s://%s:%s@%s/' % (self.config['method'],
-                self.config['alm_id'], self.config['alm_password'],
-                self.config['alm_server'])
         handler_func = (urllib2.HTTPSHandler if self.config['method'] == 'https'
                         else urllib2.HTTPHandler)
-        handler = handler_func(debuglevel=config['debug'])
+        handler = handler_func(debuglevel = 0)
         self.opener = urllib2.build_opener(handler)
 
     def _call_api(self, target, method=URLRequest.GET, args=None):
@@ -34,6 +33,8 @@ class MingleAPIBase(APIBase):
         args - A dictionary of post paramters in format
                { 'key1':'value1', 'key2':'value2'}
         """
+        logger.info('Calling API: %s %s' % (method, target))
+        logger.debug('    Args: %s' % ((repr(args)[:200]) + (repr(args)[200:] and '...')))
         req_url = '%s/%s' % (self.base_uri, target)
         args = args or {}
         data = None
@@ -57,14 +58,13 @@ class MingleAPIBase(APIBase):
         if not call_success:
             if not hasattr(handle, 'code'):
                 raise ServerError('Invalid server or server unreachable.')
-            err_msg = 'Unknown Error'
             try:
                 err_ret = handle.read()
             except:
                 pass
             if handle.code == 401 or handle.code == 404:
                 raise APIAuthError
-            raise APICallError(handle.code, "Error")
+            raise APICallError(handle.code, err_ret)
 
         result = ''
         while True:

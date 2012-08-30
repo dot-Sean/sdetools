@@ -1,8 +1,4 @@
-import random, unittest
-
-from sdelib.conf_mgr import config
-from sdelib.interactive_plugin import PlugInExperience
-
+import random
 
 class AlmPluginTestHelper(object):
     def setUp(self):
@@ -58,7 +54,7 @@ class AlmPluginTestHelper(object):
     def test_add_task(self):
         """ Verify we can add the task to the ALM """
         test_task = self._create_test_task()
-        alm_key = self.tac.alm_add_task(test_task)
+        self.tac.alm_add_task(test_task)
         test_task_result = self.tac.alm_get_task(test_task)
         self.assertTrue(test_task_result)
 

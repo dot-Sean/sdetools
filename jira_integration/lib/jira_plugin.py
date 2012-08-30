@@ -4,8 +4,6 @@
 import sys, os
 
 sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
-from sdelib.conf_mgr import config
-from sdelib.interactive_plugin import PlugInExperience
 from sdelib.apiclient import APIBase, URLRequest, APIError, APIFormatError
 from alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from alm_integration.alm_plugin_base import AlmException, add_alm_config_options
@@ -126,9 +124,9 @@ class JIRAConnector(AlmConnector):
 
         #verify that we can access project
         try:
-            result = self.alm_plugin._call_api('project/%s' %
-                                               (self.sde_plugin.config
-                                               ['alm_project']))
+            self.alm_plugin._call_api('project/%s' %
+                                     (self.sde_plugin.config
+                                     ['alm_project']))
         except APIError as err:
             raise AlmException('Unable to connnect to JIRA project %s' %
                                (self.sde_plugin.config['alm_project']))
@@ -144,7 +142,7 @@ class JIRAConnector(AlmConnector):
             if not self.jira_issue_type_id:
                 raise AlmException('Issue type %s not available' %
                                    self.sde_plugin.config['jira_issue_type'])
-        except APIError as err:
+        except APIError:
             raise AlmException('Unable to get issuetype from JIRA API')
 
     def alm_get_task (self, task):
@@ -194,7 +192,7 @@ class JIRAConnector(AlmConnector):
         try:
             add_result = self.alm_plugin._call_api('issue',
                     method=URLRequest.POST, args=args)
-        except APIError as err:
+        except APIError:
             return None
 
         if (self.sde_plugin.config['alm_standard_workflow'] == 'True' and
@@ -239,9 +237,9 @@ class JIRAConnector(AlmConnector):
                                 self.sde_plugin.config['jira_reopen_transition'])
 
                 trans_args = {'transition': {'id':self.reopen_transition_id}}
-                trans_result = self.alm_plugin._call_api(trans_url,
-                                                         args=trans_args,
-                                                         method=URLRequest.POST)
+                self.alm_plugin._call_api(trans_url,
+                                          args=trans_args,
+                                          method=URLRequest.POST)
         except APIFormatError as err:
             # The response does not have JSON, so it is incorrectly raised as
             # a JSON formatting error. Ignore this error

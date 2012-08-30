@@ -11,7 +11,7 @@ from sdelib.interactive_plugin import PlugInExperience
 import logging
 
 from alm_integration.alm_plugin_base import AlmConnector, AlmTask
-from alm_integration.alm_plugin_base import AlmException, add_alm_config_options
+from alm_integration.alm_plugin_base import add_alm_config_options
 
 
 CONF_FILE_LOCATION = 'test_settings.conf'
@@ -127,7 +127,6 @@ class TestALMCase(unittest.TestCase):
         self.sde_tasks = self.tac.sde_get_tasks()
         self.alm_tasks = []
         for i, task in enumerate(self.sde_tasks):
-            old_note_count = task['note_count']
             almTask = TestAlmTask(task['id'],
                                   'TEST_ALM_%d' % i,
                                   task['priority'],

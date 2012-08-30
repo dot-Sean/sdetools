@@ -142,7 +142,6 @@ mingle_done_statuses = Ready for Testing,In Testing,Ready for Signoff,Accepted
 ######Base settings, do not modify######
 method = https
 targets =  .
-debug =  0
 skip_hidden = True
 interactive =True
 askpasswd = False
