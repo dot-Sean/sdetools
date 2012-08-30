@@ -19,7 +19,7 @@ class MingleAPIBase(APIBase):
                 self.config['alm_server'], self.config['alm_project'])
         handler_func = (urllib2.HTTPSHandler if self.config['method'] == 'https'
                         else urllib2.HTTPHandler)
-        handler = handler_func(debuglevel = 0)
+        handler = handler_func(debuglevel=0)
         self.opener = urllib2.build_opener(handler)
 
     def _call_api(self, target, method=URLRequest.GET, args=None):
