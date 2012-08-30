@@ -8,7 +8,7 @@ sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
 from sdelib.conf_mgr import config
 from sdelib.interactive_plugin import PlugInExperience
 
-from jira_integration.lib.jira_plugin import JIRATask, JIRAConnector
+from jira_integration.lib.jira_plugin import JIRAConnector
 from jira_integration.lib.jira_plugin import JIRABase, add_jira_config_options
 from alm_integration.alm_plugin_base import AlmException
 from sdelib.interactive_plugin import PluginError

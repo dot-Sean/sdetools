@@ -102,7 +102,6 @@ jira_done_statuses = Resolved,Closed
 ######Base settings, do not modify######
 method = https
 targets =  .
-debug =  1
 skip_hidden = True
 interactive =True
 askpasswd = False

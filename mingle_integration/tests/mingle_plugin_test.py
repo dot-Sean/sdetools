@@ -8,7 +8,7 @@ from alm_integration.tests.alm_plugin_test_helper import AlmPluginTestHelper
 from sdelib.conf_mgr import config
 from sdelib.interactive_plugin import PlugInExperience
 
-from mingle_integration.lib.mingle_plugin import MingleTask, MingleConnector
+from mingle_integration.lib.mingle_plugin import MingleConnector
 from mingle_integration.lib.mingle_plugin import add_mingle_config_options
 from mingle_integration.lib.mingle_apiclient import MingleAPIBase
 

@@ -110,7 +110,6 @@ rally_done_statuses = Completed,Accepted
 ######Base settings, do not modify######
 method = https
 targets =  .
-debug =  0
 skip_hidden = True
 interactive =True
 askpasswd = False
