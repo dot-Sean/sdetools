@@ -77,7 +77,7 @@ class MingleAPIBase(APIBase):
         try:
             if result:
                 result = minidom.parseString(result)
-        except Exception as e:
+        except Exception, err:
             #This means that the result doesn't have XML, not an error
             pass
         return result

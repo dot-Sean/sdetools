@@ -85,7 +85,7 @@ class MingleConnector(AlmConnector):
         try:
             task_args =  {'filters[]': ('[Name][is][%s]' % task_id)}
             result = self.alm_plugin._call_api('cards.xml', args=task_args)
-        except APIError as err:
+        except APIError, err:
             logging.error(err)
             raise AlmException('Unable to get task %s from Mingle' % task_id)
 
@@ -97,7 +97,7 @@ class MingleConnector(AlmConnector):
         try:
             card_num = card_item.getElementsByTagName(
                     'number').item(0).firstChild.nodeValue
-        except Exception as err:
+        except Exception, err:
             logging.info(err)
             raise AlmException('Unable to get card # for task '
                                '%s from Mingle' % task_id)
@@ -140,7 +140,7 @@ class MingleConnector(AlmConnector):
             self.alm_plugin._call_api('cards.xml', args=status_args,
                     method=URLRequest.POST)
             logging.debug('Task %s added to Mingle Project' % task['id'])
-        except APIError as err:
+        except APIError, err:
             raise AlmException('Please check ALM-specific settings in config '
                     'file. Unable to add task %s because of %s' %
                     (task['id'], err))
@@ -171,7 +171,7 @@ class MingleConnector(AlmConnector):
                 }
                 self.alm_plugin._call_api('cards/%s.xml' % task.get_alm_id(),
                         args=status_args, method=URLRequest.PUT)
-            except APIError as err:
+            except APIError, err:
                 raise AlmException('Unable to update task status to DONE '
                                    'for card: %s in Mingle because of %s' %
                                    (task.get_alm_id(),err))
@@ -183,7 +183,7 @@ class MingleConnector(AlmConnector):
                 }
                 self.alm_plugin._call_api('cards/%s.xml' % task.get_alm_id(),
                         args=status_args, method=URLRequest.PUT)
-            except APIError as err:
+            except APIError, err:
                 raise AlmException('Unable to update task status to TODO for '
                                    'card: %s in Mingle because of %s' %
                                    (task.get_alm_id(), err))

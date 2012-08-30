@@ -24,8 +24,8 @@ def main(argv):
         mbase = MingleAPIBase(config)
         mingle = MingleConnector(sde_plugin, mbase)
         mingle.synchronize()
-    except (AlmException, PluginError) as e:
-        print 'The following error was encountered: %s' % e
+    except (AlmException, PluginError), err:
+        print 'The following error was encountered: %s' % err
 
 if __name__ == "__main__":
     main(sys.argv)
