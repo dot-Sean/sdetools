@@ -1,3 +1,10 @@
+Requirements
+================
+- Python 2.4+
+
+This project is intended to be ultra lightweight, and portable.
+The only requirement is to have Python 2.4+ installed.
+
 SDE Library (sdelib/)
 ================
 A light weight library that provides an interface to SD Elements RESTful API.
