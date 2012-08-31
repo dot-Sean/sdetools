@@ -56,7 +56,10 @@ class JIRATask(AlmTask):
 
     def get_status(self):
         """ Translates JIRA priority into SDE priority """
-        return 'DONE' if self.status in self.done_statuses else 'TODO'
+        if self.status in self.done_statuses:
+            return 'DONE'
+        else:
+            return 'TODO'
 
     def get_timestamp(self):
         """ Returns a datetime object """
