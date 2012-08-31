@@ -51,7 +51,7 @@ class TestAlmConnector(AlmConnector):
         return "CSV File"
 
     def alm_connect(self):
-        self.fields = ['id','priority','status']
+        self.fields = ['id', 'priority', 'status']
         self.csv_file = open('test.csv', 'r+b')
 
     def alm_get_task (self, task):
@@ -113,7 +113,7 @@ class TestALMCase(unittest.TestCase):
             self.assertTrue(task.has_key('priority'))
             self.assertTrue(task.has_key('note_count'))
 
-    def _get_changed_status(self,status):
+    def _get_changed_status(self, status):
         """ Returns a changed status from the one given """
         if status == 'TODO':
             return 'NA'

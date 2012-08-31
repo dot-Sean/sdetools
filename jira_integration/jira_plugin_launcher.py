@@ -26,8 +26,8 @@ def main(argv):
         jbase = JIRABase(config)    
         jira = JIRAConnector(sde_plugin, jbase)
         jira.synchronize()
-    except (AlmException, PluginError) as e:
-        print 'The following error was encountered: %s' % e
+    except (AlmException, PluginError), err:
+        print 'The following error was encountered: %s' % err
     
 if __name__ == "__main__":
     main(sys.argv)

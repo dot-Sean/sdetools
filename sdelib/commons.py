@@ -7,6 +7,11 @@ try:
 except ImportError:
     import json_compat as json
 
+try:
+    import abc
+except ImportError:
+    import abc_compat as abc
+
 class Error(Exception):
     """
     Base Error for the Lint Library.

@@ -56,7 +56,10 @@ class JIRATask(AlmTask):
 
     def get_status(self):
         """ Translates JIRA priority into SDE priority """
-        return 'DONE' if self.status in self.done_statuses else 'TODO'
+        if self.status in self.done_statuses:
+            return 'DONE'
+        else:
+            return 'TODO'
 
     def get_timestamp(self):
         """ Returns a datetime object """
@@ -118,7 +121,7 @@ class JIRAConnector(AlmConnector):
         #verify that we can connect to JIRA
         try:
             result = self.alm_plugin._call_api('project')
-        except APIError as err:
+        except APIError:
             raise AlmException('Unable to connnect to JIRA. Please' +
                                ' check server URL, ID, password')
 
@@ -127,7 +130,7 @@ class JIRAConnector(AlmConnector):
             self.alm_plugin._call_api('project/%s' %
                                      (self.sde_plugin.config
                                      ['alm_project']))
-        except APIError as err:
+        except APIError:
             raise AlmException('Unable to connnect to JIRA project %s' %
                                (self.sde_plugin.config['alm_project']))
 
@@ -152,7 +155,7 @@ class JIRAConnector(AlmConnector):
             url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s\'' % (
                     self.sde_plugin.config['alm_project'], task_id)
             result = self.alm_plugin._call_api(url)
-        except APIError as err:
+        except APIError, err:
             logging.info(err)
             raise AlmException("Unable to get task %s from JIRA" % task_id)
         if not result['total']:
@@ -240,11 +243,11 @@ class JIRAConnector(AlmConnector):
                 self.alm_plugin._call_api(trans_url,
                                           args=trans_args,
                                           method=URLRequest.POST)
-        except APIFormatError as err:
+        except APIFormatError:
             # The response does not have JSON, so it is incorrectly raised as
             # a JSON formatting error. Ignore this error
             pass
-        except APIError as err:
+        except APIError, err:
             raise AlmException("Unable to set task status: %s" % err)
 
     def alm_disconnect(self):
