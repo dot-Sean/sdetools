@@ -4,7 +4,6 @@ import base64
 
 from commons import json, Error, UsageError
 
-import log_mgr
 import logging
 logger = logging.getLogger(__name__)
 

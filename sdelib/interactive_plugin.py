@@ -1,7 +1,4 @@
-import sys
-import getpass
-
-from commons import show_error, Error, get_password
+from commons import Error, get_password
 import apiclient
 from content import Content
 
@@ -32,7 +29,7 @@ class PlugInExperience:
                 self.config['password'] = get_password()
             try:
                 self.connect()
-            except apiclient.APIAuthError, e:
+            except apiclient.APIAuthError:
                 if askpasswd:
                     print "Incorrect Email/Passwrd\n"
                     continue
