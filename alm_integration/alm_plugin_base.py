@@ -364,14 +364,12 @@ def add_alm_config_options(config):
     config.add_custom_option('sde_statuses_in_scope',
                              'SDE statuses that are in scope',
                              '-sde_statuses_in_scope')
-    #how_tos_in_scope
     config.add_custom_option('how_tos_in_scope',
                              'Whether or not HowTos should be included',
                              '-how_tos_in_scope')
     config.add_custom_option('alm_method',
                              'HTTP or HTTPS for ALM server',
-                             '-alm_method',
-                             default='https')
+                             '-alm_method')
     config.add_custom_option('alm_server',
                              'Server of the ALM',
                              '-alm_server')
