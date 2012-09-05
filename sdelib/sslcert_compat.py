@@ -1,9 +1,17 @@
 import httplib
 import re
+import os
 import socket
-import sys
 import urllib2
-import ssl
+
+try:
+    import ssl
+    ssl_lib_found = True
+except ImportError:
+    ssl_lib_found = False
+
+CERT_PATH_NAME = os.path.dirname(os.path.abspath(__file__))
+CA_CERTS_FILE = os.path.join(CERT_PATH_NAME, 'gd_bundle.crt')
 
 class InvalidCertificateException(httplib.HTTPException, urllib2.URLError):
     def __init__(self, host, cert, reason):
@@ -80,3 +88,14 @@ class VerifiedHTTPSHandler(urllib2.HTTPSHandler):
             raise
 
     https_request = urllib2.HTTPSHandler.do_request_
+
+def get_http_handler(mode, debuglevel):
+    if mode == 'http':
+        return urllib2.HTTPHandler(debuglevel=debuglevel)
+    elif mode == 'https':
+        if not ssl_lib_found:
+            return urllib2.HTTPSHandler(debuglevel=debuglevel)
+        else:
+            return VerifiedHTTPSHandler(debuglevel=debuglevel, ca_certs=CA_CERTS_FILE)
+    raise KeyError, mode
+    
