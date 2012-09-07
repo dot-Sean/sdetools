@@ -123,7 +123,9 @@ class APIBase(object):
         call_success = True
         try:
             handle = self.opener.open(req)
-        except IOError, err:
+        except sslcert_compat.InvalidCertificateException, err:
+            raise ServerError('Unable to verify SSL certificate for host: %s' % (self.config['server']))
+        except urllib2.URLError, err:
             handle = err
             call_success = False
 
