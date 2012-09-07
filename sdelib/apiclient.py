@@ -3,6 +3,7 @@ import urllib2
 import base64
 
 from commons import json, Error, UsageError
+import sslcert_compat
 
 import logging
 logger = logging.getLogger(__name__)
@@ -63,15 +64,11 @@ class APIBase(object):
         self.auth_mode = 'basic'
         self.session_info = None
 
-        if self.config['method'] == 'https':
-            handler_func = urllib2.HTTPSHandler
-        else:
-            handler_func = urllib2.HTTPHandler
-
         urllib_debuglevel = 0
         if __name__ in config['debug_mods']:
             urllib_debuglevel = 1
-        handler = handler_func(debuglevel=urllib_debuglevel)
+
+        handler = sslcert_compat.get_http_handler(self.config['method'], debuglevel=urllib_debuglevel)
         self.opener = urllib2.build_opener(handler)
 
     def _call_api(self, target, method=URLRequest.GET, args=None):
@@ -126,7 +123,9 @@ class APIBase(object):
         call_success = True
         try:
             handle = self.opener.open(req)
-        except IOError, err:
+        except sslcert_compat.InvalidCertificateException, err:
+            raise ServerError('Unable to verify SSL certificate for host: %s' % (self.config['server']))
+        except urllib2.URLError, err:
             handle = err
             call_success = False
 
