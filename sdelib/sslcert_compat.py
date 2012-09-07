@@ -10,6 +10,11 @@ try:
 except ImportError:
     ssl_lib_found = False
 
+import logging
+logger = logging.getLogger(__name__)
+
+ssl_warned = False
+
 CERT_PATH_NAME = os.path.dirname(os.path.abspath(__file__))
 CA_CERTS_FILE = os.path.join(CERT_PATH_NAME, 'gd_bundle.crt')
 
@@ -90,10 +95,16 @@ class VerifiedHTTPSHandler(urllib2.HTTPSHandler):
     https_request = urllib2.HTTPSHandler.do_request_
 
 def get_http_handler(mode, debuglevel):
+    global ssl_warned
+
     if mode == 'http':
         return urllib2.HTTPHandler(debuglevel=debuglevel)
     elif mode == 'https':
         if not ssl_lib_found:
+            if not ssl_warned:
+                logger.warning('Missing ssl library for python: SSL certificates can'
+                    ' NOT be validated\n (use python 2.6 or install ssl for python)')
+                ssl_warned = True
             return urllib2.HTTPSHandler(debuglevel=debuglevel)
         else:
             return VerifiedHTTPSHandler(debuglevel=debuglevel, ca_certs=CA_CERTS_FILE)
