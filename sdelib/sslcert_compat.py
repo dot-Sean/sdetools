@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 ssl_warned = False
 
 CERT_PATH_NAME = os.path.dirname(os.path.abspath(__file__))
-CA_CERTS_FILE = os.path.join(CERT_PATH_NAME, 'gd_bundle.crt')
+CA_CERTS_FILE = os.path.join(CERT_PATH_NAME, 'ca_bundle.crt')
 
 class InvalidCertificateException(httplib.HTTPException, urllib2.URLError):
     def __init__(self, host, cert, reason):
