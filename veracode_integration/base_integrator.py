@@ -1,7 +1,6 @@
 #!/usr/bin/python
 import sys, os
 import collections
-import csv
 import re
 from datetime import datetime
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -10,9 +9,10 @@ from sdelib.commons import Error
 from sdelib.conf_mgr import config
 from sdelib.apiclient import APIError
 from sdelib.interactive_plugin import PlugInExperience
+from sdelib import log_mgr
 from xml.dom import minidom
 
-__all__ = ['BaseIntegrator, IntegrationError, IntegrationResult']
+logger = log_mgr.mods.add_mod(__name__)
 
 class IntegrationError(Error):
     pass
@@ -41,8 +41,8 @@ class BaseIntegrator:
     def _init_config(self):
         self.config.add_custom_option("mapping_file",
                 "Task ID -> CWE mapping in XML format", "m")
-        self.config.add_custom_option("logging",
-                "Logging level: on | off", "l", "off")
+        self.config.add_custom_option("flaws_only",
+                "Only update tasks identified having flaws. (on | off)", "z", "on")
         self.config.add_custom_option("trial_run",
                 "Trial run only: 'true' or 'false' (default)", "t", "false")
 
@@ -130,12 +130,6 @@ class BaseIntegrator:
                 return True
         return False
 
-    def log_message (self, severity, message):
-        # TODO: Integrate with future logging component
-        if config['logging'] == 'on':
-            now = datetime.now().isoformat(' ')
-            print "%s - %s - %s" % (now, severity, message)
-
     def get_tool_name(self):
         return 'External tool'
 
@@ -143,29 +137,21 @@ class BaseIntegrator:
         commit = (config['trial_run'] != 'true')
 
         stats_subtasks_added = 0
-        stats_tasks_affected = 0
         stats_api_errors = 0
-        stats_missing_maps = 0
         stats_total_skips = 0
         stats_total_skips_findings = 0
         import_start_datetime = datetime.now()
         file_name = '' # Needed for Notes API. All notes will have an empty filename.
 
-        # TODO: Temporary values defined below. These will be removed when shared logging facility is used.
-        severityError = "ERROR"
-        severityWarn = "WARN"
-        severityMsg = "INFO"
-        severityTestRun = "TEST_RUN"
-
-        self.log_message(severityMsg, "Integration underway for: %s" % (self.report_id))
-        self.log_message(severityMsg, "Mapped SD application/project: %s/%s" % (self.config['application'],self.config['project']))
+        logger.info("Integration underway for: %s" % (self.report_id))
+        logger.info("Mapped SD application/project: %s/%s" % (self.config['application'],self.config['project']))
 
         task_list = []
-        tasks_found = []
         try:
             task_list = self.plugin.get_task_list()
+            logger.debug("Retrieved task list for %s/%s" % (self.config['application'],self.config['project']))
         except APIError, e:
-            self.log_message(severityError, "Could not get task list for %s - Reason: %s" % (self.config['project'], str(e)))
+            logger.exception("Could not get task list for %s/%s - Reason: %s" % (self.config['application'],self.config['project'], str(e)))
             stats_api_errors += 1
 
         unique_findings = self.unique_findings()
@@ -182,11 +168,11 @@ class BaseIntegrator:
                 if mapped_tasks:
                     new_task_id = mapped_tasks[0] # use the first one
                     if task_id != new_task_id:
-                        self.log_message(severityWarn, "Task %s was not found in the project, mapping it to the default task %s." % (task_id, new_task_id))
+                        logger.warn("Task %s was not found in the project, mapping it to the default task %s." % (task_id, new_task_id))
                         task_id = new_task_id
 
             if not self.task_exists(task_id, task_list):
-                self.log_message(severityError, "Task %s was not found in the project, skipping %d findings." % (task_id, len(finding['cwes'])))
+                logger.error("Task %s was not found in the project, skipping %d findings." % (task_id, len(finding['cwes'])))
                 stats_total_skips += 1
                 stats_total_skips_findings += len(finding['cwes'])
                 continue
@@ -209,14 +195,14 @@ class BaseIntegrator:
 
             if commit:
                 try:
-                    api_result = self.plugin.add_note(task_id, description, file_name, "TODO")
-                    self.log_message(severityMsg, "TODO note added to %s" % (msg))
+                    self.plugin.add_note(task_id, description, file_name, "TODO")
+                    logger.debug("TODO note added to %s" % (msg))
                     stats_subtasks_added += 1
                 except APIError, e:
-                    self.log_message(severityError, "Could not add TODO note to %s - Reason: %s" % (msg, str(e)))
+                    logger.exception("Could not add TODO note to %s - Reason: %s" % (msg, str(e)))
                     stats_api_errors += 1
             else:
-                self.log_message(severityTestRun, "TODO note added to %s" % (msg))
+                logger.debug("TODO note added to %s" % (msg))
                 stats_subtasks_added += 1
 
         stats_noflaw_notes_added=0
@@ -235,36 +221,37 @@ class BaseIntegrator:
             noflaw_tasks.append(int(task_id))
         noflaw_tasks = sorted(noflaw_tasks)
 
-        for task_id in noflaw_tasks:
-            msg = "T%s" % task_id
-            description  = "Automated analysis tool %s did not identify any potential vulnerabilities for this task.\n" % (self.get_tool_name())
-            description += "%s Reference: %s\n\n" % (self.get_tool_name(), self.report_id)
-
-            if commit:
-                try:
-                    self.plugin.add_note("T%s" % (task_id), description, file_name, "DONE")
-                    self.log_message(severityMsg, "Marked %s task as DONE" % (msg))
+        if config['flaws_only'] == 'off':
+            for task_id in noflaw_tasks:
+                msg = "T%s" % task_id
+                description  = "Automated analysis tool %s did not identify any potential vulnerabilities for this task.\n" % (self.get_tool_name())
+                description += "%s Reference: %s\n\n" % (self.get_tool_name(), self.report_id)
+    
+                if commit:
+                    try:
+                        self.plugin.add_note("T%s" % (task_id), description, file_name, "DONE")
+                        logger.debug("Marked %s task as DONE" % (msg))
+                        stats_noflaw_notes_added += 1
+                    except APIError, e:
+                        logger.exception("Could not mark %s DONE - Reason: %s" % (msg, str(e)))
+                        stats_api_errors += 1
+                else:
+                    logger.info("Marked %s as DONE" % (msg))
                     stats_noflaw_notes_added += 1
-                except APIError, e:
-                    self.log_message(severityError, "Could not mark %s DONE - Reason: %s" % (msg, str(e)))
-                    stats_api_errors += 1
-            else:
-                self.log_message(severityTestRun, "Marked %s as DONE" % (msg))
-                stats_noflaw_notes_added += 1
 
-        self.log_message(severityMsg, "---------------------------------------------------------")
+        logger.info("---------------------------------------------------------")
         if missing_cwe_map:
-            self.log_message(severityError, "These CWEs could not be mapped: "+ ",".join(missing_cwe_map))
-            self.log_message(severityError, "%d total flaws could not be mapped." %(len(missing_cwe_map)))
+            logger.error("These CWEs could not be mapped: "+ ",".join(missing_cwe_map))
+            logger.error("%d total flaws could not be mapped." %(len(missing_cwe_map)))
         else:
-             self.log_message(severityMsg, "All CWEs successfully mapped to a task.")
-        self.log_message(severityMsg, "%d subtasks created from %d flaws."%(stats_subtasks_added, len(self.findings)))
-        self.log_message(severityMsg, "%d/%d project tasks had 0 flaws." %(len(noflaw_tasks),len(task_list)-(stats_test_tasks)))
+             logger.info("All CWEs successfully mapped to a task.")
+        logger.info("%d subtasks created from %d flaws."%(stats_subtasks_added, len(self.findings)))
+        logger.info("%d/%d project tasks had 0 flaws." %(len(noflaw_tasks),len(task_list)-(stats_test_tasks)))
         if stats_total_skips:
-            self.log_message(severityError, "%d flaws were mapped to %d tasks not found in the project. Skipped"%(stats_total_skips_findings,stats_total_skips))
-        self.log_message(severityMsg, "%d total api errors encountered." % (stats_api_errors))
-        self.log_message(severityMsg, "---------------------------------------------------------")
-        self.log_message(severityMsg, "Completed")
+            logger.error("%d flaws were mapped to %d tasks not found in the project. Skipped"%(stats_total_skips_findings,stats_total_skips))
+        logger.info("%d total api errors encountered." % (stats_api_errors))
+        logger.info("---------------------------------------------------------")
+        logger.info("Completed")
 
         return IntegrationResult(import_start_datetime=import_start_datetime,
                                  import_finish_datetime=datetime.now(),
