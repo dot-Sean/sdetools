@@ -18,7 +18,7 @@ LOG_LEVELS = {
     'verbose': logging.INFO,
     'default': logging.WARNING,
     'error': logging.ERROR,
-    'queit': logging.CRITICAL,
+    'quiet': logging.CRITICAL,
     }
 
 class Config(object):
