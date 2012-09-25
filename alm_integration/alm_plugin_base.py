@@ -1,7 +1,6 @@
 import sys, os
 sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
 
-import csv
 from abc import ABCMeta, abstractmethod
 from datetime import datetime
 
@@ -95,6 +94,20 @@ class AlmConnector(object):
             raise AlmException('Missing or incorrect conflict_policy '
                                'in configuration. Valid values are '
                                'alm, sde, or timestamp.')
+
+        if (self.sde_plugin.config['sde_min_priority']):
+            bad_priority_msg =  'Incorrect sde_min_priority specified in configuration. Valid values are > 0 '
+            bad_priority_msg += ' and <= 10'
+
+            try:
+                self.sde_plugin.config['sde_min_priority'] = int(self.sde_plugin.config['sde_min_priority'])
+            except:
+                raise AlmException(bad_priority_msg)
+
+            if (self.sde_plugin.config['sde_min_priority'] < 1 or self.sde_plugin.config['sde_min_priority'] >10):
+                raise AlmException(bad_priority_msg)
+        else:
+            self.sde_plugin.config['sde_min_priority'] = 1
 
         logger.info('*** AlmConnector initialized ***')
 
@@ -219,7 +232,7 @@ class AlmConnector(object):
         try:
             self.sde_plugin.api.add_note(task_id, note_msg,
                                              filename, status)
-            logger.debug('Sucessfuly set note for task %s' % task_id)
+            logger.debug('Successfuly set note for task %s' % task_id)
 
         except APIError, err:
             logger.error(err)
@@ -231,7 +244,8 @@ class AlmConnector(object):
         For example, has one of the appropriate phases
         """
         return (task['phase'] in self.sde_plugin.config['alm_phases']  and
-                task['status'] in self.sde_plugin.config['sde_statuses_in_scope'])
+                task['status'] in self.sde_plugin.config['sde_statuses_in_scope'] and
+                task['priority'] >= self.sde_plugin.config['sde_min_priority'])
 
     def sde_update_task_status(self, task, status):
         """ Updates the status of the given task in SD Elements
@@ -364,6 +378,9 @@ def add_alm_config_options(config):
     config.add_custom_option('sde_statuses_in_scope',
                              'SDE statuses that are in scope',
                              '-sde_statuses_in_scope')
+    config.add_custom_option('sde_min_priority',
+                             'Minimum SDE priority in scope',
+                             '-sde_min_priority')
     config.add_custom_option('how_tos_in_scope',
                              'Whether or not HowTos should be included',
                              '-how_tos_in_scope')

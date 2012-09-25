@@ -122,7 +122,7 @@ class JIRAConnector(AlmConnector):
         try:
             result = self.alm_plugin._call_api('project')
         except APIError:
-            raise AlmException('Unable to connnect to JIRA. Please' +
+            raise AlmException('Unable to connect to JIRA. Please' +
                                ' check server URL, ID, password')
 
         #verify that we can access project
@@ -131,7 +131,7 @@ class JIRAConnector(AlmConnector):
                                      (self.sde_plugin.config
                                      ['alm_project']))
         except APIError:
-            raise AlmException('Unable to connnect to JIRA project %s' %
+            raise AlmException('Unable to connect to JIRA project %s' %
                                (self.sde_plugin.config['alm_project']))
 
         #get Issue ID for given type name
