@@ -49,6 +49,11 @@ alm_project = JIRAPROJECT
 #TODO,DONE,NA
 sde_statuses_in_scope = TODO,DONE,NA
 
+# Synchronize all SD Elements tasks having the following
+# minimum priority
+# Default: 1 (all tasks)
+#sde_min_priority = 1
+
 #SD Elements task phases that are in scope.
 #Valid values: comma separated list-
 #requirements,architecture-design,development,testing
