@@ -42,7 +42,8 @@ class MingleAPIBase(APIBase):
             if args:
                 req_url = '%s?%s' % (req_url, urllib.urlencode(args))
         else:
-            data = urllib.urlencode(args)
+            encoded_args = dict((key.encode('utf-8'), val.encode('utf-8')) for key, val in args.items())
+            data = urllib.urlencode(encoded_args)
         req = URLRequest(req_url, data=data, method=method)
         encoded_auth = base64.encodestring('%s:%s' % (self.config['alm_id'], self.config['alm_password']))[:-1]
         authheader =  "Basic %s" % (encoded_auth)
