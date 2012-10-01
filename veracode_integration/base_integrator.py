@@ -140,11 +140,15 @@ class BaseIntegrator:
         stats_api_errors = 0
         stats_total_skips = 0
         stats_total_skips_findings = 0
+        stats_total_flaws_found = 0
         import_start_datetime = datetime.now()
         file_name = '' # Needed for Notes API. All notes will have an empty filename.
 
         logger.info("Integration underway for: %s" % (self.report_id))
         logger.info("Mapped SD application/project: %s/%s" % (self.config['application'],self.config['project']))
+
+        if not commit:
+            logger.info("Trial run only. No changes will be made")
 
         task_list = []
         try:
@@ -170,6 +174,8 @@ class BaseIntegrator:
                     if task_id != new_task_id:
                         logger.warn("Task %s was not found in the project, mapping it to the default task %s." % (task_id, new_task_id))
                         task_id = new_task_id
+
+            stats_total_flaws_found += len(finding['cwes'])
 
             if not self.task_exists(task_id, task_list):
                 logger.error("Task %s was not found in the project, skipping %d findings." % (task_id, len(finding['cwes'])))
@@ -245,7 +251,7 @@ class BaseIntegrator:
             logger.error("%d total flaws could not be mapped." %(len(missing_cwe_map)))
         else:
              logger.info("All CWEs successfully mapped to a task.")
-        logger.info("%d subtasks created from %d flaws."%(stats_subtasks_added, len(self.findings)))
+        logger.info("%d subtasks created from %d flaws."%(stats_subtasks_added, stats_total_flaws_found))
         logger.info("%d/%d project tasks had 0 flaws." %(len(noflaw_tasks),len(task_list)-(stats_test_tasks)))
         if stats_total_skips:
             logger.error("%d flaws were mapped to %d tasks not found in the project. Skipped"%(stats_total_skips_findings,stats_total_skips))
@@ -262,9 +268,9 @@ class BaseIntegrator:
 
 def main(argv):
     base = BaseIntegrator(config)
-    base.parse_args(argv)
-    base.load_mapping_from_xml()
-    base.output_mapping()
+    if base.parse_args(argv):
+        base.load_mapping_from_xml()
+        base.output_mapping()
 
 if __name__ == "__main__":
     main(sys.argv)

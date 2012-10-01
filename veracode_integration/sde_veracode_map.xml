@@ -41,7 +41,6 @@
 	<task id="193" title="Review non-categorized/miscellaneous findings from static code analysis">
 		<cwe id="597" title="Use of Wrong Operator in String Comparison"/>
 		<cwe id="668" title="Exposure of Resource to Wrong Sphere"/>
-		<cwe id="557" title="Concurrency Issues"/>
 		<cwe id="391" title="Unchecked Error Condition"/>
 		<cwe id="498" title="Cloneable Class Containing Sensitive Information"/>
 		<cwe id="234" title="Failure to Handle Missing Parameter"/>
@@ -50,7 +49,6 @@
 		<cwe id="656" title="Reliance on Security Through Obscurity"/>
 		<cwe id="404" title="Improper Resource Shutdown or Release"/>
 		<cwe id="366" title="Race Condition within a Thread"/>
-		<cwe id="367" title="Time-of-check Time-of-use (TOCTOU) Race Condition"/>
 		<cwe id="548" title="Information Exposure Through Directory Listing"/>
 		<cwe id="560" title="Use of Umask() with Chmod-Style Argument"/>
 		<cwe id="675" title="Duplicate Operations on Resource"/>
@@ -66,20 +64,27 @@
 		<cwe id="311" title="Missing Encryption of Sensitive Data"/>	
 		<cwe id="312" title="Cleartext Storage of Sensitive Information"/>
 		<cwe id="313" title="Plaintext Storage in a File or on Disk"/>
-	        <cwe id="*" title="Unmapped CWE"/>
-        </task>
-
-	<task id="192" title="Follow best practices when accessing memory">
-		<cwe id="415" title="Double Free"/>
 		<cwe id="193" title="Off-by-One Error"/>
-		<cwe id="121" title="Stack-Based Buffer Overflow"/>
-		<cwe id="416" title="Use After Free"/>
-		<cwe id="125" title="Out-of-Bounds Read"/>
 		<cwe id="135" title="Incorrect Calculation of Multi-Byte String Length"/>
 		<cwe id="134" title="Uncontrolled Format String"/>
 		<cwe id="129" title="Improper Validation of Array Index"/>
 		<cwe id="170" title="Improper Null Termination"/>
-	</task>
+	        <cwe id="*" title="Unmapped CWE"/>
+        </task>
+        <task id="206" title="Avoid time of check time of use race condition against external resources">
+                <cwe id="367" title="Time-of-check Time-of-use (TOCTOU) Race Condition"/>
+        </task>
+        <task id="205" title="Avoid inter-process race conditions">
+                <cwe id="557" title="Concurrency Issues"/>
+        </task>
+        <task id="202" title="Prevent buffer overflow/underflow">
+                <cwe id="121" title="Stack-Based Buffer Overflow"/>
+        </task>
+        <task id="204" title="Follow security best practices when dealing with pointers">
+                <cwe id="125" title="Out-of-Bounds Read"/>
+                <cwe id="415" title="Double Free"/>
+                <cwe id="416" title="Use After Free"/>
+        </task>
 	<task id="60" title="Only use approved cryptographic algorithms and key lengths">
 		<cwe id="757" title="Selection of Less-Secure Algorithm During Negotiation (Algorithm Downgrade)"/>
 		<cwe id="347" title="Improper Verification of Cryptographic Signature"/>
