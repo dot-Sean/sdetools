@@ -1,6 +1,8 @@
 import commons
 
-class CommandBase(object):
+class BaseCommand(object):
+    cmd_name = None
+
     def __init__(self, config):
         self.config = config
 

@@ -12,7 +12,17 @@ from sdelib import commons
 commons.base_path = base_path
 
 def main(argv):
-    pass
+    command = {}
+
+    for mod_name in os.listdir(base_path):
+        if not mod_name.startswith('mod_'):
+            continue
+        if not os.path.isdir(mod_name):
+            continue
+        mod = __import__(mod_name)
+        cmd_name = mod_name[4:]
+        command[cmd_name] = mod.Command
+        command[cmd_name].cmd_name = cmd_name
 
 if __name__ == "__main__":
     main(sys.argv)
