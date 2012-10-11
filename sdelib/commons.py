@@ -12,6 +12,8 @@ try:
 except ImportError:
     import abc_compat as abc
 
+base_path = None
+
 class Error(Exception):
     """
     Base Error for the Lint Library.

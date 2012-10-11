@@ -13,9 +13,11 @@ except ImportError:
 import logging
 logger = logging.getLogger(__name__)
 
+from sdelib import commons
+
 ssl_warned = False
 
-CERT_PATH_NAME = os.path.dirname(os.path.abspath(__file__))
+CERT_PATH_NAME = os.path.join(commons.base_path, 'ssl')
 CA_CERTS_FILE = os.path.join(CERT_PATH_NAME, 'ca_bundle.crt')
 
 class InvalidCertificateException(httplib.HTTPException, urllib2.URLError):
