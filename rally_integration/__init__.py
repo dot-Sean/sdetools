@@ -1,2 +1,1 @@
-__all__ = [
-    'rally_plugin_launcher']
+__all__ = ['rally_plugin_launcher']

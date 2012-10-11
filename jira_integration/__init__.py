@@ -1,2 +1,1 @@
-__all__ = [
-    'jira_plugin']
+__all__ = ['jira_plugin']
