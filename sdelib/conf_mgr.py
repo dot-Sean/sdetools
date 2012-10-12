@@ -164,7 +164,7 @@ class Config(object):
         return True, 'Config File Parsed'
 
     def parse_args(self, arvg):
-        usage = "%%prog [options...] %s\n\n%s\n" % (self.custom_args['syntax_text'], self.custom_args['help_text'])
+        usage = "%%prog COMMAND [ARGS] %s\n\n%s\n" % (self.custom_args['syntax_text'], self.custom_args['help_text'])
 
         parser = optparse.OptionParser(usage)
         parser.add_option('-c', '--config', metavar='CONFIG_FILE', dest='conf_file', 
@@ -225,6 +225,7 @@ class Config(object):
             show_error("Unable to read or process configuration file.\n Reason: %s" % (ret_val))
             return False
 
+        args = args[1:]
         if (self.custom_args['var_name'] is None):
             if args:
                 show_error("Unknown arguments in the command line.", usage_hint=True)

@@ -16,10 +16,6 @@ class Command(BaseCommand):
     def handle(self, *args):
         scanner = Scanner(config)
 
-        ret = config.parse_args(argv)
-        if not ret:
-            sys.exit(1)
-
         try:
             plugin = PlugInExperience(config)
 

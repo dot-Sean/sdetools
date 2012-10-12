@@ -5,12 +5,17 @@ import getpass
 try:
     import json
 except ImportError:
-    import json_compat as json
+    from extlib import json_compat as json
 
 try:
     import abc
 except ImportError:
-    import abc_compat as abc
+    from extlib import abc_compat as abc
+
+try:
+    import argparse
+except ImportError:
+    from extlib import argparse_compat as argparse
 
 base_path = None
 
