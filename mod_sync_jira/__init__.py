@@ -2,9 +2,10 @@
 #
 # Plugin for two way integration with JIRA
 
+from sdelib.cmd import BaseCommand
 from sdelib.interactive_plugin import PlugInExperience
-from jira_integration.lib.jira_plugin import JIRAConnector
-from jira_integration.lib.jira_plugin import JIRABase, add_jira_config_options
+from mod_sync_jira.lib.jira_plugin import JIRAConnector
+from mod_sync_jira.lib.jira_plugin import JIRABase, add_jira_config_options
 from alm_integration.alm_plugin_base import AlmException
 from sdelib.interactive_plugin import PluginError
 
@@ -23,4 +24,5 @@ class Command(BaseCommand):
             jira.synchronize()
         except (AlmException, PluginError), err:
             print 'The following error was encountered: %s' % err
-
+            return False
+        return True
