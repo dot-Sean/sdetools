@@ -9,7 +9,7 @@ import log_mgr
 
 from commons import show_error
 
-__all__ = ['config', 'Config']
+__all__ = ['Config']
 
 DEFAULT_CONFIG_FILE = "~/.sdelint.cnf"
 
@@ -49,7 +49,8 @@ class Config(object):
             'debug_mods': '',
         }
 
-    def __init__(self):
+    def __init__(self, command_list):
+        self.command_list = command_list
         self.settings = self.DEFAULTS.copy()
         self.custom_options = []
         self.custom_args = {
@@ -131,7 +132,7 @@ class Config(object):
 
         cnf = ConfigParser.ConfigParser()
         # This will preserve case
-        config.optionxform = str
+        cnf.optionxform = str
         stat = cnf.read(file_name)
         if not stat:
             if (file_name == DEFAULT_CONFIG_FILE):
@@ -288,5 +289,3 @@ class Config(object):
                 self[name] = val
 
         return True
-
-config = Config()

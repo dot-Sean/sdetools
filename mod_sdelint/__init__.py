@@ -10,6 +10,7 @@ from sdelib.interactive_plugin import PlugInExperience
 from sdelib.scanner import Scanner
 
 class Command(BaseCommand):
+    name = 'lint'
     help = 'SDE Lint tool scans project file and displays tasks that match the context of each file.'
 
     def handle(self, *args):

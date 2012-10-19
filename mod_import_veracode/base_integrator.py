@@ -1,12 +1,9 @@
 #!/usr/bin/python
-import sys, os
 import collections
 import re
 from datetime import datetime
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from sdelib.commons import Error
-from sdelib.conf_mgr import config
 from sdelib.apiclient import APIError
 from sdelib.interactive_plugin import PlugInExperience
 from sdelib import log_mgr
@@ -57,11 +54,11 @@ class BaseIntegrator:
 
     def load_mapping_from_xml(self):
         try:
-            base = minidom.parse(config['mapping_file'])
+            base = minidom.parse(self.config['mapping_file'])
         except KeyError, ke:
             raise IntegrationError("Missing configuration option 'mapping_file'")
         except Exception, e:
-            raise IntegrationError("An error occurred opening mapping file '%s'" % config['mapping_file'])
+            raise IntegrationError("An error occurred opening mapping file '%s'" % self.config['mapping_file'])
 
         cwe_mapping = collections.defaultdict(list)
         self.cwe_title = {}
@@ -73,7 +70,7 @@ class BaseIntegrator:
 
         self.mapping = cwe_mapping
         if not self.mapping:
-            raise IntegrationError("No mapping was found in file '%s'" % config['mapping_file'])
+            raise IntegrationError("No mapping was found in file '%s'" % self.config['mapping_file'])
 
     def generate_findings(self):
         return []
@@ -134,7 +131,7 @@ class BaseIntegrator:
         return 'External tool'
 
     def import_findings(self):
-        commit = (config['trial_run'] != 'true')
+        commit = (self.config['trial_run'] != 'true')
 
         stats_subtasks_added = 0
         stats_api_errors = 0
@@ -145,7 +142,7 @@ class BaseIntegrator:
         file_name = '' # Needed for Notes API. All notes will have an empty filename.
 
         logger.info("Integration underway for: %s" % (self.report_id))
-        logger.info("Mapped SD application/project: %s/%s" % (self.config['application'],self.config['project']))
+        logger.info("Mapped SD application/project: %s/%s" % (self.config['application'], self.config['project']))
 
         if not commit:
             logger.info("Trial run only. No changes will be made")
@@ -153,9 +150,10 @@ class BaseIntegrator:
         task_list = []
         try:
             task_list = self.plugin.get_task_list()
-            logger.debug("Retrieved task list for %s/%s" % (self.config['application'],self.config['project']))
+            logger.debug("Retrieved task list for %s/%s" % (self.config['application'], self.config['project']))
         except APIError, e:
-            logger.exception("Could not get task list for %s/%s - Reason: %s" % (self.config['application'],self.config['project'], str(e)))
+            logger.exception("Could not get task list for %s/%s - Reason: %s" % 
+                (self.config['application'], self.config['project'], str(e)))
             stats_api_errors += 1
 
         unique_findings = self.unique_findings()
@@ -227,7 +225,7 @@ class BaseIntegrator:
             noflaw_tasks.append(int(task_id))
         noflaw_tasks = sorted(noflaw_tasks)
 
-        if config['flaws_only'] == 'off':
+        if self.config['flaws_only'] == 'off':
             for task_id in noflaw_tasks:
                 msg = "T%s" % task_id
                 description  = "Automated analysis tool %s did not identify any potential vulnerabilities for this task.\n" % (self.get_tool_name())
@@ -265,13 +263,3 @@ class BaseIntegrator:
                                  noflaw_tasks=noflaw_tasks,
                                  error_count=stats_api_errors,
                                  error_cwes_unmapped=len(missing_cwe_map))
-
-def main(argv):
-    base = BaseIntegrator(config)
-    if base.parse_args(argv):
-        base.load_mapping_from_xml()
-        base.output_mapping()
-
-if __name__ == "__main__":
-    main(sys.argv)
-

@@ -25,24 +25,15 @@ def load_modules():
             continue
         mod = __import__(mod_name)
         cmd_name = mod_name[4:]
-        command[cmd_name] = mod.Command
+        cmd_cls = mod.Command
+        if hasattr(cmd_cls, 'name'):
+            cmd_name = cmd_cls.name
+        if not hasattr(cmd_cls, 'help'):
+            raise commons.UsageError('Missing help string for module %s' % (cmd_name))
+        command[cmd_name] = cmd_cls
         command[cmd_name].cmd_name = cmd_name
 
     return command
-
-def get_commands_help(command):
-    ret = [('help', 'Prints the list of available commands.')]
-    for cmd_name in command:
-        ret.append((cmd_name, command[cmd_name].help))
-    ret.sort()
-    return ret
-
-def print_command_list(cmd_list):
-    print 'Available commands are:'
-    print
-    for cmd_name, cmd_help in cmd_list:
-        print '%s%s' % (cmd_name.ljust(20), cmd_help)
-    print
 
 def main(argv):
     command = load_modules()
@@ -57,11 +48,6 @@ def main(argv):
             curr_cmd_name = arg
             break
 
-    if curr_cmd_name == 'help':
-        cmd_list = get_commands_help(command)
-        print_command_list(cmd_list)
-        return True
-
     if not curr_cmd_name:
         commons.show_error("Missing command", usage_hint=True)
         return False
@@ -72,7 +58,7 @@ def main(argv):
 
     curr_cmd = command[curr_cmd_name]
 
-    config = conf_mgr.Config()
+    config = conf_mgr.Config(command)
     ret = config.parse_args(argv)
     if not ret:
         return False
@@ -84,5 +70,8 @@ def main(argv):
     return False
 
 if __name__ == "__main__":
-    ret = main(sys.argv)
-    
+    exit_stat = main(sys.argv)
+    if not exit_stat:
+        sys.exit(1)
+    else:
+        sys.exit(0)

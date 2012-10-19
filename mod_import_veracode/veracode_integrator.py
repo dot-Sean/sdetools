@@ -1,7 +1,4 @@
-#!/usr/bin/python
-import sys
 from base_integrator import BaseIntegrator, IntegrationError
-from sdelib.conf_mgr import config
 from xml.dom import minidom
 
 REQUIRED_ATTRIBS = ['issueid', 'cweid', 'categoryid', 'categoryname', 'description', 'severity', 'module']
@@ -42,11 +39,11 @@ class VeracodeIntegrator(BaseIntegrator):
 
     def parse(self):
         try:
-            base = minidom.parse(config['report_xml'])
+            base = minidom.parse(self.config['report_xml'])
         except KeyError, ke:
             raise VeracodeIntegrationError("Missing configuration option 'report_xml'")
         except Exception, e:
-            raise VeracodeIntegrationError("Error opening report xml (%s)" % config['report_xml'])
+            raise VeracodeIntegrationError("Error opening report xml (%s)" % self.config['report_xml'])
 
         detailed_reports = base.getElementsByTagName('detailedreport')
         if len(detailed_reports) != 1:
@@ -80,14 +77,3 @@ class VeracodeIntegrator(BaseIntegrator):
 
     def generate_findings(self):
         return [self._make_finding(item) for item in self.get_raw_findings()]
-
-def main(argv):
-    vc_integrator = VeracodeIntegrator(config)
-    vc_integrator.parse_args(argv)
-    vc_integrator.load_mapping_from_xml()
-    vc_integrator.parse()
-    vc_integrator.import_findings()
-
-if __name__ == "__main__":
-    main(sys.argv)
-
