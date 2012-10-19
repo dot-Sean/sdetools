@@ -7,28 +7,31 @@ if sys.platform.startswith("win"):
     current_file = sys.argv[0]
 else:
     current_file = __file__
-base_path = os.path.split(os.path.abspath(current_file))[0]
-sys.path.append(base_path)
+BASE_PATH = os.path.split(os.path.abspath(current_file))[0]
+
+MODULES_PATH = os.path.join(BASE_PATH, 'modules')
+sys.path.append(BASE_PATH)
 
 from sdelib import commons
-commons.base_path = base_path
+commons.base_path = BASE_PATH
 
 from sdelib import conf_mgr
 
 def load_modules():
     command = {}
 
-    for mod_name in os.listdir(base_path):
-        if not mod_name.startswith('mod_'):
-            continue
-        if not os.path.isdir(mod_name):
+    for mod_name in os.listdir(MODULES_PATH):
+        if mod_name.startswith('_'):
             continue
         try:
-            mod = __import__(mod_name)
+            mod = __import__('modules.' + mod_name)
         except ImportError:
             raise commons.UsageError('Unable to import module %s' % (mod_name))
-        cmd_name = mod_name[4:]
+        mod = getattr(mod, mod_name)
+        if not hasattr(mod, 'Command'):
+            raise commons.UsageError('Module missing Command class: %s' % (mod_name))
         cmd_cls = mod.Command
+        cmd_name = mod_name[4:]
         if hasattr(cmd_cls, 'name'):
             cmd_name = cmd_cls.name
         if not hasattr(cmd_cls, 'help'):
