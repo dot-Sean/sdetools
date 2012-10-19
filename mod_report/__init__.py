@@ -6,7 +6,6 @@
 # Piggybacks off Ehsan's Lint tool code
 
 import csv
-
 from sdelib.cmd import BaseCommand
 from sdelib.interactive_plugin import PlugInExperience
 
