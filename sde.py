@@ -70,7 +70,7 @@ def main(argv):
     cmd_inst.customize_config()
     try:
         ret_status = cmd_inst.handle(*argv[2:])
-    except Error, e:
+    except commons.Error, e:
         commons.show_error(str(e))
         return False
 

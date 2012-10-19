@@ -34,5 +34,5 @@ class Command(BaseCommand):
 
     def handle(self, *args):
         plugin = PlugInExperience(self.config)
-        test_report(plugin)
+        self.test_report(plugin)
         return True
