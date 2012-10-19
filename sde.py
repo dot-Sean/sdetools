@@ -23,7 +23,10 @@ def load_modules():
             continue
         if not os.path.isdir(mod_name):
             continue
-        mod = __import__(mod_name)
+        try:
+            mod = __import__(mod_name)
+        except ImportError:
+            raise commons.UsageError('Unable to import module %s' % (mod_name))
         cmd_name = mod_name[4:]
         cmd_cls = mod.Command
         if hasattr(cmd_cls, 'name'):
@@ -65,9 +68,15 @@ def main(argv):
 
     cmd_inst = curr_cmd(config)
     cmd_inst.customize_config()
-    cmd_inst.handle(*argv[2:])
+    try:
+        ret_status = cmd_inst.handle(*argv[2:])
+    except Error, e:
+        commons.show_error(str(e))
+        return False
 
-    return False
+    if ret_status is None:
+        ret_status = True
+    return ret_status
 
 if __name__ == "__main__":
     exit_stat = main(sys.argv)
