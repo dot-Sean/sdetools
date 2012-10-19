@@ -2,6 +2,7 @@
 import sys
 import os
 import getopt
+import logging
 
 if sys.platform.startswith("win"):
     current_file = sys.argv[0]
@@ -23,15 +24,22 @@ def load_modules():
     for mod_name in os.listdir(MODULES_PATH):
         if mod_name.startswith('_'):
             continue
+        if os.path.isdir(os.path.join(MODULES_PATH, mod_name)):
+            pass
+        elif mod_name.endswith('.py'):
+            mod_name = mod_name[:-3]
+        else:
+            continue
         try:
             mod = __import__('modules.' + mod_name)
         except ImportError:
+            logging.exception('Exception in importing module %s' % (mod_name))
             raise commons.UsageError('Unable to import module %s' % (mod_name))
         mod = getattr(mod, mod_name)
         if not hasattr(mod, 'Command'):
             raise commons.UsageError('Module missing Command class: %s' % (mod_name))
         cmd_cls = mod.Command
-        cmd_name = mod_name[4:]
+        cmd_name = mod_name
         if hasattr(cmd_cls, 'name'):
             cmd_name = cmd_cls.name
         if not hasattr(cmd_cls, 'help'):

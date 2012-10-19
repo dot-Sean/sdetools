@@ -1,5 +1,5 @@
 from sdelib.cmd import BaseCommand
-from mod_import_veracode import veracode_integrator
+from modules.import_veracode import veracode_integrator
 
 class Command(BaseCommand):
     help = 'Veracode -> SDE import utility.'
