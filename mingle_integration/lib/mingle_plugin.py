@@ -72,7 +72,7 @@ class MingleConnector(AlmConnector):
         """ Verifies that Mingle connection works """
         #Check to make sure that we can do a simple API call
         try:
-            self.alm_plugin._call_api('cards.xml')
+            self.alm_plugin.call_api('cards.xml')
         except APIError:
             raise AlmException('Unable to connnect to Mingle. Please '
                                'check server URL, ID, password and '
@@ -84,7 +84,7 @@ class MingleConnector(AlmConnector):
 
         try:
             task_args =  {'filters[]': ('[Name][is][%s]' % task_id)}
-            result = self.alm_plugin._call_api('cards.xml', args=task_args)
+            result = self.alm_plugin.call_api('cards.xml', args=task_args)
         except APIError, err:
             logging.error(err)
             raise AlmException('Unable to get task %s from Mingle' % task_id)
@@ -137,7 +137,7 @@ class MingleConnector(AlmConnector):
                 'card[properties][][name]': 'status',
                 'card[properties][][value]': self.sde_plugin.config['mingle_new_status']
             }
-            self.alm_plugin._call_api('cards.xml', args=status_args,
+            self.alm_plugin.call_api('cards.xml', args=status_args,
                     method=URLRequest.POST)
             logging.debug('Task %s added to Mingle Project' % task['id'])
         except APIError, err:
@@ -169,7 +169,7 @@ class MingleConnector(AlmConnector):
                     'card[properties][][name]':'status',
                     'card[properties][][value]': self.sde_plugin.config['mingle_done_statuses'][0]
                 }
-                self.alm_plugin._call_api('cards/%s.xml' % task.get_alm_id(),
+                self.alm_plugin.call_api('cards/%s.xml' % task.get_alm_id(),
                         args=status_args, method=URLRequest.PUT)
             except APIError, err:
                 raise AlmException('Unable to update task status to DONE '
@@ -181,7 +181,7 @@ class MingleConnector(AlmConnector):
                     'card[properties][][name]':'status',
                     'card[properties][][value]': self.sde_plugin.config['mingle_new_status']
                 }
-                self.alm_plugin._call_api('cards/%s.xml' % task.get_alm_id(),
+                self.alm_plugin.call_api('cards/%s.xml' % task.get_alm_id(),
                         args=status_args, method=URLRequest.PUT)
             except APIError, err:
                 raise AlmException('Unable to update task status to TODO for '

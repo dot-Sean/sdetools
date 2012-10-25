@@ -1,9 +1,6 @@
 # Copyright SDElements Inc
 # Extensible two way integration with JIRA
 
-import sys, os
-
-sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
 from sdelib.apiclient import APIBase, URLRequest, APIError, APIFormatError
 from alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from alm_integration.alm_plugin_base import AlmException, add_alm_config_options
@@ -11,7 +8,6 @@ from sdelib.conf_mgr import Config
 from datetime import datetime
 import logging
 import copy
-
 
 class JIRABase(APIBase):
     """ Base plugin for JIRA """
@@ -120,14 +116,14 @@ class JIRAConnector(AlmConnector):
         """ Verifies that JIRA connection works """
         #verify that we can connect to JIRA
         try:
-            result = self.alm_plugin._call_api('project')
+            result = self.alm_plugin.call_api('project')
         except APIError:
             raise AlmException('Unable to connect to JIRA. Please' +
                                ' check server URL, ID, password')
 
         #verify that we can access project
         try:
-            self.alm_plugin._call_api('project/%s' %
+            self.alm_plugin.call_api('project/%s' %
                                      (self.sde_plugin.config
                                      ['alm_project']))
         except APIError:
@@ -136,7 +132,7 @@ class JIRAConnector(AlmConnector):
 
         #get Issue ID for given type name
         try:
-            issue_types = self.alm_plugin._call_api('issuetype')
+            issue_types = self.alm_plugin.call_api('issuetype')
             for issue_type in issue_types:
                 if (issue_type['name'] ==
                         self.sde_plugin.config['jira_issue_type']):
@@ -154,7 +150,7 @@ class JIRAConnector(AlmConnector):
         try:
             url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s\'' % (
                     self.sde_plugin.config['alm_project'], task_id)
-            result = self.alm_plugin._call_api(url)
+            result = self.alm_plugin.call_api(url)
         except APIError, err:
             logging.info(err)
             raise AlmException("Unable to get task %s from JIRA" % task_id)
@@ -193,7 +189,7 @@ class JIRAConnector(AlmConnector):
            }
         }
         try:
-            add_result = self.alm_plugin._call_api('issue',
+            add_result = self.alm_plugin.call_api('issue',
                     method=URLRequest.POST, args=args)
         except APIError:
             return None
@@ -216,7 +212,7 @@ class JIRAConnector(AlmConnector):
         try:
             if status == 'DONE' or status == 'NA':
                 if not self.close_transition_id:
-                    transitions = self.alm_plugin._call_api(trans_url)
+                    transitions = self.alm_plugin.call_api(trans_url)
                     for transition in transitions['transitions']:
                         if transition['name'] == self.sde_plugin.config['jira_close_transition']:
                             self.close_transition_id = transition['id']
@@ -225,12 +221,12 @@ class JIRAConnector(AlmConnector):
                         raise AlmException('Unable to find transition %s' %
                                 self.sde_plugin.config['jira_close_transition'])
                 trans_args = {'transition': {'id': self.close_transition_id}}
-                trans_result = self.alm_plugin._call_api(trans_url, args=trans_args,
+                trans_result = self.alm_plugin.call_api(trans_url, args=trans_args,
                                                          method=URLRequest.POST)
             elif status=='TODO':
                 #We are updating a closed task to TODO
                 if not self.reopen_transition_id:
-                    transitions = self.alm_plugin._call_api(trans_url)
+                    transitions = self.alm_plugin.call_api(trans_url)
                     for transition in transitions['transitions']:
                         if transition['name'] == self.sde_plugin.config['jira_reopen_transition']:
                             self.reopen_transition_id = transition['id']
@@ -240,7 +236,7 @@ class JIRAConnector(AlmConnector):
                                 self.sde_plugin.config['jira_reopen_transition'])
 
                 trans_args = {'transition': {'id':self.reopen_transition_id}}
-                self.alm_plugin._call_api(trans_url,
+                self.alm_plugin.call_api(trans_url,
                                           args=trans_args,
                                           method=URLRequest.POST)
         except APIFormatError:

@@ -22,7 +22,7 @@ class MingleAPIBase(APIBase):
         handler = handler_func(debuglevel=0)
         self.opener = urllib2.build_opener(handler)
 
-    def _call_api(self, target, method=URLRequest.GET, args=None):
+    def call_api(self, target, method=URLRequest.GET, args=None):
         """
         Internal method used to call a RESTFul API
 

@@ -248,7 +248,7 @@ class BaseIntegrator:
             logger.error("These CWEs could not be mapped: "+ ",".join(missing_cwe_map))
             logger.error("%d total flaws could not be mapped." %(len(missing_cwe_map)))
         else:
-             logger.info("All CWEs successfully mapped to a task.")
+            logger.info("All CWEs successfully mapped to a task.")
         logger.info("%d subtasks created from %d flaws."%(stats_subtasks_added, stats_total_flaws_found))
         logger.info("%d/%d project tasks had 0 flaws." %(len(noflaw_tasks),len(task_list)-(stats_test_tasks)))
         if stats_total_skips:

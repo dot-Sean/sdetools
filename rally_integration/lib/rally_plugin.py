@@ -109,7 +109,7 @@ class RallyConnector(AlmConnector):
         """ Verifies that Rally connection works """
         #Check to make sure that we can do a simple API call
         try:
-            self.alm_plugin._call_api('task.js')
+            self.alm_plugin.call_api('task.js')
         except APIError:
             raise AlmException('Unable to connnect to Rally. Please check '
                                'server URL, ID, password, workspace and project')
@@ -119,7 +119,7 @@ class RallyConnector(AlmConnector):
             query_args = {
                 'query': '(Name = \"%s\")' % self.sde_plugin.config['rally_workspace']
             }
-            workspace_ref = self.alm_plugin._call_api('workspace.js',
+            workspace_ref = self.alm_plugin.call_api('workspace.js',
                                                        args=query_args)
             num_results = workspace_ref['QueryResult']['TotalResultCount']
             if not num_results:
@@ -138,7 +138,7 @@ class RallyConnector(AlmConnector):
             query_args = {
                 'query': '(Name = \"%s\")' % self.sde_plugin.config['alm_project']
             }
-            project_ref = self.alm_plugin._call_api('project.js',
+            project_ref = self.alm_plugin.call_api('project.js',
                                                     args = query_args)
             num_results = project_ref['QueryResult']['TotalResultCount']
             if not num_results:
@@ -160,7 +160,7 @@ class RallyConnector(AlmConnector):
 
         try:
             query_args = {'query' : '(Name = \"%s\")' % task_id}
-            result = self.alm_plugin._call_api('hierarchicalrequirement.js',
+            result = self.alm_plugin.call_api('hierarchicalrequirement.js',
                                                args = query_args)
         except APIError as err:
             logging.info('Error is %s:' , err)
@@ -173,7 +173,7 @@ class RallyConnector(AlmConnector):
         try:
             task_result_url =  result['QueryResult']['Results'][0]['_ref']
             task_result_url = task_result_url.split('/%s/' % API_VERSION)[1]
-            task_data = self.alm_plugin._call_api(task_result_url)
+            task_data = self.alm_plugin.call_api(task_result_url)
             task_data = task_data['HierarchicalRequirement']
             return RallyTask(task_id,
                              task_data['FormattedID'],
@@ -203,7 +203,7 @@ class RallyConnector(AlmConnector):
                     'Project': self.project_ref
                 }
             }
-            rsp = self.alm_plugin._call_api('hierarchicalrequirement/create.js',
+            rsp = self.alm_plugin.call_api('hierarchicalrequirement/create.js',
                                             method = URLRequest.POST,
                                             args = create_args)
             logging.info('Response was %s', rsp)
@@ -244,7 +244,7 @@ class RallyConnector(AlmConnector):
                                         self.sde_plugin.config['rally_done_statuses'][0]
                         }
                 }
-                self.alm_plugin._call_api(task.get_alm_task_ref(),
+                self.alm_plugin.call_api(task.get_alm_task_ref(),
                                           args = trans_args,
                                           method=URLRequest.POST)
             except APIError as err:
@@ -260,7 +260,7 @@ class RallyConnector(AlmConnector):
                             self.sde_plugin.config['rally_new_status']
                     }
                 }
-                self.alm_plugin._call_api(task.get_alm_task_ref(),
+                self.alm_plugin.call_api(task.get_alm_task_ref(),
                                           args = trans_args,
                                           method=URLRequest.POST)
             except APIError as err:
