@@ -1,11 +1,12 @@
-from restclient import RESTBase, APIError, APIHTTPError, ServerError, APIFormatError
+from restclient import RESTBase
+from restclient import APIError, APIHTTPError, APICallError, APIAuthError, ServerError, APIFormatError
 
 import logging
 logger = logging.getLogger(__name__)
 
 class APIBase(RESTBase):
     def __init__(self, config):
-        super(APIBase, self).__init__('sde', config)
+        super(APIBase, self).__init__('sde', 'SD Elements', config, 'api')
         self.app = None
         self.prj = None
 

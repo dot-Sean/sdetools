@@ -73,14 +73,20 @@ def main(argv):
     curr_cmd = command[curr_cmd_name]
 
     config = conf_mgr.Config(command)
+
+    cmd_inst = curr_cmd(config, argv[2:])
+    try:
+        cmd_inst.configure()
+    except commons.UsageError, e:
+        commons.show_error(str(e))
+        return False
+
     ret = config.parse_args(argv)
     if not ret:
         return False
 
-    cmd_inst = curr_cmd(config)
-    cmd_inst.customize_config()
     try:
-        ret_status = cmd_inst.handle(*argv[2:])
+        ret_status = cmd_inst.handle()
     except commons.Error, e:
         commons.show_error(str(e))
         return False

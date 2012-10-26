@@ -60,6 +60,7 @@ class Config(object):
             'validator_func': None,
             'validator_args': {},
         }
+        self.parser = None
 
     def __getitem__(self, key):
         if key in self.settings:
@@ -71,7 +72,7 @@ class Config(object):
             raise KeyError, 'Unknown configuration item: %s' % (key)
         self.settings[key] = val
 
-    def add_custom_option(self, var_name, help_title, short_form, default='', meta_var=None):
+    def add_custom_option(self, var_name, help_title, short_form=None, default='', meta_var=None):
         """
         Use this to extend the options for your own use cases. The item is added to arguments.
         The same var_name is parsed from config file if present.
@@ -92,9 +93,10 @@ class Config(object):
             'help_title': help_title,
             'default': default,
             'meta_var': meta_var,
-            'short_form': '-' + short_form,
             'long_form': '--' + var_name.lower(),
         }
+        if short_form:
+            config_item['short_form'] = '-' + short_form
 
         if config_item['meta_var'] is None:
             config_item['meta_var'] = config_item['var_name'].upper()
@@ -102,14 +104,14 @@ class Config(object):
         self.custom_options.append(config_item)
         self.settings[config_item['var_name']] = config_item['default']
 
-    def set_custom_args(self, var_name, syntax_text, help_text, validator_func, validator_args={}):
+    def set_custom_args(self, var_name, syntax_text, help_text, validator_func=None, validator_args={}):
         """
         Use this to tell the config manager to use the command arguments.
         Args:
             <var_name>: Name of the config variable. (use lower case, numbers and underscore only)
             <syntax_text>: The text for syntax of the arguments (e.g. target [option1])
             <help_text>: A multi-line capable blob of text help
-            <validator_func>: A callback function to validate the arguments
+            [<validator_func>]: A callback function to validate the arguments
                 Syntax: myfunc(config, args, **<validator_args>)
                 Return: None => Pass, <Error String> => Fail
             [<validator_args>]: A set of arguments to pass to validator function for state-keeping
@@ -165,9 +167,12 @@ class Config(object):
         return True, 'Config File Parsed'
 
     def parse_args(self, arvg):
-        usage = "%%prog COMMAND [ARGS] %s\n\n%s\n" % (self.custom_args['syntax_text'], self.custom_args['help_text'])
+        usage = "%%prog COMMAND [ARGS] %s\n Hint: %%prog help         -> List commands\n"\
+            " Hint: %%prog help COMMAND -> Providers help for command COMMAND\n%s\n" %\
+            (self.custom_args['syntax_text'], self.custom_args['help_text'])
 
         parser = optparse.OptionParser(usage)
+        self.parser = parser
         parser.add_option('-c', '--config', metavar='CONFIG_FILE', dest='conf_file', 
             default=self.DEFAULTS['conf_file'], type='string',
             help = "Configuration File if. Ignored if -C is used. (Default is %s)" % (self.DEFAULTS['conf_file']))
@@ -198,8 +203,11 @@ class Config(object):
             default='', type='string',
             help = "Comma-seperated List of modules to debug, e.g. sdelib.apiclient)")
         for item in self.custom_options:
+            opt_forms = [item['long_form']]
+            if 'short_form' in item:
+                opt_forms.append(item['short_form'])
             parser.add_option(
-                item['short_form'], item['long_form'], dest=item['var_name'], metavar=item['meta_var'], 
+                *opt_forms, dest=item['var_name'], metavar=item['meta_var'], 
                 default=item['default'], type='string', help=item['help_title'])
 
         try:
@@ -234,13 +242,14 @@ class Config(object):
         else:
             if args:
                 self[self.custom_args['var_name']] = args
-            ret = self.custom_args['validator_func'](
-                self,
-                self[self.custom_args['var_name']],
-                **self.custom_args['validator_args'])
-            if ret:
-                show_error(ret, usage_hint=True)
-                return False
+            if self.custom_args['validator_func']:
+                ret = self.custom_args['validator_func'](
+                    self,
+                    self[self.custom_args['var_name']],
+                    **self.custom_args['validator_args'])
+                if ret:
+                    show_error(ret, usage_hint=True)
+                    return False
 
         # No more errors, lets apply the changes
         if opts.quiet:

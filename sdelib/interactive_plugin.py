@@ -22,14 +22,14 @@ class PlugInExperience:
         return result
 
     def get_and_validate_password(self):
-        askpasswd = (self.config['password'] is None)
+        askpasswd = (self.config['sde_pass'] is None)
         while not self.connected:
             if askpasswd:
                 print "Enter the password for account: %s" % (self.config['email'])
-                self.config['password'] = get_password()
+                self.config['sde_passw'] = get_password()
             try:
                 self.connect()
-            except apiclient.APIAuthError:
+            except self.api.APIAuthError:
                 if askpasswd:
                     print "Incorrect Email/Passwrd\n"
                     continue

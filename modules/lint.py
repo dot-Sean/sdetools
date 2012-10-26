@@ -13,7 +13,7 @@ class Command(BaseCommand):
     name = 'lint'
     help = 'SDE Lint tool scans project file and displays tasks that match the context of each file.'
 
-    def handle(self, *args):
+    def handle(self):
         scanner = Scanner(self.config)
 
         try:

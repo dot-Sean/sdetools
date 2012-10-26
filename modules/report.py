@@ -14,6 +14,9 @@ CSV_FILENAME = "output.csv"
 class Command(BaseCommand):
     help = 'Creates a CSV output of project details for reporting purposes (Proof of Concept only!)'
 
+    def configure(self):
+        self.plugin = PlugInExperience(self.config)
+
     def test_report(self, plugin):
          app_list = plugin.api.get_applications()
 
@@ -32,7 +35,6 @@ class Command(BaseCommand):
                       task = task_list[task_ind]
                       csv_file.writerow([app['name'],proj['name'],task['title'],task['weakness']['title'],task['status']])
 
-    def handle(self, *args):
-        plugin = PlugInExperience(self.config)
-        self.test_report(plugin)
+    def handle(self):
+        self.test_report(self.plugin)
         return True

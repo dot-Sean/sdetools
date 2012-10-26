@@ -1,10 +1,7 @@
-import sys, os
-sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
-
 from abc import ABCMeta, abstractmethod
 from datetime import datetime
 
-from sdelib.apiclient import APIError
+from sdelib.restclient import APIError
 from sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
@@ -372,34 +369,14 @@ class AlmConnector(object):
 
 def add_alm_config_options(config):
     """ Adds ALM config options to the config file"""
-    config.add_custom_option('alm_phases',
-                             'Phases of the ALM',
-                             '-alm_phases')
-    config.add_custom_option('sde_statuses_in_scope',
-                             'SDE statuses that are in scope',
-                             '-sde_statuses_in_scope')
-    config.add_custom_option('sde_min_priority',
-                             'Minimum SDE priority in scope',
-                             '-sde_min_priority')
-    config.add_custom_option('how_tos_in_scope',
-                             'Whether or not HowTos should be included',
-                             '-how_tos_in_scope')
-    config.add_custom_option('alm_method',
-                             'HTTP or HTTPS for ALM server',
-                             '-alm_method')
-    config.add_custom_option('alm_server',
-                             'Server of the ALM',
-                             '-alm_server')
-    config.add_custom_option('alm_id',
-                             'Username for ALM Tool',
-                             '-alm_id')
-    config.add_custom_option('alm_password',
-                             'Password for ALM Tool',
-                             '-alm_password')
-    config.add_custom_option('alm_project',
-                             'Project in ALM Tool',
-                             '-alm_project')
-    config.add_custom_option('conflict_policy',
-                             'Conflict policy to use',
-                             '-conflict_policy')
+    config.add_custom_option('alm_phases', 'Phases of the ALM')
+    config.add_custom_option('sde_statuses_in_scope', 'SDE statuses that are in scope')
+    config.add_custom_option('sde_min_priority', 'Minimum SDE priority in scope')
+    config.add_custom_option('how_tos_in_scope', 'Whether or not HowTos should be included')
+    config.add_custom_option('alm_method', 'HTTP or HTTPS for ALM server')
+    config.add_custom_option('alm_server', 'Server of the ALM')
+    config.add_custom_option('alm_user', 'Username for ALM Tool')
+    config.add_custom_option('alm_pass', 'Password for ALM Tool')
+    config.add_custom_option('alm_project', 'Project in ALM Tool')
+    config.add_custom_option('conflict_policy', 'Conflict policy to use')
 

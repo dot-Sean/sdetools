@@ -4,7 +4,7 @@ import re
 from datetime import datetime
 
 from sdelib.commons import Error
-from sdelib.apiclient import APIError
+from sdelib.restclient import APIError
 from sdelib.interactive_plugin import PlugInExperience
 from sdelib import log_mgr
 from xml.dom import minidom

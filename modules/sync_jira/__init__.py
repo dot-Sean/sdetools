@@ -13,10 +13,10 @@ from sdelib.interactive_plugin import PluginError
 class Command(BaseCommand):
     help = 'JIRA <-> SDE sync utility.'
 
-    def customize_config(self):
+    def configure(self):
         add_jira_config_options(self.config)
 
-    def handle(self, *args):
+    def handle(self):
         try:
             sde_plugin = PlugInExperience(self.config)
             jbase = JIRABase(self.config)

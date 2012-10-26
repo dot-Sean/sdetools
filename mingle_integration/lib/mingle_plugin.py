@@ -1,10 +1,7 @@
 # Copyright SDElements Inc
 # Extensible two way integration with Mingle
 
-import sys, os
-
-sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
-from sdelib.apiclient import URLRequest, APIError
+from sdelib.restclient import URLRequest, APIError
 from alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from alm_integration.alm_plugin_base import AlmException, add_alm_config_options
 from sdelib.conf_mgr import Config
@@ -196,15 +193,7 @@ class MingleConnector(AlmConnector):
 def add_mingle_config_options(config):
     """ Adds Mingle specific config options to the config file"""
     add_alm_config_options(config)
-    config.add_custom_option('alm_standard_workflow',
-                             'Standard workflow in Mingle?',
-                             '-alm_standard_workflow')
-    config.add_custom_option('mingle_card_type',
-                             'IDs for issues raised in Mingle',
-                             '-mingle_card_type')
-    config.add_custom_option('mingle_new_status',
-                             'status to set for new tasks in Mingle',
-                             '-mingle_new_status')
-    config.add_custom_option('mingle_done_statuses',
-                             'Done statuses in Mingle',
-                             '-mingle_done_statuses')
+    config.add_custom_option('alm_standard_workflow', 'Standard workflow in Mingle?')
+    config.add_custom_option('mingle_card_type', 'IDs for issues raised in Mingle')
+    config.add_custom_option('mingle_new_status', 'status to set for new tasks in Mingle')
+    config.add_custom_option('mingle_done_statuses', 'Done statuses in Mingle')

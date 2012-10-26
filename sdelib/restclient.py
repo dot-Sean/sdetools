@@ -8,6 +8,13 @@ from extlib import sslcert_compat
 import logging
 logger = logging.getLogger(__name__)
 
+CONF_OPTS = {
+    '%(prefix)s_user': 'Username for %(name)s Tool',
+    '%(prefix)s_pass': 'Password for %(name)s Tool',
+    '%(prefix)s_method': 'http vs https for %(name)s server',
+    '%(prefix)s_server': 'Server of the %(name)s',
+}
+
 class APIError(Error):
     pass
 
@@ -56,9 +63,20 @@ class URLRequest(urllib2.Request):
         return urllib2.Request.get_method(self)
 
 class RESTBase(object):
-    def __init__(self, conf_prefix, config):
-        self.conf_prefix = conf_prefix
+    URLRequest = URLRequest
+
+    APIError = APIError
+    APIHTTPError = APIHTTPError
+    APICallError = APICallError
+    APIAuthError = APIAuthError
+    ServerError = ServerError
+    APIFormatError = APIFormatError
+
+    def __init__(self, conf_prefix, conf_name, config, base_path):
         self.config = config
+        self.base_path = base_path
+        self.conf_prefix = conf_prefix
+        self.conf_name = conf_name
         self.opener = None
         self._customize_config()
 
@@ -67,10 +85,15 @@ class RESTBase(object):
         return self.config[conf_name]
 
     def _customize_config(self):
-        pass
+        for var_name in CONF_OPTS:
+            desc = CONF_OPTS[var_name]
+            self.config.add_custom_option(
+                var_name % {'prefix': self.conf_prefix},
+                desc % {'name': self.conf_name})
 
     def post_conf_init(self):
-        self.base_uri = '%s://%s/api' % (self._get_conf['method'], self._get_conf['server'])
+        self.base_uri = '%s://%s/%s' % (self._get_conf('method'), 
+                self._get_conf('server'), self.base_path)
         self.auth_mode = 'basic'
         self.session_info = None
 
@@ -78,7 +101,7 @@ class RESTBase(object):
         if __name__ in self.config['debug_mods']:
             urllib_debuglevel = 1
 
-        handler = sslcert_compat.get_http_handler(self._get_conf['method'], debuglevel=urllib_debuglevel)
+        handler = sslcert_compat.get_http_handler(self._get_conf('method'), debuglevel=urllib_debuglevel)
         self.opener = urllib2.build_opener(handler)
 
     def call_api(self, target, method=URLRequest.GET, args=None):
@@ -93,7 +116,7 @@ class RESTBase(object):
 
         """
         if not self.opener:
-            self.pst_conf_init()
+            self.post_conf_init()
 
         logger.info('Calling API: %s %s' % (method, target))
         logger.debug('    Args: %s' % ((repr(args)[:200]) + (repr(args)[200:] and '...')))
@@ -116,7 +139,7 @@ class RESTBase(object):
         if target == 'session':
             pass
         elif auth_mode == 'basic':
-            encoded_auth = base64.encodestring('%s:%s' % (self._get_conf['user'], self._get_conf['password']))[:-1]
+            encoded_auth = base64.encodestring('%s:%s' % (self._get_conf('user'), self._get_conf('pass')))[:-1]
             authheader =  "Basic %s" % (encoded_auth)
             req.add_header("Authorization", authheader)
         elif auth_mode == 'session':
@@ -137,7 +160,7 @@ class RESTBase(object):
         try:
             handle = self.opener.open(req)
         except sslcert_compat.InvalidCertificateException, err:
-            raise ServerError('Unable to verify SSL certificate for host: %s' % (self._get_conf['server']))
+            raise ServerError('Unable to verify SSL certificate for host: %s' % (self._get_conf('server')))
         except urllib2.URLError, err:
             handle = err
             call_success = False
@@ -176,8 +199,8 @@ class RESTBase(object):
         """
 
         args = {
-            'username': self._get_conf['user'],
-            'password': self._get_conf['password']}
+            'username': self._get_conf('user'),
+            'password': self._get_conf('pass')}
         try:
             result = self.call_api('session', URLRequest.PUT, args=args)
         except APIHTTPError, err:

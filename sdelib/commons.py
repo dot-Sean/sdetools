@@ -34,9 +34,11 @@ class UsageError(Error):
     pass
 
 def show_error(err_msg, usage_hint=False):
+    import pdb
+    pdb.set_trace()
     print "FATAL ERROR: %s" % (err_msg)
     if usage_hint:
-        print "Try -h to see the usage"
+        print "Try '-h' or 'help' as arguments to see the usage"
     print
 
 def get_password():

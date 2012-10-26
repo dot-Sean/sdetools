@@ -1,10 +1,7 @@
 # Copyright SDElements Inc
 # Extensible two way integration with Rally
 
-import sys, os
-
-sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
-from sdelib.apiclient import APIBase, URLRequest, APIError
+from sdelib.restclient import RESTBase, APIError
 from alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from alm_integration.alm_plugin_base import AlmException, add_alm_config_options
 from sdelib.conf_mgr import Config
@@ -14,20 +11,12 @@ import copy
 
 API_VERSION = '1.11'
 
-class RallyAPIBase(APIBase):
+class RallyAPIBase(RESTBase):
     """ Base plugin for Rally """
 
     def __init__(self, config):
-        #Workaround to copy over the ALM id & password for Rally
-        #authentication without overwriting the SD Elements
-        #email & password in the config
-        alm_config = copy.deepcopy(config)
-        alm_config['email'] = alm_config['alm_id']
-        alm_config['password'] = alm_config['alm_password']
-        super(RallyAPIBase, self).__init__(alm_config)
-        self.base_uri = '%s://%s/slm/webservice/%s' % (self.config['alm_method'],
-                                                        self.config['alm_server'],
-                                                        API_VERSION)
+        super(RallyAPIBase, self).__init__('alm', 'ALM', alm_config, 
+                'slm/webservice/%s' % (API_VERSION))
 
 class RallyConfig(Config):
     """Configuration for Rally"""
@@ -204,7 +193,7 @@ class RallyConnector(AlmConnector):
                 }
             }
             rsp = self.alm_plugin.call_api('hierarchicalrequirement/create.js',
-                                            method = URLRequest.POST,
+                                            method = self.alm_plugin.URLRequest.POST,
                                             args = create_args)
             logging.info('Response was %s', rsp)
             logging.debug('Task %s added to Rally Project', task['id'])
@@ -246,7 +235,7 @@ class RallyConnector(AlmConnector):
                 }
                 self.alm_plugin.call_api(task.get_alm_task_ref(),
                                           args = trans_args,
-                                          method=URLRequest.POST)
+                                          method=self.alm_plugin.URLRequest.POST)
             except APIError as err:
                 raise AlmException('Unable to update task status to DONE '
                                    'for card: %s in Rally because of %s' % 
@@ -262,7 +251,7 @@ class RallyConnector(AlmConnector):
                 }
                 self.alm_plugin.call_api(task.get_alm_task_ref(),
                                           args = trans_args,
-                                          method=URLRequest.POST)
+                                          method=self.alm_plugin.URLRequest.POST)
             except APIError as err:
                 raise AlmException('Unable to update task status to TODO '
                                    'for card: '
@@ -280,18 +269,8 @@ def add_rally_config_options(config):
 
     add_alm_config_options(config)
 
-    config.add_custom_option('alm_standard_workflow',
-                             'Standard workflow in Rally?',
-                             '-alm_standard_workflow')
-    config.add_custom_option('rally_card_type',
-                             'IDs for issues raised in Rally',
-                             '-rally_card_type')
-    config.add_custom_option('rally_new_status',
-                             'status to set for new tasks in Rally',
-                             '-rally_new_status')
-    config.add_custom_option('rally_done_statuses',
-                             'Done statuses in Rally',
-                             '-rally_done_statuses')
-    config.add_custom_option('rally_workspace',
-                             'Rally Workspace',
-                             '-rally_workspace')
+    config.add_custom_option('alm_standard_workflow', 'Standard workflow in Rally?')
+    config.add_custom_option('rally_card_type', 'IDs for issues raised in Rally')
+    config.add_custom_option('rally_new_status', 'status to set for new tasks in Rally')
+    config.add_custom_option('rally_done_statuses', 'Done statuses in Rally')
+    config.add_custom_option('rally_workspace', 'Rally Workspace')

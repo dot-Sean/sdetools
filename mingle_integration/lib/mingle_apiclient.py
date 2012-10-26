@@ -1,13 +1,8 @@
-import sys, os
-
-sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
-
 import urllib
 import urllib2
 import base64
 
-from sdelib.apiclient import APICallError, APIAuthError
-from sdelib.apiclient import ServerError, URLRequest, APIBase
+from sdelib.apiclient import APIBase
 from xml.dom import minidom
 import logging
 logger = logging.getLogger(__name__)
@@ -22,7 +17,7 @@ class MingleAPIBase(APIBase):
         handler = handler_func(debuglevel=0)
         self.opener = urllib2.build_opener(handler)
 
-    def call_api(self, target, method=URLRequest.GET, args=None):
+    def call_api(self, target, method=self.URLRequest.GET, args=None):
         """
         Internal method used to call a RESTFul API
 
@@ -38,14 +33,14 @@ class MingleAPIBase(APIBase):
         req_url = '%s/%s' % (self.base_uri, target)
         args = args or {}
         data = None
-        if method == URLRequest.GET:
+        if method == self.URLRequest.GET:
             if args:
                 req_url = '%s?%s' % (req_url, urllib.urlencode(args))
         else:
             encoded_args = dict((key.encode('utf-8'), val.encode('utf-8')) for key, val in args.items())
             data = urllib.urlencode(encoded_args)
-        req = URLRequest(req_url, data=data, method=method)
-        encoded_auth = base64.encodestring('%s:%s' % (self.config['alm_id'], self.config['alm_password']))[:-1]
+        req = self.URLRequest(req_url, data=data, method=method)
+        encoded_auth = base64.encodestring('%s:%s' % (self.config['alm_user'], self.config['alm_pass']))[:-1]
         authheader =  "Basic %s" % (encoded_auth)
         req.add_header("Authorization", authheader)
 
@@ -58,14 +53,14 @@ class MingleAPIBase(APIBase):
 
         if not call_success:
             if not hasattr(handle, 'code'):
-                raise ServerError('Invalid server or server unreachable.')
+                raise self.ServerError('Invalid server or server unreachable.')
             try:
                 err_ret = handle.read()
             except:
                 pass
             if handle.code == 401 or handle.code == 404:
-                raise APIAuthError
-            raise APICallError(handle.code, err_ret)
+                raise self.APIAuthError
+            raise self.APICallError(handle.code, err_ret)
 
         result = ''
         while True:

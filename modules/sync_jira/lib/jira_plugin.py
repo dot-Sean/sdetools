@@ -1,7 +1,7 @@
 # Copyright SDElements Inc
 # Extensible two way integration with JIRA
 
-from sdelib.apiclient import APIBase, URLRequest, APIError, APIFormatError
+from sdelib.restclient import RESTBase, APIError
 from alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from alm_integration.alm_plugin_base import AlmException, add_alm_config_options
 from sdelib.conf_mgr import Config
@@ -9,20 +9,11 @@ from datetime import datetime
 import logging
 import copy
 
-class JIRABase(APIBase):
+class JIRABase(RESTBase):
     """ Base plugin for JIRA """
 
     def __init__(self, config):
-        # Workaroud to copy over the ALM id & password for JIRA
-        # authentication without overwriting the SD Elements
-        # email & password in the config.
-        alm_config = copy.deepcopy(config)
-        alm_config['email'] = alm_config['alm_id']
-        alm_config['password'] = alm_config['alm_password']
-        # Call parent constructor, and perform other configuration
-        super(JIRABase, self).__init__(alm_config)
-        self.base_uri = '%s://%s/rest/api/2' % (self.config['alm_method'],
-                                                self.config['alm_server'])
+        super(JIRABase, self).__init__('alm', 'ALM', alm_config, 'rest/api/2')
 
 class JIRAConfig(Config):
     def set_settings(self, config):
@@ -190,7 +181,7 @@ class JIRAConnector(AlmConnector):
         }
         try:
             add_result = self.alm_plugin.call_api('issue',
-                    method=URLRequest.POST, args=args)
+                    method=self.alm_plugin.URLRequest.POST, args=args)
         except APIError:
             return None
 
@@ -222,7 +213,7 @@ class JIRAConnector(AlmConnector):
                                 self.sde_plugin.config['jira_close_transition'])
                 trans_args = {'transition': {'id': self.close_transition_id}}
                 trans_result = self.alm_plugin.call_api(trans_url, args=trans_args,
-                                                         method=URLRequest.POST)
+                        method=self.alm_plugin.URLRequest.POST)
             elif status=='TODO':
                 #We are updating a closed task to TODO
                 if not self.reopen_transition_id:
@@ -236,10 +227,9 @@ class JIRAConnector(AlmConnector):
                                 self.sde_plugin.config['jira_reopen_transition'])
 
                 trans_args = {'transition': {'id':self.reopen_transition_id}}
-                self.alm_plugin.call_api(trans_url,
-                                          args=trans_args,
-                                          method=URLRequest.POST)
-        except APIFormatError:
+                self.alm_plugin.call_api(trans_url, args=trans_args,
+                        method=self.alm_plugin.URLRequest.POST)
+        except self.alm_plugin.APIFormatError:
             # The response does not have JSON, so it is incorrectly raised as
             # a JSON formatting error. Ignore this error
             pass
@@ -254,18 +244,8 @@ def add_jira_config_options(config):
 
     add_alm_config_options(config)
 
-    config.add_custom_option('alm_standard_workflow',
-                             'Standard workflow in JIRA?',
-                             '-alm_standard_workflow')
-    config.add_custom_option('jira_issue_type',
-                             'IDs for issues raised in JIRA',
-                             '-jira_issue_type')
-    config.add_custom_option('jira_close_transition',
-                             'Close transition in JIRA',
-                             '-jira_close_transition')
-    config.add_custom_option('jira_reopen_transition',
-                             'Re-open transiiton in JIRA',
-                             '-jira_reopen_transition')
-    config.add_custom_option('jira_done_statuses',
-                             'Done statuses in JIRA',
-                             '-jira_done_statuses')
+    config.add_custom_option('alm_standard_workflow', 'Standard workflow in JIRA?')
+    config.add_custom_option('jira_issue_type', 'IDs for issues raised in JIRA')
+    config.add_custom_option('jira_close_transition', 'Close transition in JIRA')
+    config.add_custom_option('jira_reopen_transition', 'Re-open transiiton in JIRA')
+    config.add_custom_option('jira_done_statuses', 'Done statuses in JIRA')
