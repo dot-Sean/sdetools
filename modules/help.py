@@ -11,21 +11,25 @@ from sdelib import commons
 class Command(BaseCommand):
     name = 'help'
     help = 'Prints the list of available commands.'
+    conf_syntax = '[command_name]'
+    conf_help = 'command_name: [optional] Specify command name for help\n'\
+        '  (omit to see a list of available commands)'
 
     def configure(self):
-        self.config.set_custom_args('command', 'COMMAND: command name.',
-            '    See help for list of available commands')
         if not self.args:
             return
         cmd_name = self.args[0]
         if cmd_name == self.name:
+            ret = self.config.parse_args(self)
+            self.config.parser.print_usage()
             return
         if cmd_name not in self.config.command_list:
-            raise commons.UsageError('Error: Unable to find command %s' % (cmd_name))
+            raise commons.UsageError('Unable to find command %s' % (cmd_name))
+
         cmd_obj = self.config.command_list[cmd_name]
         cmd_inst = cmd_obj(self.config, self.args)
         cmd_inst.configure()
-        ret = cmd_inst.config.parse_args(sys.argv)
+        ret = cmd_inst.config.parse_args(cmd_inst)
         cmd_inst.config.parser.print_help()
 
     def get_commands_help(self):

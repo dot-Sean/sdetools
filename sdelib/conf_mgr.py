@@ -7,7 +7,7 @@ import logging
 
 import log_mgr
 
-from commons import show_error
+from commons import show_error, UsageError
 
 __all__ = ['Config']
 
@@ -47,19 +47,13 @@ class Config(object):
             'skip_hidden': True,
             'log_level': logging.WARNING,
             'debug_mods': '',
+            'args': None,
         }
 
     def __init__(self, command_list):
         self.command_list = command_list
         self.settings = self.DEFAULTS.copy()
         self.custom_options = []
-        self.custom_args = {
-            'var_name': None,
-            'syntax_text': '',
-            'help_text': '',
-            'validator_func': None,
-            'validator_args': {},
-        }
         self.parser = None
 
     def __getitem__(self, key):
@@ -104,29 +98,6 @@ class Config(object):
         self.custom_options.append(config_item)
         self.settings[config_item['var_name']] = config_item['default']
 
-    def set_custom_args(self, var_name, syntax_text, help_text, validator_func=None, validator_args={}):
-        """
-        Use this to tell the config manager to use the command arguments.
-        Args:
-            <var_name>: Name of the config variable. (use lower case, numbers and underscore only)
-            <syntax_text>: The text for syntax of the arguments (e.g. target [option1])
-            <help_text>: A multi-line capable blob of text help
-            [<validator_func>]: A callback function to validate the arguments
-                Syntax: myfunc(config, args, **<validator_args>)
-                Return: None => Pass, <Error String> => Fail
-            [<validator_args>]: A set of arguments to pass to validator function for state-keeping
-        
-        Note: The special variable in config is parsed the exact same way 
-            a command line is parsed (quotes and what not)
-        Note: Arguments are useful specially in the case where a list of input is passed to it
-        """
-        self.custom_args['var_name'] = var_name.lower()
-        self.custom_args['syntax_text'] = syntax_text
-        self.custom_args['help_text'] = help_text
-        self.custom_args['validator_func'] = validator_func
-        self.custom_args['validator_args'] = validator_args
-        self.settings[self.custom_args['var_name']] = None
-
     def parse_config_file(self, file_name):
         if not file_name:
             return True, 'Empty file.'
@@ -143,9 +114,7 @@ class Config(object):
                 return False, 'Config file not found.'
 
         config_keys = ['log_level', 'debug_mods', 'server', 'email', 'password', 
-            'application', 'project', 'authmode']
-        if self.custom_args['var_name']:
-            config_keys.append(self.custom_args['var_name'])
+            'application', 'project', 'authmode', 'args']
 
         for item in self.custom_options:
             config_keys.append(item['var_name'])
@@ -153,9 +122,9 @@ class Config(object):
         for key in config_keys:
             if cnf.has_option('global', key):
                 val = cnf.get('global', key)
-                if key == self.custom_args['var_name']:
+                if key == 'args':
                     val = list(shlex.shlex(val, posix=True))
-                if key == 'password':
+                elif key == 'password':
                     if not val:
                         val = None
                 elif key == 'log_level':
@@ -166,10 +135,13 @@ class Config(object):
                 self[key] = val
         return True, 'Config File Parsed'
 
-    def parse_args(self, arvg):
-        usage = "%%prog COMMAND [ARGS] %s\n Hint: %%prog help         -> List commands\n"\
-            " Hint: %%prog help COMMAND -> Providers help for command COMMAND\n%s\n" %\
-            (self.custom_args['syntax_text'], self.custom_args['help_text'])
+    def parse_args(self, cmd_inst):
+        usage = "%%prog %s [Options] %s\n" % (cmd_inst.name, cmd_inst.conf_syntax)
+        if cmd_inst.conf_help:
+            usage += '%s\n' % (cmd_inst.conf_help)
+        usage += "\n Hint: %prog help -> List commands\n"
+        usage += " Hint: %%prog help %s -> Providers help for command %s" %\
+            (cmd_inst.name, cmd_inst.name)
 
         parser = optparse.OptionParser(usage)
         self.parser = parser
@@ -234,22 +206,8 @@ class Config(object):
             show_error("Unable to read or process configuration file.\n Reason: %s" % (ret_val))
             return False
 
-        args = args[1:]
-        if (self.custom_args['var_name'] is None):
-            if args:
-                show_error("Unknown arguments in the command line.", usage_hint=True)
-                return False
-        else:
-            if args:
-                self[self.custom_args['var_name']] = args
-            if self.custom_args['validator_func']:
-                ret = self.custom_args['validator_func'](
-                    self,
-                    self[self.custom_args['var_name']],
-                    **self.custom_args['validator_args'])
-                if ret:
-                    show_error(ret, usage_hint=True)
-                    return False
+        self.command = args[0]
+        self.args = args[1:]
 
         # No more errors, lets apply the changes
         if opts.quiet:
@@ -260,7 +218,8 @@ class Config(object):
             self['log_level'] = logging.DEBUG
         if opts.debug_mods:
             self['debug_mods'] = opts.debug_mods
-        self['debug_mods'] = [x.strip() for x in self['debug_mods'].split(',')]
+        if type(self['debug_mods']) is str:
+            self['debug_mods'] = [x.strip() for x in self['debug_mods'].split(',')]
 
         log_mgr.mods.set_all_level(self['log_level'])
         for modname in self['debug_mods']:

@@ -81,8 +81,15 @@ def main(argv):
         commons.show_error(str(e))
         return False
 
-    ret = config.parse_args(argv)
-    if not ret:
+    ret_status = cmd_inst.parse_args()
+    if not ret_status:
+        return False
+
+    cmd_inst.args = config.args
+    try:
+        cmd_inst.process_args()
+    except commons.Error, e:
+        commons.show_error(str(e))
         return False
 
     try:

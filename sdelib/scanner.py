@@ -125,32 +125,24 @@ class FileScanner:
 
         return
 
-def args_validator(config, args):
-    """
-    Validator helper for argument parsing. Returns error description in case of error,
-    or None if validate passed.
-    """
-    if not args:
-        return "Missing target (e.g. use \".\" for current dir)"
-
-    for path in args:
-        if not os.path.exists(path):
-            return "Unable to locate or access the path: %s" % (path)
-
-    return None
-
 class Scanner:
     def __init__(self, config):
         self.config = config
         self.content = None
-        self._init_config()
 
-    def _init_config(self):
-        self.config.set_custom_args(
-            'targets',
-            'target1 [target2 ...]',
-            'target(s) are the directory/file to be scanned.',
-            args_validator)
+    def validate_args(self, args):
+        """
+        Validator helper for argument parsing. Returns error description in case of error,
+        or None if validate passed.
+        """
+        if not args:
+            return "Missing target (e.g. use \".\" for current dir)"
+
+        for path in args:
+            if not os.path.exists(path):
+                return "Unable to locate or access the path: %s" % (path)
+
+        return None
 
     def set_content(self, content):
         self.content = content
