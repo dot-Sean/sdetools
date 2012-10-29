@@ -37,11 +37,7 @@ class Config(object):
     DEFAULTS = {
             'conf_file': DEFAULT_CONFIG_FILE,
             'interactive': True,
-            'server': None,
-            'method': 'https',   # Can be 'http' or 'https'
             'authmode': 'session', # Can be 'session' or 'basic'
-            'email': None,
-            'password': '', # A None for password means Ask for Password
             'application': None,
             'project': None,
             'skip_hidden': True,
@@ -55,6 +51,7 @@ class Config(object):
         self.settings = self.DEFAULTS.copy()
         self.custom_options = []
         self.parser = None
+        self.args = sys.argv[2:]
 
     def __getitem__(self, key):
         if key in self.settings:
@@ -81,6 +78,7 @@ class Config(object):
         Note: the long form becomes --<var_name>
         Note: short form is case sensitive
         Note: Do not use the base <var_names> (used in the base defaults)
+        Note: If default is a string, the option is optional. Otherwise, it is mandatory.
         """
         config_item = {
             'var_name': var_name.lower(),
@@ -113,8 +111,8 @@ class Config(object):
             else:
                 return False, 'Config file not found.'
 
-        config_keys = ['log_level', 'debug_mods', 'server', 'email', 'password', 
-            'application', 'project', 'authmode', 'args']
+        config_keys = ['log_level', 'debug_mods', 'application', 'project', 
+            'authmode', 'args']
 
         for item in self.custom_options:
             config_keys.append(item['var_name'])
@@ -135,7 +133,7 @@ class Config(object):
                 self[key] = val
         return True, 'Config File Parsed'
 
-    def parse_args(self, cmd_inst):
+    def prepare_parser(self, cmd_inst):
         usage = "%%prog %s [Options] %s\n" % (cmd_inst.name, cmd_inst.conf_syntax)
         if cmd_inst.conf_help:
             usage += '%s\n' % (cmd_inst.conf_help)
@@ -152,20 +150,6 @@ class Config(object):
             help = "Do NOT use any configuration file")
         parser.add_option('-I', '--noninteractive', dest='interactive', default=True, action='store_false', 
             help="Run in Non-Interactive mode")
-        parser.add_option('-e', '--email', metavar='EMAIL', dest='email', default='', type='string',
-            help = "Username for SDE Accout")
-        parser.add_option('-p', '--password', metavar='PASSWORD', dest='password', default='', type='string',
-            help = "Password for SDE Accout")
-        parser.add_option('-P', '--askpasswd', dest='askpasswd', default=False, action='store_true',
-            help = "Prompt for SDE Accout password (interactive mode only)")
-        parser.add_option('-s', '--server', dest='server', default='', type='string', 
-            help="SDE Server instance to use")
-        parser.add_option('-a', '--application', dest='application', default='', type='string', 
-            help="SDE Application to use")
-        parser.add_option('-j', '--project', dest='project', default='', help="SDE Project to use")
-        parser.add_option('-H', '--skiphidden', dest='skip_hidden', 
-            default=self.DEFAULTS['skip_hidden'], action='store_false',
-            help = "Skip hidden files/directories.")
         parser.add_option('-d', '--debug', dest='debug', action='store_true', 
             help = "Set logging to debug level")
         parser.add_option('-v', '--verbose', dest='verbose', action='store_true', help = "Verbose output")
@@ -181,9 +165,14 @@ class Config(object):
             parser.add_option(
                 *opt_forms, dest=item['var_name'], metavar=item['meta_var'], 
                 default=item['default'], type='string', help=item['help_title'])
+        self.parser = parser
+
+    def parse_args(self, cmd_inst):
+        if self.parser is None:
+            self.prepare_parser(cmd_inst)
 
         try:
-            (opts, args) = parser.parse_args()
+            (opts, args) = self.parser.parse_args()
         except:
             if (str(sys.exc_info()[1]) == '0'):
                 # This happens when -h is used
@@ -225,35 +214,17 @@ class Config(object):
         for modname in self['debug_mods']:
             log_mgr.mods.set_level(modname, logging.DEBUG)
             
-        self['skip_hidden'] = opts.skip_hidden
         self['interactive'] = opts.interactive
-        if opts.server:
-            self['server'] = opts.server
-        if not self['server']:
-            show_error("Server not specified", usage_hint=True)
-            return False
-        if opts.email:
-            self['email'] = opts.email
-        if not self['email']:
-            show_error("Email not specified", usage_hint=True)
-            return False
-        if opts.askpasswd:
-            self['password'] = None
-        else:
-            if opts.password:
-                self['password'] = opts.password
-            if not self['password']:
-                show_error("Password not specified", usage_hint=True)
-                return False
-        if opts.application:
-            self['application'] = opts.application
-        if opts.project:
-            self['project'] = opts.project
 
         for item in self.custom_options:
             name = item['var_name']
             val = getattr(opts, name)
             if val:
                 self[name] = val
+
+        # Check for missing mandatory options
+            if type(self[name]) is not str:
+                show_error("Missing value for option '%s'" % (name))
+                return False
 
         return True

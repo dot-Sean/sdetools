@@ -14,7 +14,7 @@ logger = log_mgr.mods.add_mod(__name__)
 class IntegrationError(Error):
     pass
 
-class IntegrationResult:
+class IntegrationResult(object):
     def __init__(self, import_start_datetime, import_finish_datetime, affected_tasks, noflaw_tasks,
             error_count, error_cwes_unmapped):
         self.import_start_datetime = import_start_datetime
@@ -24,7 +24,7 @@ class IntegrationResult:
         self.error_count = error_count
         self.error_cwes_unmapped = error_cwes_unmapped
 
-class BaseIntegrator:
+class BaseIntegrator(object):
     def __init__(self, config):
         self.findings = []
         self.phase_exceptions = ['testing']
@@ -33,24 +33,13 @@ class BaseIntegrator:
         self.config = config
         self.plugin = None
         self.cwe_title = {}
-        self._init_config()
-
-    def _init_config(self):
+        self.plugin = PlugInExperience(self.config)
         self.config.add_custom_option("mapping_file",
-                "Task ID -> CWE mapping in XML format", "m")
+                "Task ID -> CWE mapping in XML format", "m", None)
         self.config.add_custom_option("flaws_only",
                 "Only update tasks identified having flaws. (on | off)", "z", "on")
         self.config.add_custom_option("trial_run",
                 "Trial run only: 'true' or 'false' (default)", "t", "false")
-
-    def parse_args(self, argv):
-        ret = self.config.parse_args(argv)
-        if not ret:
-            raise IntegrationError("Error parsing arguments")
-        self.init_plugin()
-
-    def init_plugin(self):
-        self.plugin = PlugInExperience(self.config)
 
     def load_mapping_from_xml(self):
         try:

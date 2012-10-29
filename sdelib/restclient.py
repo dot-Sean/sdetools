@@ -8,12 +8,12 @@ from extlib import sslcert_compat
 import logging
 logger = logging.getLogger(__name__)
 
-CONF_OPTS = {
-    '%(prefix)s_user': 'Username for %(name)s Tool',
-    '%(prefix)s_pass': 'Password for %(name)s Tool',
-    '%(prefix)s_method': 'http vs https for %(name)s server',
-    '%(prefix)s_server': 'Server of the %(name)s',
-}
+CONF_OPTS = [
+    ('%(prefix)s_user', 'Username for %(name)s Tool', None),
+    ('%(prefix)s_pass', 'Password for %(name)s Tool', None),
+    ('%(prefix)s_method', 'http vs https for %(name)s server (default is https)', 'https'),
+    ('%(prefix)s_server', 'Server of the %(name)s', None),
+]
 
 class APIError(Error):
     pass
@@ -85,11 +85,11 @@ class RESTBase(object):
         return self.config[conf_name]
 
     def _customize_config(self):
-        for var_name in CONF_OPTS:
-            desc = CONF_OPTS[var_name]
+        for var_name, desc, default in CONF_OPTS:
             self.config.add_custom_option(
                 var_name % {'prefix': self.conf_prefix},
-                desc % {'name': self.conf_name})
+                desc % {'name': self.conf_name},
+                default=default)
 
     def post_conf_init(self):
         self.base_uri = '%s://%s/%s' % (self._get_conf('method'), 

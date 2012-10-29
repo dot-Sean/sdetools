@@ -20,7 +20,11 @@ class Command(BaseCommand):
         self.plugin = PlugInExperience(self.config)
 
     def process_args(self):
-        err_reason = self.scanner.validate_args(self.args)
+        if self.args:
+            targets = self.args
+        else:
+            targets = self.config['args']
+        err_reason = self.scanner.set_targets(targets)
         if err_reason:
             raise UsageError(err_reason)
         return True

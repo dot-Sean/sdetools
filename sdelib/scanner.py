@@ -130,19 +130,19 @@ class Scanner:
         self.config = config
         self.content = None
 
-    def validate_args(self, args):
+    def set_targets(self, targets):
         """
         Validator helper for argument parsing. Returns error description in case of error,
         or None if validate passed.
         """
-        if not args:
-            return "Missing target (e.g. use \".\" for current dir)"
+        if not targets:
+            raise UsageError("Missing target (e.g. use \".\" for current dir)")
 
-        for path in args:
+        for path in targets:
             if not os.path.exists(path):
-                return "Unable to locate or access the path: %s" % (path)
+                raise UsageError("Unable to locate or access the path: %s" % (path))
 
-        return None
+        self.targets = targets
 
     def set_content(self, content):
         self.content = content
@@ -157,7 +157,7 @@ class Scanner:
         if self.content is None:
             raise UsageError('Missing content: Set content before using scanner.')
         file_paths = []
-        for target in self.config['targets']:
+        for target in self.targets:
             if not os.path.isdir(target):
                 file_paths.append(target)
                 continue

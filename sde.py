@@ -39,13 +39,11 @@ def load_modules():
         if not hasattr(mod, 'Command'):
             raise commons.UsageError('Module missing Command class: %s' % (mod_name))
         cmd_cls = mod.Command
-        cmd_name = mod_name
-        if hasattr(cmd_cls, 'name'):
-            cmd_name = cmd_cls.name
+        if not hasattr(cmd_cls, 'name'):
+            cmd_cls.name = mod_name
         if not hasattr(cmd_cls, 'help'):
-            raise commons.UsageError('Missing help string for module %s' % (cmd_name))
-        command[cmd_name] = cmd_cls
-        command[cmd_name].cmd_name = cmd_name
+            raise commons.UsageError('Missing help string for module %s' % (cmd_cls.name))
+        command[cmd_cls.name] = cmd_cls
 
     return command
 

@@ -16,21 +16,23 @@ class Command(BaseCommand):
         '  (omit to see a list of available commands)'
 
     def configure(self):
-        if not self.args:
-            return
-        cmd_name = self.args[0]
-        if cmd_name == self.name:
-            ret = self.config.parse_args(self)
-            self.config.parser.print_usage()
-            return
-        if cmd_name not in self.config.command_list:
-            raise commons.UsageError('Unable to find command %s' % (cmd_name))
+        self.help_cmd = None
 
-        cmd_obj = self.config.command_list[cmd_name]
-        cmd_inst = cmd_obj(self.config, self.args)
-        cmd_inst.configure()
-        ret = cmd_inst.config.parse_args(cmd_inst)
-        cmd_inst.config.parser.print_help()
+    def parse_args(self):
+        # We bypass parsing and validation of args by overwriting the base class behavior
+        # This is unique to help
+        if not self.args:
+            return True
+
+        self.help_cmd = self.args[0]
+
+        if self.help_cmd == self.name:
+            ret = self.config.prepare_parser(self)
+            self.config.parser.print_usage()
+            return True
+        if self.help_cmd not in self.config.command_list:
+            raise commons.UsageError('Unable to find command %s' % (self.help_cmd))
+        return True
 
     def get_commands_help(self):
         ret = []
@@ -49,9 +51,15 @@ class Command(BaseCommand):
         print
 
     def handle(self):
-        if self.args:
-            return True
-        cmd_list = self.get_commands_help()
-        self.print_command_list(cmd_list)
+        if self.help_cmd:
+            cmd_obj = self.config.command_list[self.help_cmd]
+            cmd_inst = cmd_obj(self.config, self.args)
+            cmd_inst.configure()
+            cmd_inst.config.prepare_parser(cmd_inst)
+            cmd_inst.config.parser.print_help()
+        else:
+            cmd_list = self.get_commands_help()
+            self.print_command_list(cmd_list)
+
         return True
 

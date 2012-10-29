@@ -9,6 +9,8 @@ class PlugInExperience:
     def __init__(self, config):
         self.config = config
         self.api = apiclient.APIBase(self.config)
+        config.add_custom_option('sde_application', "SDE Application to use", default='')
+        config.add_custom_option('sde_project', "SDE Project to use", default='')
         self.connected = False
 
     def connect(self):
@@ -26,7 +28,7 @@ class PlugInExperience:
         while not self.connected:
             if askpasswd:
                 print "Enter the password for account: %s" % (self.config['email'])
-                self.config['sde_passw'] = get_password()
+                self.config['sde_pass'] = get_password()
             try:
                 self.connect()
             except self.api.APIAuthError:

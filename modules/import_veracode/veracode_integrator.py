@@ -13,12 +13,9 @@ class VeracodeIntegrationError(IntegrationError):
 class VeracodeIntegrator(BaseIntegrator):
 
     def __init__(self, config):
-        BaseIntegrator.__init__(self, config)
-        self.raw_findings = []
-
-    def _init_config(self):
-        BaseIntegrator._init_config(self)
+        super(VeracodeIntegrator, self).__init__(config)
         self.config.add_custom_option("report_xml", "Veracode Report XML", "x")
+        self.raw_findings = []
 
     def _make_raw_finding(self, node):
         """
