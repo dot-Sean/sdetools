@@ -8,4 +8,7 @@ except ImportError:
 
 from distutils.core import setup
 
-setup(console=['sde_tools.py'])
+setup(
+    console=['sde.py'],
+    zipfile=None,
+    )
