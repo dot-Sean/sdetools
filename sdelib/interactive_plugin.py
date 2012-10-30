@@ -40,13 +40,13 @@ class PlugInExperience:
 
     def select_application(self):
         filters = {}
-        if self.config['application']:
-            filters['name'] = self.config['application']
+        if self.config['sde_application']:
+            filters['name'] = self.config['sde_application']
         app_list = self.api.get_applications(**filters)
 
-        if (self.config['application']):
+        if (self.config['sde_application']):
             if (not app_list):
-                raise PluginError('Specified Application not found -> %s' % (self.config['application']))
+                raise PluginError('Specified Application not found -> %s' % (self.config['sde_application']))
             elif (len(app_list) == 1):
                 return app_list[0]
 
