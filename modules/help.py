@@ -26,10 +26,6 @@ class Command(BaseCommand):
 
         self.help_cmd = self.args[0]
 
-        if self.help_cmd == self.name:
-            ret = self.config.prepare_parser(self)
-            self.config.parser.print_usage()
-            return True
         if self.help_cmd not in self.config.command_list:
             raise commons.UsageError('Unable to find command %s' % (self.help_cmd))
         return True
