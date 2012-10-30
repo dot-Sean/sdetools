@@ -18,8 +18,15 @@ options = {
 for mod_name in modules.__all__:
     options['py2exe']['includes'].append('modules.%s' % mod_name)
 
+static_files = [
+    ('ssl', ['ssl/ca_bundle.crt'])
+]
+    
 setup(
+    name='sde',
     console=['sde.py'],
+    description='SD Elements Tools',
     zipfile=None,
-    options=options
+    options=options,
+    data_files=static_files,
     )
