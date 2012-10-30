@@ -10,25 +10,17 @@ else:
     current_file = __file__
 BASE_PATH = os.path.split(os.path.abspath(current_file))[0]
 
-MODULES_PATH = os.path.join(BASE_PATH, 'modules')
-sys.path.append(BASE_PATH)
-
 from sdelib import commons
 commons.base_path = BASE_PATH
 
 from sdelib import conf_mgr
+import modules
 
 def load_modules():
     command = {}
 
-    for mod_name in os.listdir(MODULES_PATH):
+    for mod_name in modules.__all__:
         if mod_name.startswith('_'):
-            continue
-        if os.path.isdir(os.path.join(MODULES_PATH, mod_name)):
-            pass
-        elif mod_name.endswith('.py'):
-            mod_name = mod_name[:-3]
-        else:
             continue
         try:
             mod = __import__('modules.' + mod_name)
