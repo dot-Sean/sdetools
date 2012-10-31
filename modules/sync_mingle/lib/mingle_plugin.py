@@ -1,17 +1,34 @@
 # Copyright SDElements Inc
 # Extensible two way integration with Mingle
 
+import urllib
+from xml.dom import minidom
+
+from sdelib.restclient import RESTBase
 from sdelib.restclient import URLRequest, APIError
 from alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from alm_integration.alm_plugin_base import AlmException, add_alm_config_options
 from sdelib.conf_mgr import Config
 from datetime import datetime
 import logging
+logger = logging.getLogger(__name__)
 
+class MingleAPIBase(RESTBase):
+    def __init__(self, config):
+        super(APIBase, self).__init__('alm', 'Mingle', config, 'api/v2/projects/%s' % config['alm_project'])
 
-class MingleConfig(Config):
-    def set_settings(self, config):
-        self.settings = config.copy()
+    def parse_response(self, result): 
+        if result:
+            try:
+                result = minidom.parseString(result)
+            except Exception, err:
+                # This means that the result doesn't have XML, not an error
+                pass
+        return result
+
+    def parse_response(self, result):
+        encoded_args = dict((key.encode('utf-8'), val.encode('utf-8')) for key, val in args.items())
+        return urllib.urlencode(encoded_args)
 
 class MingleTask(AlmTask):
     """ Representation of a task in Mingle"""

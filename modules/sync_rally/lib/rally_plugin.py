@@ -18,12 +18,6 @@ class RallyAPIBase(RESTBase):
         super(RallyAPIBase, self).__init__('alm', 'ALM', alm_config, 
                 'slm/webservice/%s' % (API_VERSION))
 
-class RallyConfig(Config):
-    """Configuration for Rally"""
-
-    def set_settings(self, config):
-        self.settings = config.copy()
-
 class RallyTask(AlmTask):
     """ Representation of a task in Rally """
 

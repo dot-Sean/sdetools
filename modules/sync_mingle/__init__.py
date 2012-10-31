@@ -1,7 +1,7 @@
 from sdelib.cmd import BaseCommand
 from sdelib.interactive_plugin import PlugInExperience
-from modules.mingle.lib.mingle_plugin import MingleConnector, MingleAPIBase
-from modules.mingle.lib.mingle_plugin import add_mingle_config_options
+from modules.sync_mingle.lib.mingle_plugin import MingleConnector, MingleAPIBase
+from modules.sync_mingle.lib.mingle_plugin import add_mingle_config_options
 from alm_integration.alm_plugin_base import AlmException
 from sdelib.interactive_plugin import PluginError
 

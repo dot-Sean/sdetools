@@ -4,8 +4,8 @@
 
 from sdelib.cmd import BaseCommand
 from sdelib.interactive_plugin import PlugInExperience
-from modules.sync_jira.lib.jira_plugin import RallyConnector, RallyAPIBase
-from modules.sync_jira.lib.jira_plugin import add_rally_config_options
+from modules.sync_rally.lib.rally_plugin import RallyConnector, RallyAPIBase
+from modules.sync_rally.lib.rally_plugin import add_rally_config_options
 from alm_integration.alm_plugin_base import AlmException
 from sdelib.interactive_plugin import PluginError
 
