@@ -99,13 +99,13 @@ class PlugInExperience:
             sel_app = self.select_application()
 
             filters = {}
-            if self.config['project']:
-                filters['name'] = self.config['project']
+            if self.config['sde_project']:
+                filters['name'] = self.config['sde_project']
             prj_list = self.api.get_projects(sel_app['id'], **filters)
 
-            if (self.config['project']):
+            if (self.config['sde_project']):
                 if (not prj_list):
-                    raise PluginError('Specified Project not found -> %s' % (self.config['project']))
+                    raise PluginError('Specified Project not found -> %s' % (self.config['sde_project']))
                 elif (len(prj_list) == 1):
                     return (sel_app, prj_list[0])
 
