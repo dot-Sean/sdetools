@@ -80,21 +80,27 @@ class Config(object):
         Note: Do not use the base <var_names> (used in the base defaults)
         Note: If default is a string, the option is optional. Otherwise, it is mandatory.
         """
+        var_name = var_name.lower()
+        if var_name in self.settings:
+            log_mgr.warning('Attempting to re-customize an existing '
+                'config %s (IGNORE)' % var_name)
+            return
+
         config_item = {
-            'var_name': var_name.lower(),
+            'var_name': var_name,
             'help_title': help_title,
             'default': default,
             'meta_var': meta_var,
-            'long_form': '--' + var_name.lower(),
+            'long_form': '--' + var_name,
         }
         if short_form:
             config_item['short_form'] = '-' + short_form
 
         if config_item['meta_var'] is None:
-            config_item['meta_var'] = config_item['var_name'].upper()
+            config_item['meta_var'] = var_name.upper()
 
         self.custom_options.append(config_item)
-        self.settings[config_item['var_name']] = config_item['default']
+        self.settings[var_name] = config_item['default']
 
     def parse_config_file(self, file_name):
         if not file_name:
@@ -118,19 +124,20 @@ class Config(object):
             config_keys.append(item['var_name'])
 
         for key in config_keys:
-            if cnf.has_option('global', key):
-                val = cnf.get('global', key)
-                if key == 'args':
-                    val = list(shlex.shlex(val, posix=True))
-                elif key == 'password':
-                    if not val:
-                        val = None
-                elif key == 'log_level':
-                    val = val.strip()
-                    if val not in LOG_LEVELS:
-                        return False, 'Unknown log_level value in config file'
-                    val = LOG_LEVELS[val]
-                self[key] = val
+            if not cnf.has_option('global', key):
+                continue
+            val = cnf.get('global', key)
+            if key == 'args':
+                val = list(shlex.shlex(val, posix=True))
+            elif key == 'password':
+                if not val:
+                    val = None
+            elif key == 'log_level':
+                val = val.strip()
+                if val not in LOG_LEVELS:
+                    return False, 'Unknown log_level value in config file'
+                val = LOG_LEVELS[val]
+            self[key] = val
         return True, 'Config File Parsed'
 
     def prepare_parser(self, cmd_inst):
@@ -180,10 +187,6 @@ class Config(object):
             else:
                 show_error("Invalid options specified.", usage_hint=True)
                 return False
-
-        if (not opts.interactive) and (opts.askpasswd):
-            show_error("Password can not be requested in Non-Interactive mode", usage_hint=True)
-            return False
 
         if opts.skip_conf_file:
             self['conf_file'] = None

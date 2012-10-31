@@ -163,7 +163,7 @@ class RESTBase(object):
             cookie_str = '; '.join(['%s=%s' % (x, cookies[x]) for x in cookies])
             req.add_header('Cookie', cookie_str)
         else:
-            raise UsageError('Unknown Authentication mode.')
+            raise UsageError('Unknown Authentication mode "%s".' % (auth_mode))
 
         call_success = True
         try:
@@ -176,7 +176,7 @@ class RESTBase(object):
 
         if not call_success:
             if not hasattr(handle, 'code'):
-                raise ServerError('Invalid server or server unreachable.')
+                raise ServerError('Invalid server or server unreachable: %s' % (self._get_conf('server')))
             try:
                 err_msg = handle.read()
             except:
@@ -198,7 +198,7 @@ class RESTBase(object):
             result += res_buf
         handle.close()
 
-        result = self.process_return(result)
+        result = self.parse_response(result)
 
         return result
 

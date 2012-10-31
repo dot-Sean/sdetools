@@ -8,14 +8,11 @@ from alm_integration.tests.alm_plugin_test_helper import AlmPluginTestHelper
 from sdelib.conf_mgr import config
 from sdelib.interactive_plugin import PlugInExperience
 from modules.sync_rally.rally_plugin import RallyConnector, RallyAPIBase
-from modules.sync_rally.rally_plugin import add_rally_config_options
-
 
 CONF_FILE_LOCATION = 'test_settings.conf'
 
 class TestRallyCase(AlmPluginTestHelper, unittest.TestCase):
      def setUp(self):
-        add_rally_config_options(config)
         config.parse_config_file(CONF_FILE_LOCATION)
         self.tac = RallyConnector(PlugInExperience(config), RallyAPIBase(config))
         super(TestRallyCase, self).setUp()

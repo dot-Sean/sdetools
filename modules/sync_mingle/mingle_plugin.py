@@ -7,7 +7,7 @@ from xml.dom import minidom
 from sdelib.restclient import RESTBase
 from sdelib.restclient import URLRequest, APIError
 from alm_integration.alm_plugin_base import AlmTask, AlmConnector
-from alm_integration.alm_plugin_base import AlmException, add_alm_config_options
+from alm_integration.alm_plugin_base import AlmException
 from sdelib.conf_mgr import Config
 from datetime import datetime
 import logging
@@ -15,7 +15,8 @@ logger = logging.getLogger(__name__)
 
 class MingleAPIBase(RESTBase):
     def __init__(self, config):
-        super(APIBase, self).__init__('alm', 'Mingle', config, 'api/v2/projects/%s' % config['alm_project'])
+        super(APIBase, self).__init__('alm', 'Mingle', config, 
+                'api/v2/projects/%s' % config['alm_project'])
 
     def parse_response(self, result): 
         if result:
@@ -60,9 +61,17 @@ class MingleTask(AlmTask):
 
 class MingleConnector(AlmConnector):
 
-    def __init__(self, sde_plugin, alm_plugin):
+    def __init__(self, config, alm_plugin):
         """ Initializes connection to Mingle """
-        AlmConnector.__init__(self, sde_plugin, alm_plugin)
+        super(MingleConnector, self).__init__(config, alm_plugin)
+
+        config.add_custom_option('alm_standard_workflow', 'Standard workflow in Mingle?')
+        config.add_custom_option('mingle_card_type', 'IDs for issues raised in Mingle')
+        config.add_custom_option('mingle_new_status', 'status to set for new tasks in Mingle')
+        config.add_custom_option('mingle_done_statuses', 'Done statuses in Mingle')
+
+    def initialize(self):
+        super(MingleConnector, self).initialize()
 
         #Verify that the configuration options are set properly
         if (not self.sde_plugin.config['mingle_done_statuses'] or
@@ -206,11 +215,3 @@ class MingleConnector(AlmConnector):
 
     def alm_disconnect(self):
         pass
-
-def add_mingle_config_options(config):
-    """ Adds Mingle specific config options to the config file"""
-    add_alm_config_options(config)
-    config.add_custom_option('alm_standard_workflow', 'Standard workflow in Mingle?')
-    config.add_custom_option('mingle_card_type', 'IDs for issues raised in Mingle')
-    config.add_custom_option('mingle_new_status', 'status to set for new tasks in Mingle')
-    config.add_custom_option('mingle_done_statuses', 'Done statuses in Mingle')

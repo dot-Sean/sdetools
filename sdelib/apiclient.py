@@ -43,7 +43,7 @@ class APIBase(RESTBase):
 
     def add_note(self, task, text, filename, status):
         note = {'text':text, 'filename':filename, 'status':status, 'task':task}
-        result = self.call_api('notes', URLRequest.POST, args=note)
+        result = self.call_api('notes', self.URLRequest.POST, args=note)
         return result
 
     def get_notes(self, task):
@@ -54,6 +54,6 @@ class APIBase(RESTBase):
         Update the task status. The task ID should include the project number
         """
         #TODO: regular expression on task and status for validation
-        result = self.call_api('tasks/%s' % task, URLRequest.PUT,
+        result = self.call_api('tasks/%s' % task, self.URLRequest.PUT,
             args={'status':status})
         return result['status']

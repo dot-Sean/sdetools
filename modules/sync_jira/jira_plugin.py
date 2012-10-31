@@ -3,7 +3,7 @@
 
 from sdelib.restclient import RESTBase, APIError
 from alm_integration.alm_plugin_base import AlmTask, AlmConnector
-from alm_integration.alm_plugin_base import AlmException, add_alm_config_options
+from alm_integration.alm_plugin_base import AlmException
 from sdelib.conf_mgr import Config
 from datetime import datetime
 import logging
@@ -71,9 +71,18 @@ class JIRATask(AlmTask):
 
 class JIRAConnector(AlmConnector):
 
-    def __init__(self, sde_plugin, alm_plugin):
+    def __init__(self, config, alm_plugin):
         """ Initializes connection to JIRA """
-        super(JIRAConnector, self).__init__(sde_plugin, alm_plugin)
+        super(JIRAConnector, self).__init__(config, alm_plugin)
+
+        config.add_custom_option('alm_standard_workflow', 'Standard workflow in JIRA?')
+        config.add_custom_option('jira_issue_type', 'IDs for issues raised in JIRA')
+        config.add_custom_option('jira_close_transition', 'Close transition in JIRA')
+        config.add_custom_option('jira_reopen_transition', 'Re-open transiiton in JIRA')
+        config.add_custom_option('jira_done_statuses', 'Done statuses in JIRA')
+
+    def initialize(self):
+        super(JIRAConnector, self).initialize()
 
         #Verify that the configuration options are set properly
         if (not self.sde_plugin.config['jira_done_statuses'] or
@@ -105,6 +114,7 @@ class JIRAConnector(AlmConnector):
         try:
             result = self.alm_plugin.call_api('project')
         except APIError:
+            raise
             raise AlmException('Unable to connect to JIRA. Please' +
                                ' check server URL, ID, password')
 
@@ -234,14 +244,3 @@ class JIRAConnector(AlmConnector):
 
     def alm_disconnect(self):
         pass
-
-def add_jira_config_options(config):
-    """ Adds JIRA specific config options to the config file"""
-
-    add_alm_config_options(config)
-
-    config.add_custom_option('alm_standard_workflow', 'Standard workflow in JIRA?')
-    config.add_custom_option('jira_issue_type', 'IDs for issues raised in JIRA')
-    config.add_custom_option('jira_close_transition', 'Close transition in JIRA')
-    config.add_custom_option('jira_reopen_transition', 'Re-open transiiton in JIRA')
-    config.add_custom_option('jira_done_statuses', 'Done statuses in JIRA')

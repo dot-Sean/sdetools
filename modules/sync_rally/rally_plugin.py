@@ -3,7 +3,7 @@
 
 from sdelib.restclient import RESTBase, APIError
 from alm_integration.alm_plugin_base import AlmTask, AlmConnector
-from alm_integration.alm_plugin_base import AlmException, add_alm_config_options
+from alm_integration.alm_plugin_base import AlmException
 from sdelib.conf_mgr import Config
 from datetime import datetime
 import logging
@@ -15,7 +15,7 @@ class RallyAPIBase(RESTBase):
     """ Base plugin for Rally """
 
     def __init__(self, config):
-        super(RallyAPIBase, self).__init__('alm', 'ALM', alm_config, 
+        super(RallyAPIBase, self).__init__('alm', 'ALM', config, 
                 'slm/webservice/%s' % (API_VERSION))
 
 class RallyTask(AlmTask):
@@ -55,9 +55,18 @@ class RallyTask(AlmTask):
 class RallyConnector(AlmConnector):
     """Connects SD Elements to Rally"""
 
-    def __init__(self, sde_plugin, alm_plugin):
-        """ Initializes connection to Rally """
-        super(RallyConnector, self).__init__(sde_plugin, alm_plugin)
+    def __init__(self, config, alm_plugin):
+        super(RallyConnector, self).__init__(config, alm_plugin)
+
+        """ Adds Rally specific config options to the config file"""
+        config.add_custom_option('alm_standard_workflow', 'Standard workflow in Rally?')
+        config.add_custom_option('rally_card_type', 'IDs for issues raised in Rally')
+        config.add_custom_option('rally_new_status', 'status to set for new tasks in Rally')
+        config.add_custom_option('rally_done_statuses', 'Done statuses in Rally')
+        config.add_custom_option('rally_workspace', 'Rally Workspace')
+
+    def initialize(self):
+        super(RallyConnector, self).initialize()
 
         #Verify that the configuration options are set properly
         for item in ['rally_done_statuses', 'alm_standard_workflow', 'rally_card_type',
@@ -246,14 +255,3 @@ class RallyConnector(AlmConnector):
 
     def alm_disconnect(self):
         pass
-
-def add_rally_config_options(config):
-    """ Adds Rally specific config options to the config file"""
-
-    add_alm_config_options(config)
-
-    config.add_custom_option('alm_standard_workflow', 'Standard workflow in Rally?')
-    config.add_custom_option('rally_card_type', 'IDs for issues raised in Rally')
-    config.add_custom_option('rally_new_status', 'status to set for new tasks in Rally')
-    config.add_custom_option('rally_done_statuses', 'Done statuses in Rally')
-    config.add_custom_option('rally_workspace', 'Rally Workspace')

@@ -11,7 +11,6 @@ from sdelib.interactive_plugin import PlugInExperience
 import logging
 
 from alm_integration.alm_plugin_base import AlmConnector, AlmTask
-from alm_integration.alm_plugin_base import add_alm_config_options
 
 
 CONF_FILE_LOCATION = 'test_settings.conf'
@@ -88,7 +87,6 @@ class TestAlmConnector(AlmConnector):
 
 class TestALMCase(unittest.TestCase):
     def setUp(self):
-        add_alm_config_options(config)
         config.parse_config_file(CONF_FILE_LOCATION)
         self.plugin = PlugInExperience(config)
         self.tac = TestAlmConnector(self.plugin, None)
