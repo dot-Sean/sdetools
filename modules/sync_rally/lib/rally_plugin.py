@@ -66,24 +66,13 @@ class RallyConnector(AlmConnector):
         super(RallyConnector, self).__init__(sde_plugin, alm_plugin)
 
         #Verify that the configuration options are set properly
-        if (not self.sde_plugin.config['rally_done_statuses'] or
-            len(self.sde_plugin.config['rally_done_statuses']) < 1):
-            raise AlmException('Missing rally_done_statuses in configuration')
+        for item in ['rally_done_statuses', 'alm_standard_workflow', 'rally_card_type',
+            'rally_new_status', 'rally_workspace']:
+            if not self.sde_plugin.config[item]:
+                raise AlmException('Missing %s in configuration' % item)
 
         self.sde_plugin.config['rally_done_statuses'] = (
                 self.sde_plugin.config['rally_done_statuses'].split(','))
-
-        if not self.sde_plugin.config['alm_standard_workflow']:
-            raise AlmException('Missing alm_standard_workflow in configuration')
-
-        if not self.sde_plugin.config['rally_card_type']:
-            raise AlmException('Missing rally_card_type in configuration')
-
-        if not self.sde_plugin.config['rally_new_status']:
-            raise AlmException('Missing rally_card_type in configuration')
-
-        if not self.sde_plugin.config['rally_workspace']:
-            raise AlmException('Missing rally_workspace in configuration')
 
         self.project_ref = None
         self.workspace_ref = None

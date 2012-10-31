@@ -104,6 +104,16 @@ class RESTBase(object):
         handler = sslcert_compat.get_http_handler(self._get_conf('method'), debuglevel=urllib_debuglevel)
         self.opener = urllib2.build_opener(handler)
 
+    def encode_post_args(self, args):
+        return json.dumps(args)
+
+    def parse_response(self, result):
+        try:
+            result = json.loads(result)
+        except:
+            raise APIFormatError('Unable to process JSON data.')
+        return result
+
     def call_api(self, target, method=URLRequest.GET, args=None):
         """
         Internal method used to call a RESTFul API
@@ -112,7 +122,7 @@ class RESTBase(object):
         target - the path of the API call (without host name)
         method -  HTTP Verb, specified by the URLRequest class. Default
                   is GET
-        args - JSON Data for arguments
+        args - Data for arguments
 
         """
         if not self.opener:
@@ -122,15 +132,14 @@ class RESTBase(object):
         logger.debug('    Args: %s' % ((repr(args)[:200]) + (repr(args)[200:] and '...')))
         req_url = '%s/%s' % (self.base_uri, target)
         auth_mode = self.auth_mode
-        if not args:
-            args = {}
+        args = args or {}
         data = None
 
         if method == URLRequest.GET:
             if args:
                 req_url = '%s?%s' % (req_url, urllib.urlencode(args))
         else:
-            data = json.dumps(args)
+            data = self.encode_post_args(args)
         req = URLRequest(req_url, data=data, method=method)
 
         if (method != URLRequest.GET):
@@ -168,11 +177,14 @@ class RESTBase(object):
         if not call_success:
             if not hasattr(handle, 'code'):
                 raise ServerError('Invalid server or server unreachable.')
-            err_msg = 'Unknown Error'
             try:
-                err_ret = handle.read()
-                err_msg = json.loads(err_ret)['error']
+                err_msg = handle.read()
             except:
+                err_msg = 'Unknown Error'
+            try:
+                err_msg = json.loads(err_msg)['error']
+            except:
+                # Not a JSON error
                 pass
             if handle.code == 401:
                 raise APIAuthError
@@ -186,10 +198,7 @@ class RESTBase(object):
             result += res_buf
         handle.close()
 
-        try:
-            result = json.loads(result)
-        except:
-            raise APIFormatError('Unable to process JSON data.')
+        result = self.process_return(result)
 
         return result
 

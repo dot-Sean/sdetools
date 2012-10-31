@@ -8,7 +8,7 @@ from alm_integration.tests.alm_plugin_test_helper import AlmPluginTestHelper
 from sdelib.conf_mgr import config
 from sdelib.interactive_plugin import PlugInExperience
 from mod_sync_jira.lib.jira_plugin import JIRAConnector
-from mod_sync_jira.lib.jira_plugin import JIRABase, add_jira_config_options
+from mod_sync_jira.lib.jira_plugin import JIRAPIABase, add_jira_config_options
 
 CONF_FILE_LOCATION = 'test_settings.conf'
 
@@ -16,7 +16,7 @@ class TestJiraCase(AlmPluginTestHelper, unittest.TestCase):
     def setUp(self):
         add_jira_config_options(config)
         config.parse_config_file(CONF_FILE_LOCATION)
-        self.tac = JIRAConnector(PlugInExperience(config), JIRABase(config))
+        self.tac = JIRAConnector(PlugInExperience(config), JIRAPIABase(config))
         super(TestJiraCase, self).setUp()
 
 if __name__ == "__main__":

@@ -9,11 +9,11 @@ from datetime import datetime
 import logging
 import copy
 
-class JIRABase(RESTBase):
+class JIRAPIABase(RESTBase):
     """ Base plugin for JIRA """
 
     def __init__(self, config):
-        super(JIRABase, self).__init__('alm', 'ALM', alm_config, 'rest/api/2')
+        super(JIRAPIABase, self).__init__('alm', 'JIRA', config, 'rest/api/2')
 
 class JIRAConfig(Config):
     def set_settings(self, config):
