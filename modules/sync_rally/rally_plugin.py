@@ -1,13 +1,15 @@
 # Copyright SDElements Inc
 # Extensible two way integration with Rally
 
+from datetime import datetime
+
 from sdelib.restclient import RESTBase, APIError
 from alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from alm_integration.alm_plugin_base import AlmException
 from sdelib.conf_mgr import Config
-from datetime import datetime
-import logging
-import copy
+
+from sdelib import log_mgr
+logger = log_mgr.mods.add_mod(__name__)
 
 API_VERSION = '1.11'
 
@@ -144,7 +146,7 @@ class RallyConnector(AlmConnector):
             result = self.alm_plugin.call_api('hierarchicalrequirement.js',
                                                args = query_args)
         except APIError as err:
-            logging.info('Error is %s:' , err)
+            logger.info('Error is %s:' , err)
             raise AlmException('Unable to get task %s from Rally' % task_id)
         num_results = result['QueryResult']['TotalResultCount']
 
@@ -163,14 +165,14 @@ class RallyConnector(AlmConnector):
                              task_data['LastUpdateDate'],
                              self.sde_plugin.config['rally_done_statuses'])
         except Exception as err:
-            logging.info('Error is %s:', err)
+            logger.info('Error is %s:', err)
             raise AlmException('Unable to get card # for task '
                                '%s from Rally' % task_id)
 
     def alm_add_task(self, task):
         try:
             if self.alm_get_task(task):
-                logging.debug('Task %s already exists in Rally Project', task['id'])
+                logger.debug('Task %s already exists in Rally Project', task['id'])
                 return None
         except AlmException:
             #This means task doesn't exist, which is expected
@@ -187,8 +189,8 @@ class RallyConnector(AlmConnector):
             rsp = self.alm_plugin.call_api('hierarchicalrequirement/create.js',
                                             method = self.alm_plugin.URLRequest.POST,
                                             args = create_args)
-            logging.info('Response was %s', rsp)
-            logging.debug('Task %s added to Rally Project', task['id'])
+            logger.info('Response was %s', rsp)
+            logger.debug('Task %s added to Rally Project', task['id'])
 
         except APIError as err:
             raise AlmException('Please check ALM-specific settings in config '
@@ -196,7 +198,7 @@ class RallyConnector(AlmConnector):
                                '%s because of %s' % (task['id'], err))
 
         #Return a unique identifier to this task in Rally
-        logging.info('Getting task %s', task['id'])
+        logger.info('Getting task %s', task['id'])
         alm_task = self.alm_get_task(task)
         if not alm_task:
             raise AlmException('Alm task not added sucessfully. Please '
@@ -214,7 +216,7 @@ class RallyConnector(AlmConnector):
 
         if (not task or
             not self.sde_plugin.config['alm_standard_workflow'] == 'True'):
-            logging.debug('Status synchronization disabled')
+            logger.debug('Status synchronization disabled')
             return
 
         if status == 'DONE' or status == 'NA':
@@ -250,7 +252,7 @@ class RallyConnector(AlmConnector):
                                    '%s in Rally because of %s' %
                                    (task.get_alm_id(), err))
 
-        logging.debug('Status changed to %s for task %s in Rally',
+        logger.debug('Status changed to %s for task %s in Rally',
                       status, task.get_alm_id())
 
     def alm_disconnect(self):

@@ -2,13 +2,13 @@
 import collections
 import re
 from datetime import datetime
+from xml.dom import minidom
 
 from sdelib.commons import Error
 from sdelib.restclient import APIError
 from sdelib.interactive_plugin import PlugInExperience
-from sdelib import log_mgr
-from xml.dom import minidom
 
+from sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
 class IntegrationError(Error):

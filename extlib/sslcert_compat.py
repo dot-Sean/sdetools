@@ -17,8 +17,13 @@ from sdelib import commons
 
 ssl_warned = False
 
-CERT_PATH_NAME = os.path.join(commons.base_path, 'ssl')
+CERT_PATH_NAME = os.path.join(commons.base_path, 'docs', 'ssl')
 CA_CERTS_FILE = os.path.join(CERT_PATH_NAME, 'ca_bundle.crt')
+
+try:
+    open(CA_CERTS_FILE).close()
+except:
+    logging.warning('Unable to access SSL root certificate: %s' % (CA_CERTS_FILE))
 
 class InvalidCertificateException(httplib.HTTPException, urllib2.URLError):
     def __init__(self, host, cert, reason):

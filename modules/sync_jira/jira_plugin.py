@@ -1,13 +1,15 @@
 # Copyright SDElements Inc
 # Extensible two way integration with JIRA
 
+from datetime import datetime
+
 from sdelib.restclient import RESTBase, APIError
 from alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from alm_integration.alm_plugin_base import AlmException
 from sdelib.conf_mgr import Config
-from datetime import datetime
-import logging
-import copy
+
+from sdelib import log_mgr
+logger = log_mgr.mods.add_mod(__name__)
 
 class JIRAAPIBase(RESTBase):
     """ Base plugin for JIRA """
@@ -55,7 +57,7 @@ class JIRATask(AlmTask):
         try:
             priority = int(priority)
         except (TypeError):
-            logging.error('Could not coerce %s into an integer' % priority)
+            logger.error('Could not coerce %s into an integer' % priority)
             raise AlmException("Error in translating SDE priority to JIRA: "
                                "%s is not an integer priority" % priority)
         if priority == 10:
@@ -149,7 +151,7 @@ class JIRAConnector(AlmConnector):
                     self.sde_plugin.config['alm_project'], task_id)
             result = self.alm_plugin.call_api(url)
         except APIError, err:
-            logging.info(err)
+            logger.info(err)
             raise AlmException("Unable to get task %s from JIRA" % task_id)
         if not result['total']:
             #No result was found from query

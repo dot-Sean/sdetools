@@ -2,6 +2,7 @@
 # Extensible two way integration with Mingle
 
 import urllib
+from datetime import datetime
 from xml.dom import minidom
 
 from sdelib.restclient import RESTBase
@@ -9,9 +10,9 @@ from sdelib.restclient import URLRequest, APIError
 from alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from alm_integration.alm_plugin_base import AlmException
 from sdelib.conf_mgr import Config
-from datetime import datetime
-import logging
-logger = logging.getLogger(__name__)
+
+from sdelib import log_mgr
+logger = log_mgr.mods.add_mod(__name__)
 
 class MingleAPIBase(RESTBase):
     def __init__(self, config):
@@ -109,7 +110,7 @@ class MingleConnector(AlmConnector):
             task_args =  {'filters[]': ('[Name][is][%s]' % task_id)}
             result = self.alm_plugin.call_api('cards.xml', args=task_args)
         except APIError, err:
-            logging.error(err)
+            logger.error(err)
             raise AlmException('Unable to get task %s from Mingle' % task_id)
 
         card_element =  result.getElementsByTagName('card')
@@ -121,7 +122,7 @@ class MingleConnector(AlmConnector):
             card_num = card_item.getElementsByTagName(
                     'number').item(0).firstChild.nodeValue
         except Exception, err:
-            logging.info(err)
+            logger.info(err)
             raise AlmException('Unable to get card # for task '
                                '%s from Mingle' % task_id)
         modified_date  = None
@@ -146,7 +147,7 @@ class MingleConnector(AlmConnector):
         #First check to see if task exists
         try:
             if self.alm_get_task(task):
-                logging.debug('Task %s already exists in Mingle Project'
+                logger.debug('Task %s already exists in Mingle Project'
                               % task['id'])
                 return None
         except AlmException:
@@ -162,7 +163,7 @@ class MingleConnector(AlmConnector):
             }
             self.alm_plugin.call_api('cards.xml', args=status_args,
                     method=URLRequest.POST)
-            logging.debug('Task %s added to Mingle Project' % task['id'])
+            logger.debug('Task %s added to Mingle Project' % task['id'])
         except APIError, err:
             raise AlmException('Please check ALM-specific settings in config '
                     'file. Unable to add task %s because of %s' %
@@ -183,7 +184,7 @@ class MingleConnector(AlmConnector):
 
     def alm_update_task_status(self, task, status):
         if not task or not self.sde_plugin.config['alm_standard_workflow'] == 'True':
-            logging.debug('Status synchronization disabled')
+            logger.debug('Status synchronization disabled')
             return
 
         if status == 'DONE' or status=='NA':
@@ -210,7 +211,7 @@ class MingleConnector(AlmConnector):
                 raise AlmException('Unable to update task status to TODO for '
                                    'card: %s in Mingle because of %s' %
                                    (task.get_alm_id(), err))
-        logging.debug('Status changed to %s for task %s in Mingle' %
+        logger.debug('Status changed to %s for task %s in Mingle' %
                 (status, task.get_alm_id()))
 
     def alm_disconnect(self):
