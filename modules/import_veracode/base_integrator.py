@@ -25,7 +25,7 @@ class IntegrationResult(object):
         self.error_cwes_unmapped = error_cwes_unmapped
 
 class BaseIntegrator(object):
-    def __init__(self, config):
+    def __init__(self, config, default_mapping_file=None):
         self.findings = []
         self.phase_exceptions = ['testing']
         self.mapping = {}
@@ -35,7 +35,7 @@ class BaseIntegrator(object):
         self.cwe_title = {}
         self.plugin = PlugInExperience(self.config)
         self.config.add_custom_option("mapping_file",
-                "Task ID -> CWE mapping in XML format", "m", None)
+                "Task ID -> CWE mapping in XML format", "m", default_mapping_file)
         self.config.add_custom_option("flaws_only",
                 "Only update tasks identified having flaws. (on | off)", "z", "on")
         self.config.add_custom_option("trial_run",
@@ -131,19 +131,15 @@ class BaseIntegrator(object):
         file_name = '' # Needed for Notes API. All notes will have an empty filename.
 
         logger.info("Integration underway for: %s" % (self.report_id))
-        logger.info("Mapped SD application/project: %s/%s" % (self.config['application'], self.config['project']))
+        logger.info("Mapped SD application/project: %s/%s" % 
+            (self.config['sde_application'], self.config['sde_project']))
 
         if not commit:
             logger.info("Trial run only. No changes will be made")
 
-        task_list = []
-        try:
-            task_list = self.plugin.get_task_list()
-            logger.debug("Retrieved task list for %s/%s" % (self.config['application'], self.config['project']))
-        except APIError, e:
-            logger.exception("Could not get task list for %s/%s - Reason: %s" % 
-                (self.config['application'], self.config['project'], str(e)))
-            stats_api_errors += 1
+        task_list = self.plugin.get_task_list()
+        logger.debug("Retrieved task list for %s/%s" % 
+            (self.config['sde_application'], self.config['sde_project']))
 
         unique_findings = self.unique_findings()
         missing_cwe_map = unique_findings['nomap']
@@ -241,7 +237,8 @@ class BaseIntegrator(object):
         logger.info("%d subtasks created from %d flaws."%(stats_subtasks_added, stats_total_flaws_found))
         logger.info("%d/%d project tasks had 0 flaws." %(len(noflaw_tasks),len(task_list)-(stats_test_tasks)))
         if stats_total_skips:
-            logger.error("%d flaws were mapped to %d tasks not found in the project. Skipped"%(stats_total_skips_findings,stats_total_skips))
+            logger.error("%d flaws were mapped to %d tasks not found in the project. Skipped " % 
+                (stats_total_skips_findings,stats_total_skips))
         logger.info("%d total api errors encountered." % (stats_api_errors))
         logger.info("---------------------------------------------------------")
         logger.info("Completed")

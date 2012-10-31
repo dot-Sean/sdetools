@@ -32,7 +32,7 @@ class Config(object):
     indicate that a value needs to be asked interactively.
 
     Usage sample:
-        prj_name = config['project']
+        prj_name = config['sde_project']
     """
     DEFAULTS = {
             'conf_file': DEFAULT_CONFIG_FILE,

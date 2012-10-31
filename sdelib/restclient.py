@@ -30,8 +30,10 @@ class APICallError(APIHTTPError):
     pass
 
 class APIAuthError(APIError):
-    def __init__(self):
-        APIError.__init__(self, 'Incorrect Credentials')
+    def __init__(self, msg=None):
+        if not msg:
+            msg = 'Incorrect Credentials'
+        APIError.__init__(self, msg)
 
 class ServerError(APIError):
     """
@@ -187,7 +189,7 @@ class RESTBase(object):
                 # Not a JSON error
                 pass
             if handle.code == 401:
-                raise APIAuthError
+                raise APIAuthError('Invalid Credentials for %s' % self.conf_name)
             raise APICallError(handle.code, err_msg)
 
         result = ''
@@ -214,7 +216,7 @@ class RESTBase(object):
             result = self.call_api('session', URLRequest.PUT, args=args)
         except APIHTTPError, err:
             if err.code == 400:
-                raise APIAuthError
+                raise APIAuthError('Invalid Credentials for %s' % self.conf_name)
             raise
         for key in ['session-cookie-name', 'csrf-token', 'csrf-header-name',
             'csrf-cookie-domain', 'csrf-cookie-name', 'session-token']:

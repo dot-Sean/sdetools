@@ -1,5 +1,7 @@
-from base_integrator import BaseIntegrator, IntegrationError
+import os
 from xml.dom import minidom
+
+from base_integrator import BaseIntegrator, IntegrationError
 
 REQUIRED_ATTRIBS = ['issueid', 'cweid', 'categoryid', 'categoryname', 'description', 'severity', 'module']
 LOCATION_ATTRIBS = ['sourcefilepath', 'sourcefile', 'line', 'location']
@@ -7,14 +9,16 @@ SOURCE_NAME = "Veracode"
 
 __all__ = ['VeracodeIntegrator']
 
+DEFAULT_MAPPING_FILE = os.path.join('docs', 'veracode', 'sde_veracode_map.xml')
+
 class VeracodeIntegrationError(IntegrationError):
     pass
 
 class VeracodeIntegrator(BaseIntegrator):
 
     def __init__(self, config):
-        super(VeracodeIntegrator, self).__init__(config)
-        self.config.add_custom_option("report_xml", "Veracode Report XML", "x")
+        super(VeracodeIntegrator, self).__init__(config, DEFAULT_MAPPING_FILE)
+        self.config.add_custom_option("report_xml", "Veracode Report XML", "x", None)
         self.raw_findings = []
 
     def _make_raw_finding(self, node):

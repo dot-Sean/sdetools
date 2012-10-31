@@ -9,6 +9,8 @@ class PlugInExperience:
     def __init__(self, config):
         self.config = config
         self.api = apiclient.APIBase(self.config)
+        self.app = None
+        self.prj = None
         config.add_custom_option('sde_application', "SDE Application to use", default='')
         config.add_custom_option('sde_project', "SDE Project to use", default='')
         self.connected = False
@@ -39,6 +41,9 @@ class PlugInExperience:
             break
 
     def select_application(self):
+        if not self.connected:
+             self.get_and_validate_password()
+
         filters = {}
         if self.config['sde_application']:
             filters['name'] = self.config['sde_application']
@@ -117,10 +122,8 @@ class PlugInExperience:
                 return (sel_app, sel_prj)
 
     def get_task_list(self):
-        if not self.connected:
-            self.get_and_validate_password()
-
-        self.app, self.prj = self.select_project()
+        if not self.prj:
+            self.app, self.prj = self.select_project()
         
         return self.api.get_tasks(self.prj['id'])
 
@@ -132,17 +135,13 @@ class PlugInExperience:
         return content
 
     def add_note(self, task_id, text, filename, status):
-        if not self.connected:
-             self.get_and_validate_password()
- 
-        self.app, self.prj = self.select_project()
+        if not self.prj:
+            self.app, self.prj = self.select_project()
 
         return self.api.add_note("%d-%s" % (self.prj['id'], task_id), text, filename, status)
 
     def get_notes(self, task_id):
-        if not self.connected:
-             self.get_and_validate_password()
-
-        self.app, self.prj = self.select_project()
+        if not self.prj:
+            self.app, self.prj = self.select_project()
  
         return self.api.get_notes("%d-%s" % (self.prj['id'], task_id))       
