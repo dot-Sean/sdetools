@@ -8,8 +8,8 @@ from alm_integration.tests.alm_plugin_test_helper import AlmPluginTestHelper
 from sdelib.conf_mgr import config
 from sdelib.interactive_plugin import PlugInExperience
 
-from modules.sync_mingle.lib.mingle_plugin import MingleConnector, MingleAPIBase
-from modules.sync_mingle.lib.mingle_plugin import add_mingle_config_options
+from modules.sync_mingle.mingle_plugin import MingleConnector, MingleAPIBase
+from modules.sync_mingle.mingle_plugin import add_mingle_config_options
 
 
 CONF_FILE_LOCATION = 'test_settings.conf'
