@@ -133,8 +133,9 @@ class Config(object):
         config_keys = ['log_level', 'debug_mods', 'application', 'project', 
             'authmode', 'args']
 
-        for item in self.custom_options:
-            config_keys.append(item['var_name'])
+        for name, opts in self.custom_options:
+            for item in opts:
+                config_keys.append(item['var_name'])
 
         for key in config_keys:
             if not cnf.has_option('global', key):
