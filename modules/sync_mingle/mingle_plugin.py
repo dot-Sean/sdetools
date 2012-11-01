@@ -22,6 +22,10 @@ class MingleAPIBase(RESTBase):
         self.base_path = 'api/v2/projects/%s' % self.config['alm_project']
         super(MingleAPIBase, self).post_conf_init()
 
+    def encode_post_args(self, args):
+        encoded_args = dict((key.encode('utf-8'), val.encode('utf-8')) for key, val in args.items())
+        return urllib.urlencode(encoded_args)
+
     def parse_response(self, result): 
         if result:
             try:
@@ -30,10 +34,6 @@ class MingleAPIBase(RESTBase):
                 # This means that the result doesn't have XML, not an error
                 pass
         return result
-
-    def parse_response(self, result):
-        encoded_args = dict((key.encode('utf-8'), val.encode('utf-8')) for key, val in args.items())
-        return urllib.urlencode(encoded_args)
 
 class MingleTask(AlmTask):
     """ Representation of a task in Mingle"""
