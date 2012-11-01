@@ -109,9 +109,9 @@ class Config(object):
 
         if not group_name:
             group_name = "Module-specific option"
-        for name, opts in self.custom_options:
+        for name, optlist in self.custom_options:
             if group_name == name:
-                opts.append(config_item)
+                optlist.append(config_item)
                 return
         self.custom_options.append((group_name, [config_item]))
 
@@ -133,8 +133,8 @@ class Config(object):
         config_keys = ['log_level', 'debug_mods', 'application', 'project', 
             'authmode', 'args']
 
-        for name, opts in self.custom_options:
-            for item in opts:
+        for name, optlist in self.custom_options:
+            for item in optlist:
                 config_keys.append(item['var_name'])
 
         for key in config_keys:
@@ -180,9 +180,9 @@ class Config(object):
             default='', type='string',
             help = "Comma-seperated List of modules to debug, e.g. sdelib.apiclient)")
 
-        for group_name, opts in self.custom_options:
+        for group_name, optslist in self.custom_options:
             group = optparse.OptionGroup(parser, group_name)
-            for item in opts:
+            for item in optslist:
                 opt_forms = [item['long_form']]
                 if 'short_form' in item:
                     opt_forms.append(item['short_form'])
@@ -236,8 +236,8 @@ class Config(object):
             
         self['interactive'] = opts.interactive
 
-        for group_name, opts in self.custom_options:
-            for item in opts:
+        for group_name, optlist in self.custom_options:
+            for item in optlist:
                 name = item['var_name']
                 val = getattr(opts, name)
                 if val:
