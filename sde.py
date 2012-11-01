@@ -67,11 +67,12 @@ def main(argv):
     cmd_inst = curr_cmd(config, argv[2:])
     try:
         cmd_inst.configure()
+
+        ret_status = cmd_inst.parse_args()
     except commons.UsageError, e:
         commons.show_error(str(e))
         return False
 
-    ret_status = cmd_inst.parse_args()
     if not ret_status:
         return False
 

@@ -77,11 +77,16 @@ class JIRAConnector(AlmConnector):
         """ Initializes connection to JIRA """
         super(JIRAConnector, self).__init__(config, alm_plugin)
 
-        config.add_custom_option('alm_standard_workflow', 'Standard workflow in JIRA?')
-        config.add_custom_option('jira_issue_type', 'IDs for issues raised in JIRA')
-        config.add_custom_option('jira_close_transition', 'Close transition in JIRA')
-        config.add_custom_option('jira_reopen_transition', 'Re-open transiiton in JIRA')
-        config.add_custom_option('jira_done_statuses', 'Done statuses in JIRA')
+        config.add_custom_option('alm_standard_workflow', 'Standard workflow in JIRA?',
+                default='True')
+        config.add_custom_option('jira_issue_type', 'IDs for issues raised in JIRA',
+                default='Bug')
+        config.add_custom_option('jira_close_transition', 'Close transition in JIRA',
+                default='Close Issue')
+        config.add_custom_option('jira_reopen_transition', 'Re-open transiiton in JIRA',
+                default='Reopen Issue')
+        config.add_custom_option('jira_done_statuses', 'Statuses that signify a task is Done in JIRA',
+                default='Resolved,Closed')
 
     def initialize(self):
         super(JIRAConnector, self).initialize()

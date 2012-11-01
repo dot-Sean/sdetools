@@ -72,12 +72,18 @@ class AlmConnector(object):
 
     def _add_alm_config_options(self):
         """ Adds ALM config options to the config file"""
-        self.config.add_custom_option('alm_phases', 'Phases of the ALM')
-        self.config.add_custom_option('sde_statuses_in_scope', 'SDE statuses that are in scope')
-        self.config.add_custom_option('sde_min_priority', 'Minimum SDE priority in scope')
-        self.config.add_custom_option('how_tos_in_scope', 'Whether or not HowTos should be included')
-        self.config.add_custom_option('alm_project', 'Project in ALM Tool')
-        self.config.add_custom_option('conflict_policy', 'Conflict policy to use')
+        self.config.add_custom_option('alm_phases', 'Phases of the ALM',
+                default='requirements,architecture-design,development')
+        self.config.add_custom_option('sde_statuses_in_scope', 'SDE statuses that are in scope', 
+                default='DONE,TODO,NA')
+        self.config.add_custom_option('sde_min_priority', 'Minimum SDE priority in scope',
+                default='7')
+        self.config.add_custom_option('how_tos_in_scope', 'Whether or not HowTos should be included',
+                default='False')
+        self.config.add_custom_option('alm_project', 'Project in ALM Tool',
+                default=None)
+        self.config.add_custom_option('conflict_policy', 'Conflict policy to use',
+                default='alm')
 
     def initialize(self):
         #Verify that the configuration options are set properly
