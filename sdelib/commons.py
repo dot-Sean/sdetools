@@ -1,5 +1,7 @@
 __all__ = ['json', 'Error', 'show_error', 'get_password']
 
+import sys
+
 import getpass
 
 try:
@@ -34,10 +36,9 @@ class UsageError(Error):
     pass
 
 def show_error(err_msg, usage_hint=False):
-    print "FATAL ERROR: %s" % (err_msg)
+    sys.stderr.write("FATAL ERROR: %s\n" % (err_msg))
     if usage_hint:
-        print "Try specifying 'help' as arguments to see the usage"
-    print
+        sys.stderr.write("  Try specifying 'help' as arguments to see the usage\n")
 
 def get_password():
     try:
