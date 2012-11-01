@@ -9,11 +9,11 @@ class Command(BaseCommand):
 
     def configure(self):
         mbase = MingleAPIBase(self.config)
-        self.mingle = JIRAConnector(self.config, mbase)
+        self.mingle = MingleConnector(self.config, mbase)
 
     def handle(self):
         try:
-            self.jira.initialize()
+            self.mingle.initialize()
             self.mingle.synchronize()
         except (AlmException, PluginError), err:
             print 'The following error was encountered: %s' % err
