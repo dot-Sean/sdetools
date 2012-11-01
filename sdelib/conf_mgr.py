@@ -63,17 +63,19 @@ class Config(object):
             raise KeyError, 'Unknown configuration item: %s' % (key)
         self.settings[key] = val
 
-    def add_custom_option(self, var_name, help_title, short_form=None, default='', meta_var=None):
+    def add_custom_option(self, var_name, help_title, short_form=None, 
+            default='', meta_var=None, group_name=None):
         """
         Use this to extend the options for your own use cases. The item is added to arguments.
         The same var_name is parsed from config file if present.
 
         Args:
-            <var_name>: Name of the config variable. (use lower case, numbers and underscore only)
-            <help_title>: A one or two sentence description of the config item.
-            <short_form>: a single character where -<short_form> becomes the option (e.g. 'w' for -w).
-            [<default>]: Optional. Emtpy string by default.
-            [<meta_var>]: Optional. Defaults to capital format.
+            var_name: Name of the config variable. (use lower case, numbers and underscore)
+            help_title: A one or two sentence description of the config item
+            [short_form]: a single character where (e.g. 'w' for -w)
+            [default]: Optional. Emtpy string by default
+            [meta_var]: Optional. Defaults to capital format
+            [group_name]: Name of the group (use same name for grouping)
 
         Note: the long form becomes --<var_name>
         Note: short form is case sensitive
@@ -85,6 +87,11 @@ class Config(object):
             log_mgr.warning('Attempting to re-customize an existing '
                 'config %s (IGNORE)' % var_name)
             return
+
+        if type(default) is str:
+            help_title += ' [optional]'
+            if default:
+                help_title += ' default: %s' % (default)
 
         config_item = {
             'var_name': var_name,
@@ -98,9 +105,15 @@ class Config(object):
 
         if config_item['meta_var'] is None:
             config_item['meta_var'] = var_name.upper()
-
-        self.custom_options.append(config_item)
         self.settings[var_name] = config_item['default']
+
+        if not group_name:
+            group_name = "Module-specific option"
+        for name, opts in self.custom_options:
+            if group_name == name:
+                opts.append(config_item)
+                return
+        self.custom_options.append((group_name, [config_item]))
 
     def parse_config_file(self, file_name):
         if not file_name:
@@ -165,14 +178,17 @@ class Config(object):
         parser.add_option('--debugmods', metavar='MOD_NAME1,[MOD_NAME2,[...]]', dest='debug_mods', 
             default='', type='string',
             help = "Comma-seperated List of modules to debug, e.g. sdelib.apiclient)")
-        for item in self.custom_options:
-            opt_forms = [item['long_form']]
-            if 'short_form' in item:
-                opt_forms.append(item['short_form'])
-            parser.add_option(
-                *opt_forms, dest=item['var_name'], metavar=item['meta_var'], 
-                default=item['default'], type='string', help=item['help_title'])
-        self.parser = parser
+
+        for group_name, opts in self.custom_options:
+            group = optparse.OptionGroup(parser, group_name)
+            for item in opts:
+                opt_forms = [item['long_form']]
+                if 'short_form' in item:
+                    opt_forms.append(item['short_form'])
+                group.add_option(
+                    *opt_forms, dest=item['var_name'], metavar=item['meta_var'], 
+                    default=item['default'], type='string', help=item['help_title'])
+            parser.add_option_group(group)
 
     def parse_args(self, cmd_inst):
         if self.parser is None:
@@ -219,15 +235,16 @@ class Config(object):
             
         self['interactive'] = opts.interactive
 
-        for item in self.custom_options:
-            name = item['var_name']
-            val = getattr(opts, name)
-            if val:
-                self[name] = val
+        for group_name, opts in self.custom_options:
+            for item in opts:
+                name = item['var_name']
+                val = getattr(opts, name)
+                if val:
+                    self[name] = val
 
-        # Check for missing mandatory options
-            if type(self[name]) is not str:
-                show_error("Missing value for option '%s'" % (name))
-                return False
+                # Check for missing mandatory options
+                if type(self[name]) is not str:
+                    show_error("Missing value for option '%s'" % (name))
+                    return False
 
         return True

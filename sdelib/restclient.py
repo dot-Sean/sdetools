@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 CONF_OPTS = [
     ('%(prefix)s_user', 'Username for %(name)s Tool', None),
     ('%(prefix)s_pass', 'Password for %(name)s Tool', None),
-    ('%(prefix)s_method', 'http vs https for %(name)s server (default is https)', 'https'),
     ('%(prefix)s_server', 'Server of the %(name)s', None),
+    ('%(prefix)s_method', 'http vs https for %(name)s server', 'https'),
 ]
 
 class APIError(Error):
@@ -91,7 +91,8 @@ class RESTBase(object):
             self.config.add_custom_option(
                 var_name % {'prefix': self.conf_prefix},
                 desc % {'name': self.conf_name},
-                default=default)
+                default=default,
+                group_name='%s Connector' % (self.conf_name))
 
     def post_conf_init(self):
         self.base_uri = '%s://%s/%s' % (self._get_conf('method'), 

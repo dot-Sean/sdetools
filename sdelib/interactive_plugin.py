@@ -11,8 +11,10 @@ class PlugInExperience:
         self.api = apiclient.APIBase(self.config)
         self.app = None
         self.prj = None
-        config.add_custom_option('sde_application', "SDE Application to use", default='')
-        config.add_custom_option('sde_project', "SDE Project to use", default='')
+        config.add_custom_option('sde_application', "SDE Application to use", 
+            default='', group_name="SD Elements Connector")
+        config.add_custom_option('sde_project', "SDE Project to use",
+            default='', group_name="SD Elements Connector")
         self.connected = False
 
     def connect(self):

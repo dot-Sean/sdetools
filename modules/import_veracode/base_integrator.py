@@ -39,7 +39,7 @@ class BaseIntegrator(object):
         self.config.add_custom_option("flaws_only",
                 "Only update tasks identified having flaws. (on | off)", "z", "on")
         self.config.add_custom_option("trial_run",
-                "Trial run only: 'true' or 'false' (default)", "t", "false")
+                "Trial run only: 'true' or 'false'", "t", "false")
 
     def load_mapping_from_xml(self):
         try:
