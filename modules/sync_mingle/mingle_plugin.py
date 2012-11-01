@@ -16,8 +16,11 @@ logger = log_mgr.mods.add_mod(__name__)
 
 class MingleAPIBase(RESTBase):
     def __init__(self, config):
-        super(APIBase, self).__init__('alm', 'Mingle', config, 
-                'api/v2/projects/%s' % config['alm_project'])
+        super(MingleAPIBase, self).__init__('alm', 'Mingle', config, None)
+
+    def post_conf_init(self):
+        self.base_path = 'api/v2/projects/%s' % self.config['alm_project']
+        super(MingleAPIBase, self).post_conf_init()
 
     def parse_response(self, result): 
         if result:
@@ -66,10 +69,14 @@ class MingleConnector(AlmConnector):
         """ Initializes connection to Mingle """
         super(MingleConnector, self).__init__(config, alm_plugin)
 
-        config.add_custom_option('alm_standard_workflow', 'Standard workflow in Mingle?')
-        config.add_custom_option('mingle_card_type', 'IDs for issues raised in Mingle')
-        config.add_custom_option('mingle_new_status', 'status to set for new tasks in Mingle')
-        config.add_custom_option('mingle_done_statuses', 'Done statuses in Mingle')
+        config.add_custom_option('alm_standard_workflow', 'Standard workflow in Mingle?',
+            default='True')
+        config.add_custom_option('mingle_card_type', 'IDs for issues raised in Mingle',
+            default='Story')
+        config.add_custom_option('mingle_new_status', 'Status to set for new tasks in Mingle',
+            default='Ready for Analysis')
+        config.add_custom_option('mingle_done_statuses', 'Statuses that signify a task is Done in Mingle',
+            default='Ready for Testing,In Testing,Ready for Signoff,Accepted')
 
     def initialize(self):
         super(MingleConnector, self).initialize()
