@@ -5,12 +5,19 @@ import getpass
 try:
     import json
 except ImportError:
-    import json_compat as json
+    from extlib import json_compat as json
 
 try:
     import abc
 except ImportError:
-    import abc_compat as abc
+    from extlib import abc_compat as abc
+
+try:
+    import argparse
+except ImportError:
+    from extlib import argparse_compat as argparse
+
+base_path = None
 
 class Error(Exception):
     """
@@ -29,7 +36,7 @@ class UsageError(Error):
 def show_error(err_msg, usage_hint=False):
     print "FATAL ERROR: %s" % (err_msg)
     if usage_hint:
-        print "Try -h to see the usage"
+        print "Try specifying 'help' as arguments to see the usage"
     print
 
 def get_password():

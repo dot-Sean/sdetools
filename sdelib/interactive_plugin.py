@@ -9,6 +9,12 @@ class PlugInExperience:
     def __init__(self, config):
         self.config = config
         self.api = apiclient.APIBase(self.config)
+        self.app = None
+        self.prj = None
+        config.add_custom_option('sde_application', "SDE Application to use", 
+            default='', group_name="SD Elements Connector")
+        config.add_custom_option('sde_project', "SDE Project to use",
+            default='', group_name="SD Elements Connector")
         self.connected = False
 
     def connect(self):
@@ -22,14 +28,14 @@ class PlugInExperience:
         return result
 
     def get_and_validate_password(self):
-        askpasswd = (self.config['password'] is None)
+        askpasswd = (self.config['sde_pass'] is None)
         while not self.connected:
             if askpasswd:
                 print "Enter the password for account: %s" % (self.config['email'])
-                self.config['password'] = get_password()
+                self.config['sde_pass'] = get_password()
             try:
                 self.connect()
-            except apiclient.APIAuthError:
+            except self.api.APIAuthError:
                 if askpasswd:
                     print "Incorrect Email/Passwrd\n"
                     continue
@@ -37,14 +43,17 @@ class PlugInExperience:
             break
 
     def select_application(self):
+        if not self.connected:
+             self.get_and_validate_password()
+
         filters = {}
-        if self.config['application']:
-            filters['name'] = self.config['application']
+        if self.config['sde_application']:
+            filters['name'] = self.config['sde_application']
         app_list = self.api.get_applications(**filters)
 
-        if (self.config['application']):
+        if (self.config['sde_application']):
             if (not app_list):
-                raise PluginError('Specified Application not found -> %s' % (self.config['application']))
+                raise PluginError('Specified Application not found -> %s' % (self.config['sde_application']))
             elif (len(app_list) == 1):
                 return app_list[0]
 
@@ -97,13 +106,13 @@ class PlugInExperience:
             sel_app = self.select_application()
 
             filters = {}
-            if self.config['project']:
-                filters['name'] = self.config['project']
+            if self.config['sde_project']:
+                filters['name'] = self.config['sde_project']
             prj_list = self.api.get_projects(sel_app['id'], **filters)
 
-            if (self.config['project']):
+            if (self.config['sde_project']):
                 if (not prj_list):
-                    raise PluginError('Specified Project not found -> %s' % (self.config['project']))
+                    raise PluginError('Specified Project not found -> %s' % (self.config['sde_project']))
                 elif (len(prj_list) == 1):
                     return (sel_app, prj_list[0])
 
@@ -115,10 +124,8 @@ class PlugInExperience:
                 return (sel_app, sel_prj)
 
     def get_task_list(self):
-        if not self.connected:
-            self.get_and_validate_password()
-
-        self.app, self.prj = self.select_project()
+        if not self.prj:
+            self.app, self.prj = self.select_project()
         
         return self.api.get_tasks(self.prj['id'])
 
@@ -130,17 +137,13 @@ class PlugInExperience:
         return content
 
     def add_note(self, task_id, text, filename, status):
-        if not self.connected:
-             self.get_and_validate_password()
- 
-        self.app, self.prj = self.select_project()
+        if not self.prj:
+            self.app, self.prj = self.select_project()
 
         return self.api.add_note("%d-%s" % (self.prj['id'], task_id), text, filename, status)
 
     def get_notes(self, task_id):
-        if not self.connected:
-             self.get_and_validate_password()
-
-        self.app, self.prj = self.select_project()
+        if not self.prj:
+            self.app, self.prj = self.select_project()
  
         return self.api.get_notes("%d-%s" % (self.prj['id'], task_id))       

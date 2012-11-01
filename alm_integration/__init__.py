@@ -1,2 +1,1 @@
-__all__ = [
-    'alm_plugin_base']
+__all__ = ['alm_plugin_base']

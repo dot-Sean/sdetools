@@ -1,10 +1,9 @@
-import sys, os
-sys.path.append(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
-
 from abc import ABCMeta, abstractmethod
 from datetime import datetime
 
-from sdelib.apiclient import APIError
+from sdelib.restclient import APIError
+from sdelib.interactive_plugin import PlugInExperience
+
 from sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
@@ -59,55 +58,70 @@ class AlmConnector(object):
     #This is an abstract base class
     __metaclass__ = ABCMeta
 
-    #ALM Configuration
-    configuration = None
-
-    def __init__(self, sde_plugin, alm_plugin):
+    def __init__(self, config, alm_plugin):
         """  Initialization of the Connector
 
         Keyword arguments:
         sde_plugin -- An SD Elements Plugin configuration object
         alm_plugin -- A plugin to connect to the ALM tool
         """
-        self.sde_plugin = sde_plugin
+        self.config = config
+        self.sde_plugin = PlugInExperience(self.config)
         self.alm_plugin = alm_plugin
+        self._add_alm_config_options()
 
+    def _add_alm_config_options(self):
+        """ Adds ALM config options to the config file"""
+        self.config.add_custom_option('alm_phases', 'Phases of the ALM',
+                default='requirements,architecture-design,development')
+        self.config.add_custom_option('sde_statuses_in_scope', 'SDE statuses that are in scope', 
+                default='DONE,TODO,NA')
+        self.config.add_custom_option('sde_min_priority', 'Minimum SDE priority in scope',
+                default='7')
+        self.config.add_custom_option('how_tos_in_scope', 'Whether or not HowTos should be included',
+                default='False')
+        self.config.add_custom_option('alm_project', 'Project in ALM Tool',
+                default=None)
+        self.config.add_custom_option('conflict_policy', 'Conflict policy to use',
+                default='alm')
+
+    def initialize(self):
         #Verify that the configuration options are set properly
-        if not self.sde_plugin.config['alm_phases']:
+        if not self.config['alm_phases']:
             raise AlmException('Missing alm_phases in configuration')
 
-        self.sde_plugin.config['alm_phases'] = self.sde_plugin.config['alm_phases'].split(',')
+        self.config['alm_phases'] = self.config['alm_phases'].split(',')
 
-        if not self.sde_plugin.config['sde_statuses_in_scope']:
+        if not self.config['sde_statuses_in_scope']:
             raise AlmException('Missing the SD Elements statuses in scope')
 
-        self.sde_plugin.config['sde_statuses_in_scope'] = self.sde_plugin.config['sde_statuses_in_scope'].split(',')
-        for status in self.sde_plugin.config['sde_statuses_in_scope']:
+        self.config['sde_statuses_in_scope'] = self.config['sde_statuses_in_scope'].split(',')
+        for status in self.config['sde_statuses_in_scope']:
             if status not in('TODO', 'DONE', 'NA'):
                 raise AlmException('Invalid status specified in '
                                    'sde_statuses_in_scope')
 
-        if (not self.sde_plugin.config['conflict_policy'] or
-            not (self.sde_plugin.config['conflict_policy'] == 'alm' or
-                 self.sde_plugin.config['conflict_policy'] == 'sde' or
-                 self.sde_plugin.config['conflict_policy'] == 'timestamp')):
+        if (not self.config['conflict_policy'] or
+            not (self.config['conflict_policy'] == 'alm' or
+                 self.config['conflict_policy'] == 'sde' or
+                 self.config['conflict_policy'] == 'timestamp')):
             raise AlmException('Missing or incorrect conflict_policy '
                                'in configuration. Valid values are '
                                'alm, sde, or timestamp.')
 
-        if (self.sde_plugin.config['sde_min_priority']):
+        if (self.config['sde_min_priority']):
             bad_priority_msg =  'Incorrect sde_min_priority specified in configuration. Valid values are > 0 '
             bad_priority_msg += ' and <= 10'
 
             try:
-                self.sde_plugin.config['sde_min_priority'] = int(self.sde_plugin.config['sde_min_priority'])
+                self.config['sde_min_priority'] = int(self.config['sde_min_priority'])
             except:
                 raise AlmException(bad_priority_msg)
 
-            if (self.sde_plugin.config['sde_min_priority'] < 1 or self.sde_plugin.config['sde_min_priority'] >10):
+            if (self.config['sde_min_priority'] < 1 or self.config['sde_min_priority'] >10):
                 raise AlmException(bad_priority_msg)
         else:
-            self.sde_plugin.config['sde_min_priority'] = 1
+            self.config['sde_min_priority'] = 1
 
         logger.info('*** AlmConnector initialized ***')
 
@@ -182,7 +196,7 @@ class AlmConnector(object):
         try:
             self.sde_plugin.connect()
         except APIError:
-            raise AlmException('Unable to connect to SD Elements.' +
+            raise AlmException('Unable to connect to SD Elements. ' +
                            'Please review URL, id, and password in ' +
                            'configuration file.')
 
@@ -243,9 +257,9 @@ class AlmConnector(object):
 
         For example, has one of the appropriate phases
         """
-        return (task['phase'] in self.sde_plugin.config['alm_phases']  and
-                task['status'] in self.sde_plugin.config['sde_statuses_in_scope'] and
-                task['priority'] >= self.sde_plugin.config['sde_min_priority'])
+        return (task['phase'] in self.config['alm_phases']  and
+                task['status'] in self.config['sde_statuses_in_scope'] and
+                task['priority'] >= self.config['sde_min_priority'])
 
     def sde_update_task_status(self, task, status):
         """ Updates the status of the given task in SD Elements
@@ -291,7 +305,7 @@ class AlmConnector(object):
                  ALM
         """
         contents = '%s\n\nImported from SD Elements: %s' % (task['content'], task['url'])
-        if self.sde_plugin.config['how_tos_in_scope'] == 'True':
+        if self.config['how_tos_in_scope'] == 'True':
             if task['implementations']:
                 contents = contents + '\n\nHow Tos:\n\n'
                 for implementation in task['implementations']:
@@ -341,9 +355,9 @@ class AlmConnector(object):
                         # What takes precedence in case of a conflict of
                         # status. Start with ALM
                         precedence = 'alm'
-                        if self.sde_plugin.config['conflict_policy'] == 'sde':
+                        if self.config['conflict_policy'] == 'sde':
                             precedence = 'sde'
-                        elif self.sde_plugin.config['conflict_policy'] == 'timestamp':
+                        elif self.config['conflict_policy'] == 'timestamp':
                             sde_time = datetime.fromtimestamp(task['timestamp'])
                             alm_time = alm_task.get_timestamp()
                             logger.debug('comparing timestamps for task %s - SDE: %s, ALM: %s' %
@@ -369,37 +383,4 @@ class AlmConnector(object):
         except AlmException, err:
             self.alm_disconnect()
             raise err
-
-def add_alm_config_options(config):
-    """ Adds ALM config options to the config file"""
-    config.add_custom_option('alm_phases',
-                             'Phases of the ALM',
-                             '-alm_phases')
-    config.add_custom_option('sde_statuses_in_scope',
-                             'SDE statuses that are in scope',
-                             '-sde_statuses_in_scope')
-    config.add_custom_option('sde_min_priority',
-                             'Minimum SDE priority in scope',
-                             '-sde_min_priority')
-    config.add_custom_option('how_tos_in_scope',
-                             'Whether or not HowTos should be included',
-                             '-how_tos_in_scope')
-    config.add_custom_option('alm_method',
-                             'HTTP or HTTPS for ALM server',
-                             '-alm_method')
-    config.add_custom_option('alm_server',
-                             'Server of the ALM',
-                             '-alm_server')
-    config.add_custom_option('alm_id',
-                             'Username for ALM Tool',
-                             '-alm_id')
-    config.add_custom_option('alm_password',
-                             'Password for ALM Tool',
-                             '-alm_password')
-    config.add_custom_option('alm_project',
-                             'Project in ALM Tool',
-                             '-alm_project')
-    config.add_custom_option('conflict_policy',
-                             'Conflict policy to use',
-                             '-conflict_policy')
 
