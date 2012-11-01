@@ -187,8 +187,11 @@ class Config(object):
                 if 'short_form' in item:
                     opt_forms.append(item['short_form'])
                 group.add_option(
-                    *opt_forms, dest=item['var_name'], metavar=item['meta_var'], 
-                    default=item['default'], type='string', help=item['help_title'])
+                    *opt_forms, 
+                    dest=item['var_name'], 
+                    metavar=item['meta_var'], 
+                    type='string', 
+                    help=item['help_title'])
             parser.add_option_group(group)
 
     def parse_args(self, cmd_inst):
