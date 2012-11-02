@@ -3,6 +3,9 @@
 
 from datetime import datetime
 
+import xml.parsers.expat
+import socket
+
 from extlib import SOAPpy 
 from sdelib.restclient import RESTBase, APIError
 from alm_integration.alm_plugin_base import AlmTask, AlmConnector
@@ -122,18 +125,41 @@ class JIRAConnector(AlmConnector):
         return "JIRA"
 
     def alm_connect(self):
-        self.jira = SOAPpy.WSDL.Proxy('http://localhost:8081/rpc/soap/jirasoapservice-v2?wsdl')
-        self.auth = self.jira.login(self.sde_plugin.config['alm_user'], self.sde_plugin.config['alm_pass'])
 
-        """ Verifies that JIRA connection works """
-        #verify that we can connect to JIRA
+        # Get a proxy to the server
+        try:
+            self.jira = SOAPpy.WSDL.Proxy('%s://%s/rpc/soap/jirasoapservice-v2?wsdl' %
+                                      (self.sde_plugin.config['alm_method'], self.sde_plugin.config['alm_server']))
+        except (SOAPpy.Types.faultType, xml.parsers.expat.ExpatError, socket.error) as err:
+            logger.error(err)
+            raise AlmException('Unable to connect to JIRA. Please check server URL')
+        except (xml.parsers.expat.ExpatError, socket.error) as err:
+            logger.error(err)            
+            raise AlmException('Unable to connect to JIRA. Please' +
+                               ' check network connectivity' )
+
+        # Attempt to login
+        try:
+            self.auth = self.jira.login(self.sde_plugin.config['alm_user'], self.sde_plugin.config['alm_pass'])
+        except (SOAPpy.Types.faultType) as err:
+            logger.warn(err)            
+            raise AlmException('Unable to login to JIRA. Please check ID, password')
+        except (xml.parsers.expat.ExpatError, socket.error) as err:
+            logger.error(err)            
+            raise AlmException('Unable to login to JIRA. Please check network connectivity')
+
+        # Test for project existence
         try:
             result = self.jira.getProjectByKey(self.auth, self.sde_plugin.config['alm_project'])
-        except APIError:
-            raise
-            raise AlmException('Unable to connect to JIRA. Please' +
-                               ' check server URL, ID, password')
-
+        except (SOAPpy.Types.faultType) as err:
+            logger.error(err)
+            raise AlmException('Unable to connect to project %s. Please' +
+                               ' check project settings' % (self.sde_plugin.config['alm_project']))
+        except (xml.parsers.expat.ExpatError, socket.error) as err:
+            logger.error(err)            
+            raise AlmException('Unable to connect to project %s. Please' +
+                               ' check network connectivity' % (self.sde_plugin.config['alm_project']))
+        
         #get Issue ID for given type name
         try:
             issue_types = self.jira.getIssueTypes(self.auth)
@@ -145,9 +171,13 @@ class JIRAConnector(AlmConnector):
             if not self.jira_issue_type_id:
                 raise AlmException('Issue type %s not available' %
                                    self.sde_plugin.config['jira_issue_type'])
-        except APIError:
-            raise AlmException('Unable to get issuetype from JIRA API')
-
+        except (SOAPpy.Types.faultType) as err:
+            logger.error(err)
+            raise AlmException('Unable to get issuetype from JIRA')
+        except (xml.parsers.expat.ExpatError, socket.error) as err:
+            logger.error(err)            
+            raise AlmException('Unable to get issuetype from JIRA. Please check network connectivity')
+        
         self.statuses = self.jira.getStatuses(self.auth)
         self.priorities = self.jira.getPriorities(self.auth)
         
@@ -158,38 +188,41 @@ class JIRAConnector(AlmConnector):
             jql = "project='%s' AND summary~'%s'" % (
                     self.sde_plugin.config['alm_project'], task_id)
             issues = self.jira.getIssuesFromJqlSearch( self.auth, jql, SOAPpy.Types.intType(1) )
-            #result = self.alm_plugin.call_api(url)
-        except APIError, err:
-            logger.info(err)
+        except (SOAPpy.Types.faultType) as err:
+            logger.error(err)
             raise AlmException("Unable to get task %s from JIRA" % task_id)
+        except (xml.parsers.expat.ExpatError, socket.error) as err:
+            logger.error(err)
+            raise AlmException("Unable to get task %s from JIRA. Please check network connectivity" % task_id)
+            
         if not issues or len(issues) <= 0:
             #No result was found from query
             return None
         #We will use the first result from the query
         jtask = issues[0]
 
-        resolution = None
-        status = None
-        priority = None
+        task_resolution = None
+        task_status = None
+        task_priority = None
 
         if jtask['resolution']:
-            resolution = jtask['resolution']
+            task_resolution = jtask['resolution']
         if jtask['status']:
-            for a_status in self.statuses:
-                if a_status['id'] == jtask['status']:
-                    status = a_status['name']
+            for status in self.statuses:
+                if status['id'] == jtask['status']:
+                    task_status = status['name']
                     break
         if jtask['priority']:
-            for a_priority in self.priorities:
-                if a_priority['id'] == jtask['priority']:
-                    priority = a_priority['name']
+            for priority in self.priorities:
+                if priority['id'] == jtask['priority']:
+                    task_priority = priority['name']
                     break
 
         return JIRATask(task['id'],
                         jtask['key'],
-                        priority,
-                        status,
-                        resolution,
+                        task_priority,
+                        task_status,
+                        task_resolution,
                         jtask['updated'],
                         self.sde_plugin.config['jira_done_statuses'])
 
@@ -215,7 +248,8 @@ class JIRAConnector(AlmConnector):
 
         try:
             new_issue = self.jira.createIssue(self.auth,args)
-        except APIError:
+        except (SOAPpy.Types.faultType, xml.parsers.expat.ExpatError, socket.error) as err:
+            logger.error(err)
             return None
 
         if (self.sde_plugin.config['alm_standard_workflow'] == 'True' and
@@ -229,7 +263,6 @@ class JIRAConnector(AlmConnector):
         if (not task or
             not self.sde_plugin.config['alm_standard_workflow'] == 'True'):
             return
-        print "try to update for %s" % task.get_alm_id()
         trans_result = None
         transitions = self.jira.getAvailableActions(self.auth, task.get_alm_id())
         # TODO: these two block are nearly identical: refactor
@@ -256,12 +289,13 @@ class JIRAConnector(AlmConnector):
                                 self.sde_plugin.config['jira_reopen_transition'])
 
                 trans_result = self.jira.progressWorkflowAction(self.auth,task.get_alm_id(),self.reopen_transition_id)                
-        except self.alm_plugin.APIFormatError:
-            # The response does not have JSON, so it is incorrectly raised as
-            # a JSON formatting error. Ignore this error
-            pass
-        except APIError, err:
+        except (SOAPpy.Types.faultType) as err:
+            logger.error(err)
             raise AlmException("Unable to set task status: %s" % err)
+        except (xml.parsers.expat.ExpatError, socket.error) as err:
+            logger.error(err)
+            raise AlmException("Unable to set task status: %s. Check network connectivity" % err)
+        
 
     def alm_disconnect(self):
         pass
