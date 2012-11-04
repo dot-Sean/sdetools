@@ -39,14 +39,19 @@ from version import __version__
 import socket
 from types import *
 
-from NS import NS 
+from NS import NS
 
 ################################################################################
 # Configuration class
 ################################################################################
 
+
 class SOAPConfig:
     __readonly = ('SSLserver', 'SSLclient', 'GSIserver', 'GSIclient')
+    class SSLconfig:
+        __slots__ = ('key_file', 'cert_file')
+        key_file = None
+        cert_file = None
 
     def __init__(self, config = None, **kw):
         d = self.__dict__
@@ -62,7 +67,7 @@ class SOAPConfig:
                 if k[0] != '_':
                     d[k] = v
         else:
-            # Setting debug also sets returnFaultInfo, 
+            # Setting debug also sets returnFaultInfo,
             # dumpHeadersIn, dumpHeadersOut, dumpSOAPIn, and dumpSOAPOut
             self.debug = 0
             self.dumpFaultInfo = 1
@@ -118,7 +123,7 @@ class SOAPConfig:
             except:
                 d['GSIserver'] = 0
                 d['GSIclient'] = 0
-                
+
 
             # Server SSL support if M2Crypto.SSL available
             try:
@@ -133,6 +138,10 @@ class SOAPConfig:
                 d['SSLclient'] = 1
             except:
                 d['SSLclient'] = 0
+
+            # Cert support
+            if d['SSLclient'] or d['SSLserver']:
+                d['SSL'] = self.SSLconfig()
 
         for k, v in kw.items():
             if k[0] != '_':
@@ -194,7 +203,7 @@ class SOAPConfig:
                 d['dumpHeadersOut']     = \
                 d['dumpSOAPIn']         = \
                 d['dumpSOAPOut']        = value
-            
+
         else:
             d[name] = value
 
