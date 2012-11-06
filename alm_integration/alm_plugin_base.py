@@ -355,6 +355,8 @@ class AlmConnector(object):
                         # What takes precedence in case of a conflict of
                         # status. Start with ALM
                         precedence = 'alm'
+                        updated_system = 'sde'
+
                         if self.config['conflict_policy'] == 'sde':
                             precedence = 'sde'
                         elif self.config['conflict_policy'] == 'timestamp':
@@ -364,11 +366,13 @@ class AlmConnector(object):
                                           (task['id'], str(sde_time), str(alm_time)))
                             if (sde_time > alm_time):
                                 precedence = 'sde'
+                        
                         if (precedence == 'alm'):
                             self.sde_update_task_status(task, alm_task.get_status())
                         else:
                             self.alm_update_task_status(alm_task, task['status'])
-                        logger.debug('Updated status of task %s in %s' % (task['id'], precedence))
+                            updated_system = 'alm'
+                        logger.debug('Updated status of task %s in %s' % (task['id'], updated_system))
                 else:
                     #Only exists in SD Elements, add it to ALM
                     ref = self.alm_add_task(task)
