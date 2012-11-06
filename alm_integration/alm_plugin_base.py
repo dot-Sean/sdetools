@@ -357,19 +357,24 @@ class AlmConnector(object):
                     sys.exit(0)
 
             #Attempt to connect to SDE & ALM
+            progress = 0
+
             self.sde_connect()
-            self.output_progress(2)
+            progress += 2
+            self.output_progress(progress)
+
             self.alm_connect()
-            self.output_progress(4)
+            progress += 2
+            self.output_progress(progress)
 
             #Attempt to get all tasks
             tasks = self.sde_get_tasks()
             logger.info('Retrieved all tasks from SDE')
+            total_work = (progress+len(tasks))
 
-            task_count = 0
             for task in tasks:
-                task_count += 1
-                self.output_progress((task_count+4)*100/(4+len(tasks)))
+                progress += 1
+                self.output_progress(100*progress/total_work)
 
                 if not self.in_scope(task):
                     continue
