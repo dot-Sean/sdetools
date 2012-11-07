@@ -1,8 +1,6 @@
 from sdelib.cmd import BaseCommand
 from sdelib.apiclient import APIBase
 
-CSV_FILENAME = "output.csv"
-
 class Command(BaseCommand):
     name = 'list_projects'
     help = 'Creates a list of applications and projects that contain a certain word in their name'\
