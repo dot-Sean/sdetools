@@ -11,11 +11,37 @@ from sdelib.conf_mgr import Config
 from sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
-class JIRAAPIBase(RESTBase):
+class JIRARestAPI(RESTBase):
     """ Base plugin for JIRA """
 
     def __init__(self, config):
-        super(JIRAAPIBase, self).__init__('alm', 'JIRA', config, 'rest/api/2')
+        super(JIRARestAPI, self).__init__('alm', 'JIRA', config, 'rest/api/2')
+
+    def connect(self):
+        """ Verifies that JIRA connection works """
+        #verify that we can connect to JIRA
+        try:
+            result = self.call_api('project')
+        except APIError:
+            raise AlmException('Unable to connect to JIRA. Check server URL, ID, password')
+
+        #verify that we can access project
+        try:
+            self.call_api('project/%s' % (self.config['alm_project']))
+        except APIError:
+            raise AlmException('Unable to connect to JIRA project %s' % self.config['alm_project'])
+
+    def get_issue_type(self):
+        #get Issue ID for given type name
+        try:
+            issue_types = self.call_api('issuetype')
+            for issue_type in issue_types:
+                if (issue_type['name'] == self.config['jira_issue_type']):
+                    return issue_type['id']
+        except APIError:
+            raise AlmException('Unable to get issuetype from JIRA API')
+
+        raise AlmException('Issue type %s not available' % self.config['jira_issue_type'])
 
 class JIRATask(AlmTask):
     """ Representation of a task in JIRA """
@@ -110,43 +136,14 @@ class JIRAConnector(AlmConnector):
 
         self.close_transition_id = None
         self.reopen_transition_id = None
-        self.jira_issue_type_id = None
 
     def alm_name(self):
         return "JIRA"
 
     def alm_connect(self):
-        """ Verifies that JIRA connection works """
-        #verify that we can connect to JIRA
-        try:
-            result = self.alm_plugin.call_api('project')
-        except APIError:
-            raise
-            raise AlmException('Unable to connect to JIRA. Please' +
-                               ' check server URL, ID, password')
+        self.alm_plugin.connect()
 
-        #verify that we can access project
-        try:
-            self.alm_plugin.call_api('project/%s' %
-                                     (self.sde_plugin.config
-                                     ['alm_project']))
-        except APIError:
-            raise AlmException('Unable to connect to JIRA project %s' %
-                               (self.sde_plugin.config['alm_project']))
-
-        #get Issue ID for given type name
-        try:
-            issue_types = self.alm_plugin.call_api('issuetype')
-            for issue_type in issue_types:
-                if (issue_type['name'] ==
-                        self.sde_plugin.config['jira_issue_type']):
-                    self.jira_issue_type_id = issue_type['id']
-                    break
-            if not self.jira_issue_type_id:
-                raise AlmException('Issue type %s not available' %
-                                   self.sde_plugin.config['jira_issue_type'])
-        except APIError:
-            raise AlmException('Unable to get issuetype from JIRA API')
+        self.jira_issue_type_id = self.alm_plugin.get_issue_type()
 
     def alm_get_task (self, task):
         task_id = task['title'].partition(':')[0]
