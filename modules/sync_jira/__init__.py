@@ -3,7 +3,8 @@
 # Plugin for two way integration with JIRA
 
 from sdelib.cmd import BaseCommand
-from modules.sync_jira.jira_plugin import JIRAConnector, JIRARestAPI
+from modules.sync_jira.jira_plugin import JIRAConnector
+from modules.sync_jira.jira_rest import JIRARestAPI
 from modules.sync_jira.jira_soap import JIRASoapAPI
 from alm_integration.alm_plugin_base import AlmException
 from sdelib.interactive_plugin import PluginError
@@ -23,9 +24,9 @@ class Command(BaseCommand):
         api_ver = self.config['jira_version'][:1]
         if api_ver not in ['4', '5']:
             raise AlmException('Only JIRA versions 4.4 and 5 are supported')
-        self.config['api_ver'] = int(api_ver)
+        self.config.jira_api_ver = int(api_ver)
 
-        if api_ver == 4:
+        if self.config.jira_api_ver == 4:
             self.jira.alm_plugin = JIRASoapAPI(self.config)
             
         self.jira.initialize()

@@ -54,6 +54,8 @@ class AlmConnector(object):
     Abstract base class for connectors to Application Lifecycle
     Management tools such as JIRA, Team Foundation Server, Rally, etc.
     """
+    # This needs to be overwritten
+    alm_name = 'ALM Module'
 
     #This is an abstract base class
     __metaclass__ = ABCMeta
@@ -124,11 +126,6 @@ class AlmConnector(object):
             self.config['sde_min_priority'] = 1
 
         logger.info('*** AlmConnector initialized ***')
-
-    @abstractmethod
-    def alm_name(self):
-        """ Returns a string representation of the ALM, e.g. 'JIRA' """
-        pass
 
     @abstractmethod
     def alm_connect(self):
@@ -287,7 +284,7 @@ class AlmConnector(object):
                                'to the server, or the status was invalid')
         logger.info('Status for task %s successfully set in SD Elements' % task['id'])
 
-        note_msg = 'Task status changed via %s' % self.alm_name()
+        note_msg = 'Task status changed via %s' % self.alm_name
         try:
             self._add_note(task['id'], note_msg, '', status)
         except APIError, err:
@@ -376,7 +373,7 @@ class AlmConnector(object):
                 else:
                     #Only exists in SD Elements, add it to ALM
                     ref = self.alm_add_task(task)
-                    note_msg = 'Task synchronized in %s' % self.alm_name()
+                    note_msg = 'Task synchronized in %s' % self.alm_name
                     if ref:
                         note_msg += '. Reference: %s' % (ref)
                     self._add_note(task['id'], note_msg, '', task['status'])

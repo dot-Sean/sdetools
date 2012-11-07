@@ -1,9 +1,13 @@
 import xml.parsers.expat
 import socket
 
-from extlib import SOAPpy 
+from extlib import SOAPpy
 
 from alm_integration.alm_plugin_base import AlmException
+from modules.sync_jira.jira_shared import JIRATask
+
+import logging
+logger = logging.getLogger(__name__)
 
 class SOAPProxyWrap:
     """
@@ -15,10 +19,10 @@ class SOAPProxyWrap:
             self.__fname = fname
 
         def __call__(self, *args):
+            logger.debug('Calling JIRA SOAP method %s with %s' % (self.__fname, args))
             try:
                 return self.__fobj(*args)
             except (xml.parsers.expat.ExpatError, socket.error), err:
-                logger.error(err)            
                 raise AlmException('Unable to access JIRA (for %s). '
                         ' Please check network connectivity.' % (self.fname))
 
@@ -27,7 +31,7 @@ class SOAPProxyWrap:
 
     def __getattr__(self, name):
         f = getattr(self.proxy, name)
-        return __FCall(f, proxy, name)
+        return self.__FCall(f, name)
 
 class JIRASoapAPI:
     def __init__(self, config):
@@ -39,59 +43,53 @@ class JIRASoapAPI:
         self.auth = None
         
     def connect(self):
+        config = SOAPpy.Config
+        if __name__ in self.config['debug_mods']:
+            config.debug = 1
+
         # Get a proxy to the server
         try:
-            self.proxy = SOAPpy.WSDL.Proxy('%s://%s/rpc/soap/jirasoapservice-v2?wsdl' %
-                    (self.config['alm_method'], self.config['alm_server']))
+            proxy = SOAPpy.WSDL.Proxy('%s://%s/rpc/soap/jirasoapservice-v2?wsdl' %
+                    (self.config['alm_method'], self.config['alm_server']), config=config)
         except (SOAPpy.Types.faultType, xml.parsers.expat.ExpatError, socket.error) as err:
-            logger.error(err)
             raise AlmException('Unable to connect to JIRA. Please check server URL')
+        self.proxy = SOAPProxyWrap(proxy)
 
         # Attempt to login
         try:
             self.auth = self.proxy.login(self.config['alm_user'], self.config['alm_pass'])
         except (SOAPpy.Types.faultType) as err:
-            logger.warn(err)            
             raise AlmException('Unable to login to JIRA. Please check ID, password')
 
         # Test for project existence
         try:
             result = self.proxy.getProjectByKey(self.auth, self.config['alm_project'])
         except (SOAPpy.Types.faultType) as err:
-            logger.error(err)
             raise AlmException('Unable to connect to project %s. Please' +
                                ' check project settings' % (self.config['alm_project']))
-       
-        #get Issue ID for given type name
-        try:
-            issue_types = self.proxy.getIssueTypes(self.auth)
-            for issue_type in issue_types:
-                if (issue_type['name'] ==
-                        self.config['jira_issue_type']):
-                    self.jira_issue_type_id = issue_type['id']
-                    break
-            if not self.jira_issue_type_id:
-                raise AlmException('Issue type %s not available' % self.config['jira_issue_type'])
-        except (SOAPpy.Types.faultType) as err:
-            logger.error(err)
-            raise AlmException('Unable to get issuetype from JIRA')
         
+        # For JIRA 4 we need the ID-Name mapping for status and priority
         self.statuses = self.proxy.getStatuses(self.auth)
         self.priorities = self.proxy.getPriorities(self.auth)
-        
-    def alm_get_task (self, task):
-        task_id = task['title'].partition(':')[0]
-        result = None
+
+    def get_issue_types(self):
+        try:
+            return self.proxy.getIssueTypes(self.auth)
+        except (SOAPpy.Types.faultType) as err:
+            raise AlmException('Unable to get issuetype from JIRA')
+
+    def get_task(self, task, task_id):
         try:
             jql = "project='%s' AND summary~'%s'" % (self.config['alm_project'], task_id)
             issues = self.proxy.getIssuesFromJqlSearch(self.auth, jql, SOAPpy.Types.intType(1))
         except (SOAPpy.Types.faultType) as err:
-            logger.error(err)
             raise AlmException("Unable to get task %s from JIRA" % task_id)
-            
-        if not issues or len(issues) <= 0:
+
+        # We can't simplify this since issues is a complex object
+        if not issues or len(issues) == 0:
             #No result was found from query
             return None
+
         #We will use the first result from the query
         jtask = issues[0]
 
@@ -121,7 +119,7 @@ class JIRASoapAPI:
                         self.config['jira_done_statuses'])
 
     def alm_add_task(self, task):
-
+        #Add task
         selected_priority = None
         for priority in self.priorities:
             if priority['name'] == JIRATask.translate_priority(task['priority']):
@@ -129,29 +127,21 @@ class JIRASoapAPI:
                 break
         if not selected_priority:
             raise AlmException('Unable to find priority %s' %
-                                                JIRATask.translate_priority(task['priority']))        
-        #Add task
-        add_result = None
-        args= {
-               'project': self.config['alm_project'],
-               'summary':task['title'],
-               'description':task['content'],
-               'priority':selected_priority,
-               'type': self.jira_issue_type_id
-               }
+                    JIRATask.translate_priority(task['priority']))        
+
+        args = {
+            'project': self.config['alm_project'],
+            'summary': task['title'],
+            'description': task['content'],
+            'priority': selected_priority,
+            'type': self.jira_issue_type_id
+        }
 
         try:
-            new_issue = self.proxy.createIssue(self.auth,args)
+            return self.proxy.createIssue(self.auth, args)
         except (SOAPpy.Types.faultType, AlmException) as err:
-            logger.error(err)
+            logger.exception('Unable to add issue to JIRA')
             return None
-
-        if (self.config['alm_standard_workflow'] == 'True' and
-            (task['status'] == 'DONE' or task['status'] == 'NA')):
-            self.alm_update_task_status(self.alm_get_task(task), task['status'])
-
-        #Return a unique identifier to this task in JIRA
-        return 'Issue %s' % new_issue['key']
 
     def alm_update_task_status(self, task, status):
         if (not task or

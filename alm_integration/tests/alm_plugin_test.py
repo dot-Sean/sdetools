@@ -46,8 +46,7 @@ class TestAlmConnector(AlmConnector):
 
     'Connects' to a CSV file that has a list of tasks.
     """
-    def alm_name(self):
-        return "CSV File"
+    alm_name = 'CSV File'
 
     def alm_connect(self):
         self.fields = ['id', 'priority', 'status']
