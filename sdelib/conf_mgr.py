@@ -183,15 +183,15 @@ class Config(object):
         for group_name, optslist in self.custom_options:
             group = optparse.OptionGroup(parser, group_name)
             for item in optslist:
+                opt_args = {
+                    'dest': item['var_name'], 
+                    'metavar': item['meta_var'], 
+                    'type': 'string', 
+                    'help': item['help_title']}
                 opt_forms = [item['long_form']]
                 if 'short_form' in item:
                     opt_forms.append(item['short_form'])
-                group.add_option(
-                    *opt_forms, 
-                    dest=item['var_name'], 
-                    metavar=item['meta_var'], 
-                    type='string', 
-                    help=item['help_title'])
+                group.add_option(*opt_forms, **opt_args)
             parser.add_option_group(group)
 
     def parse_args(self, cmd_inst):

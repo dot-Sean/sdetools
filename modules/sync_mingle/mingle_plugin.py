@@ -56,7 +56,10 @@ class MingleTask(AlmTask):
 
     def get_status(self):
         """ Translates Mingle status into SDE status """
-        return 'DONE' if self.status in self.done_statuses else 'TODO'
+        if self.status in self.done_statuses:
+            return 'DONE'
+        else:
+            return 'TODO'
 
     def get_timestamp(self):
         """ Returns a datetime object """
@@ -145,7 +148,10 @@ class MingleConnector(AlmConnector):
                             'Status'):
                     status_node = prop.getElementsByTagName(
                             'value').item(0).firstChild
-                    status = status_node.nodeValue if status_node else 'TODO'
+                    if status_code:
+                        status = status_node.nodeValue
+                    else:
+                        status = 'TODO'
                     break
         return MingleTask(task_id, card_num, status, modified_date,
                           self.sde_plugin.config['mingle_done_statuses'])

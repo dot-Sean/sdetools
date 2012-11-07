@@ -48,7 +48,10 @@ class RallyTask(AlmTask):
 
     def get_status(self):
         """Translates Rally status into SDE status"""
-        return 'DONE' if self.status in self.done_statuses else 'TODO'
+        if self.status in self.done_statuses:
+            return 'DONE'
+        else:
+            return 'TODO'
 
     def get_timestamp(self):
         """ Returns a datetime object """
@@ -146,11 +149,11 @@ class RallyConnector(AlmConnector):
         result = None
 
         try:
-            query_args = {'query' : '(Name = \"%s\")' % task_id}
+            query_args = {'query': '(Name = \"%s\")' % task_id}
             result = self.alm_plugin.call_api('hierarchicalrequirement.js',
                                                args = query_args)
-        except APIError as err:
-            logger.info('Error is %s:' , err)
+        except APIError, err:
+            logger.info('Error is %s:', err)
             raise AlmException('Unable to get task %s from Rally' % task_id)
         num_results = result['QueryResult']['TotalResultCount']
 
@@ -168,7 +171,7 @@ class RallyConnector(AlmConnector):
                              task_data['ScheduleState'],
                              task_data['LastUpdateDate'],
                              self.sde_plugin.config['rally_done_statuses'])
-        except Exception as err:
+        except Exception, err:
             logger.info('Error is %s:', err)
             raise AlmException('Unable to get card # for task '
                                '%s from Rally' % task_id)
@@ -191,12 +194,11 @@ class RallyConnector(AlmConnector):
                 }
             }
             rsp = self.alm_plugin.call_api('hierarchicalrequirement/create.js',
-                                            method = self.alm_plugin.URLRequest.POST,
-                                            args = create_args)
+                    method = self.alm_plugin.URLRequest.POST, args = create_args)
             logger.info('Response was %s', rsp)
             logger.debug('Task %s added to Rally Project', task['id'])
 
-        except APIError as err:
+        except APIError, err:
             raise AlmException('Please check ALM-specific settings in config '
                                'file. Unable to add task '
                                '%s because of %s' % (task['id'], err))
@@ -234,7 +236,7 @@ class RallyConnector(AlmConnector):
                 self.alm_plugin.call_api(task.get_alm_task_ref(),
                                           args = trans_args,
                                           method=self.alm_plugin.URLRequest.POST)
-            except APIError as err:
+            except APIError, err:
                 raise AlmException('Unable to update task status to DONE '
                                    'for card: %s in Rally because of %s' % 
                                    (task.get_alm_id(), err))
@@ -250,7 +252,7 @@ class RallyConnector(AlmConnector):
                 self.alm_plugin.call_api(task.get_alm_task_ref(),
                                           args = trans_args,
                                           method=self.alm_plugin.URLRequest.POST)
-            except APIError as err:
+            except APIError, err:
                 raise AlmException('Unable to update task status to TODO '
                                    'for card: '
                                    '%s in Rally because of %s' %

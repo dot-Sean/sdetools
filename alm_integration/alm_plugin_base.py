@@ -1,5 +1,7 @@
-from abc import ABCMeta, abstractmethod
 from datetime import datetime
+
+from sdelib.commons import abc
+abstractmethod = abc.abstractmethod
 
 from sdelib.restclient import APIError
 from sdelib.interactive_plugin import PlugInExperience
@@ -56,7 +58,7 @@ class AlmConnector(object):
     """
 
     #This is an abstract base class
-    __metaclass__ = ABCMeta
+    __metaclass__ = abc.ABCMeta
 
     def __init__(self, config, alm_plugin):
         """  Initialization of the Connector
