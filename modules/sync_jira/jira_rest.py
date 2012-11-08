@@ -90,7 +90,7 @@ class JIRARestAPI(RESTBase):
 
     def update_task_status(self, task_id, status_id):
         trans_url = 'issue/%s/transitions' % task_id
-        trans_args = {'transition': {'id': trans_id}}
+        trans_args = {'transition': {'id': status_id}}
         try:
             self.alm_plugin.call_api(trans_url, args=trans_args,
                     method=self.alm_plugin.URLRequest.POST)
