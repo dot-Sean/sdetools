@@ -73,10 +73,12 @@ class JIRAConnector(AlmConnector):
 
     def alm_add_task(self, task):
         new_issue = self.alm_plugin.add_task(task, self.jira_issue_type_id)
+        logger.info('Create new task in JIRA: %s' % new_issue['key'])
 
         if (self.config['alm_standard_workflow'] == 'True' and
             (task['status'] == 'DONE' or task['status'] == 'NA')):
-            self.alm_update_task_status(self.alm_get_task(task), task['status'])
+            alm_task = self.alm_get_task(task)
+            self.alm_update_task_status(alm_task, task['status'])
 
         #Return a unique identifier to this task in JIRA
         return 'Issue %s' % new_issue['key']
@@ -101,6 +103,8 @@ class JIRAConnector(AlmConnector):
         trans_id = trans_table[trans_name]
 
         self.alm_plugin.update_task_status(alm_id, trans_id)
+
+        logger.info('Updated task status in JIRA for task %s' % alm_id)
 
     def alm_disconnect(self):
         pass

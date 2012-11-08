@@ -288,7 +288,7 @@ class AlmConnector(object):
         try:
             self._add_note(task['id'], note_msg, '', status)
         except APIError, err:
-            logger.info('Unable to set a note to mark status '
+            logger.error('Unable to set a note to mark status '
                          'for %s to %s' % (task['id'], status))
 
     def sde_get_task_content(self, task):

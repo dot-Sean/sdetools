@@ -75,14 +75,13 @@ class JIRARestAPI(RESTBase):
         try:
             return self.call_api('issue', method=self.URLRequest.POST, args=args)
         except APIError:
-            logger.exception('Unable to add issue to JIRA')
-            return None
+            raise AlmException('Unable to add issue to JIRA')
 
     def get_available_transitions(self, task_id):
         trans_url = 'issue/%s/transitions' % task_id
         ret_trans = {}
         try:
-            transitions = self.alm_plugin.call_api(trans_url)
+            transitions = self.call_api(trans_url)
         except APIError, err:
             raise AlmException("Unable to get transition IDS for JIRA task %s" % task_id)
         for transition in transitions['transitions']:
