@@ -5,6 +5,7 @@ from datetime import datetime
 
 from alm_integration.alm_plugin_base import AlmConnector, AlmException
 from modules.sync_jira.jira_shared import JIRATask
+from modules.sync_jira.jira_rest import JIRARestAPI
 from sdelib.conf_mgr import Config
 
 from sdelib import log_mgr
@@ -32,24 +33,24 @@ class JIRAConnector(AlmConnector):
         super(JIRAConnector, self).initialize()
 
         #Verify that the configuration options are set properly
-        if (not self.sde_plugin.config['jira_done_statuses'] or
-            len(self.sde_plugin.config['jira_done_statuses']) < 1):
+        if (not self.config['jira_done_statuses'] or
+            len(self.config['jira_done_statuses']) < 1):
             raise AlmException('Missing jira_done_statuses in configuration')
 
-        self.sde_plugin.config['jira_done_statuses'] = (
-                self.sde_plugin.config['jira_done_statuses'].split(','))
+        self.config['jira_done_statuses'] = (self.config['jira_done_statuses'].split(','))
 
-        if not self.sde_plugin.config['alm_standard_workflow']:
+        if not self.config['alm_standard_workflow']:
             raise AlmException('Missing alm_standard_workflow in configuration')
-        if not self.sde_plugin.config['jira_issue_type']:
+        if not self.config['jira_issue_type']:
             raise AlmException('Missing jira_issue_type in configuration')
-        if not self.sde_plugin.config['jira_close_transition']:
+        if not self.config['jira_close_transition']:
             raise AlmException('Missing jira_close_transition in configuration')
-        if not self.sde_plugin.config['jira_reopen_transition']:
+        if not self.config['jira_reopen_transition']:
             raise AlmException('Missing jira_reopen_transition in configuration')
 
-        self.close_transition_id = None
-        self.reopen_transition_id = None
+        self.transition_id = {
+            'close': None,
+            'reopen': None}
 
     def alm_connect(self):
         self.alm_plugin.connect()
@@ -71,7 +72,7 @@ class JIRAConnector(AlmConnector):
         return self.alm_plugin.get_task(task, task_id)
 
     def alm_add_task(self, task):
-        new_issue = self.alm_plugin.add_task(task)
+        new_issue = self.alm_plugin.add_task(task, self.jira_issue_type_id)
 
         if (self.config['alm_standard_workflow'] == 'True' and
             (task['status'] == 'DONE' or task['status'] == 'NA')):
@@ -82,47 +83,24 @@ class JIRAConnector(AlmConnector):
 
     def alm_update_task_status(self, task, status):
         if (not task or
-            not self.sde_plugin.config['alm_standard_workflow'] == 'True'):
+            not self.config['alm_standard_workflow'] == 'True'):
             return
+        
+        alm_id = task.get_alm_id()
 
-        trans_result = None
-        trans_url = 'issue/%s/transitions' % task.get_alm_id()
-        # TODO: these two block are nearly identical: refactor
-        try:
-            if status == 'DONE' or status == 'NA':
-                if not self.close_transition_id:
-                    transitions = self.alm_plugin.call_api(trans_url)
-                    for transition in transitions['transitions']:
-                        if transition['name'] == self.sde_plugin.config['jira_close_transition']:
-                            self.close_transition_id = transition['id']
-                            break
-                    if not self.close_transition_id:
-                        raise AlmException('Unable to find transition %s' %
-                                self.sde_plugin.config['jira_close_transition'])
-                trans_args = {'transition': {'id': self.close_transition_id}}
-                trans_result = self.alm_plugin.call_api(trans_url, args=trans_args,
-                        method=self.alm_plugin.URLRequest.POST)
-            elif status=='TODO':
-                #We are updating a closed task to TODO
-                if not self.reopen_transition_id:
-                    transitions = self.alm_plugin.call_api(trans_url)
-                    for transition in transitions['transitions']:
-                        if transition['name'] == self.sde_plugin.config['jira_reopen_transition']:
-                            self.reopen_transition_id = transition['id']
-                            break
-                    if not self.reopen_transition_id:
-                        raise AlmException('Unable to find transition %s' %
-                                self.sde_plugin.config['jira_reopen_transition'])
+        trans_table = self.alm_plugin.get_available_transitions(alm_id)
 
-                trans_args = {'transition': {'id':self.reopen_transition_id}}
-                self.alm_plugin.call_api(trans_url, args=trans_args,
-                        method=self.alm_plugin.URLRequest.POST)
-        except self.alm_plugin.APIFormatError:
-            # The response does not have JSON, so it is incorrectly raised as
-            # a JSON formatting error. Ignore this error
-            pass
-        except APIError, err:
-            raise AlmException("Unable to set task status: %s" % err)
+        if status == 'DONE' or status == 'NA':
+            new_state = 'close'
+        elif status == 'TODO':
+            new_state = 'reopen'
+
+        trans_name = self.config['jira_%s_transition' % new_state]
+        if trans_name not in trans_table:
+            raise AlmException('Unable to find transition %s' % trans_name)
+        trans_id = trans_table[trans_name]
+
+        self.alm_plugin.update_task_status(alm_id, trans_id)
 
     def alm_disconnect(self):
         pass

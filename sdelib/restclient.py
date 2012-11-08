@@ -132,7 +132,7 @@ class RESTBase(object):
             self.post_conf_init()
 
         logger.info('Calling API: %s %s' % (method, target))
-        logger.debug('    Args: %s' % ((repr(args)[:200]) + (repr(args)[200:] and '...')))
+        logger.debug(' + Args: %s' % ((repr(args)[:200]) + (repr(args)[200:] and '...')))
         req_url = '%s/%s' % (self.base_uri, target)
         auth_mode = self.auth_mode
         args = args or {}

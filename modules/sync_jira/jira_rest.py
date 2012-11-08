@@ -22,7 +22,7 @@ class JIRARestAPI(RESTBase):
         except APIError:
             raise AlmException('Unable to connect to JIRA project %s' % self.config['alm_project'])
 
-    def get_issue_type(self):
+    def get_issue_types(self):
         try:
             return self.call_api('issuetype')
         except APIError:
@@ -55,7 +55,7 @@ class JIRARestAPI(RESTBase):
                         jtask['fields']['updated'],
                         self.config['jira_done_statuses'])
 
-    def add_task(self, task):
+    def add_task(self, task, issue_type_id):
         #Add task
         args = {
            'fields': {
@@ -68,7 +68,7 @@ class JIRARestAPI(RESTBase):
                    'name': JIRATask.translate_priority(task['priority'])
                },
                'issuetype': {
-                   'id': self.jira_issue_type_id
+                   'id': issue_type_id
                }
            }
         }
@@ -77,3 +77,27 @@ class JIRARestAPI(RESTBase):
         except APIError:
             logger.exception('Unable to add issue to JIRA')
             return None
+
+    def get_available_transitions(self, task_id):
+        trans_url = 'issue/%s/transitions' % task_id
+        ret_trans = {}
+        try:
+            transitions = self.alm_plugin.call_api(trans_url)
+        except APIError, err:
+            raise AlmException("Unable to get transition IDS for JIRA task %s" % task_id)
+        for transition in transitions['transitions']:
+            ret_trans[transition['name']] = transition['id']
+        return ret_trans
+
+    def update_task_status(self, task_id, status_id):
+        trans_url = 'issue/%s/transitions' % task_id
+        trans_args = {'transition': {'id': trans_id}}
+        try:
+            self.alm_plugin.call_api(trans_url, args=trans_args,
+                    method=self.alm_plugin.URLRequest.POST)
+        except self.alm_plugin.APIFormatError:
+            # The response does not have JSON, so it is incorrectly raised as
+            # a JSON formatting error. Ignore this error
+            pass
+        except APIError, err:
+            raise AlmException("Unable to set task status: %s" % err)
