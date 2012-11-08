@@ -59,6 +59,7 @@ class RallyTask(AlmTask):
 
 class RallyConnector(AlmConnector):
     """Connects SD Elements to Rally"""
+    alm_name = 'Rally'
 
     def __init__(self, config, alm_plugin):
         super(RallyConnector, self).__init__(config, alm_plugin)
@@ -91,9 +92,6 @@ class RallyConnector(AlmConnector):
 
     def carriage_return(self):
         return '<br//>'
-
-    def alm_name(self):
-        return 'Rally'
 
     def alm_connect(self):
         """ Verifies that Rally connection works """

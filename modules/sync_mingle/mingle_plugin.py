@@ -67,6 +67,7 @@ class MingleTask(AlmTask):
                                  '%Y-%m-%dT%H:%M:%SZ')
 
 class MingleConnector(AlmConnector):
+    alm_name = 'Mingle'
 
     def __init__(self, config, alm_plugin):
         """ Initializes connection to Mingle """
@@ -98,9 +99,6 @@ class MingleConnector(AlmConnector):
             raise AlmException('Missing mingle_card_type in configuration')
         if not self.sde_plugin.config['mingle_new_status']:
             raise AlmException('Missing mingle_card_type in configuration')
-
-    def alm_name(self):
-        return 'Mingle'
 
     def alm_connect(self):
         """ Verifies that Mingle connection works """
