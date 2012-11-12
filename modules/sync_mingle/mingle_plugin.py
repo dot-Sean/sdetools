@@ -109,7 +109,7 @@ class MingleConnector(AlmConnector):
         try:
             self.alm_plugin.call_api('cards.xml')
         except APIError:
-            raise AlmException('Unable to connnect to Mingle. Please '
+            raise AlmException('Unable to connect to Mingle. Please '
                                'check server URL, ID, password and '
                                'project')
 
@@ -149,7 +149,7 @@ class MingleConnector(AlmConnector):
                             'Status'):
                     status_node = prop.getElementsByTagName(
                             'value').item(0).firstChild
-                    if status_code:
+                    if status_node:
                         status = status_node.nodeValue
                     else:
                         status = 'TODO'
@@ -158,15 +158,6 @@ class MingleConnector(AlmConnector):
                           self.sde_plugin.config['mingle_done_statuses'])
 
     def alm_add_task(self, task):
-        #First check to see if task exists
-        try:
-            if self.alm_get_task(task):
-                logger.debug('Task %s already exists in Mingle Project'
-                              % task['id'])
-                return None
-        except AlmException:
-            #This means task doesn't exist, which is expected
-            pass
         try:
             status_args = {
                 'card[name]': task['title'],
