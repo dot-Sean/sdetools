@@ -1,4 +1,5 @@
 from datetime import datetime
+import sys
 
 from sdelib.commons import abc
 abstractmethod = abc.abstractmethod
@@ -88,6 +89,10 @@ class AlmConnector(object):
                 default=None)
         self.config.add_custom_option('conflict_policy', 'Conflict policy to use',
                 default='alm')
+        self.config.add_custom_option('show_progress','Show progress',
+                default='False')
+        self.config.add_custom_option('test_alm_connection', 'Test Alm Connection Only',
+                default='False')
 
     def initialize(self):
         #Verify that the configuration options are set properly
@@ -127,6 +132,11 @@ class AlmConnector(object):
         else:
             self.config['sde_min_priority'] = 1
 
+        if (not self.sde_plugin.config['show_progress']):
+            self.sde_plugin.config['show_progress'] = False
+        else:
+            self.sde_plugin.config['show_progress'] = (self.sde_plugin.config['show_progress']=="True")
+            
         logger.info('*** AlmConnector initialized ***')
 
     @abstractmethod
@@ -312,6 +322,11 @@ class AlmConnector(object):
                     contents = contents + implementation['content'] + '\n\n'
         return contents
 
+    def output_progress(self, percent):
+        if self.sde_plugin.config['show_progress']:
+            print str(percent)+"% complete"
+            sys.stdout.flush()
+
     def synchronize(self):
         """ Synchronizes SDE project with ALM project.
 
@@ -336,15 +351,31 @@ class AlmConnector(object):
             if not self.sde_plugin:
                 raise AlmException('Requires initialization')
 
+            if (self.sde_plugin.config['test_alm_connection']):
+                if(self.sde_plugin.config['test_alm_connection']=="True"):
+                    self.alm_connect()
+                    sys.exit(0)
+
             #Attempt to connect to SDE & ALM
+            progress = 0
+
             self.sde_connect()
+            progress += 2
+            self.output_progress(progress)
+
             self.alm_connect()
+            progress += 2
+            self.output_progress(progress)
 
             #Attempt to get all tasks
             tasks = self.sde_get_tasks()
             logger.info('Retrieved all tasks from SDE')
+            total_work = (progress+len(tasks))
 
             for task in tasks:
+                progress += 1
+                self.output_progress(100*progress/total_work)
+
                 if not self.in_scope(task):
                     continue
                 alm_task = self.alm_get_task(task)
@@ -375,10 +406,9 @@ class AlmConnector(object):
                 else:
                     #Only exists in SD Elements, add it to ALM
                     ref = self.alm_add_task(task)
-                    note_msg = 'Task synchronized in %s' % self.alm_name
-                    if ref:
-                        note_msg += '. Reference: %s' % (ref)
+                    note_msg = 'Task synchronized in %s. Reference: %s' % (self.alm_name, ref)
                     self._add_note(task['id'], note_msg, '', task['status'])
+                    logger.debug(note_msg)
 
             logger.info('Synchronization complete')
             self.alm_disconnect()
