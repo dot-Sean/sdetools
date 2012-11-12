@@ -31,7 +31,7 @@ class LoggerModules:
         return logging.getLogger(modname)
 
     def set_level(self, modname, level):
-        if modname not in self.modules:
+        if (modname not in self.modules) and (not modname.startswith('modules')):
             raise KeyError, modname
         logger = logging.getLogger(modname)
         logger.setLevel(level)

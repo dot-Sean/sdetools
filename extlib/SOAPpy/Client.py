@@ -202,7 +202,7 @@ class HTTPTransport:
             from pyGlobus.io import GSIHTTP
             r = GSIHTTP(real_addr, tcpAttr = config.tcpAttr)
         elif addr.proto == 'https':
-            r = httplib.HTTPS(real_addr)
+            r = httplib.HTTPS(real_addr, key_file=config.SSL.key_file, cert_file=config.SSL.cert_file)
         else:
             r = HTTPWithTimeout(real_addr, timeout=timeout)
 

@@ -1,6 +1,9 @@
-from abc import ABCMeta, abstractmethod
 from datetime import datetime
 import sys
+
+from sdelib.commons import abc
+abstractmethod = abc.abstractmethod
+
 from sdelib.restclient import APIError
 from sdelib.interactive_plugin import PlugInExperience
 
@@ -54,9 +57,11 @@ class AlmConnector(object):
     Abstract base class for connectors to Application Lifecycle
     Management tools such as JIRA, Team Foundation Server, Rally, etc.
     """
+    # This needs to be overwritten
+    alm_name = 'ALM Module'
 
     #This is an abstract base class
-    __metaclass__ = ABCMeta
+    __metaclass__ = abc.ABCMeta
 
     def __init__(self, config, alm_plugin):
         """  Initialization of the Connector
@@ -133,11 +138,6 @@ class AlmConnector(object):
             self.sde_plugin.config['show_progress'] = (self.sde_plugin.config['show_progress']=="True")
             
         logger.info('*** AlmConnector initialized ***')
-
-    @abstractmethod
-    def alm_name(self):
-        """ Returns a string representation of the ALM, e.g. 'JIRA' """
-        pass
 
     @abstractmethod
     def alm_connect(self):
@@ -296,11 +296,11 @@ class AlmConnector(object):
                                'to the server, or the status was invalid')
         logger.info('Status for task %s successfully set in SD Elements' % task['id'])
 
-        note_msg = 'Task status changed via %s' % self.alm_name()
+        note_msg = 'Task status changed via %s' % self.alm_name
         try:
             self._add_note(task['id'], note_msg, '', status)
         except APIError, err:
-            logger.info('Unable to set a note to mark status '
+            logger.error('Unable to set a note to mark status '
                          'for %s to %s' % (task['id'], status))
 
     def sde_get_task_content(self, task):
@@ -385,6 +385,8 @@ class AlmConnector(object):
                         # What takes precedence in case of a conflict of
                         # status. Start with ALM
                         precedence = 'alm'
+                        updated_system = 'sde'
+
                         if self.config['conflict_policy'] == 'sde':
                             precedence = 'sde'
                         elif self.config['conflict_policy'] == 'timestamp':
@@ -394,15 +396,17 @@ class AlmConnector(object):
                                           (task['id'], str(sde_time), str(alm_time)))
                             if (sde_time > alm_time):
                                 precedence = 'sde'
+                        
                         if (precedence == 'alm'):
                             self.sde_update_task_status(task, alm_task.get_status())
                         else:
                             self.alm_update_task_status(alm_task, task['status'])
-                        logger.debug('Updated status of task %s in %s' % (task['id'], precedence))
+                            updated_system = 'alm'
+                        logger.debug('Updated status of task %s in %s' % (task['id'], updated_system))
                 else:
                     #Only exists in SD Elements, add it to ALM
                     ref = self.alm_add_task(task)
-                    note_msg = 'Task synchronized in %s. Reference: %s' % (self.alm_name(), ref)
+                    note_msg = 'Task synchronized in %s. Reference: %s' % (self.alm_name, ref)
                     self._add_note(task['id'], note_msg, '', task['status'])
                     logger.debug(note_msg)
 

@@ -11,7 +11,6 @@ except ImportError:
     ssl_lib_found = False
 
 import logging
-logger = logging.getLogger(__name__)
 
 from sdelib import commons
 
@@ -109,7 +108,7 @@ def get_http_handler(mode, debuglevel):
     elif mode == 'https':
         if not ssl_lib_found:
             if not ssl_warned:
-                logger.warning('Missing ssl library for python: SSL certificates can'
+                logging.warning('Missing ssl library for python: SSL certificates can'
                     ' NOT be validated\n (use python 2.6 or install ssl for python)')
                 ssl_warned = True
             return urllib2.HTTPSHandler(debuglevel=debuglevel)
