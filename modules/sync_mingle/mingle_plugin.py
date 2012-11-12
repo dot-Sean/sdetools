@@ -35,9 +35,6 @@ class MingleAPIBase(RESTBase):
                 pass
         return result
 
-    def set_content_type(self, req, method):
-        pass
-
 class MingleTask(AlmTask):
     """ Representation of a task in Mingle"""
 
@@ -109,7 +106,7 @@ class MingleConnector(AlmConnector):
         try:
             self.alm_plugin.call_api('cards.xml')
         except APIError:
-            raise AlmException('Unable to connnect to Mingle. Please '
+            raise AlmException('Unable to connect to Mingle. Please '
                                'check server URL, ID, password and '
                                'project')
 
