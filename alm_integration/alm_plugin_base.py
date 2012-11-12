@@ -402,7 +402,7 @@ class AlmConnector(object):
                 else:
                     #Only exists in SD Elements, add it to ALM
                     ref = self.alm_add_task(task)
-                    note_msg = 'Task synchronized in %s. Reference: %s' (% self.alm_name(), ref)
+                    note_msg = 'Task synchronized in %s. Reference: %s' % (self.alm_name(), ref)
                     self._add_note(task['id'], note_msg, '', task['status'])
                     logger.debug(note_msg)
 
