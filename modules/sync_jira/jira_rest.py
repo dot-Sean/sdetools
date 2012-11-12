@@ -92,8 +92,7 @@ class JIRARestAPI(RESTBase):
         trans_url = 'issue/%s/transitions' % task_id
         trans_args = {'transition': {'id': status_id}}
         try:
-            self.call_api(trans_url, args=trans_args,
-                    method=self.alm_plugin.URLRequest.POST)
+            self.call_api(trans_url, args=trans_args, method=self.URLRequest.POST)
         except self.APIFormatError:
             # The response does not have JSON, so it is incorrectly raised as
             # a JSON formatting error. Ignore this error
