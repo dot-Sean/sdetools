@@ -117,6 +117,10 @@ class RESTBase(object):
             raise APIFormatError('Unable to process JSON data.')
         return result
 
+    def set_post_content_type(self, req, method):
+        if (method != URLRequest.GET):
+            req.add_header('Content-Type','application/json')
+
     def call_api(self, target, method=URLRequest.GET, args=None):
         """
         Internal method used to call a RESTFul API
@@ -145,8 +149,7 @@ class RESTBase(object):
             data = self.encode_post_args(args)
         req = URLRequest(req_url, data=data, method=method)
 
-        if (method != URLRequest.GET):
-            req.add_header('Content-Type','application/json')
+        self.set_content_type(req, method)
 
         if target == 'session':
             pass
