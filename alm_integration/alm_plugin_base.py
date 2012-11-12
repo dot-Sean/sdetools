@@ -85,7 +85,7 @@ class AlmConnector(object):
         self.config.add_custom_option('conflict_policy', 'Conflict policy to use',
                 default='alm')
         self.config.add_custom_option('show_progress','Show progress',
-                default='false')
+                default='False')
         self.config.add_custom_option('test_alm_connection', 'Test Alm Connection Only',
                 default='False')
 
