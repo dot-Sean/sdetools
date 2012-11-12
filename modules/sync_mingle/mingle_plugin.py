@@ -35,7 +35,7 @@ class MingleAPIBase(RESTBase):
                 pass
         return result
 
-    def set_post_content_type(self, req, method):
+    def set_content_type(self, req, method):
         pass
 
 class MingleTask(AlmTask):
