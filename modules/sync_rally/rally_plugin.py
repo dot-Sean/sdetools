@@ -176,13 +176,6 @@ class RallyConnector(AlmConnector):
 
     def alm_add_task(self, task):
         try:
-            if self.alm_get_task(task):
-                logger.debug('Task %s already exists in Rally Project', task['id'])
-                return None
-        except AlmException:
-            #This means task doesn't exist, which is expected
-            pass
-        try:
             create_args = { 
                 'HierarchicalRequirement' : {
                     'Name': task['title'],

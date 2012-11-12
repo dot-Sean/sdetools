@@ -155,15 +155,6 @@ class MingleConnector(AlmConnector):
                           self.sde_plugin.config['mingle_done_statuses'])
 
     def alm_add_task(self, task):
-        #First check to see if task exists
-        try:
-            if self.alm_get_task(task):
-                logger.debug('Task %s already exists in Mingle Project'
-                              % task['id'])
-                return None
-        except AlmException:
-            #This means task doesn't exist, which is expected
-            pass
         try:
             status_args = {
                 'card[name]': task['title'],
