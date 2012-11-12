@@ -146,7 +146,7 @@ class MingleConnector(AlmConnector):
                             'Status'):
                     status_node = prop.getElementsByTagName(
                             'value').item(0).firstChild
-                    if status_code:
+                    if status_node:
                         status = status_node.nodeValue
                     else:
                         status = 'TODO'
