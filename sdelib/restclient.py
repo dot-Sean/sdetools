@@ -117,7 +117,7 @@ class RESTBase(object):
             raise APIFormatError('Unable to process JSON data.')
         return result
 
-    def set_post_content_type(self, req, method):
+    def set_content_type(self, req, method):
         if (method != URLRequest.GET):
             req.add_header('Content-Type','application/json')
 
