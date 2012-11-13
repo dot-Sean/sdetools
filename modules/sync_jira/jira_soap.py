@@ -133,7 +133,7 @@ class JIRASoapAPI:
         args = {
             'project': self.config['alm_project'],
             'summary': task['title'],
-            'description': task['content'],
+            'description': task['formatted_content'],
             'priority': selected_priority,
             'type': issue_type_id
         }

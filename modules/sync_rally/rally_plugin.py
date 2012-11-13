@@ -99,7 +99,7 @@ class RallyConnector(AlmConnector):
         try:
             self.alm_plugin.call_api('task.js')
         except APIError:
-            raise AlmException('Unable to connnect to Rally. Please check '
+            raise AlmException('Unable to connect to Rally. Please check '
                                'server URL, ID, password, workspace and project')
 
         #Now try to get workspace ID
@@ -118,7 +118,7 @@ class RallyConnector(AlmConnector):
             self.workspace_ref = workspace_ref
 
         except APIError:
-            raise AlmException('Unable to connnect to Rally. Please check '
+            raise AlmException('Unable to connect to Rally. Please check '
                                'server URL, ID, password and project')
 
         #Now get project ID
@@ -137,7 +137,7 @@ class RallyConnector(AlmConnector):
             self.project_ref = project_ref
 
         except APIError:
-            raise AlmException('Unable to connnect to Rally. Please '
+            raise AlmException('Unable to connect to Rally. Please '
                                'check server URL, ID, password and project')
 
 
@@ -175,13 +175,6 @@ class RallyConnector(AlmConnector):
                                '%s from Rally' % task_id)
 
     def alm_add_task(self, task):
-        try:
-            if self.alm_get_task(task):
-                logger.debug('Task %s already exists in Rally Project', task['id'])
-                return None
-        except AlmException:
-            #This means task doesn't exist, which is expected
-            pass
         try:
             create_args = { 
                 'HierarchicalRequirement' : {

@@ -63,7 +63,7 @@ class JIRARestAPI(RESTBase):
                    'key': self.config['alm_project']
                },
                'summary': task['title'],
-               'description': task['content'],
+               'description': task['formatted_content'],
                'priority': {
                    'name': JIRATask.translate_priority(task['priority'])
                },
