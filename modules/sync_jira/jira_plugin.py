@@ -72,6 +72,8 @@ class JIRAConnector(AlmConnector):
         return self.alm_plugin.get_task(task, task_id)
 
     def alm_add_task(self, task):
+        task['formatted_content'] = self.sde_get_task_content(task)
+
         new_issue = self.alm_plugin.add_task(task, self.jira_issue_type_id)
         logger.info('Create new task in JIRA: %s' % new_issue['key'])
 
