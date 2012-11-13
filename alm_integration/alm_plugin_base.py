@@ -4,13 +4,14 @@ import sys
 from sdelib.commons import abc
 abstractmethod = abc.abstractmethod
 
+from sdelib.commons import Error
 from sdelib.restclient import APIError
 from sdelib.interactive_plugin import PlugInExperience
 
 from sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
-class AlmException(Exception):
+class AlmException(Error):
     """ Class for ALM Exceptions """
 
     def __init__(self, value):
