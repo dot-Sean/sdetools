@@ -6,6 +6,7 @@ from datetime import datetime
 from alm_integration.alm_plugin_base import AlmConnector, AlmException
 from modules.sync_jira.jira_shared import JIRATask
 from modules.sync_jira.jira_rest import JIRARestAPI
+from modules.sync_jira.jira_markdown import convert_markdown
 from sdelib.conf_mgr import Config
 
 from sdelib import log_mgr
@@ -110,3 +111,6 @@ class JIRAConnector(AlmConnector):
 
     def alm_disconnect(self):
         pass
+
+    def convert_markdown_to_alm(self, content): 
+        return convert_markdown(content)
