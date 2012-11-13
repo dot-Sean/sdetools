@@ -66,8 +66,8 @@ class JIRASoapAPI:
         try:
             result = self.proxy.getProjectByKey(self.auth, self.config['alm_project'])
         except SOAPpy.Types.faultType:
-            raise AlmException('Unable to connect to project %s. Please' +
-                               ' check project settings' % (self.config['alm_project']))
+            raise AlmException(('Unable to connect to project %s. Please' +
+                               ' check project settings') % (self.config['alm_project']))
         
         # For JIRA 4 we need the ID-Name mapping for status and priority
         self.statuses = self.proxy.getStatuses(self.auth)
