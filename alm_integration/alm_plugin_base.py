@@ -364,7 +364,7 @@ class AlmConnector(object):
             if (self.sde_plugin.config['test_alm_connection']):
                 if(self.sde_plugin.config['test_alm_connection']=="True"):
                     self.alm_connect()
-                    sys.exit(0)
+                    return
 
             #Attempt to connect to SDE & ALM
             progress = 0
