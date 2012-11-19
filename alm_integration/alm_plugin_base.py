@@ -286,8 +286,11 @@ class AlmConnector(object):
                   or 'NA'
         """
         if not self.sde_plugin:
-            logger.error('Incorrect initialization')
             raise AlmException('Requires initialization')
+
+        if (task['status'] == 'NA') and (status == 'DONE'):
+            logger.info('Skipping the update of N/A to DONE for task %s' % (task['id']))
+            return
 
         logger.debug('Attempting to update task %s to %s' % (task['id'], status))
 
@@ -390,7 +393,7 @@ class AlmConnector(object):
                     continue
                 alm_task = self.alm_get_task(task)
                 if alm_task:
-                    #Exists in both SDE & ALM
+                    # Exists in both SDE & ALM
                     if alm_task.get_status() != task['status']:
                         # What takes precedence in case of a conflict of
                         # status. Start with ALM
