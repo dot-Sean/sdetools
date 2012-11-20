@@ -1,6 +1,6 @@
 # Copyright SDElements Inc
 # Extensible two way integration with Mingle
-
+import sys
 import urllib
 from datetime import datetime
 from xml.dom import minidom
@@ -13,6 +13,15 @@ from sdelib.conf_mgr import Config
 
 from sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
+
+MINGLE_HEADERS = [
+    ('X-RallyIntegrationName', 'SD Elements'),
+    ('X-RallyIntegrationVendor', 'SD Elements'),
+    ('X-RallyIntegrationVersion', '1.0'),
+    ('X-RallyIntegrationOS', sys.platform),
+    ('X-RallyIntegrationPlatform', 'Python %s' % sys.version.split(' ',1)[0].replace('\n', '')),
+    ('X-RallyIntegrationLibrary', 'Rally REST API'),
+]
 
 class MingleAPIBase(RESTBase):
     def __init__(self, config):
@@ -37,6 +46,9 @@ class MingleAPIBase(RESTBase):
 
     def set_content_type(self, req, method):
         pass
+
+    def get_custom_headers(self, target, method):
+        return MINGLE_HEADERS
 
 class MingleTask(AlmTask):
     """ Representation of a task in Mingle"""
