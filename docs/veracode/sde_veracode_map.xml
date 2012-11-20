@@ -98,7 +98,7 @@
 	<task id="176" title="Apply principles of privacy when handling personal information">
 		<cwe id="359" title="Privacy Violation"/>
 	</task>
-	<task id="27" title="Turn off session rewriting">
+	<task id="20" title="Invalidate old session ID after authentication">
 		<cwe id="384" title="Session Fixation"/>
 	</task>
 	<task id="22" title="Set secure flag on session cookies">
