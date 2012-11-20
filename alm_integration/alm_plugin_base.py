@@ -1,16 +1,21 @@
 from datetime import datetime
 import sys
+import re
 
 from sdelib.commons import abc
 abstractmethod = abc.abstractmethod
 
+from sdelib.commons import Error
 from sdelib.restclient import APIError
 from sdelib.interactive_plugin import PlugInExperience
 
 from sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
-class AlmException(Exception):
+RE_CODE_DOWNLOAD = re.compile(r'\{\{ USE_MEDIA_URL \}\}([^\)]+\))\{@class=code-download\}')
+
+
+class AlmException(Error):
     """ Class for ALM Exceptions """
 
     def __init__(self, value):
@@ -281,8 +286,11 @@ class AlmConnector(object):
                   or 'NA'
         """
         if not self.sde_plugin:
-            logger.error('Incorrect initialization')
             raise AlmException('Requires initialization')
+
+        if (task['status'] == 'NA') and (status == 'DONE'):
+            logger.info('Skipping the update of N/A to DONE for task %s' % (task['id']))
+            return
 
         logger.debug('Attempting to update task %s to %s' % (task['id'], status))
 
@@ -303,9 +311,12 @@ class AlmConnector(object):
             logger.error('Unable to set a note to mark status '
                          'for %s to %s' % (task['id'], status))
 
+    def convert_markdown_to_alm(self, content):
+        return content
+
     def sde_get_task_content(self, task):
         """ Convenience method that returns the text that should go into
-        contents of an ALM ticket/defect/story for a given task.
+        content of an ALM ticket/defect/story for a given task.
 
         Raises an AlmException on encountering an error
 
@@ -313,14 +324,16 @@ class AlmConnector(object):
         task  -- An SD Elements task representing the task to enter in the
                  ALM
         """
-        contents = '%s\n\nImported from SD Elements: %s' % (task['content'], task['url'])
-        if self.config['how_tos_in_scope'] == 'True':
-            if task['implementations']:
-                contents = contents + '\n\nHow Tos:\n\n'
-                for implementation in task['implementations']:
-                    contents = contents + implementation['title'] + '\n\n'
-                    contents = contents + implementation['content'] + '\n\n'
-        return contents
+        content = '%s\n\nImported from SD Elements: %s' % (task['content'], task['url'])
+        if (self.config['how_tos_in_scope'] == 'True') and task['implementations']:
+            content += '\n\n# How Tos:\n\n'
+            for implementation in task['implementations']:
+                content += '## %s\n\n' % (implementation['title'])
+                content += implementation['content'] + '\n\n'
+
+        content = RE_CODE_DOWNLOAD.sub(r'https://%s/\1' % self.config['sde_server'], content)
+
+        return self.convert_markdown_to_alm(content)
 
     def output_progress(self, percent):
         if self.sde_plugin.config['show_progress']:
@@ -354,7 +367,7 @@ class AlmConnector(object):
             if (self.sde_plugin.config['test_alm_connection']):
                 if(self.sde_plugin.config['test_alm_connection']=="True"):
                     self.alm_connect()
-                    sys.exit(0)
+                    return
 
             #Attempt to connect to SDE & ALM
             progress = 0
@@ -380,7 +393,7 @@ class AlmConnector(object):
                     continue
                 alm_task = self.alm_get_task(task)
                 if alm_task:
-                    #Exists in both SDE & ALM
+                    # Exists in both SDE & ALM
                     if alm_task.get_status() != task['status']:
                         # What takes precedence in case of a conflict of
                         # status. Start with ALM

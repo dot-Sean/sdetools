@@ -51,6 +51,7 @@ class Config(object):
         self.settings = self.DEFAULTS.copy()
         self.custom_options = []
         self.parser = None
+        self.use_conf_file = True
         self.args = sys.argv[2:]
 
     def __getitem__(self, key):
@@ -123,12 +124,15 @@ class Config(object):
         cnf = ConfigParser.ConfigParser()
         # This will preserve case
         cnf.optionxform = str
-        stat = cnf.read(file_name)
-        if not stat:
-            if (file_name == DEFAULT_CONFIG_FILE):
-                return True, 'Missing default config file.'
-            else:
-                return False, 'Config file not found.'
+        if file_name == '-':
+            cnf.readfp(sys.stdin)
+        else:
+            stat = cnf.read(file_name)
+            if not stat:
+                if (file_name == DEFAULT_CONFIG_FILE):
+                    return True, 'Missing default config file.'
+                else:
+                    return False, 'Config file not found.'
 
         config_keys = ['log_level', 'debug_mods', 'application', 'project', 
             'authmode', 'args']
@@ -164,11 +168,12 @@ class Config(object):
 
         parser = optparse.OptionParser(usage)
         self.parser = parser
-        parser.add_option('-c', '--config', metavar='CONFIG_FILE', dest='conf_file', 
-            default=self.DEFAULTS['conf_file'], type='string',
-            help = "Configuration File if. Ignored if -C is used. (Default is %s)" % (self.DEFAULTS['conf_file']))
-        parser.add_option('-C', '--skipconfig', dest='skip_conf_file', default=False, action='store_true',
-            help = "Do NOT use any configuration file")
+        if self.use_conf_file:
+            parser.add_option('-c', '--config', metavar='CONFIG_FILE', dest='conf_file', 
+                default=self.DEFAULTS['conf_file'], type='string',
+                help = "Configuration File if. Ignored if -C is used. (Default is %s)" % (self.DEFAULTS['conf_file']))
+            parser.add_option('-C', '--skipconfig', dest='skip_conf_file', default=False, action='store_true',
+                help = "Do NOT use any configuration file")
         parser.add_option('-I', '--noninteractive', dest='interactive', default=True, action='store_false', 
             help="Run in Non-Interactive mode")
         parser.add_option('-d', '--debug', dest='debug', action='store_true', 
@@ -208,7 +213,7 @@ class Config(object):
                 show_error("Invalid options specified.", usage_hint=True)
                 return False
 
-        if opts.skip_conf_file:
+        if (not self.use_conf_file) or opts.skip_conf_file:
             self['conf_file'] = None
         else:
             self['conf_file'] = opts.conf_file
@@ -238,6 +243,9 @@ class Config(object):
             log_mgr.mods.set_level(modname, logging.DEBUG)
             
         self['interactive'] = opts.interactive
+        if (self['interactive']) and (self['conf_file'] == '-'):
+            show_error("Unable to use interactive mode with standard input for configuration: Use -I")
+            return False
 
         for group_name, optlist in self.custom_options:
             for item in optlist:

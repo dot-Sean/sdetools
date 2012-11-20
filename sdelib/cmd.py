@@ -13,7 +13,10 @@ class BaseCommand(object):
         pass
 
     def parse_args(self):
-        return self.config.parse_args(self)
+        res = self.config.parse_args(self)
+        if res:
+            self.args = self.config.args
+        return res
 
     def process_args(self):
         return True
