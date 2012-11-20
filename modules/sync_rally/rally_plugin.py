@@ -1,6 +1,7 @@
 # Copyright SDElements Inc
 # Extensible two way integration with Rally
 
+import sys
 from datetime import datetime
 
 from sdelib.restclient import RESTBase, APIError
@@ -13,12 +14,24 @@ logger = log_mgr.mods.add_mod(__name__)
 
 API_VERSION = '1.11'
 
+RALLY_HEADERS = [
+    ('X-RallyIntegrationName', 'SD Elements'),
+    ('X-RallyIntegrationVendor', 'SD Elements'),
+    ('X-RallyIntegrationVersion', '1.0'),
+    ('X-RallyIntegrationOS', sys.platform),
+    ('X-RallyIntegrationPlatform', 'Python %s' % sys.version.split(' ',1)[0].replace('\n', '')),
+    ('X-RallyIntegrationLibrary', 'Rally REST API'),
+]
+
 class RallyAPIBase(RESTBase):
     """ Base plugin for Rally """
 
     def __init__(self, config):
         super(RallyAPIBase, self).__init__('alm', 'ALM', config, 
                 'slm/webservice/%s' % (API_VERSION))
+
+    def get_custom_headers(self, target, method):
+        return RALLY_HEADERS
 
 class RallyTask(AlmTask):
     """ Representation of a task in Rally """
