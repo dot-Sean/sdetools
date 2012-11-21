@@ -121,6 +121,12 @@ class RESTBase(object):
         if (method != URLRequest.GET):
             req.add_header('Content-Type','application/json')
 
+    def get_custom_headers(self, target, method):
+        """
+        Override this to add your own custom headers
+        """
+        return []
+
     def call_api(self, target, method=URLRequest.GET, args=None):
         """
         Internal method used to call a RESTFul API
@@ -170,6 +176,8 @@ class RESTBase(object):
             req.add_header('Cookie', cookie_str)
         else:
             raise UsageError('Unknown Authentication mode "%s".' % (auth_mode))
+        for item, val in self.get_custom_headers(target, method):
+            req.add_header(item, val)
 
         call_success = True
         try:
