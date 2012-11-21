@@ -38,6 +38,9 @@
 	<task id="55" title="Validate all untrusted XML input">
 		<cwe id="112" title="Missing XML Validation"/>
 	</task>
+        <task id="203" title="Avoid uncontrolled format string">
+ 		<cwe id="134" title="Uncontrolled Format String"/>
+        </task>
 	<task id="193" title="Review non-categorized/miscellaneous findings from static code analysis">
 		<cwe id="597" title="Use of Wrong Operator in String Comparison"/>
 		<cwe id="668" title="Exposure of Resource to Wrong Sphere"/>
@@ -66,7 +69,6 @@
 		<cwe id="313" title="Plaintext Storage in a File or on Disk"/>
 		<cwe id="193" title="Off-by-One Error"/>
 		<cwe id="135" title="Incorrect Calculation of Multi-Byte String Length"/>
-		<cwe id="134" title="Uncontrolled Format String"/>
 		<cwe id="129" title="Improper Validation of Array Index"/>
 		<cwe id="170" title="Improper Null Termination"/>
 	        <cwe id="*" title="Unmapped CWE"/>
