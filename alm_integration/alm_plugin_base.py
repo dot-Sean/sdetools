@@ -288,10 +288,6 @@ class AlmConnector(object):
         if not self.sde_plugin:
             raise AlmException('Requires initialization')
 
-        if (task['status'] == 'NA') and (status == 'DONE'):
-            logger.info('Skipping the update of N/A to DONE for task %s' % (task['id']))
-            return
-
         logger.debug('Attempting to update task %s to %s' % (task['id'], status))
 
         try:
