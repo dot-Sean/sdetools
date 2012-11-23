@@ -340,6 +340,12 @@ class AlmConnector(object):
             print str(percent)+"% complete"
             sys.stdout.flush()
 
+    def status_match(self, alm_status, sde_status):
+        if sde_status=="NA" or sde_status=="DONE":
+            return alm_status == "DONE"
+        else:
+            return alm_status == "TODO"
+
     def synchronize(self):
         """ Synchronizes SDE project with ALM project.
 
@@ -394,7 +400,7 @@ class AlmConnector(object):
                 alm_task = self.alm_get_task(task)
                 if alm_task:
                     # Exists in both SDE & ALM
-                    if alm_task.get_status() != task['status']:
+                    if not self.status_match(alm_task.get_status(), task['status']):
                         # What takes precedence in case of a conflict of
                         # status. Start with ALM
                         precedence = 'alm'
