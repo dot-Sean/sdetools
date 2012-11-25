@@ -15,10 +15,6 @@ class Command(BaseCommand):
         self.rally = RallyConnector(self.config, rbase)
 
     def handle(self):
-        try:
-            self.rally.initialize()
-            self.rally.synchronize()
-        except (AlmException, PluginError), err:
-            print 'The following error was encountered: %s' % err
-            return False
+        self.rally.initialize()
+        self.rally.synchronize()
         return True

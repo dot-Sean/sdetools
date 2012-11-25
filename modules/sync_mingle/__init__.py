@@ -12,10 +12,6 @@ class Command(BaseCommand):
         self.mingle = MingleConnector(self.config, mbase)
 
     def handle(self):
-        try:
-            self.mingle.initialize()
-            self.mingle.synchronize()
-        except (AlmException, PluginError), err:
-            print 'The following error was encountered: %s' % err
-            return False
+        self.mingle.initialize()
+        self.mingle.synchronize()
         return True
