@@ -136,14 +136,14 @@ class PlugInExperience:
         content.import_task_list(task_list)
         return content
 
-    def add_note(self, task_id, text, filename, status):
+    def add_task_ide_note(self, task_id, text, filename, status):
         if not self.prj:
             self.app, self.prj = self.select_project()
 
-        return self.api.add_note("%d-%s" % (self.prj['id'], task_id), text, filename, status)
+        return self.api.add_task_ide_note("%d-%s" % (self.prj['id'], task_id), text, filename, status)
 
-    def get_notes(self, task_id):
+    def get_task_ide_notes(self, task_id):
         if not self.prj:
             self.app, self.prj = self.select_project()
  
-        return self.api.get_notes("%d-%s" % (self.prj['id'], task_id))       
+        return self.api.get_task_ide_notes("%d-%s" % (self.prj['id'], task_id))       

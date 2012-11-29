@@ -17,7 +17,7 @@ class TestVeracode(unittest.TestCase):
           self.integrator.init_plugin()
 
      def note_check(self, task_id, result, status):
-         api_result = self.integrator.plugin.get_notes("T%d" % task_id)
+         api_result = self.integrator.plugin.get_task_ide_notes("T%d" % task_id)
          notes = api_result['notes']
          last_note = notes[len(notes)-1]
          note_time = datetime.datetime.fromtimestamp(last_note['updated'])

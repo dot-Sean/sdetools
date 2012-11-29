@@ -184,7 +184,7 @@ class BaseIntegrator(object):
 
             if commit:
                 try:
-                    self.plugin.add_note(task_id, description, file_name, "TODO")
+                    self.plugin.add_task_ide_note(task_id, description, file_name, "TODO")
                     logger.debug("TODO note added to %s" % (msg))
                     stats_subtasks_added += 1
                 except APIError, e:
@@ -218,7 +218,7 @@ class BaseIntegrator(object):
     
                 if commit:
                     try:
-                        self.plugin.add_note("T%s" % (task_id), description, file_name, "DONE")
+                        self.plugin.add_task_ide_note("T%s" % (task_id), description, file_name, "DONE")
                         logger.debug("Marked %s task as DONE" % (msg))
                         stats_noflaw_notes_added += 1
                     except APIError, e:

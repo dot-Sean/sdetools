@@ -258,7 +258,7 @@ class AlmConnector(object):
             raise AlmException('Requires initialization')
 
         try:
-            self.sde_plugin.api.add_note(task_id, note_msg,
+            self.sde_plugin.api.add_task_ide_note(task_id, note_msg,
                                              filename, status)
             logger.debug('Successfuly set note for task %s' % task_id)
 

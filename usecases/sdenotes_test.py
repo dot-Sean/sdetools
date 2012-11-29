@@ -17,7 +17,7 @@ def load():
 
     plugin.get_compiled_task_list()
         
-    plugin.add_note("T21","Test note","filename","DONE")
+    plugin.add_task_ide_note("T21","Test note","filename","DONE")
 
 def main(argv):
     ret = config.parse_args(argv)
