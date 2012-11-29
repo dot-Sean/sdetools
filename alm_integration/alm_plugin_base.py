@@ -385,14 +385,18 @@ class AlmConnector(object):
             #Attempt to get all tasks
             tasks = self.sde_get_tasks()
             logger.info('Retrieved all tasks from SDE')
+
+            #Prune unnecessary tasks - progress must match reality
+            tasks = [task for task in tasks if self.in_scope(task)]
+
+            logger.info('Pruned tasks out of scope')
+
             total_work = (progress+len(tasks))
 
             for task in tasks:
                 progress += 1
                 self.output_progress(100*progress/total_work)
 
-                if not self.in_scope(task):
-                    continue
                 alm_task = self.alm_get_task(task)
                 if alm_task:
                     # Exists in both SDE & ALM
