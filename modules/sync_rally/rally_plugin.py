@@ -25,7 +25,7 @@ RALLY_HEADERS = [
     ('X-RallyIntegrationLibrary', 'Rally REST API'),
 ]
 
-RALLY_HTML_COVERT = [
+RALLY_HTML_CONVERT = [
     ('<h1>', '<br><font size="5">'),
     ('<h2>', '<br><font size="4">'),
     ('<h3>', '<br><font size="3">'),
@@ -299,7 +299,7 @@ class RallyConnector(AlmConnector):
             s.append('</code>'.join(item))
         s = '<code>'.join(s)
 
-        for before, after in RALLY_HTML_COVERT:
+        for before, after in RALLY_HTML_CONVERT:
             if type(before) is str:
                 s = s.replace(before, after)
             else:
