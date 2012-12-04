@@ -320,7 +320,7 @@ class AlmConnector(object):
         task  -- An SD Elements task representing the task to enter in the
                  ALM
         """
-        content = '%s\n\nImported from SD Elements: %s' % (task['content'], task['url'])
+        content = '%s\n\nImported from SD Elements: [%s](%s)' % (task['content'], task['url'], task['url'])
         if (self.config['how_tos_in_scope'] == 'True') and task['implementations']:
             content += '\n\n# How Tos:\n\n'
             for implementation in task['implementations']:
