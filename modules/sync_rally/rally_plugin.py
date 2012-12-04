@@ -2,12 +2,14 @@
 # Extensible two way integration with Rally
 
 import sys
+import re
 from datetime import datetime
 
 from sdelib.restclient import RESTBase, APIError
 from alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from alm_integration.alm_plugin_base import AlmException
 from sdelib.conf_mgr import Config
+from extlib import markdown
 
 from sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
@@ -21,6 +23,20 @@ RALLY_HEADERS = [
     ('X-RallyIntegrationOS', sys.platform),
     ('X-RallyIntegrationPlatform', 'Python %s' % sys.version.split(' ',1)[0].replace('\n', '')),
     ('X-RallyIntegrationLibrary', 'Rally REST API'),
+]
+
+RALLY_HTML_COVERT = [
+    ('<h1>', '<br><font size="5">'),
+    ('<h2>', '<br><font size="4">'),
+    ('<h3>', '<br><font size="3">'),
+    ('<h4>', '<br><font size="2">'),
+    ('<h5>', '<br><font size="2">'),
+    ('<h6>', '<br><font size="2">'),
+    (re.compile('</h[1-6]>'), '</font><br><br>'),
+    ('<p>', ''),
+    ('</p>', '<br><br>'),
+    ('<pre><code>', '<span style="font-family: courier new,monospace;"><pre><code>'),
+    ('</code></pre>', '</code></pre></span>'),
 ]
 
 class RallyAPIBase(RESTBase):
@@ -102,6 +118,8 @@ class RallyConnector(AlmConnector):
 
         self.project_ref = None
         self.workspace_ref = None
+
+        self.mark_down_converter = markdown.Markdown(safe_mode="escape")
 
     def carriage_return(self):
         return '<br//>'
@@ -267,3 +285,24 @@ class RallyConnector(AlmConnector):
 
     def alm_disconnect(self):
         pass
+
+    def convert_markdown_to_alm(self, content): 
+        s = self.mark_down_converter.convert(content)
+
+        # We do some jumping through hoops to add <br> at end of each
+        # line for segments between code tags
+        sliced = s.split('<code>')
+        s = [sliced[0]]
+        for item in sliced[1:]:
+            item = item.split('</code>')
+            item[0] = item[0].replace('\n', '<br>\n')
+            s.append('</code>'.join(item))
+        s = '<code>'.join(s)
+
+        for before, after in RALLY_HTML_COVERT:
+            if type(before) is str:
+                s = s.replace(before, after)
+            else:
+                s = before.sub(after, s)
+
+        return s
