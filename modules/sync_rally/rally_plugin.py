@@ -136,7 +136,7 @@ class RallyConnector(AlmConnector):
         #Now try to get workspace ID
         try:
             query_args = {
-                'query': '(Name = \"%s\")' % self.sde_plugin.config['rally_workspace']
+                'query': '(Name = \"%s\")' % self.sde_plugin.config['rally_workspace'],
             }
             workspace_ref = self.alm_plugin.call_api('workspace.js',
                                                        args=query_args)
@@ -155,7 +155,8 @@ class RallyConnector(AlmConnector):
         #Now get project ID
         try:
             query_args = {
-                'query': '(Name = \"%s\")' % self.sde_plugin.config['alm_project']
+                'query': '(Name = \"%s\")' % self.sde_plugin.config['alm_project'],
+                'workspace': self.workspace_ref,
             }
             project_ref = self.alm_plugin.call_api('project.js',
                                                     args = query_args)
@@ -173,12 +174,16 @@ class RallyConnector(AlmConnector):
 
 
 
-    def alm_get_task (self, task):
+    def alm_get_task(self, task):
         task_id = task['title']
         result = None
 
         try:
-            query_args = {'query': '(Name = \"%s\")' % task_id}
+            query_args = {
+                'query': '(Name = \"%s\")' % task_id,
+                'workspace': self.workspace_ref,
+                'project': self.project_ref,
+                }
             result = self.alm_plugin.call_api('hierarchicalrequirement.js',
                                                args = query_args)
         except APIError, err:
