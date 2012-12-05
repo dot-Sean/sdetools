@@ -1,9 +1,6 @@
 # Version 0.01
-# Rohit Sethi
 # Copyright SDElements Inc
-#
-# Proof of concept of a report generator
-# Piggybacks off Ehsan's Lint tool code
+
 
 import csv
 from sdelib.cmd import BaseCommand
