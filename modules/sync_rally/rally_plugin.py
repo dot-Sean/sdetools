@@ -16,6 +16,8 @@ logger = log_mgr.mods.add_mod(__name__)
 
 API_VERSION = '1.11'
 
+MAX_CONTENT_SIZE = 30000
+
 RALLY_HEADERS = [
     ('X-RallyIntegrationName', 'SD Elements'),
     ('X-RallyIntegrationVendor', 'SD Elements'),
@@ -291,7 +293,7 @@ class RallyConnector(AlmConnector):
     def alm_disconnect(self):
         pass
 
-    def convert_markdown_to_alm(self, content): 
+    def convert_markdown_to_alm(self, content, ref): 
         s = self.mark_down_converter.convert(content)
 
         # We do some jumping through hoops to add <br> at end of each
@@ -310,4 +312,9 @@ class RallyConnector(AlmConnector):
             else:
                 s = before.sub(after, s)
 
+        if len(s) > MAX_CONTENT_SIZE:
+            logger.warning('Content too long for %s - Truncating.' % ref)
+            s = s[:MAX_CONTENT_SIZE]
+
         return s
+

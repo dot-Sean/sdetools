@@ -112,5 +112,5 @@ class JIRAConnector(AlmConnector):
     def alm_disconnect(self):
         pass
 
-    def convert_markdown_to_alm(self, content): 
+    def convert_markdown_to_alm(self, content, ref): 
         return convert_markdown(content)

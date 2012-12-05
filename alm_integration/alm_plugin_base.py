@@ -307,7 +307,7 @@ class AlmConnector(object):
             logger.error('Unable to set a note to mark status '
                          'for %s to %s' % (task['id'], status))
 
-    def convert_markdown_to_alm(self, content):
+    def convert_markdown_to_alm(self, content, ref):
         return content
 
     def sde_get_task_content(self, task):
@@ -329,7 +329,7 @@ class AlmConnector(object):
 
         content = RE_CODE_DOWNLOAD.sub(r'https://%s/\1' % self.config['sde_server'], content)
 
-        return self.convert_markdown_to_alm(content)
+        return self.convert_markdown_to_alm(content, ref=task['id'])
 
     def output_progress(self, percent):
         if self.sde_plugin.config['show_progress']:
