@@ -3,19 +3,21 @@
 #### SD Elements server and project settings  #####
 ###################################################
 #SD Elements server name, includes port
-server = m1.sdelements.com
+sde_server = m1.sdelements.com
+
+sde_method = https
 
 #SD Elements user login email
-email = sdeuser
+sde_user = sdeuser
 
 #SD Elements user password
-password = sdepassword
+sde_pass = sdepassword
 
 #SD Elements application
-application = sdeappname
+sde_application = sdeappname
 
 #SD Elements project
-project = sdeproject
+sde_project = sdeproject
 
 ###################################################
 #### Rally server and project settings       #####
@@ -31,11 +33,11 @@ alm_method = https
 # -create new issues for the project
 # -read existing issues in the project
 # -create transitions on issues (e.g. close an issue)
-alm_id = rallyid
+alm_user = rallyid
               
 #Password for above user. Note that this will be encrypted
 #in future versions of the plugin
-alm_password = rallypassword
+alm_pass = rallypassword
               
 #Rally project identifier
 alm_project = Sample Project
@@ -108,9 +110,4 @@ rally_done_statuses = Completed,Accepted
 
 
 ######Base settings, do not modify######
-method = https
-targets =  .
-skip_hidden = True
-interactive =True
-askpasswd = False
-auth_mode = basic
+interactive = True

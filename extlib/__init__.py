@@ -1,6 +1,8 @@
 __all__ = [
-    'abc_compat.py',
-    'sslcert_compat.py',
-    'json_compat.py',
-    'argparse_compat.py',
+    'abc_compat',
+    'sslcert_compat',
+    'json_compat',
+    'argparse_compat',
+    'markdown',
+    'SOAPpy',
     ]

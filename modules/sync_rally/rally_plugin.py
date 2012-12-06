@@ -2,17 +2,21 @@
 # Extensible two way integration with Rally
 
 import sys
+import re
 from datetime import datetime
 
 from sdelib.restclient import RESTBase, APIError
 from alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from alm_integration.alm_plugin_base import AlmException
 from sdelib.conf_mgr import Config
+from extlib import markdown
 
 from sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
 API_VERSION = '1.11'
+
+MAX_CONTENT_SIZE = 30000
 
 RALLY_HEADERS = [
     ('X-RallyIntegrationName', 'SD Elements'),
@@ -21,6 +25,20 @@ RALLY_HEADERS = [
     ('X-RallyIntegrationOS', sys.platform),
     ('X-RallyIntegrationPlatform', 'Python %s' % sys.version.split(' ',1)[0].replace('\n', '')),
     ('X-RallyIntegrationLibrary', 'Rally REST API'),
+]
+
+RALLY_HTML_CONVERT = [
+    ('<h1>', '<br><font size="5">'),
+    ('<h2>', '<br><font size="4">'),
+    ('<h3>', '<br><font size="3">'),
+    ('<h4>', '<br><font size="2">'),
+    ('<h5>', '<br><font size="2">'),
+    ('<h6>', '<br><font size="2">'),
+    (re.compile('</h[1-6]>'), '</font><br><br>'),
+    ('<p>', ''),
+    ('</p>', '<br><br>'),
+    ('<pre><code>', '<span style="font-family: courier new,monospace;"><pre><code>'),
+    ('</code></pre>', '</code></pre></span>'),
 ]
 
 class RallyAPIBase(RESTBase):
@@ -103,6 +121,8 @@ class RallyConnector(AlmConnector):
         self.project_ref = None
         self.workspace_ref = None
 
+        self.mark_down_converter = markdown.Markdown(safe_mode="escape")
+
     def carriage_return(self):
         return '<br//>'
 
@@ -118,7 +138,7 @@ class RallyConnector(AlmConnector):
         #Now try to get workspace ID
         try:
             query_args = {
-                'query': '(Name = \"%s\")' % self.sde_plugin.config['rally_workspace']
+                'query': '(Name = \"%s\")' % self.sde_plugin.config['rally_workspace'],
             }
             workspace_ref = self.alm_plugin.call_api('workspace.js',
                                                        args=query_args)
@@ -137,7 +157,8 @@ class RallyConnector(AlmConnector):
         #Now get project ID
         try:
             query_args = {
-                'query': '(Name = \"%s\")' % self.sde_plugin.config['alm_project']
+                'query': '(Name = \"%s\")' % self.sde_plugin.config['alm_project'],
+                'workspace': self.workspace_ref,
             }
             project_ref = self.alm_plugin.call_api('project.js',
                                                     args = query_args)
@@ -155,12 +176,16 @@ class RallyConnector(AlmConnector):
 
 
 
-    def alm_get_task (self, task):
+    def alm_get_task(self, task):
         task_id = task['title']
         result = None
 
         try:
-            query_args = {'query': '(Name = \"%s\")' % task_id}
+            query_args = {
+                'query': '(Name = \"%s\")' % task_id,
+                'workspace': self.workspace_ref,
+                'project': self.project_ref,
+                }
             result = self.alm_plugin.call_api('hierarchicalrequirement.js',
                                                args = query_args)
         except APIError, err:
@@ -267,3 +292,29 @@ class RallyConnector(AlmConnector):
 
     def alm_disconnect(self):
         pass
+
+    def convert_markdown_to_alm(self, content, ref): 
+        s = self.mark_down_converter.convert(content)
+
+        # We do some jumping through hoops to add <br> at end of each
+        # line for segments between code tags
+        sliced = s.split('<code>')
+        s = [sliced[0]]
+        for item in sliced[1:]:
+            item = item.split('</code>')
+            item[0] = item[0].replace('\n', '<br>\n')
+            s.append('</code>'.join(item))
+        s = '<code>'.join(s)
+
+        for before, after in RALLY_HTML_CONVERT:
+            if type(before) is str:
+                s = s.replace(before, after)
+            else:
+                s = before.sub(after, s)
+
+        if len(s) > MAX_CONTENT_SIZE:
+            logger.warning('Content too long for %s - Truncating.' % ref)
+            s = s[:MAX_CONTENT_SIZE]
+
+        return s
+
