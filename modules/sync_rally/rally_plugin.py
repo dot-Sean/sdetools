@@ -14,7 +14,7 @@ from extlib import markdown
 from sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
-API_VERSION = '1.11'
+API_VERSION = '1.39'
 
 MAX_CONTENT_SIZE = 30000
 
