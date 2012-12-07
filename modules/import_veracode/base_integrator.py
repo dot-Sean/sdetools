@@ -33,13 +33,14 @@ class BaseIntegrator(object):
         self.config = config
         self.plugin = None
         self.cwe_title = {}
+        self.confidence = {}
         self.plugin = PlugInExperience(self.config)
         self.config.add_custom_option("mapping_file",
                 "Task ID -> CWE mapping in XML format", "m", default_mapping_file)
         self.config.add_custom_option("flaws_only",
-                "Only update tasks identified having flaws. (on | off)", "z", "on")
+                "Only update tasks identified having flaws. (True | False)", "z", "True")
         self.config.add_custom_option("trial_run",
-                "Trial run only: 'true' or 'false'", "t", "false")
+                "Trial run only: 'True' or 'False'", "t", "False")
 
     def load_mapping_from_xml(self):
         try:
@@ -51,7 +52,9 @@ class BaseIntegrator(object):
 
         cwe_mapping = collections.defaultdict(list)
         self.cwe_title = {}
+        self.confidence = {}
         for task in base.getElementsByTagName('task'):
+            self.confidence[task.attributes['id'].value] = task.attributes['confidence'].value
             for cwe in task.getElementsByTagName('cwe'):
                 cwe_id = cwe.attributes['id'].value
                 cwe_mapping[cwe_id].append(task.attributes['id'].value)
@@ -120,15 +123,14 @@ class BaseIntegrator(object):
         return 'External tool'
 
     def import_findings(self):
-        commit = (self.config['trial_run'] != 'true')
+        commit = (self.config['trial_run'] != 'True')
 
-        stats_subtasks_added = 0
+        stats_failures_added = 0
         stats_api_errors = 0
         stats_total_skips = 0
         stats_total_skips_findings = 0
         stats_total_flaws_found = 0
         import_start_datetime = datetime.now()
-        file_name = '' # Needed for Notes API. All notes will have an empty filename.
 
         logger.info("Integration underway for: %s" % (self.report_id))
         logger.info("Mapped SD application/project: %s/%s" % 
@@ -136,6 +138,10 @@ class BaseIntegrator(object):
 
         if not commit:
             logger.info("Trial run only. No changes will be made")
+        else:
+            ret = self.plugin.add_project_analysis_note(self.report_id, self.get_tool_name())
+            project_analysis_note_ref = ret['id'] 
+
 
         task_list = self.plugin.get_task_list()
         logger.debug("Retrieved task list for %s/%s" % 
@@ -166,35 +172,45 @@ class BaseIntegrator(object):
                 stats_total_skips_findings += len(finding['cwes'])
                 continue
 
-            task_id = "T%s" % (task_id)
+            task_name = "T%s" % (task_id)
 
-            description  = "Automated analysis tool %s identified %d potential vulnerabilities for this task.\n" % (self.get_tool_name(), len(finding['cwes']))
-            description += "%s Reference: %s\n\n" % (self.get_tool_name(), self.report_id)
-            description += "Referenced Weaknesses:\n"
+            analysis_findings = []
+            last_cwe = None
+            cwe_finding = {}
 
-            for cwe in sorted(set(finding['cwes'])):
-                if self.cwe_title.has_key(cwe):
-                   description += "CWE #%s: %s\n" % ( cwe, self.cwe_title[cwe] )
-                else:
-                   description += "CWE #%s\n" % ( cwe )
+            for cwe in sorted(finding['cwes']):
+                if last_cwe != cwe:
+                    if len(cwe_finding.items()) > 0:
+                        analysis_findings.append(cwe_finding)
+                        cwe_finding = {}
+                    cwe_finding['count'] = 0
+                    cwe_finding['cwe'] = cwe
+                    last_cwe = cwe
+                    if self.cwe_title.has_key(last_cwe):
+                        cwe_finding['desc'] = self.cwe_title[last_cwe]
 
-            description = description[:800]
+                cwe_finding['count'] = cwe_finding['count'] + 1
 
-            msg = "%s" % task_id
+            if len(finding.items()) > 0:
+                analysis_findings.append(cwe_finding)
 
             if commit:
                 try:
-                    self.plugin.add_task_ide_note(task_id, description, file_name, "TODO")
-                    logger.debug("TODO note added to %s" % (msg))
-                    stats_subtasks_added += 1
+                    finding_confidence = "none"
+                    if self.confidence.has_key(task_id):
+                        finding_confidence = self.confidence[task_id]
+
+                    ret = self.plugin.add_analysis_note(task_name, project_analysis_note_ref, finding_confidence, analysis_findings)
+                    logger.debug("Marked %s as FAILURE with %s confidence" % (task_name, finding_confidence))
+                    stats_failures_added += 1
                 except APIError, e:
-                    logger.exception("Could not add TODO note to %s - Reason: %s" % (msg, str(e)))
+                    logger.exception("Could not mark %s as FAILURE - Reason: %s" % (task_name, str(e)))
                     stats_api_errors += 1
             else:
-                logger.debug("TODO note added to %s" % (msg))
-                stats_subtasks_added += 1
+                logger.debug("Marked %s as FAILURE with %s confidence" % (task_name, finding_confidence))
+                stats_failures_added += 1
 
-        stats_noflaw_notes_added=0
+        stats_passes_added=0
         stats_test_tasks=0
 
         affected_tasks = []
@@ -205,28 +221,34 @@ class BaseIntegrator(object):
                 continue
             task_id = re.search('(\d+)-[^\d]+(\d+)', task['id']).group(2)
             if(unique_findings.has_key(task_id)):
-                affected_tasks.append(int(task_id))
+                affected_tasks.append(task_id)
                 continue
-            noflaw_tasks.append(int(task_id))
-        noflaw_tasks = sorted(noflaw_tasks)
+            noflaw_tasks.append(task_id)
 
-        if self.config['flaws_only'] == 'off':
+        if self.config['flaws_only'] == 'False':
             for task_id in noflaw_tasks:
-                msg = "T%s" % task_id
-                description  = "Automated analysis tool %s did not identify any potential vulnerabilities for this task.\n" % (self.get_tool_name())
-                description += "%s Reference: %s\n\n" % (self.get_tool_name(), self.report_id)
-    
+
+                task_name = "T%s" % task_id
+
+                finding_confidence = "none"
+                if self.confidence.has_key(task_id):
+                    finding_confidence = self.confidence[task_id]
+                else:
+                    continue
+
                 if commit:
                     try:
-                        self.plugin.add_task_ide_note("T%s" % (task_id), description, file_name, "DONE")
-                        logger.debug("Marked %s task as DONE" % (msg))
-                        stats_noflaw_notes_added += 1
+                        analysis_findings = []
+
+                        self.plugin.add_analysis_note(task_name, project_analysis_note_ref, finding_confidence, analysis_findings)
+                        logger.debug("Marked %s task as PASS with %s confidence" % (task_name, finding_confidence))
+                        stats_passes_added += 1
                     except APIError, e:
-                        logger.exception("Could not mark %s DONE - Reason: %s" % (msg, str(e)))
+                        logger.exception("Could not mark %s as PASS - Reason: %s" % (task_name, str(e)))
                         stats_api_errors += 1
                 else:
-                    logger.info("Marked %s as DONE" % (msg))
-                    stats_noflaw_notes_added += 1
+                    logger.info("Marked %s as PASS with %s confidence" % (task_name, finding_confidence))
+                    stats_passes_added += 1
 
         logger.info("---------------------------------------------------------")
         if missing_cwe_map:
@@ -234,8 +256,8 @@ class BaseIntegrator(object):
             logger.error("%d total flaws could not be mapped." %(len(missing_cwe_map)))
         else:
             logger.info("All CWEs successfully mapped to a task.")
-        logger.info("%d subtasks created from %d flaws."%(stats_subtasks_added, stats_total_flaws_found))
-        logger.info("%d/%d project tasks had 0 flaws." %(len(noflaw_tasks),len(task_list)-(stats_test_tasks)))
+        logger.info("%d failures recorded from %d flaws."%(stats_failures_added, stats_total_flaws_found))
+        logger.info("%d/%d project tasks had 0 flaws." %(len(noflaw_tasks),len(task_list)-(stats_test_tasks))) 
         if stats_total_skips:
             logger.error("%d flaws were mapped to %d tasks not found in the project. Skipped " % 
                 (stats_total_skips_findings,stats_total_skips))

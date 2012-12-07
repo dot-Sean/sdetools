@@ -51,14 +51,21 @@ class APIBase(RESTBase):
         result = self.call_api('tasknotes/ide', self.URLRequest.POST, args=note)
         return result
 
-    def get_task_notes(self, task):
-        return self.call_api('tasknotes', args={'task':task})
+    def get_task_notes(self, task, note_type):
+        end_point = 'tasknotes'
+        if note_type not in ['', 'ide', 'text']:
+            return
+        if note_type:
+            end_point += '/%s' % note_type)
+        return self.call_api(end_point, args={'task':task})
 
-    def get_task_text_notes(self, task):
-        return self.call_api('tasknotes/text', args={'task':task})
+    def add_analysis_note(self, task, analysis_ref, confidence, findings):
+        note = {'task':task, 'project_analysis_note':analysis_ref, 'confidence':confidence, 'findings':findings}
+        return self.call_api('tasknotes/analysis', self.URLRequest.POST, args=note)
 
-    def get_task_ide_notes(self, task):
-        return self.call_api('tasknotes/ide', args={'task':task})
+    def add_project_analysis_note(self, project_id, analysis_ref, analysis_type):
+        project_analysis = {'project':project_id, 'analysis_ref':analysis_ref, 'analysis_type':analysis_type}
+        return self.call_api('projectnotes/analysis', self.URLRequest.POST, args=project_analysis)
 
     def update_task_status(self, task, status):
         """

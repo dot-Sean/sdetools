@@ -3,9 +3,9 @@ from xml.dom import minidom
 
 from base_integrator import BaseIntegrator, IntegrationError
 
-REQUIRED_ATTRIBS = ['issueid', 'cweid', 'categoryid', 'categoryname', 'description', 'severity', 'module']
+REQUIRED_ATTRIBS = ['issueid', 'cweid', 'categoryid', 'categoryname', 'description', 'severity', 'module','remediation_status']
 LOCATION_ATTRIBS = ['sourcefilepath', 'sourcefile', 'line', 'location']
-SOURCE_NAME = "Veracode"
+SOURCE_NAME = "veracode"
 
 __all__ = ['VeracodeIntegrator']
 
@@ -57,6 +57,11 @@ class VeracodeIntegrator(BaseIntegrator):
 
         self.raw_findings[:] = [self._make_raw_finding(node)
                                 for node in base.getElementsByTagName('flaw')]
+
+        # Veracode tracks 'fixed' flaws - prune them out
+        for flaw in list(self.raw_findings):
+            if(flaw['remediation_status'] == 'Fixed'):
+                self.raw_findings.remove(flaw)
 
     def output_raw_findings(self):
         for item in self.raw_findings:

@@ -142,8 +142,20 @@ class PlugInExperience:
 
         return self.api.add_task_ide_note("%d-%s" % (self.prj['id'], task_id), text, filename, status)
 
-    def get_task_ide_notes(self, task_id):
+    def get_task_notes(self, task_id, note_type=''):
         if not self.prj:
             self.app, self.prj = self.select_project()
  
-        return self.api.get_task_ide_notes("%d-%s" % (self.prj['id'], task_id))       
+        return self.api.get_task_ide_notes("%d-%s" % (self.prj['id'], task_id), note_type)
+
+    def add_project_analysis_note(self, analysis_ref, analysis_type):
+        if not self.prj:
+            self.app, self.prj = self.select_project()
+
+        return self.api.add_project_analysis_note(self.prj['id'], analysis_ref, analysis_type)
+
+    def add_analysis_note(self, task_id, analysis_ref, confidence, findings):
+        if not self.prj:
+            self.app, self.prj = self.select_project()
+
+        return self.api.add_analysis_note("%d-%s" % (self.prj['id'], task_id), analysis_ref, confidence, findings)

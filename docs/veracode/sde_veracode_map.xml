@@ -1,47 +1,47 @@
 <mapping>
-	<task id="151" title="Use cryptographically secure random numbers">
+	<task id="151" title="Use cryptographically secure random numbers" confidence="high">
 		<cwe id="331" title="Insufficient Entropy"/>
 	</task>
-	<task id="199" title="Avoid relying on evironment variables for application settings">
+	<task id="199" title="Avoid relying on evironment variables for application settings" confidence="none">
 		<cwe id="526" title="Information Exposure Through Environmental Variables"/>
 		<cwe id="15" title="External Control of System or Configuration Setting"/>
 	</task>
-	<task id="198" title="Encrypt sensitive information in memory">
+	<task id="198" title="Encrypt sensitive information in memory" confidence="none">
 		<cwe id="316" title="Plaintext Storage in Memory"/>
 	</task>
-	<task id="157" title="Securely create and cleanup of temporary files must be cleaned up after the resource is used">
+	<task id="157" title="Securely create and cleanup of temporary files must be cleaned up after the resource is used" confidence="none">
 		<cwe id="378" title="Creation of Temporary File With Insecure Permissions"/>
 		<cwe id="377" title="Insecure Temporary File"/>
 	</task>
-	<task id="156" title="Validate certificate and its chain of trust properly">
+	<task id="156" title="Validate certificate and its chain of trust properly" confidence="high">
 		<cwe id="296" title="Improper Following of Chain of Trust for Certificate Validation"/>
 		<cwe id="297" title="Improper Validation of Host-specific Certificate Data"/>
 		<cwe id="298" title="Improper Validation of Certificate Expiration"/>
 	</task>
-	<task id="159" title="Avoid sending detailed error messages to remote systems">
+	<task id="159" title="Avoid sending detailed error messages to remote systems" confidence="none">
 		<cwe id="201" title="Information Exposure Through Sent Data"/>
 		<cwe id="209" title="Information Exposure Through an Error Message"/>
 		<cwe id="497" title="Exposure of System Data to an Unauthorized Control Sphere"/>
 	</task>
-	<task id="197" title="Verify the integrity of dynamically-included third party code">
+	<task id="197" title="Verify the integrity of dynamically-included third party code" confidence="none">
 		<cwe id="494" title="Download of Code Without Integrity Check"/>
 	</task>
-	<task id="196" title="Avoid Dangerous Functions">
+	<task id="196" title="Avoid Dangerous Functions" confidence="high">
 		<cwe id="242" title="Use of Inherently Dangerous Function"/>
 	</task>
-	<task id="191" title="Follow best practices when handling primitive data types">
+	<task id="191" title="Follow best practices when handling primitive data types" confidence="high">
 		<cwe id="195" title="Signed to Unsigned Conversion Error"/>
 		<cwe id="197" title="Numeric Truncation Error"/>
 		<cwe id="196" title="Unsigned to Signed Conversion Error"/>
 		<cwe id="192" title="Integer Coercion Error"/>
 	</task>
-	<task id="55" title="Validate all untrusted XML input">
+	<task id="55" title="Validate all untrusted XML input" confidence="high">
 		<cwe id="112" title="Missing XML Validation"/>
 	</task>
-        <task id="203" title="Avoid uncontrolled format string">
+        <task id="203" title="Avoid uncontrolled format string" confidence="high">
  		<cwe id="134" title="Uncontrolled Format String"/>
         </task>
-	<task id="193" title="Review non-categorized/miscellaneous findings from static code analysis">
+	<task id="193" title="Review non-categorized/miscellaneous findings from static code analysis" confidence="none">
 		<cwe id="597" title="Use of Wrong Operator in String Comparison"/>
 		<cwe id="668" title="Exposure of Resource to Wrong Sphere"/>
 		<cwe id="391" title="Unchecked Error Condition"/>
@@ -73,120 +73,118 @@
 		<cwe id="170" title="Improper Null Termination"/>
 	        <cwe id="*" title="Unmapped CWE"/>
         </task>
-        <task id="206" title="Avoid time of check time of use race condition against external resources">
+        <task id="206" title="Avoid time of check time of use race condition against external resources" confidence="none">
                 <cwe id="367" title="Time-of-check Time-of-use (TOCTOU) Race Condition"/>
         </task>
-        <task id="205" title="Avoid inter-process race conditions">
+        <task id="205" title="Avoid inter-process race conditions" confidence="low">
                 <cwe id="557" title="Concurrency Issues"/>
         </task>
-        <task id="202" title="Prevent buffer overflow/underflow">
+        <task id="202" title="Prevent buffer overflow/underflow" confidence="high">
                 <cwe id="121" title="Stack-Based Buffer Overflow"/>
         </task>
-        <task id="204" title="Follow security best practices when dealing with pointers">
+        <task id="204" title="Follow security best practices when dealing with pointers" confidence="high">
                 <cwe id="125" title="Out-of-Bounds Read"/>
                 <cwe id="415" title="Double Free"/>
                 <cwe id="416" title="Use After Free"/>
         </task>
-	<task id="60" title="Only use approved cryptographic algorithms and key lengths">
+	<task id="60" title="Only use approved cryptographic algorithms and key lengths" confidence="low">
 		<cwe id="757" title="Selection of Less-Secure Algorithm During Negotiation (Algorithm Downgrade)"/>
 		<cwe id="347" title="Improper Verification of Cryptographic Signature"/>
 		<cwe id="326" title="Inadequate Encryption Strength"/>
 		<cwe id="327" title="Use of a Broken or Risky Cryptographic Algorithm"/>
 		<cwe id="329" title="Not Using a Random IV with CBC Mode"/>
 	</task>
-	<task id="62" title="Lockdown passwords in property and configuration files (e.g. database connection strings)">
+	<task id="62" title="Lockdown passwords in property and configuration files (e.g. database connection strings)" confidence="high">
 		<cwe id="522" title="Insufficiently Protected Credentials"/>
 	</task>
-	<task id="176" title="Apply principles of privacy when handling personal information">
+	<task id="176" title="Apply principles of privacy when handling personal information" confidence="low">
 		<cwe id="359" title="Privacy Violation"/>
 	</task>
-	<task id="20" title="Invalidate old session ID after authentication">
+	<task id="20" title="Invalidate old session ID after authentication" confidence="high">
 		<cwe id="384" title="Session Fixation"/>
 	</task>
-	<task id="22" title="Set secure flag on session cookies">
+	<task id="22" title="Set secure flag on session cookies" confidence="high">
 		<cwe id="614" title="Sensitive Cookie in HTTPS Session Without Secure Attribute"/>
 	</task>
-	<task id="49" title="Remove/disable unused, test or debug code and data">
+	<task id="49" title="Remove/disable unused, test or debug code and data" confidence="low">
 		<cwe id="215" title="Information Exposure Through Debug Information"/>
-	</task>
-	<task id="49" title="Remove/disable unused, test or debug code and data">
 		<cwe id="511" title="Logic/Time Bomb"/>
 		<cwe id="489" title="Leftover Debug Code"/>
 		<cwe id="530" title="Exposure of Backup File to an Unauthorized Control Sphere"/>
 		<cwe id="506" title="Embedded Malicious Code"/>
 		<cwe id="514" title="Covert Channel"/>
 	</task>
-	<task id="47" title="Implement a global error handler and generic default error page for end users">
+	<task id="47" title="Implement a global error handler and generic default error page for end users" confidence="high">
 		<cwe id="201" title="Information Exposure Through Sent Data"/>
 		<cwe id="209" title="Information Exposure Through an Error Message"/>
 		<cwe id="497" title="Exposure of System Data to an Unauthorized Control Sphere"/>
 	</task>
-	<task id="42" title="Avoid relying on untrusted data for server side page, view, or template selection">
+	<task id="42" title="Avoid relying on untrusted data for server side page, view, or template selection" confidence="high">
 		<cwe id="98" title="Improper Control of Filename for Include/Require Statement in PHP Program (PHP File Inclusion)"/>
 	</task>
-	<task id="43" title="Avoid unsafe operating system interaction">
+	<task id="43" title="Avoid unsafe operating system interaction" confidence="high">
 		<cwe id="114" title="Process Control"/>
 		<cwe id="426" title="Untrusted Search Path"/>
 		<cwe id="427" title="Uncontrolled Search Path Element"/>
 		<cwe id="78" title="Improper Neutralization of Special Elements used in an OS Command (OS Command Injection)"/>
 	</task>
-	<task id="41" title="Use Lightweight Directory Access Protocol (LDAP) encoding when interacting with LDAP data">
+	<task id="41" title="Use Lightweight Directory Access Protocol (LDAP) encoding when interacting with LDAP data" confidence="high">
 		<cwe id="90" title="Improper Neutralization of Special Elements Used in an LDAP Query (LDAP Injection)"/>
 	</task>
-	<task id="182" title="Avoid nested expressions based on unvalidated input">
+	<task id="182" title="Avoid nested expressions based on unvalidated input" confidence="high">
 		<cwe id="95" title="Improper Neutralization of Directives in Dynamically Evaluated Code (Eval Injection)"/>
 	</task>
-	<task id="181" title="Validate model explicitly for fields the user is allowed to update">
+	<task id="181" title="Validate model explicitly for fields the user is allowed to update" confidence="low">
 		<cwe id="103" title="Struts: Incomplete validate() Method Definition"/>
 		<cwe id="104" title="Struts: Form Bean Does Not Extend Validation Class"/>
 	</task>
-	<task id="7" title="Salt and hash stored password">
+	<task id="7" title="Salt and hash stored password" confidence="low">
 		<cwe id="256" title="Plaintext Storage of a Password"/>
 	</task>
-	<task id="189" title="Avoid usage of unmanaged code">
+	<task id="189" title="Avoid usage of unmanaged code" confidence="low">
 		<cwe id="111" title="Direct Use of Unsafe JNI"/>
 	</task>
-	<task id="76" title="Do not hard code passwords">
+	<task id="76" title="Do not hard code passwords" confidence="low">
 		<cwe id="259" title="Use of Hard-coded Password"/>
 		<cwe id="321" title="Use of Hard-coded Cryptographic Key"/>
 	</task>
-	<task id="72" title="Use safe arithmetic to avoid integer overflow">
+	<task id="72" title="Use safe arithmetic to avoid integer overflow" confidence="high">
 		<cwe id="191" title="Integer Underflow (Wrap or Wraparound)"/>
 		<cwe id="190" title="Integer Overflow or Wraparound"/>
 	</task>
-	<task id="11" title="Disallow external redirects">
+	<task id="11" title="Disallow external redirects" confidence="high">
 		<cwe id="601" title="URL Redirection to Untrusted Site (Open Redirect)"/>
 	</task>
-	<task id="39" title="Disallow carriage returns and line feeds when adding data to HTTP response headers">
+	<task id="39" title="Disallow carriage returns and line feeds when adding data to HTTP response headers" confidence="high">
 		<cwe id="113" title="Improper Neutralization of CRLF Sequences in HTTP Headers (HTTP Response Splitting)"/>
 	</task>
-	<task id="38" title="Bind variables in SQL statements">
+	<task id="38" title="Bind variables in SQL statements" confidence="high">
 		<cwe id="89" title="Improper Neutralization of Special Elements used in an SQL Command (SQL Injection)"/>
 		<cwe id="564" title="SQL Injection: Hibernate"/>
 	</task>
-	<task id="14" title="Principles of least privilege">
+	<task id="14" title="Principles of least privilege" confidence="low">
 		<cwe id="732" title="Incorrect Permission Assignment for Critical Resource"/>
 		<cwe id="708" title="Incorrect Ownership Assignment"/>
 	</task>
-	<task id="33" title="Verify integrity of client-supplied read-only data">
+	<task id="33" title="Verify integrity of client-supplied read-only data" confidence="low">
 		<cwe id="354" title="Improper Validation of Integrity Check Value"/>
 	</task>
-	<task id="54" title="Validate file contents">
+	<task id="54" title="Validate file contents" confidence="low">
 		<cwe id="434" title="Unrestricted Upload of File with Dangerous Type"/>
 	</task>
-	<task id="31" title="Perform input validation on all forms of input">
+	<task id="31" title="Perform input validation on all forms of input" confidence="high">
 		<cwe id="93" title="Improper Neutralization of CRLF Sequences (CRLF Injection)"/>
 		<cwe id="501" title="Trust Boundary Violation"/>
 	</task>
-	<task id="36" title="Escape untrusted data in HTML, HTML attributes, Cascading Style Sheets and JavaScript">
+	<task id="36" title="Escape untrusted data in HTML, HTML attributes, Cascading Style Sheets and JavaScript" confidence="high">
 		<cwe id="83" title="Improper Neutralization of Script in Attributes in a Web Page"/>
 		<cwe id="80" title="Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)"/>
 		<cwe id="79" title="Improper Neutralization of Input During Web Page Generation (Cross-site Scripting)"/>
 	</task>
-	<task id="55" title="Use XSDs instead of DTDs">
+	<task id="55" title="Use XSDs instead of DTDs" confidence="high">
 		<cwe id="611" title="Information Exposure Through XML External Entity Reference"/>
 	</task>
-	<task id="50" title="Use indirect object reference maps if accessing files">
+	<task id="50" title="Use indirect object reference maps if accessing files" confidence="low">
 		<cwe id="73" title="External Control of File Name or Path"/>
 		<cwe id="22" title="Improper Limitation of a Pathname to a Restricted Directory (Path Traversal)"/>
 	</task>
