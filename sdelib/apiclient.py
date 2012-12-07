@@ -56,7 +56,7 @@ class APIBase(RESTBase):
         if note_type not in ['', 'ide', 'text']:
             return
         if note_type:
-            end_point += '/%s' % note_type)
+            end_point += '/%s' % (note_type)
         return self.call_api(end_point, args={'task':task})
 
     def add_analysis_note(self, task, analysis_ref, confidence, findings):
