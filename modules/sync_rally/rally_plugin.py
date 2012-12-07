@@ -127,6 +127,9 @@ class RallyConnector(AlmConnector):
         return '<br//>'
 
     def alm_connect(self):
+
+        workspace_ref = None
+
         """ Verifies that Rally connection works """
         #Check to make sure that we can do a simple API call
         try:
@@ -137,17 +140,17 @@ class RallyConnector(AlmConnector):
 
         #Now try to get workspace ID
         try:
-            query_args = {
-                'query': '(Name = \"%s\")' % self.sde_plugin.config['rally_workspace'],
-            }
-            workspace_ref = self.alm_plugin.call_api('workspace.js',
-                                                       args=query_args)
-            num_results = workspace_ref['QueryResult']['TotalResultCount']
-            if not num_results:
+            subscription_ref = self.alm_plugin.call_api('subscription.js')
+            print subscription_ref
+            for workspace in subscription_ref['Subscription']['Workspaces']:
+                if workspace['_refObjectName'] == self.sde_plugin.config['rally_workspace']:
+                    workspace_ref = workspace['_ref']
+                    break
+
+            if not workspace_ref:
                 raise AlmException('Workspace is not valid, please check '
                                    'config value: '
                                    '%s' % self.sde_plugin.config['rally_workspace'])
-            workspace_ref = workspace_ref['QueryResult']['Results'][0]['_ref']
             self.workspace_ref = workspace_ref
 
         except APIError:
