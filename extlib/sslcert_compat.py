@@ -66,7 +66,10 @@ class CertValidatingHTTPSConnection(httplib.HTTPConnection):
         return False
 
     def connect(self):
-        sock = socket.create_connection((self.host, self.port))
+        sock = socket.create_connection((self.host, self.port), self.timeout)
+        if self._tunnel_host:
+            self.sock = sock
+            self._tunnel()
         self.sock = ssl.wrap_socket(sock, keyfile=self.key_file,
                                           certfile=self.cert_file,
                                           cert_reqs=self.cert_reqs,
