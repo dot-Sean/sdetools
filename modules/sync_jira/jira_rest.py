@@ -12,14 +12,11 @@ class JIRARestAPI(RESTBase):
         """ Verifies that JIRA connection works """
         #verify that we can connect to JIRA
         try:
-            result = self.call_api('project')
+            result = self.call_api('project/%s' % (self.config['alm_project']))
         except APIError:
             raise AlmException('Unable to connect to JIRA. Check server URL, ID, password')
 
-        #verify that we can access project
-        try:
-            self.call_api('project/%s' % (self.config['alm_project']))
-        except APIError:
+        if type( result ) != dict or not result.has_key('key') or result['key'] != self.config['alm_project']:
             raise AlmException('Unable to connect to JIRA project %s' % self.config['alm_project'])
 
     def get_issue_types(self):
