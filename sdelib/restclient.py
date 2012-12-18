@@ -9,10 +9,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 CONF_OPTS = [
-    ('%(prefix)s_user', 'Username for %(name)s Tool', None),
-    ('%(prefix)s_pass', 'Password for %(name)s Tool', None),
-    ('%(prefix)s_server', 'Server of the %(name)s', None),
-    ('%(prefix)s_method', 'http vs https for %(name)s server', 'https'),
+    ['%(prefix)s_user', 'Username for %(name)s Tool', None],
+    ['%(prefix)s_pass', 'Password for %(name)s Tool', None],
+    ['%(prefix)s_server', 'Server of the %(name)s', None],
+    ['%(prefix)s_method', 'http vs https for %(name)s server', 'https'],
 ]
 
 class APIError(Error):
@@ -74,20 +74,21 @@ class RESTBase(object):
     ServerError = ServerError
     APIFormatError = APIFormatError
 
-    def __init__(self, conf_prefix, conf_name, config, base_path):
+    def __init__(self, conf_prefix, conf_name, config, base_path, conf_opts=CONF_OPTS):
         self.config = config
         self.base_path = base_path
         self.conf_prefix = conf_prefix
         self.conf_name = conf_name
         self.opener = None
-        self._customize_config()
+        self.auth_mode = 'basic'
+        self._customize_config(conf_opts)
 
     def _get_conf(self, name):
         conf_name = '%s_%s' % (self.conf_prefix, name)
         return self.config[conf_name]
 
-    def _customize_config(self):
-        for var_name, desc, default in CONF_OPTS:
+    def _customize_config(self, conf_opts):
+        for var_name, desc, default in conf_opts:
             self.config.add_custom_option(
                 var_name % {'prefix': self.conf_prefix},
                 desc % {'name': self.conf_name},
@@ -95,9 +96,8 @@ class RESTBase(object):
                 group_name='%s Connector' % (self.conf_name))
 
     def post_conf_init(self):
-        self.base_uri = '%s://%s/%s' % (self._get_conf('method'), 
-                self._get_conf('server'), self.base_path)
-        self.auth_mode = 'basic'
+        self.server = self._get_conf('server') 
+        self.base_uri = '%s://%s/%s' % (self._get_conf('method'), self.server, self.base_path)
         self.session_info = None
 
         urllib_debuglevel = 0
@@ -116,6 +116,9 @@ class RESTBase(object):
         except:
             raise APIFormatError('Unable to process JSON data.')
         return result
+
+    def parse_error(self, result):
+        return json.loads(err_msg)['error']
 
     def set_content_type(self, req, method):
         if (method != URLRequest.GET):
@@ -157,7 +160,9 @@ class RESTBase(object):
 
         self.set_content_type(req, method)
 
-        if target == 'session':
+        if auth_mode == 'api_token':
+            req.add_header("X-Api-Token", self._get_conf('pass'))
+        elif target == 'session':
             pass
         elif auth_mode == 'basic':
             encoded_auth = base64.encodestring('%s:%s' % (self._get_conf('user'), self._get_conf('pass')))[:-1]
@@ -183,22 +188,23 @@ class RESTBase(object):
         try:
             handle = self.opener.open(req)
         except sslcert_compat.InvalidCertificateException, err:
-            raise ServerError('Unable to verify SSL certificate for host: %s' % (self._get_conf('server')))
+            raise ServerError('Unable to verify SSL certificate for host: %s' % (self.server))
         except urllib2.URLError, err:
             handle = err
             call_success = False
 
         if not call_success:
             if not hasattr(handle, 'code'):
-                raise ServerError('Invalid server or server unreachable: %s' % (self._get_conf('server')))
+                raise ServerError('Invalid server or server unreachable: %s' % (self.server))
             try:
                 err_msg = handle.read()
+                logger.info('Error calling %s API. Raw error: %s' % (self.conf_name, repr(err_msg)[:200]))
             except:
                 err_msg = 'Unknown Error'
             try:
-                err_msg = json.loads(err_msg)['error']
+                err_msg = self.parse_error(err_msg)
             except:
-                # Not a JSON error
+                # We fall back to unparsed version of the error
                 pass
             if handle.code == 401:
                 raise APIAuthError('Invalid Credentials for %s' % self.conf_name)

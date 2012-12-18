@@ -1,14 +1,29 @@
-from restclient import RESTBase
+from commons import UsageError
+import restclient
 from restclient import APIError, APIHTTPError, APICallError, APIAuthError, ServerError, APIFormatError
 
 import logging
 logger = logging.getLogger(__name__)
 
-class APIBase(RESTBase):
+class APIBase(restclient.RESTBase):
     def __init__(self, config):
-        super(APIBase, self).__init__('sde', 'SD Elements', config, 'api')
+        conf_opts = restclient.CONF_OPTS[:]
+        conf_opts.append(('sde_api_token', 'API Token for SDE', ''))
+        for i in xrange(3):
+            conf_opts[i][-1] = ''
+        super(APIBase, self).__init__('sde', 'SD Elements', config, 'api', conf_opts)
         self.app = None
         self.prj = None
+
+    def post_conf_init(self):
+        if self.config['sde_api_token']:
+            self.auth_mode = 'api_token'
+            if '$' not in self.config['sde_api_token']:
+                raise UsageError('Unable to process API Token')
+            self.config['sde_user'] = None
+            self.config['sde_pass'], self.config['sde_server'] = (
+                self.config['sde_api_token'].split('$', 1))
+        super(APIBase, self).post_conf_init()
 
     def get_applications(self, **filters):
         """
