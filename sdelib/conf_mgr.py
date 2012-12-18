@@ -37,7 +37,8 @@ class Config(object):
     DEFAULTS = {
             'conf_file': DEFAULT_CONFIG_FILE,
             'interactive': True,
-            'authmode': 'session', # Can be 'session' or 'basic'
+            # Can be 'api_token'|'session'|'basic'
+            'authmode': 'api_token', 
             'application': None,
             'project': None,
             'skip_hidden': True,
