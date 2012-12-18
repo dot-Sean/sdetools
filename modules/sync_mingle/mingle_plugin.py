@@ -19,7 +19,7 @@ class MingleAPIBase(RESTBase):
         super(MingleAPIBase, self).__init__('alm', 'Mingle', config, None)
 
     def post_conf_init(self):
-        self.base_path = 'api/v2/projects/%s' % self.config['alm_project']
+        self.base_path = 'api/v2/projects/%s' % self.urlencode_str(self.config['alm_project'])
         super(MingleAPIBase, self).post_conf_init()
 
     def encode_post_args(self, args):

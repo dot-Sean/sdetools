@@ -95,6 +95,9 @@ class RESTBase(object):
                 default=default,
                 group_name='%s Connector' % (self.conf_name))
 
+    def urlencode_str(self, instr):
+        return urllib.urlencode({'a':instr})[2:]
+
     def post_conf_init(self):
         self.server = self._get_conf('server') 
         self.base_uri = '%s://%s/%s' % (self._get_conf('method'), self.server, self.base_path)

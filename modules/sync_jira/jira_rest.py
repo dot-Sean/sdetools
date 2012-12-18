@@ -18,7 +18,7 @@ class JIRARestAPI(RESTBase):
 
         #verify that we can access project
         try:
-            self.call_api('project/%s' % (self.config['alm_project']))
+            self.call_api('project/%s' % (self.urlencode_str(self.config['alm_project'])))
         except APIError:
             raise AlmException('Unable to connect to JIRA project %s' % self.config['alm_project'])
 
