@@ -36,7 +36,7 @@ def run_command(cmd_name, args):
 
     curr_cmd = command[cmd_name]
 
-    config = conf_mgr.Config(command)
+    config = conf_mgr.Config(command, args)
 
     cmd_inst = curr_cmd(config, args)
 

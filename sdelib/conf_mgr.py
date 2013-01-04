@@ -47,13 +47,13 @@ class Config(object):
             'args': None,
         }
 
-    def __init__(self, command_list):
+    def __init__(self, command_list, args):
         self.command_list = command_list
         self.settings = self.DEFAULTS.copy()
         self.custom_options = []
         self.parser = None
         self.use_conf_file = True
-        self.args = sys.argv[2:]
+        self.args = args
 
     def __getitem__(self, key):
         if key in self.settings:
