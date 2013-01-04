@@ -7,7 +7,7 @@ import logging
 
 import log_mgr
 
-from commons import show_error, UsageError
+from commons import UsageError
 
 __all__ = ['Config']
 
@@ -47,7 +47,11 @@ class Config(object):
             'args': None,
         }
 
-    def __init__(self, command_list, args):
+    def __init__(self, command_list, args, call_src):
+        if call_src not in ['shell', 'import']:
+            raise UsageError("Invalid config source")
+
+        self.call_src = call_src
         self.command_list = command_list
         self.settings = self.DEFAULTS.copy()
         self.custom_options = []
@@ -201,6 +205,16 @@ class Config(object):
             parser.add_option_group(group)
 
     def parse_args(self, cmd_inst):
+        if self.call_src == 'shell':
+            return self.parse_shell_args(cmd_inst)
+        elif self.call_src == 'import':
+            return self.parse_func_args(cmd_inst)
+
+    def parse_func_args(cmd_inst):
+        self['conf_file'] = None
+        self['interactive'] = False
+
+    def parse_shell_args(self, cmd_inst):
         if self.parser is None:
             self.prepare_parser(cmd_inst)
 
@@ -211,8 +225,7 @@ class Config(object):
                 # This happens when -h is used
                 return False
             else:
-                show_error("Invalid options specified.", usage_hint=True)
-                return False
+                raise UsageError("Invalid options specified.")
 
         if (not self.use_conf_file) or opts.skip_conf_file:
             self['conf_file'] = None
@@ -221,8 +234,7 @@ class Config(object):
 
         ret_stat, ret_val = self.parse_config_file(self['conf_file'])
         if not ret_stat:
-            show_error("Unable to read or process configuration file.\n Reason: %s" % (ret_val))
-            return False
+            raise UsageError("Unable to read or process configuration file.\n Reason: %s" % (ret_val))
 
         self.command = args[0]
         self.args = args[1:]
@@ -245,8 +257,7 @@ class Config(object):
             
         self['interactive'] = opts.interactive
         if (self['interactive']) and (self['conf_file'] == '-'):
-            show_error("Unable to use interactive mode with standard input for configuration: Use -I")
-            return False
+            raise UsageError("Unable to use interactive mode with standard input for configuration: Use -I")
 
         for group_name, optlist in self.custom_options:
             for item in optlist:
@@ -257,7 +268,6 @@ class Config(object):
 
                 # Check for missing mandatory options
                 if type(self[name]) is not str:
-                    show_error("Missing value for option '%s'" % (name))
-                    return False
+                    raise UsageError("Missing value for option '%s'" % (name))
 
         return True

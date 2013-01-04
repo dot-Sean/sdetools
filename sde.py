@@ -29,7 +29,7 @@ def main(argv):
         return False
 
     try:
-        exit_stat = mod_mgr.run_command(curr_cmd_name, argv[2:])
+        exit_stat = mod_mgr.run_command(curr_cmd_name, argv[2:], 'shell')
     except commons.UsageError, e:
         commons.show_error(str(e), usage_hint=True)
         return False
