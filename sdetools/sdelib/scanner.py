@@ -5,6 +5,9 @@ from commons import UsageError
 
 LINE_SEP_RE = re.compile('\n')
 SHOW_LINES = 1
+TEXT_CHARS = ''.join(map(chr, [7,8,9,10,12,13,27] + range(0x20, 0x100)))
+
+is_binary_string = lambda bytes: bool(bytes.translate(None, TEXT_CHARS))
 
 class FileScanner:
     def __init__(self, config, content, file_path):
@@ -22,7 +25,11 @@ class FileScanner:
             fp = open(self.file_path, 'r')
         except:
             return False
+
+        # Scans the first 1 Megabyte
         self.fval = fp.read(1024*1024)
+        # Check first 1K to see if file is binary
+        self.is_binary = is_binary_string(self.fval[:1024])
 
         line_start_pos = 0
         line_number = 1
