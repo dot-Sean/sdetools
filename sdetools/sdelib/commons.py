@@ -7,17 +7,17 @@ import getpass
 try:
     import json
 except ImportError:
-    from extlib import json_compat as json
+    from sdetools.extlib import json_compat as json
 
 try:
     import abc
 except ImportError:
-    from extlib import abc_compat as abc
+    from sdetools.extlib import abc_compat as abc
 
 try:
     import argparse
 except ImportError:
-    from extlib import argparse_compat as argparse
+    from sdetools.extlib import argparse_compat as argparse
 
 base_path = None
 

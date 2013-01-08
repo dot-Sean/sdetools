@@ -2,14 +2,14 @@ from datetime import datetime
 import sys
 import re
 
-from sdelib.commons import abc
+from sdetools.sdelib.commons import abc
 abstractmethod = abc.abstractmethod
 
-from sdelib.commons import Error
-from sdelib.restclient import APIError
-from sdelib.interactive_plugin import PlugInExperience
+from sdetools.sdelib.commons import Error
+from sdetools.sdelib.restclient import APIError
+from sdetools.sdelib.interactive_plugin import PlugInExperience
 
-from sdelib import log_mgr
+from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
 RE_CODE_DOWNLOAD = re.compile(r'\{\{ USE_MEDIA_URL \}\}([^\)]+\))\{@class=code-download\}')

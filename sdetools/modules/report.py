@@ -3,8 +3,8 @@
 
 
 import csv
-from sdelib.cmd import BaseCommand
-from sdelib.interactive_plugin import PlugInExperience
+from sdetools.sdelib.cmd import BaseCommand
+from sdetools.sdelib.interactive_plugin import PlugInExperience
 
 CSV_FILENAME = "output.csv"
 

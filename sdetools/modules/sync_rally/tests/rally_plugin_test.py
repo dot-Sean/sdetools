@@ -4,10 +4,10 @@
 import sys, os, unittest
 sys.path.append(os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0])
 
-from alm_integration.tests.alm_plugin_test_helper import AlmPluginTestHelper
-from sdelib.conf_mgr import config
-from sdelib.interactive_plugin import PlugInExperience
-from modules.sync_rally.rally_plugin import RallyConnector, RallyAPIBase
+from sdetools.alm_integration.tests.alm_plugin_test_helper import AlmPluginTestHelper
+from sdetools.sdelib.conf_mgr import config
+from sdetools.sdelib.interactive_plugin import PlugInExperience
+from sdetools.modules.sync_rally.rally_plugin import RallyConnector, RallyAPIBase
 
 CONF_FILE_LOCATION = 'test_settings.conf'
 

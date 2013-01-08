@@ -12,7 +12,7 @@ except ImportError:
 
 import logging
 
-from sdelib import commons
+from sdetools.sdelib import commons
 
 ssl_warned = False
 

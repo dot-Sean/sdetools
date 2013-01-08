@@ -1,9 +1,9 @@
 import inspect
 import urlparse
 
-from sdelib.commons import UsageError, json
-from sdelib.cmd import BaseCommand
-from sdelib.apiclient import APIBase
+from sdetools.sdelib.commons import UsageError, json
+from sdetools.sdelib.cmd import BaseCommand
+from sdetools.sdelib.apiclient import APIBase
 
 def has_method(obj, name):
     v = vars(obj.__class__)

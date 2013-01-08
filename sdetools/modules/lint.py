@@ -4,10 +4,10 @@
 # Copyright SDElements Inc
 #
 
-from sdelib.cmd import BaseCommand
-from sdelib.commons import show_error, Error, UsageError
-from sdelib.interactive_plugin import PlugInExperience
-from sdelib.scanner import Scanner
+from sdetools.sdelib.cmd import BaseCommand
+from sdetools.sdelib.commons import show_error, Error, UsageError
+from sdetools.sdelib.interactive_plugin import PlugInExperience
+from sdetools.sdelib.scanner import Scanner
 
 class Command(BaseCommand):
     name = 'lint'

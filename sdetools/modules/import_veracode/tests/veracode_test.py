@@ -4,9 +4,10 @@
 import sys, os, unittest, datetime
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from veracode_integration.veracode_integrator import VeracodeIntegrator
-from sdelib.conf_mgr import config
 from xml.dom import minidom
+
+from sdetools.modules.import_veracode.veracode_integrator import VeracodeIntegrator
+from sdetools.sdelib.conf_mgr import config
 
 CONF_FILE_LOCATION = 'test_settings.conf'
 

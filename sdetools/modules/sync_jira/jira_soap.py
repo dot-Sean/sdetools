@@ -1,12 +1,12 @@
 import xml.parsers.expat
 import socket
 
-from extlib import SOAPpy
+from sdetools.extlib import SOAPpy
 
-from alm_integration.alm_plugin_base import AlmException
-from modules.sync_jira.jira_shared import JIRATask
+from sdetools.alm_integration.alm_plugin_base import AlmException
+from sdetools.modules.sync_jira.jira_shared import JIRATask
 
-from sdelib import log_mgr
+from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
 class SOAPProxyWrap:

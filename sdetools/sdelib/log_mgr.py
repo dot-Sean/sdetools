@@ -1,7 +1,7 @@
 """
 To use the integrated logging, here is what you need to do in your module
 
-from sdelib import log_mgr
+from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
 ...
@@ -47,7 +47,7 @@ mods = LoggerModules()
 mods.add_mod('') # Root handler
 
 # Setting default handlers for all library modules
-import sdelib
+from sdetools import sdelib
 for modname in sdelib.__all__:
     mods.add_mod('%s.%s' % (__name__.rsplit('.', 1)[0], modname))
 

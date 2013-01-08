@@ -5,13 +5,13 @@ import sys
 import re
 from datetime import datetime
 
-from sdelib.restclient import RESTBase, APIError
-from alm_integration.alm_plugin_base import AlmTask, AlmConnector
-from alm_integration.alm_plugin_base import AlmException
-from sdelib.conf_mgr import Config
-from extlib import markdown
+from sdetools.sdelib.restclient import RESTBase, APIError
+from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
+from sdetools.alm_integration.alm_plugin_base import AlmException
+from sdetools.sdelib.conf_mgr import Config
+from sdetools.extlib import markdown
 
-from sdelib import log_mgr
+from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
 API_VERSION = '1.39'

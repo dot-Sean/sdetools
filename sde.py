@@ -2,16 +2,9 @@
 import sys
 import os
 
-if sys.platform.startswith("win"):
-    current_file = sys.argv[0]
-else:
-    current_file = __file__
-BASE_PATH = os.path.split(os.path.abspath(current_file))[0]
-
-from sdelib import commons
-commons.base_path = BASE_PATH
-
-from sdelib import mod_mgr
+import sdetools
+from sdetools.sdelib import commons
+from sdetools.sdelib import mod_mgr
 
 def main(argv):
     if len(argv) < 2:

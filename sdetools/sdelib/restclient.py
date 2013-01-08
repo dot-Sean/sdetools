@@ -3,7 +3,7 @@ import urllib2
 import base64
 
 from commons import json, Error, UsageError
-from extlib import sslcert_compat
+from sdetools.extlib import sslcert_compat
 
 import logging
 logger = logging.getLogger(__name__)

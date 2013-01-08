@@ -5,8 +5,8 @@
 #
 import sys
 
-from sdelib.cmd import BaseCommand
-from sdelib import commons
+from sdetools.sdelib.cmd import BaseCommand
+from sdetools.sdelib import commons
 
 class Command(BaseCommand):
     name = 'help'

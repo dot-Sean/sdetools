@@ -1,6 +1,6 @@
-from sdelib.restclient import RESTBase, APIError
-from alm_integration.alm_plugin_base import AlmException
-from modules.sync_jira.jira_shared import JIRATask
+from sdetools.sdelib.restclient import RESTBase, APIError
+from sdetools.alm_integration.alm_plugin_base import AlmException
+from sdetools.modules.sync_jira.jira_shared import JIRATask
 
 class JIRARestAPI(RESTBase):
     """ Base plugin for JIRA """

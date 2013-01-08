@@ -2,12 +2,12 @@
 #
 # Plugin for two way integration with JIRA
 
-from sdelib.cmd import BaseCommand
-from modules.sync_jira.jira_rest import JIRARestAPI
-from modules.sync_jira.jira_soap import JIRASoapAPI
-from modules.sync_jira.jira_plugin import JIRAConnector
-from alm_integration.alm_plugin_base import AlmException
-from sdelib.interactive_plugin import PluginError
+from sdetools.sdelib.cmd import BaseCommand
+from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
+from sdetools.modules.sync_jira.jira_soap import JIRASoapAPI
+from sdetools.modules.sync_jira.jira_plugin import JIRAConnector
+from sdetools.alm_integration.alm_plugin_base import AlmException
+from sdetools.sdelib.interactive_plugin import PluginError
 
 class Command(BaseCommand):
     help = 'JIRA <-> SDE sync utility.'

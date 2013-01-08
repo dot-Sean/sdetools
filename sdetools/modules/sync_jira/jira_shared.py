@@ -1,4 +1,4 @@
-from alm_integration.alm_plugin_base import AlmTask
+from sdetools.alm_integration.alm_plugin_base import AlmTask
 
 class JIRATask(AlmTask):
     """ Representation of a task in JIRA """

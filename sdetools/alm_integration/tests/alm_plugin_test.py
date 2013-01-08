@@ -6,11 +6,11 @@ sys.path.append(os.path.split(os.path.split(os.path.split(os.path.abspath(__file
 
 import csv
 
-from sdelib.conf_mgr import config
-from sdelib.interactive_plugin import PlugInExperience
+from sdetools.sdelib.conf_mgr import config
+from sdetools.sdelib.interactive_plugin import PlugInExperience
 import logging
 
-from alm_integration.alm_plugin_base import AlmConnector, AlmTask
+from sdetools.alm_integration.alm_plugin_base import AlmConnector, AlmTask
 
 
 CONF_FILE_LOCATION = 'test_settings.conf'

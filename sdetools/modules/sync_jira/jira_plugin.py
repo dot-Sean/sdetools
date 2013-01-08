@@ -3,13 +3,13 @@
 
 from datetime import datetime
 
-from alm_integration.alm_plugin_base import AlmConnector, AlmException
-from modules.sync_jira.jira_shared import JIRATask
-from modules.sync_jira.jira_rest import JIRARestAPI
-from modules.sync_jira.jira_markdown import convert_markdown
-from sdelib.conf_mgr import Config
+from sdetools.alm_integration.alm_plugin_base import AlmConnector, AlmException
+from sdetools.modules.sync_jira.jira_shared import JIRATask
+from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
+from sdetools.modules.sync_jira.jira_markdown import convert_markdown
+from sdetools.sdelib.conf_mgr import Config
 
-from sdelib import log_mgr
+from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
 class JIRAConnector(AlmConnector):

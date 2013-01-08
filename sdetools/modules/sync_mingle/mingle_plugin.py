@@ -5,13 +5,13 @@ import urllib
 from datetime import datetime
 from xml.dom import minidom
 
-from sdelib.restclient import RESTBase
-from sdelib.restclient import URLRequest, APIError
-from alm_integration.alm_plugin_base import AlmTask, AlmConnector
-from alm_integration.alm_plugin_base import AlmException
-from sdelib.conf_mgr import Config
+from sdetools.sdelib.restclient import RESTBase
+from sdetools.sdelib.restclient import URLRequest, APIError
+from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
+from sdetools.alm_integration.alm_plugin_base import AlmException
+from sdetools.sdelib.conf_mgr import Config
 
-from sdelib import log_mgr
+from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
 class MingleAPIBase(RESTBase):

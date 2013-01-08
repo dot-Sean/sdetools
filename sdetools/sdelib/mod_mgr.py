@@ -3,7 +3,7 @@ import logging
 import conf_mgr
 import commons
 
-import modules
+from sdetools import modules
 
 def load_modules():
     command = {}
@@ -12,11 +12,11 @@ def load_modules():
         if mod_name.startswith('_'):
             continue
         try:
-            mod = __import__('modules.' + mod_name)
+            mod = __import__('sdetools.modules.' + mod_name)
         except ImportError:
             logging.exception('Exception in importing module %s' % (mod_name))
             raise commons.UsageError('Unable to import module %s' % (mod_name))
-        mod = getattr(mod, mod_name)
+        mod = getattr(mod.modules, mod_name)
         if not hasattr(mod, 'Command'):
             raise commons.UsageError('Module missing Command class: %s' % (mod_name))
         cmd_cls = mod.Command
