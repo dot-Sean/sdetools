@@ -9,7 +9,8 @@ except ImportError:
 
 from distutils.core import setup
 
-import modules
+from sdetools import modules
+from sdetools import commons
 
 options = {
     'py2exe': {
@@ -18,10 +19,10 @@ options = {
 }
 
 for mod_name in modules.__all__:
-    options['py2exe']['includes'].append('modules.%s' % mod_name)
+    options['py2exe']['includes'].append('sdetools.modules.%s' % mod_name)
 
 static_files = []
-for root, dirnames, filenames in os.walk('docs'):
+for root, dirnames, filenames in os.walk(commons.media_path):
     if not filenames:
         continue
     static_files.append((root, [os.path.join(root, fn) for fn in filenames]))
