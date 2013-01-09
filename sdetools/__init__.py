@@ -13,10 +13,11 @@ def setup_path():
     from sdetools.sdelib import commons
 
     if sys.platform.startswith("win"):
-        current_file = sys.argv[0]
+        base_path = os.path.split(os.path.abspath(sys.argv[0]))[0]
+        base_path = os.path.join(base_path, 'sdetools')
     else:
         current_file = __file__
-    base_path = os.path.split(os.path.abspath(current_file))[0]
+        base_path = os.path.split(os.path.abspath(__file__))[0]
 
     commons.setup_base_path(base_path)
 

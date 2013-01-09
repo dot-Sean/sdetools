@@ -22,10 +22,11 @@ for mod_name in modules.__all__:
     options['py2exe']['includes'].append('sdetools.modules.%s' % mod_name)
 
 static_files = []
+root_path = os.path.split(commons.base_path)[0]
 for root, dirnames, filenames in os.walk(commons.media_path):
     if not filenames:
         continue
-    static_files.append((root, [os.path.join(root, fn) for fn in filenames]))
+    static_files.append((root[len(root_path)+1:], [os.path.join(root, fn) for fn in filenames]))
 
 setup(
     name='sde',
