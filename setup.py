@@ -10,7 +10,7 @@ except ImportError:
 from distutils.core import setup
 
 from sdetools import modules
-from sdetools import commons
+from sdetools.sdelib import commons
 
 options = {
     'py2exe': {
