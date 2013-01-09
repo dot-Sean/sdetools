@@ -210,7 +210,7 @@ class Config(object):
         elif self.call_src == 'import':
             return self.parse_func_args(cmd_inst)
 
-    def parse_func_args(cmd_inst):
+    def parse_func_args(self, cmd_inst):
         self['conf_file'] = None
         self['interactive'] = False
 
