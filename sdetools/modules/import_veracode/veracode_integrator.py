@@ -1,6 +1,7 @@
 import os
 from xml.dom import minidom
 
+from sdetools.sdelib import commons
 from base_integrator import BaseIntegrator, IntegrationError
 
 REQUIRED_ATTRIBS = ['issueid', 'cweid', 'categoryid', 'categoryname', 'description', 'severity', 'module','remediation_status']
@@ -9,7 +10,7 @@ SOURCE_NAME = "veracode"
 
 __all__ = ['VeracodeIntegrator']
 
-DEFAULT_MAPPING_FILE = os.path.join('docs', 'veracode', 'sde_veracode_map.xml')
+DEFAULT_MAPPING_FILE = os.path.join(commons.media_path, 'veracode', 'sde_veracode_map.xml')
 
 class VeracodeIntegrationError(IntegrationError):
     pass

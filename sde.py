@@ -1,6 +1,5 @@
 #!/usr/bin/python
 import sys
-import os
 
 import sdetools
 from sdetools.sdelib import commons

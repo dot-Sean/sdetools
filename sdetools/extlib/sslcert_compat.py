@@ -16,7 +16,7 @@ from sdetools.sdelib import commons
 
 ssl_warned = False
 
-CERT_PATH_NAME = os.path.join(commons.base_path, 'docs', 'ssl')
+CERT_PATH_NAME = os.path.join(commons.media_path, 'ssl')
 CA_CERTS_FILE = os.path.join(CERT_PATH_NAME, 'ca_bundle.crt')
 
 try:

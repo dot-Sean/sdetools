@@ -1,6 +1,7 @@
 __all__ = ['json', 'Error', 'show_error', 'get_password']
 
 import sys
+import os
 
 import getpass
 
@@ -20,6 +21,7 @@ except ImportError:
     from sdetools.extlib import argparse_compat as argparse
 
 base_path = None
+media_path = None
 
 class Error(Exception):
     """
@@ -34,6 +36,13 @@ class UsageError(Error):
     E.g. invalid choices for arguments.
     """
     pass
+
+def setup_base_path(base_path_val):
+    global base_path
+    global media_path
+
+    base_path = base_path_val
+    media_path = os.path.join(base_path, 'docs')
 
 def show_error(err_msg, usage_hint=False):
     sys.stderr.write("FATAL ERROR: %s\n" % (err_msg))
