@@ -23,9 +23,9 @@ def setup_path():
 
 setup_path()
 
-def call(cmd_name, args):
+def call(cmd_name, options, *args):
     from sdetools.sdelib import mod_mgr
 
-    exit_stat = mod_mgr.run_command(cmd_name, args, 'import')
+    exit_stat = mod_mgr.run_command(cmd_name, args, 'import', call_options=options)
 
     return exit_stat

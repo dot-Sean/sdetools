@@ -28,7 +28,7 @@ def load_modules():
 
     return command
 
-def run_command(cmd_name, args, call_src):
+def run_command(cmd_name, args, call_src, call_options={}):
     command = load_modules()
 
     if cmd_name not in command:
@@ -36,7 +36,7 @@ def run_command(cmd_name, args, call_src):
 
     curr_cmd = command[cmd_name]
 
-    config = conf_mgr.Config(command, args, call_src)
+    config = conf_mgr.Config(command, args, call_src, call_options)
 
     cmd_inst = curr_cmd(config, args)
 

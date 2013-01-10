@@ -47,7 +47,7 @@ class Config(object):
             'args': None,
         }
 
-    def __init__(self, command_list, args, call_src):
+    def __init__(self, command_list, args, call_src, call_options={}):
         if call_src not in ['shell', 'import']:
             raise UsageError("Invalid config source")
 
@@ -57,6 +57,7 @@ class Config(object):
         self.custom_options = []
         self.parser = None
         self.use_conf_file = True
+        self.call_options = call_options
         self.args = args
 
     def __getitem__(self, key):
@@ -213,6 +214,10 @@ class Config(object):
     def parse_func_args(self, cmd_inst):
         self['conf_file'] = None
         self['interactive'] = False
+        for key in self.call_options:
+            self[key] = self.call_options[key]
+        #TODO: Perform validation
+        return True
 
     def parse_shell_args(self, cmd_inst):
         if self.parser is None:
