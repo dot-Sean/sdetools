@@ -5,13 +5,15 @@ from restclient import APIError, APIHTTPError, APICallError, APIAuthError, Serve
 import logging
 logger = logging.getLogger(__name__)
 
-class APIBase(restclient.RESTBase):
+APIBase = ExtAPI
+
+class ExtAPI(restclient.RESTBase):
     def __init__(self, config):
         conf_opts = restclient.CONF_OPTS[:]
         conf_opts.append(('sde_api_token', 'API Token for SDE', ''))
         for i in xrange(3):
             conf_opts[i][-1] = ''
-        super(APIBase, self).__init__('sde', 'SD Elements', config, 'api', conf_opts)
+        super(ExtAPI, self).__init__('sde', 'SD Elements', config, 'api', conf_opts)
         self.app = None
         self.prj = None
 
@@ -23,7 +25,7 @@ class APIBase(restclient.RESTBase):
             self.config['sde_user'] = None
             self.config['sde_pass'], self.config['sde_server'] = (
                 self.config['sde_api_token'].split('$', 1))
-        super(APIBase, self).post_conf_init()
+        super(ExtAPI, self).post_conf_init()
 
     def get_applications(self, **filters):
         """
@@ -85,6 +87,7 @@ class APIBase(restclient.RESTBase):
     def update_task_status(self, task, status):
         """
         Update the task status. The task ID should include the project number
+        Returns the 'status' field of he result
         """
         #TODO: regular expression on task and status for validation
         result = self.call_api('tasks/%s' % task, self.URLRequest.PUT,

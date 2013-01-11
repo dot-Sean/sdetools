@@ -1,5 +1,5 @@
 from sdetools.sdelib.cmd import BaseCommand
-from sdetools.sdelib.apiclient import APIBase
+from sdetools.sdelib.sdeapi import APIBase
 
 class Command(BaseCommand):
     name = 'list_projects'

@@ -3,7 +3,7 @@ import urlparse
 
 from sdetools.sdelib.commons import UsageError, json
 from sdetools.sdelib.cmd import BaseCommand
-from sdetools.sdelib.apiclient import APIBase
+from sdetools.sdelib.sdeapi import APIBase
 
 def has_method(obj, name):
     v = vars(obj.__class__)

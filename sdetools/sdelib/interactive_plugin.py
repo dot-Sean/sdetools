@@ -1,5 +1,5 @@
 from commons import Error, get_password
-import apiclient
+import sdeapi
 from content import Content
 
 class PluginError(Error):
@@ -8,7 +8,7 @@ class PluginError(Error):
 class PlugInExperience:
     def __init__(self, config):
         self.config = config
-        self.api = apiclient.APIBase(self.config)
+        self.api = sdeapi.APIBase(self.config)
         self.app = None
         self.prj = None
         config.add_custom_option('sde_application', "SDE Application to use", 

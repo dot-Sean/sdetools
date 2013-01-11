@@ -189,7 +189,7 @@ class Config(object):
             help = "Silent output (except for unrecoverable errors)")
         parser.add_option('--debugmods', metavar='MOD_NAME1,[MOD_NAME2,[...]]', dest='debug_mods', 
             default='', type='string',
-            help = "Comma-seperated List of modules to debug, e.g. sdelib.apiclient)")
+            help = "Comma-seperated List of modules to debug, e.g. sdetools.sdelib.sdeapi)")
 
         for group_name, optslist in self.custom_options:
             group = optparse.OptionGroup(parser, group_name)

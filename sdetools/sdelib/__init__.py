@@ -1,7 +1,7 @@
 __all__ = [
     'log_mgr',
     'restclient',
-    'apiclient', 
+    'sdeapi', 
     'commons', 
     'conf_mgr', 
     'content', 
