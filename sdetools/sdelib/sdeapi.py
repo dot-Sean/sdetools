@@ -5,9 +5,14 @@ from restclient import APIError, APIHTTPError, APICallError, APIAuthError, Serve
 import logging
 logger = logging.getLogger(__name__)
 
-APIBase = ExtAPI
-
 class ExtAPI(restclient.RESTBase):
+    """
+    Note: In all the API calls:
+    - a 'project' arg variable is the project id
+    - a 'task' arg variable is in the format <project_id>-<task_id>
+        e.g. '127-T106'
+    """
+
     def __init__(self, config):
         conf_opts = restclient.CONF_OPTS[:]
         conf_opts.append(('sde_api_token', 'API Token for SDE', ''))
@@ -50,11 +55,17 @@ class ExtAPI(restclient.RESTBase):
         return result['projects']
 
     def get_tasks(self, project):
+        """ 
+        Get all tasks for a project indicated by the ID of the project
+        """
         result = self.call_api('tasks', args={'project':project})
         return result['tasks']
 
     def get_task(self, task):
-        """ Gets an individual task with parameter task id"""
+        """ 
+        Get an individual task with parameter task id
+        <task> = <project_id>-<task_id> (e.g. 127-T21)
+        """
         result = self.call_api('tasks/%s' % task)
         return result
 
@@ -93,3 +104,6 @@ class ExtAPI(restclient.RESTBase):
         result = self.call_api('tasks/%s' % task, self.URLRequest.PUT,
             args={'status':status})
         return result['status']
+
+APIBase = ExtAPI
+
