@@ -23,6 +23,11 @@ def setup_path():
 
 setup_path()
 
+def set_api_connector(api_module):
+    from sdetools.sdelib import sdeapi
+
+    sdeapi.APIBase = api_module
+
 def call(cmd_name, options, *args):
     from sdetools.sdelib import mod_mgr
 

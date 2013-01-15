@@ -7,6 +7,7 @@ class InternalAPI(object):
     """
 
     def __init__(self, config):
+        pass
 
     def get_applications(self, **filters):
         """
@@ -15,6 +16,8 @@ class InternalAPI(object):
         Available Filters:
             name -> application name to be searched for
         """
+        import pdb
+        pdb.set_trace()
         result = self.call_api('applications', args=filters)
         return result['applications']
 
