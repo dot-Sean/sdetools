@@ -3,19 +3,16 @@
 #### SD Elements server and project settings  #####
 ###################################################
 #SD Elements server name, includes port
-server = m1.sdelements.com
-
-#SD Elements user login email
-email = user@example.org
-
-#SD Elements user password
-password = userpassword
+sde_api_token = abcdef1234567890abcdef1234567890$m1.sdelements.com
 
 #SD Elements application
-application = SDEapp
+sde_application = SDEapp
 
 #SD Elements project
-project = SDEproj
+sde_project = SDEproj
+
+#SD Elements connection method (Avoid http in production env)
+sde_method = https
 
 ###################################################
 #### JIRA server and project settings         #####
@@ -31,11 +28,11 @@ alm_method = https
 # -create new issues for the project
 # -read existing issues in the project
 # -create transitions on issues (e.g. close an issue)
-alm_id = jira_user
+alm_user = jira_user
               
 #Password for above user. Note that this will be encrypted
 #in future versions of the plugin
-alm_password = jira_passsword
+alm_pass = jira_passsword
               
 #JIRA project key
 alm_project = JIRAPROJECT
@@ -104,9 +101,6 @@ jira_reopen_transition = Reopen Issue
 jira_done_statuses = Resolved,Closed
 
 ######Base settings, do not modify######
-method = https
 targets =  .
 skip_hidden = True
-interactive =True
-askpasswd = False
-auth_mode = basic
+interactive = True
