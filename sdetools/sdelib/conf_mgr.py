@@ -11,7 +11,7 @@ from commons import UsageError
 
 __all__ = ['Config']
 
-DEFAULT_CONFIG_FILE = "~/.sdelint.cnf"
+DEFAULT_CONFIG_FILE = os.path.join("~", ".sdelint.cnf")
 
 LOG_LEVELS = {
     'debug': logging.DEBUG,
@@ -135,7 +135,7 @@ class Config(object):
         else:
             stat = cnf.read(file_name)
             if not stat:
-                if (file_name == DEFAULT_CONFIG_FILE):
+                if file_name == os.path.expanduser(DEFAULT_CONFIG_FILE):
                     return True, 'Missing default config file.'
                 else:
                     return False, 'Config file not found.'
