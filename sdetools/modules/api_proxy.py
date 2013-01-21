@@ -33,6 +33,8 @@ class Command(BaseCommand):
             args = urlparse.parse_qs(self.config['api_args'])
         except:
             raise UsageError('Unable to URL Dcode value: %s' % (self.config['api_args'][:200]))
+        for key in args:
+            args[key] = ''.join(args[key])
             
         ret = getattr(self.api, self.config['api_func'])(**args)
 
