@@ -107,9 +107,11 @@ class RESTBase(object):
         if __name__ in self.config['debug_mods']:
             urllib_debuglevel = 1
 
-        handler = sslcert_compat.get_http_handler(self._get_conf('method'), debuglevel=urllib_debuglevel)
+        handler = sslcert_compat.get_http_handler(
+            self._get_conf('method'), 
+            debuglevel=urllib_debuglevel,
+            sde_proxy_auth=self.config['proxy_auth'])
         self.opener = urllib2.build_opener(handler)
-        self.opener.sde_proxy_auth = self.config['proxy_auth']
 
     def encode_post_args(self, args):
         return json.dumps(args)
