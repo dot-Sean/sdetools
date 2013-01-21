@@ -40,7 +40,7 @@ class CertValidatingHTTPSConnection(httplib.HTTPConnection):
     default_port = httplib.HTTPS_PORT
 
     def __init__(self, host, port=None, key_file=None, cert_file=None,
-                             ca_certs=None, strict=None, **kwargs):
+                             ca_certs=None, strict=None, sde_proxy_auth='', **kwargs):
         httplib.HTTPConnection.__init__(self, host, port, strict, **kwargs)
         self.key_file = key_file
         self.cert_file = cert_file
@@ -49,6 +49,7 @@ class CertValidatingHTTPSConnection(httplib.HTTPConnection):
             self.cert_reqs = ssl.CERT_REQUIRED
         else:
             self.cert_reqs = ssl.CERT_NONE
+        self.sde_proxy_auth = sde_proxy_auth
 
     def _GetValidHostsForCert(self, cert):
         if 'subjectAltName' in cert:
@@ -69,6 +70,9 @@ class CertValidatingHTTPSConnection(httplib.HTTPConnection):
     def connect(self):
         sock = socket.create_connection((self.host, self.port), self.timeout)
         if self._tunnel_host:
+            if ('Proxy-Authorization' not in self._tunnel_headers) and (self.sde_proxy_auth):
+                proxy_auth = base64.b64encode(self.sde_proxy_auth).strip()
+                self._tunnel_headers['Proxy-Authorization'] = 'Basic %s' % proxy_auth
             self.sock = sock
             self._tunnel()
         self.sock = ssl.wrap_socket(sock, keyfile=self.key_file,
@@ -81,31 +85,6 @@ class CertValidatingHTTPSConnection(httplib.HTTPConnection):
             if not self._ValidateCertificateHostname(cert, hostname):
                 raise InvalidCertificateException(hostname, cert,
                                                   'hostname mismatch')
-
-    def _tunnel(self):
-        self._set_hostport(self._tunnel_host, self._tunnel_port)
-        self.send("CONNECT %s:%d HTTP/1.0\r\n" % (self.host, self.port))
-        for header, value in self._tunnel_headers.iteritems():
-            self.send("%s: %s\r\n" % (header, value))
-        self.send("\r\n")
-        response = self.response_class(self.sock, strict = self.strict,
-                                       method = self._method)
-        (version, code, message) = response._read_status()
-
-        if (code == 407) and ('Proxy-Authorization' not in self._tunnel_headers) and (self.sde_proxy_auth):
-            proxy_auth = base64.b64encode(self.sde_proxy_auth).strip()
-            self._tunnel_headers['Proxy-Authorization'] = 'Basic %s' % proxy_auth
-            self._tunnel()
-            return
-        elif code != 200:
-            self.close()
-            raise socket.error, "Tunnel connection failed: %d %s" % (code,
-                                                                     message.strip())
-
-        while True:
-            line = response.fp.readline()
-            if line == '\r\n': break
-
 
 class VerifiedHTTPSHandler(urllib2.HTTPSHandler):
     def __init__(self, debuglevel, **kwargs):
@@ -128,7 +107,7 @@ class VerifiedHTTPSHandler(urllib2.HTTPSHandler):
 
     https_request = urllib2.HTTPSHandler.do_request_
 
-def get_http_handler(mode, debuglevel):
+def get_http_handler(mode, debuglevel, sde_proxy_auth=''):
     global ssl_warned
 
     if mode == 'http':
@@ -139,8 +118,10 @@ def get_http_handler(mode, debuglevel):
                 logging.warning('Missing ssl library for python: SSL certificates can'
                     ' NOT be validated\n (use python 2.6 or install ssl for python)')
                 ssl_warned = True
-            return urllib2.HTTPSHandler(debuglevel=debuglevel)
+            return urllib2.HTTPSHandler(debuglevel=debuglevel, 
+                    sde_proxy_auth=sde_proxy_auth)
         else:
-            return VerifiedHTTPSHandler(debuglevel=debuglevel, ca_certs=CA_CERTS_FILE)
+            return VerifiedHTTPSHandler(debuglevel=debuglevel, 
+                    sde_proxy_auth=sde_proxy_auth, ca_certs=CA_CERTS_FILE)
     raise KeyError, mode
     
