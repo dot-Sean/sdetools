@@ -3,6 +3,7 @@ import re
 import os
 import socket
 import urllib2
+import base64
 
 try:
     import ssl
@@ -80,6 +81,30 @@ class CertValidatingHTTPSConnection(httplib.HTTPConnection):
             if not self._ValidateCertificateHostname(cert, hostname):
                 raise InvalidCertificateException(hostname, cert,
                                                   'hostname mismatch')
+
+    def _tunnel(self):
+        self._set_hostport(self._tunnel_host, self._tunnel_port)
+        self.send("CONNECT %s:%d HTTP/1.0\r\n" % (self.host, self.port))
+        for header, value in self._tunnel_headers.iteritems():
+            self.send("%s: %s\r\n" % (header, value))
+        self.send("\r\n")
+        response = self.response_class(self.sock, strict = self.strict,
+                                       method = self._method)
+        (version, code, message) = response._read_status()
+
+        if (code == 407) and ('Proxy-Authorization' not in self._tunnel_headers) and (self.sde_proxy_auth):
+            proxy_auth = base64.b64encode(self.sde_proxy_auth).strip()
+            self._tunnel_headers['Proxy-Authorization'] = 'Basic %s' % proxy_auth
+            self._tunnel()
+            return
+        elif code != 200:
+            self.close()
+            raise socket.error, "Tunnel connection failed: %d %s" % (code,
+                                                                     message.strip())
+
+        while True:
+            line = response.fp.readline()
+            if line == '\r\n': break
 
 
 class VerifiedHTTPSHandler(urllib2.HTTPSHandler):
