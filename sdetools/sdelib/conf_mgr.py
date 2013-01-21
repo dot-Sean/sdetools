@@ -45,6 +45,7 @@ class Config(object):
             'log_level': logging.WARNING,
             'debug_mods': '',
             'args': None,
+            'proxy_auth': '',
         }
 
     def __init__(self, command_list, args, call_src, call_options={}):
@@ -187,6 +188,8 @@ class Config(object):
         parser.add_option('-v', '--verbose', dest='verbose', action='store_true', help = "Verbose output")
         parser.add_option('-q', '--quiet', dest='quiet', action='store_true', 
             help = "Silent output (except for unrecoverable errors)")
+        parser.add_option('--proxy_auth', metavar='USERNAME:PASSWORD', dest='proxy_auth', default='', type='string',
+            help = "Proxy authentication credentials, in <username>:<password> format [optional]")
         parser.add_option('--debugmods', metavar='MOD_NAME1,[MOD_NAME2,[...]]', dest='debug_mods', 
             default='', type='string',
             help = "Comma-seperated List of modules to debug, e.g. sdetools.sdelib.sdeapi)")
@@ -263,6 +266,7 @@ class Config(object):
         self['interactive'] = opts.interactive
         if (self['interactive']) and (self['conf_file'] == '-'):
             raise UsageError("Unable to use interactive mode with standard input for configuration: Use -I")
+        self['proxy_auth'] = opts.proxy_auth
 
         for group_name, optlist in self.custom_options:
             for item in optlist:
