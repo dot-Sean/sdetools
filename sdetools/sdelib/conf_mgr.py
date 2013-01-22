@@ -142,7 +142,7 @@ class Config(object):
                     return False, 'Config file not found.'
 
         config_keys = ['log_level', 'debug_mods', 'application', 'project', 
-            'authmode', 'args']
+            'authmode', 'args', 'proxy_auth']
 
         for name, optlist in self.custom_options:
             for item in optlist:
@@ -266,7 +266,8 @@ class Config(object):
         self['interactive'] = opts.interactive
         if (self['interactive']) and (self['conf_file'] == '-'):
             raise UsageError("Unable to use interactive mode with standard input for configuration: Use -I")
-        self['proxy_auth'] = opts.proxy_auth
+        if opts.proxy_auth:
+            self['proxy_auth'] = opts.proxy_auth
 
         for group_name, optlist in self.custom_options:
             for item in optlist:
