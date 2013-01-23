@@ -86,19 +86,35 @@ class CertValidatingHTTPSConnection(httplib.HTTPConnection):
                 raise InvalidCertificateException(hostname, cert,
                                                   'hostname mismatch')
 
+
+class VerifiedHTTPHandler(urllib2.HTTPHandler):
+    def __init__(self, debuglevel, **kwargs):
+        urllib2.AbstractHTTPHandler.__init__(self, debuglevel)
+        self._connection_args = kwargs
+
+    def http_open(self, req):
+        if req.has_proxy():
+            sde_proxy_auth = self._connection_args['sde_proxy_auth']
+            if ('Proxy-Authorization' not in req.headers) and (sde_proxy_auth):
+                proxy_auth_val = base64.b64encode(sde_proxy_auth).strip()
+                req.headers['Proxy-Authorization'] = 'Basic %s' % proxy_auth_val
+        return self.do_open(httplib.HTTPConnection, req)
+
+    http_request = urllib2.HTTPHandler.do_request_
+
 class VerifiedHTTPSHandler(urllib2.HTTPSHandler):
     def __init__(self, debuglevel, **kwargs):
         urllib2.AbstractHTTPHandler.__init__(self, debuglevel)
         self._connection_args = kwargs
 
     def https_open(self, req):
-        def http_class_wrapper(host, **kwargs):
+        def https_class_wrapper(host, **kwargs):
             full_kwargs = dict(self._connection_args)
             full_kwargs.update(kwargs)
             return CertValidatingHTTPSConnection(host, **full_kwargs)
 
         try:
-            return self.do_open(http_class_wrapper, req)
+            return self.do_open(https_class_wrapper, req)
         except urllib2.URLError, e:
             if type(e.reason) == ssl.SSLError and e.reason.args[0] == 1:
                 raise InvalidCertificateException(req.host, '',
@@ -111,15 +127,14 @@ def get_http_handler(mode, debuglevel, sde_proxy_auth=''):
     global ssl_warned
 
     if mode == 'http':
-        return urllib2.HTTPHandler(debuglevel=debuglevel)
+        return VerifiedHTTPHandler(debuglevel=debuglevel, sde_proxy_auth=sde_proxy_auth)
     elif mode == 'https':
         if not ssl_lib_found:
             if not ssl_warned:
                 logging.warning('Missing ssl library for python: SSL certificates can'
                     ' NOT be validated\n (use python 2.6 or install ssl for python)')
                 ssl_warned = True
-            return urllib2.HTTPSHandler(debuglevel=debuglevel, 
-                    sde_proxy_auth=sde_proxy_auth)
+            return urllib2.HTTPSHandler(debuglevel=debuglevel)
         else:
             return VerifiedHTTPSHandler(debuglevel=debuglevel, 
                     sde_proxy_auth=sde_proxy_auth, ca_certs=CA_CERTS_FILE)
