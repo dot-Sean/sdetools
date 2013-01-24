@@ -28,7 +28,7 @@ class PlugInExperience:
         return result
 
     def get_and_validate_password(self):
-        askpasswd = (self.config['sde_pass'] is None)
+        askpasswd = 'sde_pass' in self.config and self.config['sde_pass'] is None
         while not self.connected:
             if askpasswd:
                 print "Enter the password for account: %s" % (self.config['email'])

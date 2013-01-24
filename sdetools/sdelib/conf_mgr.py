@@ -71,6 +71,14 @@ class Config(object):
             raise KeyError, 'Unknown configuration item: %s' % (key)
         self.settings[key] = val
 
+    def has_key(self, key):
+        return key in self.settings
+
+    __contains__ = has_key
+
+    def get(self, key, default=None):
+        return self.settings.get(key, default)
+
     def add_custom_option(self, var_name, help_title, short_form=None, 
             default='', meta_var=None, group_name=None):
         """
