@@ -3,7 +3,7 @@ import urlparse
 
 from sdetools.sdelib.commons import UsageError, json
 from sdetools.sdelib.cmd import BaseCommand
-from sdetools.sdelib.sdeapi import APIBase
+from sdetools.sdelib import sdeapi
 
 def has_method(obj, name):
     v = vars(obj.__class__)
@@ -14,7 +14,7 @@ class Command(BaseCommand):
     help = 'Call SD Elements API'
 
     def configure(self):
-        self.api = APIBase(self.config)
+        self.api = sdeapi.APIBase(self.config)
         self.config.add_custom_option("api_func", "API Function to be Called", "f", None)
         self.config.add_custom_option("api_args", "API Arguments in URL Encoded format (skip if empty)", "a", '')
 
