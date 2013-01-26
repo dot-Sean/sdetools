@@ -276,6 +276,7 @@ class Config(object):
             raise UsageError("Unable to use interactive mode with standard input for configuration: Use -I")
         if opts.proxy_auth:
             self['proxy_auth'] = opts.proxy_auth
+            self.fix_proxy_env()
 
         for group_name, optlist in self.custom_options:
             for item in optlist:
@@ -289,3 +290,14 @@ class Config(object):
                     raise UsageError("Missing value for option '%s'" % (name))
 
         return True
+
+    def fix_proxy_env(self):
+        import urllib
+        proxy_settings = urllib.getproxies()
+        for ptype in proxy_settings:
+            proxy = proxy_settings[ptype]
+            if '://' not in proxy:
+                proxy = '%s://%s' % (ptype, proxy)
+            protocol, val = proxy.split('://')
+            proxy = '%s://%s@%s' % (protocol, self['proxy_auth'], val)
+            os.environ['%s_proxy' % ptype] = proxy

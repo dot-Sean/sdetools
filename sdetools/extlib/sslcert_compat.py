@@ -40,7 +40,7 @@ class CertValidatingHTTPSConnection(httplib.HTTPConnection):
     default_port = httplib.HTTPS_PORT
 
     def __init__(self, host, port=None, key_file=None, cert_file=None,
-                             ca_certs=None, strict=None, sde_proxy_auth='', **kwargs):
+                             ca_certs=None, strict=None, **kwargs):
         httplib.HTTPConnection.__init__(self, host, port, strict, **kwargs)
         self.key_file = key_file
         self.cert_file = cert_file
@@ -49,7 +49,6 @@ class CertValidatingHTTPSConnection(httplib.HTTPConnection):
             self.cert_reqs = ssl.CERT_REQUIRED
         else:
             self.cert_reqs = ssl.CERT_NONE
-        self.sde_proxy_auth = sde_proxy_auth
 
     def _GetValidHostsForCert(self, cert):
         if 'subjectAltName' in cert:
@@ -70,9 +69,6 @@ class CertValidatingHTTPSConnection(httplib.HTTPConnection):
     def connect(self):
         sock = socket.create_connection((self.host, self.port), self.timeout)
         if self._tunnel_host:
-            if ('Proxy-Authorization' not in self._tunnel_headers) and (self.sde_proxy_auth):
-                proxy_auth = base64.b64encode(self.sde_proxy_auth).strip()
-                self._tunnel_headers['Proxy-Authorization'] = 'Basic %s' % proxy_auth
             self.sock = sock
             self._tunnel()
         self.sock = ssl.wrap_socket(sock, keyfile=self.key_file,
@@ -86,21 +82,6 @@ class CertValidatingHTTPSConnection(httplib.HTTPConnection):
                 raise InvalidCertificateException(hostname, cert,
                                                   'hostname mismatch')
 
-
-class VerifiedHTTPHandler(urllib2.HTTPHandler):
-    def __init__(self, debuglevel, **kwargs):
-        urllib2.AbstractHTTPHandler.__init__(self, debuglevel)
-        self._connection_args = kwargs
-
-    def http_open(self, req):
-        if req.has_proxy():
-            sde_proxy_auth = self._connection_args['sde_proxy_auth']
-            if ('Proxy-Authorization' not in req.headers) and (sde_proxy_auth):
-                proxy_auth_val = base64.b64encode(sde_proxy_auth).strip()
-                req.headers['Proxy-Authorization'] = 'Basic %s' % proxy_auth_val
-        return self.do_open(httplib.HTTPConnection, req)
-
-    http_request = urllib2.HTTPHandler.do_request_
 
 class VerifiedHTTPSHandler(urllib2.HTTPSHandler):
     def __init__(self, debuglevel, **kwargs):
@@ -123,11 +104,11 @@ class VerifiedHTTPSHandler(urllib2.HTTPSHandler):
 
     https_request = urllib2.HTTPSHandler.do_request_
 
-def get_http_handler(mode, debuglevel, sde_proxy_auth=''):
+def get_http_handler(mode, debuglevel):
     global ssl_warned
 
     if mode == 'http':
-        return VerifiedHTTPHandler(debuglevel=debuglevel, sde_proxy_auth=sde_proxy_auth)
+        return urllib2.HTTPHandler(debuglevel=debuglevel)
     elif mode == 'https':
         if not ssl_lib_found:
             if not ssl_warned:
@@ -136,7 +117,6 @@ def get_http_handler(mode, debuglevel, sde_proxy_auth=''):
                 ssl_warned = True
             return urllib2.HTTPSHandler(debuglevel=debuglevel)
         else:
-            return VerifiedHTTPSHandler(debuglevel=debuglevel, 
-                    sde_proxy_auth=sde_proxy_auth, ca_certs=CA_CERTS_FILE)
+            return VerifiedHTTPSHandler(debuglevel=debuglevel, ca_certs=CA_CERTS_FILE)
     raise KeyError, mode
     
