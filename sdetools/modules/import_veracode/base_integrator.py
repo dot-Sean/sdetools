@@ -69,9 +69,6 @@ class BaseIntegrator(object):
     def generate_findings(self):
         return []
 
-    def output_mapping(self):
-        print self.mapping
-
     def unique_findings(self):
         """
         Return a map (task_id=> *flaw) based on list of findings (cwe)
