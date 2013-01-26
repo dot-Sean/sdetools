@@ -25,6 +25,8 @@ class IntegrationResult(object):
         self.error_cwes_unmapped = error_cwes_unmapped
 
 class BaseIntegrator(object):
+        TOOL_NAME = 'External tool'
+
     def __init__(self, config, default_mapping_file=None):
         self.findings = []
         self.phase_exceptions = ['testing']
@@ -95,10 +97,6 @@ class BaseIntegrator(object):
                 unique_findings[mapped_task_id] = flaws
         return unique_findings
 
-    def output_findings(self):
-        for item in self.findings:
-            print '%5s,%5s,%5s,%s' % (item['issueid'], item['cweid'], item['categoryid'],item['description'][:120])
-
     def lookup_task(self, cwe_id):
         if self.mapping.has_key(cwe_id):
             return self.mapping[cwe_id]
@@ -119,9 +117,6 @@ class BaseIntegrator(object):
                 return True
         return False
 
-    def get_tool_name(self):
-        return 'External tool'
-
     def import_findings(self):
         commit = (self.config['trial_run'] != 'True')
 
@@ -139,7 +134,7 @@ class BaseIntegrator(object):
         if not commit:
             logger.info("Trial run only. No changes will be made")
         else:
-            ret = self.plugin.add_project_analysis_note(self.report_id, self.get_tool_name())
+            ret = self.plugin.add_project_analysis_note(self.report_id, self.TOOL_NAME)
             project_analysis_note_ref = ret['id'] 
 
 
