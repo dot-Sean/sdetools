@@ -15,26 +15,21 @@ class PlugInExperience:
             default='', group_name="SD Elements Connector")
         config.add_custom_option('sde_project', "SDE Project to use",
             default='', group_name="SD Elements Connector")
-        self.connected = False
 
     def connect(self):
-        if self.config['authmode'] == 'session':
-            result = self.api.start_session()
-        else:
-            #TODO: Find a better alternative ->
-            #In 'basic' mode, we make an extra call just to verify that credentials are correct
-            result = self.api.get_applications()
-        self.connected = True
-        return result
+        self.api.connect()
 
     def get_and_validate_password(self):
-        askpasswd = 'sde_pass' in self.config and self.config['sde_pass'] is None
-        while not self.connected:
+        if not self.config['interactive']:
+            self.api.connect()
+            return
+        askpasswd = self.config['sde_pass'] is None
+        while not self.api.connected:
             if askpasswd:
                 print "Enter the password for account: %s" % (self.config['email'])
                 self.config['sde_pass'] = get_password()
             try:
-                self.connect()
+                self.api.connect()
             except self.api.APIAuthError:
                 if askpasswd:
                     print "Incorrect Email/Passwrd\n"
@@ -43,7 +38,7 @@ class PlugInExperience:
             break
 
     def select_application(self):
-        if not self.connected:
+        if not self.api.connected:
              self.get_and_validate_password()
 
         filters = {}

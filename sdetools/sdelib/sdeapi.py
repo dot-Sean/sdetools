@@ -21,6 +21,7 @@ class ExtAPI(restclient.RESTBase):
         super(ExtAPI, self).__init__('sde', 'SD Elements', config, 'api', conf_opts)
         self.app = None
         self.prj = None
+        self.connected = False
 
     def post_conf_init(self):
         if self.config['sde_api_token']:
@@ -31,6 +32,16 @@ class ExtAPI(restclient.RESTBase):
             self.config['sde_pass'], self.config['sde_server'] = (
                 self.config['sde_api_token'].split('@', 1))
         super(ExtAPI, self).post_conf_init()
+
+    def connect(self):
+        if self.config['authmode'] == 'session':
+            result = self.start_session()
+        else:
+            #TODO: Find a better alternative ->
+            #In 'basic' mode, we make an extra call just to verify that credentials are correct
+            result = self.get_applications()
+        self.connected = True
+        return result
 
     def get_applications(self, **filters):
         """
