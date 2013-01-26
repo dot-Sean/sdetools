@@ -64,14 +64,6 @@ class VeracodeIntegrator(BaseIntegrator):
             if(flaw['remediation_status'] == 'Fixed'):
                 self.raw_findings.remove(flaw)
 
-    def output_raw_findings(self):
-        for item in self.raw_findings:
-            print '%5s,%5s,%5s' % (item['issueid'], item['cweid'], item['categoryid'])
-            print item['description'][:120]
-
-    def get_raw_findings(self):
-        return self.raw_findings
-
     def _make_finding(self, item):
         finding = {'cweid': item['cweid'], 'description': item['description']}
         if item.has_key('sourcefilepath'):
@@ -83,4 +75,5 @@ class VeracodeIntegrator(BaseIntegrator):
         return finding
 
     def generate_findings(self):
-        return [self._make_finding(item) for item in self.get_raw_findings()]
+        return [self._make_finding(item) for item in self.raw_findings]
+        
