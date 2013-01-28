@@ -5,6 +5,19 @@ Requirements
 This project is intended to be ultra lightweight, and portable.
 The only requirement is to have Python 2.4+ installed.
 
+The console usage
+================
+
+__sde.py__
+
+The command line tool to run SD Elements integeration modules. Use 'python sde.py help' to see usage and 'python sde.py help <cmd>' to see usage for specific module.
+
+The package usage
+================
+import sdetools
+
+sdetools.call('api_proxy', {'api_func': 'get_applications'})
+
 SDE Library (sdelib/)
 ================
 A light weight library that provides an interface to SD Elements RESTful API.
@@ -16,9 +29,3 @@ A light weight library that provides an interface to SD Elements RESTful API.
     - Project selection
 - __conf_mgr__: Configuration Manager provides support for parsing command line arguments, reading variables from config file, and allows for extended options to be defined for each usecase.
 
-The usecases (usecases/)
-================
-
-__sdelint.py__
-
-A command line lint tool for SDElements that is capable of lightly scanning the source files and determining the contextually applicable tasks.

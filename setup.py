@@ -1,25 +1,37 @@
-import sys
 import os
+import sys
 
-try:
-    import py2exe
-except ImportError:
-    print "Error: Missing py2exe package. Use this for windows compilation only."
+if sys.version < '2.4':
+    print 'This package needs python 2.4+'
     sys.exit(1)
 
 from distutils.core import setup
 
-from sdetools import modules
+import sdetools
 from sdetools.sdelib import commons
 
-options = {
-    'py2exe': {
-        'includes':[]
+ext_opt = {
+    'options': {}
     }
-}
 
-for mod_name in modules.__all__:
-    options['py2exe']['includes'].append('sdetools.modules.%s' % mod_name)
+def set_py2exe_options():
+    from sdetools import modules
+    ext_opt['options']['py2exe'] = {
+            'includes':[]
+        }
+
+    for mod_name in modules.__all__:
+        ext_opt['options']['py2exe']['includes'].append('sdetools.modules.%s' % mod_name)
+    
+    ext_opt['console'] = ['sde.py']
+    ext_opt['zipfile'] = None
+
+try:
+    import py2exe
+except ImportError:
+    print "Warning: Missing py2exe package. Use this for windows compilation only."
+else:
+    set_py2exe_options()
 
 static_files = []
 root_path = os.path.split(commons.base_path)[0]
@@ -28,11 +40,18 @@ for root, dirnames, filenames in os.walk(commons.media_path):
         continue
     static_files.append((root[len(root_path)+1:], [os.path.join(root, fn) for fn in filenames]))
 
+f = open(os.path.join(os.path.dirname(__file__), 'README.md'))
+readme = f.read()
+f.close()
+
 setup(
-    name='sde',
-    console=['sde.py'],
-    description='SD Elements Tools',
-    zipfile=None,
-    options=options,
+    name='sdetools',
+    description='SD Element Tools: A collection of SD Elements integeration tools build around SD Elements API.',
+    long_description=readme,
+    maintainer="SD Elements",
+    maintainer_email="support@sdelements.com",
+    version=sdetools.VERSION,
+    url='https://github.com/sdelements/sdetools',
     data_files=static_files,
+    **ext_opt
     )
