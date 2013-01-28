@@ -51,7 +51,6 @@ setup(
     maintainer="SD Elements",
     maintainer_email="support@sdelements.com",
     version=sdetools.VERSION,
-    packages=['sdetools'],
     url='https://github.com/sdelements/sdetools',
     data_files=static_files,
     **ext_opt
