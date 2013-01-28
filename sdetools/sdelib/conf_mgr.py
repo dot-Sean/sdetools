@@ -276,6 +276,7 @@ class Config(object):
             raise UsageError("Unable to use interactive mode with standard input for configuration: Use -I")
         if opts.proxy_auth:
             self['proxy_auth'] = opts.proxy_auth
+        if self['proxy_auth']:
             self.fix_proxy_env()
 
         for group_name, optlist in self.custom_options:
