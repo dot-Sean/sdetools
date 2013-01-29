@@ -29,9 +29,14 @@ def set_py2exe_options():
 try:
     import py2exe
 except ImportError:
-    print "Warning: Missing py2exe package. Use this for windows compilation only."
+    if 'py2exe' in sys.argv[:1]:
+        print "Error: Missing py2exe package."
+        sys.exit(1)
 else:
     set_py2exe_options()
+
+if 'py2exe' not in sys.argv[:1]:
+    ext_opt['packages'] = ['sdetools']
 
 static_files = []
 root_path = os.path.split(commons.base_path)[0]
