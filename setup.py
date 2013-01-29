@@ -29,13 +29,13 @@ def set_py2exe_options():
 try:
     import py2exe
 except ImportError:
-    if 'py2exe' in sys.argv[:1]:
+    if 'py2exe' in sys.argv[1:]:
         print "Error: Missing py2exe package."
         sys.exit(1)
 else:
     set_py2exe_options()
 
-if 'py2exe' not in sys.argv[:1]:
+if 'py2exe' not in sys.argv[1:]:
     ext_opt['packages'] = ['sdetools']
 
 static_files = []
