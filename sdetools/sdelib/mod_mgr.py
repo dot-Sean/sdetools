@@ -5,6 +5,39 @@ import commons
 
 from sdetools import modules
 
+def stdout_callback(obj):
+    print obj
+
+class Info(object):
+    def __init__(self, title='', **items):
+        self.title = title
+        self.items = items
+
+    def __str__(self):
+        return self.title
+
+class ReturnChannel:
+    def __init__(self, call_back, call_back_args={}):
+        self.is_open = True
+        self.call_back = call_back
+        self.call_back_args = call_back_args
+        self.info_container = Info
+
+    def set_info_container(self, info_cls):
+        self.info_container = info_cls
+
+    def close(self):
+        self.is_open = False
+
+    def emit_obj(self, obj):
+        if not self.is_open:
+            raise ValueError('Emit operation on closed channel')
+        self.call_back(obj, **call_back_args)
+
+    def emit(self, *args, **kwargs):
+        info = self.info_container(*args, **kwargs)
+        self.emit_obj(info)
+
 def load_modules():
     command = {}
 
@@ -28,7 +61,9 @@ def load_modules():
 
     return command
 
-def run_command(cmd_name, args, call_src, call_options={}):
+def run_command(cmd_name, args, call_src, call_options={},
+        call_back=stdout_callback, call_back_args={}):
+
     command = load_modules()
 
     if cmd_name not in command:
