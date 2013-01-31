@@ -1,0 +1,4 @@
+include sde.py
+include README.md
+recursive-include sdetools *.py
+recursive-include sdetools/docs *
