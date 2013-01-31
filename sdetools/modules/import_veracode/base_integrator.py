@@ -25,7 +25,7 @@ class IntegrationResult(object):
         self.error_cwes_unmapped = error_cwes_unmapped
 
 class BaseIntegrator(object):
-        TOOL_NAME = 'External tool'
+    TOOL_NAME = 'External tool'
 
     def __init__(self, config, default_mapping_file=None):
         self.findings = []
