@@ -1,4 +1,5 @@
 import logging
+logger = logging.getLogger(__name__)
 
 import conf_mgr
 import commons
@@ -9,7 +10,9 @@ def stdout_callback(obj):
     print obj
 
 class Info(object):
-    def __init__(self, title='', **items):
+    def __init__(self, title='', itype='info', **items):
+        if itype not in ['info', 'error']:
+            raise ValueError('Type can only be info or error')
         self.title = title
         self.items = items
 
@@ -32,10 +35,11 @@ class ReturnChannel:
     def emit_obj(self, obj):
         if not self.is_open:
             raise ValueError('Emit operation on closed channel')
-        self.call_back(obj, **call_back_args)
+        self.call_back(obj, **self.call_back_args)
 
     def emit(self, *args, **kwargs):
         info = self.info_container(*args, **kwargs)
+        logger.debug('Emitting Msg: %s' % str(info))
         self.emit_obj(info)
 
 def load_modules():
@@ -71,7 +75,8 @@ def run_command(cmd_name, args, call_src, call_options={},
 
     curr_cmd = command[cmd_name]
 
-    config = conf_mgr.Config(command, args, call_src, call_options)
+    ret_chn = ReturnChannel(call_back, call_back_args)
+    config = conf_mgr.Config(command, args, ret_chn, call_src, call_options)
 
     cmd_inst = curr_cmd(config, args)
 

@@ -3,7 +3,8 @@ __all__ = [
     'restclient',
     'sdeapi', 
     'commons', 
-    'conf_mgr', 
+    'conf_mgr',
+    'mod_mgr',
     'content', 
     'interactive_plugin', 
     'scanner']

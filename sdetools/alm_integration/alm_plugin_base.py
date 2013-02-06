@@ -79,6 +79,7 @@ class AlmConnector(object):
         self.sde_plugin = PlugInExperience(self.config)
         self.alm_plugin = alm_plugin
         self._add_alm_config_options()
+        self.emit = self.config.emit
 
     def _add_alm_config_options(self):
         """ Adds ALM config options to the config file"""
@@ -394,6 +395,7 @@ class AlmConnector(object):
             total_work = (progress+len(tasks))
 
             for task in tasks:
+                tid = task['id'].split('-', 1)[-1]
                 progress += 1
                 self.output_progress(100*progress/total_work)
 
@@ -404,7 +406,7 @@ class AlmConnector(object):
                         # What takes precedence in case of a conflict of
                         # status. Start with ALM
                         precedence = 'alm'
-                        updated_system = 'sde'
+                        updated_system = 'SD Elements'
 
                         if self.config['conflict_policy'] == 'sde':
                             precedence = 'sde'
@@ -420,11 +422,12 @@ class AlmConnector(object):
                             self.sde_update_task_status(task, alm_task.get_status())
                         else:
                             self.alm_update_task_status(alm_task, task['status'])
-                            updated_system = 'alm'
-                        logger.debug('Updated status of task %s in %s' % (task['id'], updated_system))
+                            updated_system = self.alm_name
+                        self.emit('Updated status of task %s in %s to %s' % (tid, update_system, status))
                 else:
                     #Only exists in SD Elements, add it to ALM
                     ref = self.alm_add_task(task)
+                    self.emit('Added task %s to %s' % (tid, self.alm_name))
                     note_msg = 'Task synchronized in %s. Reference: %s' % (self.alm_name, ref)
                     self._add_note(task['id'], note_msg, '', task['status'])
                     logger.debug(note_msg)
