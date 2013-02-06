@@ -91,6 +91,7 @@ def run_command(cmd_name, args, call_src, call_options={},
     cmd_inst.process_args()
 
     ret_status = cmd_inst.handle()
+    config.ret_chnd.close()
 
     if ret_status is None:
         ret_status = True
