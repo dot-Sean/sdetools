@@ -33,6 +33,7 @@ class BaseIntegrator(object):
         self.mapping = {}
         self.report_id = ""
         self.config = config
+        self.emit = self.config.emit
         self.plugin = None
         self.cwe_title = {}
         self.confidence = {}
@@ -186,21 +187,18 @@ class BaseIntegrator(object):
             if len(finding.items()) > 0:
                 analysis_findings.append(cwe_finding)
 
-            if commit:
-                try:
+            try:
+                if commit:
                     finding_confidence = "none"
                     if self.confidence.has_key(task_id):
                         finding_confidence = self.confidence[task_id]
 
                     ret = self.plugin.add_analysis_note(task_name, project_analysis_note_ref, finding_confidence, analysis_findings)
-                    logger.debug("Marked %s as FAILURE with %s confidence" % (task_name, finding_confidence))
-                    stats_failures_added += 1
-                except APIError, e:
-                    logger.exception("Could not mark %s as FAILURE - Reason: %s" % (task_name, str(e)))
-                    stats_api_errors += 1
-            else:
                 logger.debug("Marked %s as FAILURE with %s confidence" % (task_name, finding_confidence))
                 stats_failures_added += 1
+            except APIError, e:
+                logger.exception("Could not mark %s as FAILURE - Reason: %s" % (task_name, str(e)))
+                stats_api_errors += 1
 
         stats_passes_added=0
         stats_test_tasks=0
@@ -228,19 +226,16 @@ class BaseIntegrator(object):
                 else:
                     continue
 
-                if commit:
-                    try:
+                try:
+                    if commit:
                         analysis_findings = []
 
                         self.plugin.add_analysis_note(task_name, project_analysis_note_ref, finding_confidence, analysis_findings)
-                        logger.debug("Marked %s task as PASS with %s confidence" % (task_name, finding_confidence))
-                        stats_passes_added += 1
-                    except APIError, e:
-                        logger.exception("Could not mark %s as PASS - Reason: %s" % (task_name, str(e)))
-                        stats_api_errors += 1
-                else:
                     logger.info("Marked %s as PASS with %s confidence" % (task_name, finding_confidence))
                     stats_passes_added += 1
+                except APIError, e:
+                    logger.exception("Could not mark %s as PASS - Reason: %s" % (task_name, str(e)))
+                    stats_api_errors += 1
 
         logger.info("---------------------------------------------------------")
         if missing_cwe_map:
