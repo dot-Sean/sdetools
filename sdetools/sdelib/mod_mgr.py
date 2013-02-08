@@ -10,14 +10,14 @@ def stdout_callback(obj):
     print obj
 
 class Info(object):
-    def __init__(self, title='', itype='info', **items):
-        if itype not in ['info', 'error']:
+    def __init__(self, msg, ev_type='info', **items):
+        if ev_type not in ['info', 'error']:
             raise ValueError('Type can only be info or error')
-        self.title = title
+        self.msg = msg
         self.items = items
 
     def __str__(self):
-        return self.title
+        return '%s: %s' % (ev_type.title(), self.msg)
 
 class ReturnChannel:
     def __init__(self, call_back, call_back_args={}):
@@ -41,6 +41,9 @@ class ReturnChannel:
         info = self.info_container(*args, **kwargs)
         logger.debug('Emitting Msg: %s' % str(info))
         self.emit_obj(info)
+
+    def emit_error(self, *args, **kwargs):
+        self.emit(*args, ev_type='info', **kwargs)
 
 def load_modules():
     command = {}

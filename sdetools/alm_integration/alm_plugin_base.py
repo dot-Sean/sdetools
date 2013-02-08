@@ -80,6 +80,7 @@ class AlmConnector(object):
         self.alm_plugin = alm_plugin
         self._add_alm_config_options()
         self.emit = self.config.emit
+        self.emit_error = self.config.emit_error
 
     def _add_alm_config_options(self):
         """ Adds ALM config options to the config file"""
