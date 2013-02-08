@@ -2,6 +2,16 @@ from commons import Error, get_password
 import sdeapi
 from content import Content
 
+def _verify_connect(wrapped):
+    def wrapper(self, *args, **kwargs):
+        if not self.connected:
+            self.connect()
+        if self.prj_id is None:
+            self.app_id, self.prj_id = self.select_project()
+        return wrapped(self, *args, **kwargs)
+
+    return wrapper
+
 class PluginError(Error):
     pass
 
@@ -9,20 +19,33 @@ class PlugInExperience:
     def __init__(self, config):
         self.config = config
         self.api = sdeapi.APIBase(self.config)
-        self.app = None
-        self.prj = None
+        self.app_id = None
+        self.prj_id = None
         config.add_custom_option('sde_application', "SDE Application to use", 
             default='', group_name="SD Elements Connector")
         config.add_custom_option('sde_project', "SDE Project to use",
             default='', group_name="SD Elements Connector")
+        self.connected = False
 
     def connect(self):
-        self.api.connect()
+        if self.connected:
+            return
+
+        if not self.api.connected:
+            if self.config['interactive']:
+                self.get_and_validate_password()
+            else:
+                self.api.connect()
+
+        # We allow IDs to be passed when importing sdetools
+        if type(self.config['sde_application']) in [int, long]:
+            self.app_id = self.config['sde_application']
+            if type(self.config['sde_project']) in [int, long]:
+                self.prj_id = self.config['sde_project']
+
+        self.connected = True
 
     def get_and_validate_password(self):
-        if not self.config['interactive']:
-            self.api.connect()
-            return
         askpasswd = self.config['sde_pass'] is None
         while not self.api.connected:
             if askpasswd:
@@ -38,8 +61,8 @@ class PlugInExperience:
             break
 
     def select_application(self):
-        if not self.api.connected:
-             self.get_and_validate_password()
+        if not self.connected:
+             self.connect()
 
         filters = {}
         if self.config['sde_application']:
@@ -50,7 +73,7 @@ class PlugInExperience:
             if (not app_list):
                 raise PluginError('Specified Application not found -> %s' % (self.config['sde_application']))
             elif (len(app_list) == 1):
-                return app_list[0]
+                return app_list[0]['id']
 
         if (not self.config['interactive']):
             raise PluginError('Missing Application (either use Interactive mode, or specify the exact name of an Application)')
@@ -75,7 +98,7 @@ class PlugInExperience:
                 sel_app = app_list[int(sel_ind)-1]
                 break
 
-        return sel_app
+        return sel_app['id']
 
     def _select_project_from_list(self, prj_list):
         while True:
@@ -98,31 +121,25 @@ class PlugInExperience:
 
     def select_project(self):
         while True:
-            sel_app = self.select_application()
+            sel_app_id = self.select_application()
 
             filters = {}
             if self.config['sde_project']:
                 filters['name'] = self.config['sde_project']
-            prj_list = self.api.get_projects(sel_app['id'], **filters)
+            prj_list = self.api.get_projects(sel_app_id, **filters)
 
             if (self.config['sde_project']):
                 if (not prj_list):
                     raise PluginError('Specified Project not found -> %s' % (self.config['sde_project']))
                 elif (len(prj_list) == 1):
-                    return (sel_app, prj_list[0])
+                    return (sel_app_id, prj_list[0]['id'])
 
             if (not self.config['interactive']):
                 raise PluginError('Missing Project (either use Interactive mode, or specify the exact name of an Project)')
 
             sel_prj = self._select_project_from_list(prj_list)
             if sel_prj is not None:
-                return (sel_app, sel_prj)
-
-    def get_task_list(self):
-        if not self.prj:
-            self.app, self.prj = self.select_project()
-        
-        return self.api.get_tasks(self.prj['id'])
+                return (sel_app_id, sel_prj['id'])
 
     def get_compiled_task_list(self):
         task_list = self.get_task_list()
@@ -131,26 +148,22 @@ class PlugInExperience:
         content.import_task_list(task_list)
         return content
 
+    @_verify_connect
+    def get_task_list(self):
+        return self.api.get_tasks(self.prj_id)
+
+    @_verify_connect
     def add_task_ide_note(self, task_id, text, filename, status):
-        if not self.prj:
-            self.app, self.prj = self.select_project()
+        return self.api.add_task_ide_note("%d-%s" % (self.prj_id, task_id), text, filename, status)
 
-        return self.api.add_task_ide_note("%d-%s" % (self.prj['id'], task_id), text, filename, status)
-
+    @_verify_connect
     def get_task_notes(self, task_id, note_type=''):
-        if not self.prj:
-            self.app, self.prj = self.select_project()
- 
-        return self.api.get_task_ide_notes("%d-%s" % (self.prj['id'], task_id), note_type)
+        return self.api.get_task_ide_notes("%d-%s" % (self.prj_id, task_id), note_type)
 
+    @_verify_connect
     def add_project_analysis_note(self, analysis_ref, analysis_type):
-        if not self.prj:
-            self.app, self.prj = self.select_project()
+        return self.api.add_project_analysis_note(self.prj_id, analysis_ref, analysis_type)
 
-        return self.api.add_project_analysis_note(self.prj['id'], analysis_ref, analysis_type)
-
+    @_verify_connect
     def add_analysis_note(self, task_id, analysis_ref, confidence, findings):
-        if not self.prj:
-            self.app, self.prj = self.select_project()
-
-        return self.api.add_analysis_note("%d-%s" % (self.prj['id'], task_id), analysis_ref, confidence, findings)
+        return self.api.add_analysis_note("%d-%s" % (self.prj_id, task_id), analysis_ref, confidence, findings)
