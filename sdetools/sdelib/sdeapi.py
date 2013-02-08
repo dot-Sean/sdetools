@@ -19,8 +19,6 @@ class ExtAPI(restclient.RESTBase):
         for i in xrange(3):
             conf_opts[i][-1] = ''
         super(ExtAPI, self).__init__('sde', 'SD Elements', config, 'api', conf_opts)
-        self.app = None
-        self.prj = None
         self.connected = False
 
     def post_conf_init(self):
