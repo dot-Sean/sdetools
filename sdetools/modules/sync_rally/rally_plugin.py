@@ -45,7 +45,7 @@ class RallyAPIBase(RESTBase):
     """ Base plugin for Rally """
 
     def __init__(self, config):
-        super(RallyAPIBase, self).__init__('alm', 'ALM', config, 
+        super(RallyAPIBase, self).__init__('alm', 'Rally', config, 
                 'slm/webservice/%s' % (API_VERSION))
 
     def get_custom_headers(self, target, method):

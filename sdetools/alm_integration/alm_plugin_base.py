@@ -153,7 +153,7 @@ class AlmConnector(object):
         pass
 
     @abstractmethod
-    def alm_get_task (self, task):
+    def alm_get_task(self, task):
         """ Returns an AlmTask that represents the value of this
         SD Elemets task in the ALM, or None if the task doesn't exist
 

@@ -52,7 +52,7 @@ class TestAlmConnector(AlmConnector):
         self.fields = ['id', 'priority', 'status']
         self.csv_file = open('test.csv', 'r+b')
 
-    def alm_get_task (self, task):
+    def alm_get_task(self, task):
         alm_task, reader = self.find_matching_row(task)
         if (alm_task):
             return TestAlmTask(alm_task['id'],

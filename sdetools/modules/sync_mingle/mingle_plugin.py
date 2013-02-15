@@ -113,7 +113,7 @@ class MingleConnector(AlmConnector):
                                'check server URL, ID, password and '
                                'project')
 
-    def alm_get_task (self, task):
+    def alm_get_task(self, task):
         task_id = task['title']
         result = None
 

@@ -37,12 +37,11 @@ class SOAPProxyWrap:
 class JIRASoapAPI:
     def __init__(self, config):
         self.config = config
-
-    def initialize(self):
         self.statuses = None
         self.priorities = None
         self.auth = None
         
+
     def connect(self):
         config = SOAPpy.Config
         if __name__ in self.config['debug_mods']:
