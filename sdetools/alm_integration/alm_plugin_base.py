@@ -80,7 +80,6 @@ class AlmConnector(object):
         self.alm_plugin = alm_plugin
         self._add_alm_config_options()
         self.emit = self.config.emit
-        self.emit_error = self.config.emit_error
 
     def _add_alm_config_options(self):
         """ Adds ALM config options to the config file"""
@@ -424,11 +423,11 @@ class AlmConnector(object):
                         else:
                             self.alm_update_task_status(alm_task, task['status'])
                             updated_system = self.alm_name
-                        self.emit('Updated status of task %s in %s to %s' % (tid, update_system, status))
+                        self.emit.info('Updated status of task %s in %s to %s' % (tid, update_system, status))
                 else:
                     #Only exists in SD Elements, add it to ALM
                     ref = self.alm_add_task(task)
-                    self.emit('Added task %s to %s' % (tid, self.alm_name))
+                    self.emit.info('Added task %s to %s' % (tid, self.alm_name))
                     note_msg = 'Task synchronized in %s. Reference: %s' % (self.alm_name, ref)
                     self._add_note(task['id'], note_msg, '', task['status'])
                     logger.debug(note_msg)

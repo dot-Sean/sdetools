@@ -10,14 +10,25 @@ def stdout_callback(obj):
     print obj
 
 class Info(object):
-    def __init__(self, msg, ev_type='info', **items):
-        if ev_type not in ['info', 'error']:
+    def __init__(self, ev_type, msg='', **items):
+        if ev_type not in ['info', 'error', 'close']:
             raise ValueError('Type can only be info or error')
+        self.ev_type = ev_type
         self.msg = msg
         self.items = items
 
     def __str__(self):
-        return '%s: %s' % (ev_type.title(), self.msg)
+        return '%s: %s' % (self.ev_type.title(), self.msg)
+
+class EmitShortCut:
+    def __init__(self, ret_chn):
+        self.ret_chn = ret_chn
+        self.info = self.ret_chn.emit_info
+        self.error = self.ret_chn.emit_error
+        self.close = self.ret_chn.close
+
+    def __call__(self, *args, **kwargs):
+        self.ret_chn.emit_it(*args, **kwargs)
 
 class ReturnChannel:
     def __init__(self, call_back, call_back_args={}):
@@ -25,25 +36,30 @@ class ReturnChannel:
         self.call_back = call_back
         self.call_back_args = call_back_args
         self.info_container = Info
+        self.emit = EmitShortCut(self)
 
     def set_info_container(self, info_cls):
         self.info_container = info_cls
-
-    def close(self):
-        self.is_open = False
 
     def emit_obj(self, obj):
         if not self.is_open:
             raise ValueError('Emit operation on closed channel')
         self.call_back(obj, **self.call_back_args)
 
-    def emit(self, *args, **kwargs):
+    def emit_it(self, *args, **kwargs):
         info = self.info_container(*args, **kwargs)
         logger.debug('Emitting Msg: %s' % str(info))
         self.emit_obj(info)
 
+    def close(self, *args, **kwargs):
+        self.is_open = False
+        self.emit_it('close', *args, **kwargs)
+
+    def emit_info(self, *args, **kwargs):
+        self.emit_it('info', *args, **kwargs)
+
     def emit_error(self, *args, **kwargs):
-        self.emit(*args, ev_type='info', **kwargs)
+        self.emit_it('error', *args, **kwargs)
 
 def load_modules():
     command = {}
@@ -94,7 +110,7 @@ def run_command(cmd_name, args, call_src, call_options={},
     cmd_inst.process_args()
 
     ret_status = cmd_inst.handle()
-    config.ret_chnd.close()
+    config.ret_chn.close()
 
     if ret_status is None:
         ret_status = True

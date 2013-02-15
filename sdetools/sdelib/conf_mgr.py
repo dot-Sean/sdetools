@@ -62,7 +62,6 @@ class Config(object):
         self.args = args
         self.ret_chn = ret_chn
         self.emit = self.ret_chn.emit
-        self.emit_error = self.ret_chn.emit_error
 
     def __getitem__(self, key):
         if key in self.settings:
