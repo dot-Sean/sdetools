@@ -8,4 +8,5 @@ __all__ = [
     'sync_rally',
     'api_proxy',
     'list_projects',
+    'sync_trac',
 ]

@@ -1,0 +1,179 @@
+# Copyright SDElements Inc
+# Extensible two way integration with Trac
+
+import xmlrpclib
+
+from sdetools.sdelib.restclient import RESTBase
+from sdetools.sdelib.restclient import URLRequest, APIError
+from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
+from sdetools.alm_integration.alm_plugin_base import AlmException
+
+from sdetools.sdelib import log_mgr
+logger = log_mgr.mods.add_mod(__name__)
+
+class TracXMLRPCAPI(RESTBase):
+    def __init__(self, config):
+        super(TracXMLRPCAPI, self).__init__('alm', 'Trac', config, 'login/xmlrpc')
+        self.proxy = None
+
+    def post_conf_init(self):
+        self.server = self._get_conf('server') 
+        self.base_uri = '%s://%s:%s@%s/%s' % (
+            self._get_conf('method'), 
+            self._get_conf('user'),
+            self._get_conf('pass'),
+            self.server, 
+            self.base_path)
+
+    def connect(self):
+        if self.proxy:
+            return
+        self.post_conf_init()
+        self.proxy = xmlrpclib.ServerProxy(self.base_uri)
+
+class TracConnector(AlmConnector):
+    alm_name = 'Trac'
+
+    def __init__(self, config, alm_plugin):
+        """ Initializes connection to Trac """
+        super(TracConnector, self).__init__(config, alm_plugin)
+
+        config.add_custom_option('alm_standard_workflow', 'Standard workflow in Trac?',
+            default='True')
+        config.add_custom_option('trac_card_type', 'IDs for issues raised in Trac',
+            default='Story')
+        config.add_custom_option('trac_new_status', 'Status to set for new tasks in Trac',
+            default='Ready for Analysis')
+        config.add_custom_option('trac_done_statuses', 'Statuses that signify a task is Done in Trac',
+            default='Ready for Testing,In Testing,Ready for Signoff,Accepted')
+
+    def initialize(self):
+        super(TracConnector, self).initialize()
+
+        #Verify that the configuration options are set properly
+        if (not self.sde_plugin.config['trac_done_statuses'] or
+            len(self.sde_plugin.config['trac_done_statuses']) < 1):
+            raise AlmException('Missing trac_done_statuses in configuration')
+
+        self.sde_plugin.config['trac_done_statuses'] =  (
+                self.sde_plugin.config['trac_done_statuses'].split(','))
+
+        if not self.sde_plugin.config['alm_standard_workflow']:
+            raise AlmException('Missing alm_standard_workflow in configuration')
+        if not self.sde_plugin.config['trac_card_type']:
+            raise AlmException('Missing trac_card_type in configuration')
+        if not self.sde_plugin.config['trac_new_status']:
+            raise AlmException('Missing trac_card_type in configuration')
+
+    def alm_connect(self):
+        """ Perform initial connect and verify that Trac connection works """
+        self.alm_plugin.connect()
+
+    def alm_get_task(self, task):
+        task_id = task['title']
+        result = None
+
+        try:
+            task_args =  {'filters[]': ('[Name][is][%s]' % task_id)}
+            result = self.alm_plugin.call_api('cards.xml', args=task_args)
+        except APIError, err:
+            logger.error(err)
+            raise AlmException('Unable to get task %s from Trac' % task_id)
+
+        card_element =  result.getElementsByTagName('card')
+        if not card_element.length:
+            return None
+
+        card_item = card_element.item(0)
+        try:
+            card_num = card_item.getElementsByTagName(
+                    'number').item(0).firstChild.nodeValue
+        except Exception, err:
+            logger.info(err)
+            raise AlmException('Unable to get card # for task '
+                               '%s from Trac' % task_id)
+        modified_date  = None
+        if card_item.getElementsByTagName('modified_on'):
+            modified_date = card_item.getElementsByTagName(
+                    'modified_on').item(0).firstChild.nodeValue
+        status = None
+        if card_item.getElementsByTagName('property'):
+            properties = card_item.getElementsByTagName('property')
+            for prop in properties:
+                if (prop.getElementsByTagName(
+                            'name').item(0).firstChild.nodeValue ==
+                            'Status'):
+                    status_node = prop.getElementsByTagName(
+                            'value').item(0).firstChild
+                    if status_node:
+                        status = status_node.nodeValue
+                    else:
+                        status = 'TODO'
+                    break
+        return TracTask(task_id, card_num, status, modified_date,
+                          self.sde_plugin.config['trac_done_statuses'])
+
+    def alm_add_task(self, task):
+        try:
+            status_args = {
+                'card[name]': task['title'],
+                'card[card_type_name]': self.sde_plugin.config['trac_card_type'],
+                'card[description]': self.sde_get_task_content(task),
+                'card[properties][][name]': 'status',
+                'card[properties][][value]': self.sde_plugin.config['trac_new_status']
+            }
+            self.alm_plugin.call_api('cards.xml', args=status_args,
+                    method=URLRequest.POST)
+            logger.debug('Task %s added to Trac Project' % task['id'])
+        except APIError, err:
+            raise AlmException('Please check ALM-specific settings in config '
+                    'file. Unable to add task %s because of %s' %
+                    (task['id'], err))
+
+        #Return a unique identifier to this task in Trac
+        alm_task = self.alm_get_task(task)
+        if not alm_task:
+            raise AlmException('Alm task not added sucessfully. Please '
+                               'check ALM-specific settings in config file')
+
+        if (self.sde_plugin.config['alm_standard_workflow']=='True' and
+                (task['status']=='DONE' or task['status']=='NA')):
+            self.alm_update_task_status(alm_task, task['status'])
+        return 'Project: %s, Card: %s' % (self.sde_plugin.config['alm_project'],
+                                          alm_task.get_alm_id())
+
+
+    def alm_update_task_status(self, task, status):
+        if not task or not self.sde_plugin.config['alm_standard_workflow'] == 'True':
+            logger.debug('Status synchronization disabled')
+            return
+
+        if status == 'DONE' or status=='NA':
+            try:
+                status_args = {
+                    'card[properties][][name]':'status',
+                    'card[properties][][value]': self.sde_plugin.config['trac_done_statuses'][0]
+                }
+                self.alm_plugin.call_api('cards/%s.xml' % task.get_alm_id(),
+                        args=status_args, method=URLRequest.PUT)
+            except APIError, err:
+                raise AlmException('Unable to update task status to DONE '
+                                   'for card: %s in Trac because of %s' %
+                                   (task.get_alm_id(),err))
+        elif status== 'TODO':
+            try:
+                status_args = {
+                    'card[properties][][name]':'status',
+                    'card[properties][][value]': self.sde_plugin.config['trac_new_status']
+                }
+                self.alm_plugin.call_api('cards/%s.xml' % task.get_alm_id(),
+                        args=status_args, method=URLRequest.PUT)
+            except APIError, err:
+                raise AlmException('Unable to update task status to TODO for '
+                                   'card: %s in Trac because of %s' %
+                                   (task.get_alm_id(), err))
+        logger.debug('Status changed to %s for task %s in Trac' %
+                (status, task.get_alm_id()))
+
+    def alm_disconnect(self):
+        pass

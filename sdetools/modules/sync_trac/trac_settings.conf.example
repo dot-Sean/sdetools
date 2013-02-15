@@ -1,0 +1,90 @@
+[global]
+###################################################
+#### SD Elements server and project settings  #####
+###################################################
+#SD Elements API Token
+sde_api_token = 1234567890abcdef1234567890abcdef@newcastle.sdelements.com
+
+#SD Elements application
+sde_application = SDEApp
+
+#SD Elements project
+sde_project = SDEProject
+
+###################################################
+#### Mingle server and project settings       #####
+###################################################
+
+#Mingle Server name, includes port
+alm_server = mingleserver/org_name
+
+#HTTP or HTTPs protocol
+alm_method = https
+              
+#Username for Mingle user that can:
+# -create new issues for the project
+# -read existing issues in the project
+# -create transitions on issues (e.g. close an issue)
+alm_user = trac_user_name
+              
+#Password for above user. Note that this will be encrypted
+#in future versions of the plugin
+alm_pass = trac_password
+              
+#Mingle project identifier
+alm_project = trac_milestone
+
+#A comma-delimited list of statuses for tasks
+#that you wish to import into the ALM.
+#For example, if you only want to synchronize
+#tasks that are currently TODO in SD Elements
+#then just enter TODO
+#Valid values are:
+#TODO,DONE,NA
+sde_statuses_in_scope = TODO,DONE,NA
+
+#Should HowTos be included in what's added
+#to the ALM tools?
+#Valid values are:
+#True or False
+how_tos_in_scope = True
+
+#SD Elements task phases that are in scope.
+#Valid values: comma separated list-
+#requirements,architecture-design,development,testing
+#NOTE: please do not include any spaces in task names
+alm_phases = requirements
+
+#Which system takes precedence in case of
+#confliciting status. For example, if you mark
+#an issue as Closed in Mingle and the task is TODO in
+#SD Elements, it will be changed to DONE in SD Elemenets.
+#If you mark a task as Done in SD Elements, but it's still
+#Open in Mingle, the task will automatically revert back
+#to TODO in SD Elements.
+#Valid values:
+#alm -> ALM tool (i.e Mingle) takes precedence
+#sde -> SDE takes precedence
+conflict_policy = alm
+
+
+###################################################
+#### Advanced Mingle Settings                 #####
+###################################################
+
+          
+#SD Elements has the ability to map status 
+#of a Mingle story to an SD Elements task.
+#This can be non-trivial if workflow is
+#customized. If this value is set to True
+#then the plugin will attempt to synchronize
+#task statuses. If not, then the plugin
+#will simply add new tasks from SD Element
+#into the Mingle project without attempting
+#to synchronized task status
+#Valid values: True, False
+alm_standard_workflow = True
+
+
+######Base settings, do not modify######
+interactive = True
