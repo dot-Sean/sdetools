@@ -31,6 +31,37 @@ class TracXMLRPCAPI(RESTBase):
         self.post_conf_init()
         self.proxy = xmlrpclib.ServerProxy(self.base_uri)
 
+class TracTask(AlmTask):
+    """ Representation of a task in Trac"""
+
+    def __init__(self, task_id, alm_id, status, timestamp, done_statuses):
+        self.task_id = task_id
+        self.alm_id = alm_id
+        self.status = status
+        self.timestamp = timestamp
+        self.done_statuses = done_statuses  # comma-separated list
+
+    def get_task_id(self):
+        return self.task_id
+
+    def get_alm_id(self):
+        return self.alm_id
+
+    def get_priority(self):
+        return self.priority
+
+    def get_status(self):
+        """ Translates Mingle status into SDE status """
+        if self.status in self.done_statuses:
+            return 'DONE'
+        else:
+            return 'TODO'
+
+    def get_timestamp(self):
+        """ Returns a datetime object """
+        return datetime.strptime(self.timestamp,
+                                 '%Y-%m-%dT%H:%M:%SZ')
+
 class TracConnector(AlmConnector):
     alm_name = 'Trac'
 
@@ -46,6 +77,7 @@ class TracConnector(AlmConnector):
             default='Ready for Analysis')
         config.add_custom_option('trac_done_statuses', 'Statuses that signify a task is Done in Trac',
             default='Ready for Testing,In Testing,Ready for Signoff,Accepted')
+        self.alm_task_title_prefix = 'SDE '
 
     def initialize(self):
         super(TracConnector, self).initialize()
@@ -69,72 +101,38 @@ class TracConnector(AlmConnector):
         """ Perform initial connect and verify that Trac connection works """
         self.alm_plugin.connect()
 
+    def _vet_alm_tasks(self, tasks):
+        return tasks[0]
+
     def alm_get_task(self, task):
-        task_id = task['title']
-        result = None
-
-        try:
-            task_args =  {'filters[]': ('[Name][is][%s]' % task_id)}
-            result = self.alm_plugin.call_api('cards.xml', args=task_args)
-        except APIError, err:
-            logger.error(err)
-            raise AlmException('Unable to get task %s from Trac' % task_id)
-
-        card_element =  result.getElementsByTagName('card')
-        if not card_element.length:
+        task_id = task['title'].partition(':')[0]
+        
+        qstr = 'summary^=%s%s' % (self.alm_task_title_prefix, task_id)
+        result = self.alm_plugin.proxy.ticket.query(qstr)
+        if not result:
             return None
 
-        card_item = card_element.item(0)
-        try:
-            card_num = card_item.getElementsByTagName(
-                    'number').item(0).firstChild.nodeValue
-        except Exception, err:
-            logger.info(err)
-            raise AlmException('Unable to get card # for task '
-                               '%s from Trac' % task_id)
-        modified_date  = None
-        if card_item.getElementsByTagName('modified_on'):
-            modified_date = card_item.getElementsByTagName(
-                    'modified_on').item(0).firstChild.nodeValue
-        status = None
-        if card_item.getElementsByTagName('property'):
-            properties = card_item.getElementsByTagName('property')
-            for prop in properties:
-                if (prop.getElementsByTagName(
-                            'name').item(0).firstChild.nodeValue ==
-                            'Status'):
-                    status_node = prop.getElementsByTagName(
-                            'value').item(0).firstChild
-                    if status_node:
-                        status = status_node.nodeValue
-                    else:
-                        status = 'TODO'
-                    break
-        return TracTask(task_id, card_num, status, modified_date,
+        alm_id = self._vet_alm_tasks(self, tasks)
+
+        trac_task = self.alm_plugin.proxy.ticket.get(alm_id)
+
+        return TracTask(task_id, alm_id, trac_task['status'], trac_task['changetime'],
                           self.sde_plugin.config['trac_done_statuses'])
 
     def alm_add_task(self, task):
-        try:
-            status_args = {
-                'card[name]': task['title'],
-                'card[card_type_name]': self.sde_plugin.config['trac_card_type'],
-                'card[description]': self.sde_get_task_content(task),
-                'card[properties][][name]': 'status',
-                'card[properties][][value]': self.sde_plugin.config['trac_new_status']
-            }
-            self.alm_plugin.call_api('cards.xml', args=status_args,
-                    method=URLRequest.POST)
-            logger.debug('Task %s added to Trac Project' % task['id'])
-        except APIError, err:
-            raise AlmException('Please check ALM-specific settings in config '
-                    'file. Unable to add task %s because of %s' %
-                    (task['id'], err))
+        title = '%s%s' % (self.alm_task_title_prefix, task['title'])
 
-        #Return a unique identifier to this task in Trac
-        alm_task = self.alm_get_task(task)
-        if not alm_task:
+        alm_id = self.alm_plugin.proxy.ticket.create(
+            title,
+            self.sde_get_task_content(task))
+#            attributes={
+#                'status': self.sde_plugin.config['trac_new_status']
+#                })
+
+        if not alm_id:
             raise AlmException('Alm task not added sucessfully. Please '
                                'check ALM-specific settings in config file')
+        alm_task = self.alm_plugin.proxy.ticket.get(alm_id)
 
         if (self.sde_plugin.config['alm_standard_workflow']=='True' and
                 (task['status']=='DONE' or task['status']=='NA')):
