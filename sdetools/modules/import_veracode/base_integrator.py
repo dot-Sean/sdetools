@@ -197,7 +197,8 @@ class BaseIntegrator(object):
                 logger.debug("Marked %s as FAILURE with %s confidence" % (task_name, finding_confidence))
                 stats_failures_added += 1
             except APIError, e:
-                logger.exception("Could not mark %s as FAILURE - Reason: %s" % (task_name, str(e)))
+                logger.exception("Unable to mark %s as FAILURE - Reason: %s" % (task_name, str(e)))
+                self.emit.error("API Error: Unable to mark %s as FAILURE. Skipping ..." % (task_name))
                 stats_api_errors += 1
 
         stats_passes_added=0
@@ -234,23 +235,27 @@ class BaseIntegrator(object):
                     logger.info("Marked %s as PASS with %s confidence" % (task_name, finding_confidence))
                     stats_passes_added += 1
                 except APIError, e:
-                    logger.exception("Could not mark %s as PASS - Reason: %s" % (task_name, str(e)))
+                    logger.exception("Unable to mark %s as PASS - Reason: %s" % (task_name, str(e)))
+                    self.emit.error("API Error: Unable to mark %s as PASS. Skipping ..." % (task_name))
                     stats_api_errors += 1
 
-        logger.info("---------------------------------------------------------")
         if missing_cwe_map:
-            logger.error("These CWEs could not be mapped: "+ ",".join(missing_cwe_map))
-            logger.error("%d total flaws could not be mapped." %(len(missing_cwe_map)))
+            self.emit.error("Could not map %s flaws" % (len(missing_cwe_map)), err_type='unmapped_cwe', cwe_list=missing_cwe_map)
         else:
-            logger.info("All CWEs successfully mapped to a task.")
-        logger.info("%d failures recorded from %d flaws."%(stats_failures_added, stats_total_flaws_found))
-        logger.info("%d/%d project tasks had 0 flaws." %(len(noflaw_tasks),len(task_list)-(stats_test_tasks))) 
+            self.emit.info("All flaws successfully mapped to tasks.")
+
+        results = {}
+        results['total_flaws_found'] = (stats_total_flaws_found, 'Total Flaws Found')
+        results['tasks_marked_fail'] = (stats_failures_added, 'Number of Tasks marked as FAILED')
+        results['tasks_without_findings'] = (noflaw_tasks, 'Number of Tasks in the project without any flaws')
         if stats_total_skips:
-            logger.error("%d flaws were mapped to %d tasks not found in the project. Skipped " % 
-                (stats_total_skips_findings,stats_total_skips))
-        logger.info("%d total api errors encountered." % (stats_api_errors))
-        logger.info("---------------------------------------------------------")
-        logger.info("Completed")
+            results['skipped_flaws'] = (stats_total_skips_findings, 
+                    'Number of flaws skipped because the related task was not'\
+                    ' found in the project')
+            results['skipped_tasks'] = (stats_total_skips, 'Number of tasks with flaws not found in project')
+
+        # We queue the information to be sent along the close emit
+        self.emit.queue(results=results)
 
         return IntegrationResult(import_start_datetime=import_start_datetime,
                                  import_finish_datetime=datetime.now(),

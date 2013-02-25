@@ -26,6 +26,7 @@ class EmitShortCut:
         self.info = self.ret_chn.emit_info
         self.error = self.ret_chn.emit_error
         self.close = self.ret_chn.close
+        self.queue = self.ret_chn.queue
 
     def __call__(self, *args, **kwargs):
         self.ret_chn.emit_it(*args, **kwargs)
@@ -37,6 +38,7 @@ class ReturnChannel:
         self.call_back_args = call_back_args
         self.info_container = Info
         self.emit = EmitShortCut(self)
+        self.queued_objs = {}
 
     def set_info_container(self, info_cls):
         self.info_container = info_cls
@@ -47,13 +49,23 @@ class ReturnChannel:
         self.call_back(obj, **self.call_back_args)
 
     def emit_it(self, *args, **kwargs):
+        kwargs = kwargs.copy()
+        kwargs.update(self.queued_objs)
+        self.queued_objs = {}
         info = self.info_container(*args, **kwargs)
         logger.debug('Emitting Msg: %s' % str(info))
         self.emit_obj(info)
 
+    def queue(self, **kwargs):
+        """
+        It allows objects to be added to a dict
+        Next emit will have these items attached and queue gets reset
+        """
+        self.queued_objs.update(kwargs)
+
     def close(self, *args, **kwargs):
-        self.is_open = False
         self.emit_it('close', *args, **kwargs)
+        self.is_open = False
 
     def emit_info(self, *args, **kwargs):
         self.emit_it('info', *args, **kwargs)
