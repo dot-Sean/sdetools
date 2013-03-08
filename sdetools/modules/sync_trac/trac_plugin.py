@@ -3,6 +3,7 @@
 
 import xmlrpclib
 
+from sdetools.sdelib.commons import UsageError, json
 from sdetools.sdelib.restclient import RESTBase
 from sdetools.sdelib.restclient import URLRequest, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
@@ -71,105 +72,130 @@ class TracConnector(AlmConnector):
 
         config.add_custom_option('alm_standard_workflow', 'Standard workflow in Trac?',
             default='True')
-        config.add_custom_option('trac_card_type', 'IDs for issues raised in Trac',
-            default='Story')
-        config.add_custom_option('trac_new_status', 'Status to set for new tasks in Trac',
+        config.add_custom_option('alm_close_transition', 'Close transition in Trac',
+                default='resolve,{"action_resolve_resolve_resolution":"fixed"}')
+        config.add_custom_option('alm_reopen_transition', 'Re-open transiiton in Trac',
+                default='reopen')
+        config.add_custom_option('alm_new_status', 'Status to set for new tasks in Trac',
             default='Ready for Analysis')
-        config.add_custom_option('trac_done_statuses', 'Statuses that signify a task is Done in Trac',
-            default='Ready for Testing,In Testing,Ready for Signoff,Accepted')
+        config.add_custom_option('alm_done_statuses', 'Statuses that signify a task is Done in Trac',
+            default='closed')
         self.alm_task_title_prefix = 'SDE '
 
     def initialize(self):
         super(TracConnector, self).initialize()
 
         #Verify that the configuration options are set properly
-        if (not self.sde_plugin.config['trac_done_statuses'] or
-            len(self.sde_plugin.config['trac_done_statuses']) < 1):
-            raise AlmException('Missing trac_done_statuses in configuration')
+        self.config['alm_done_statuses'] = self.config['alm_done_statuses'].split(',')
 
-        self.sde_plugin.config['trac_done_statuses'] =  (
-                self.sde_plugin.config['trac_done_statuses'].split(','))
+        if (not self.config['alm_done_statuses'] or
+            len(self.config['alm_done_statuses']) < 1):
+            raise UsageError('Missing alm_done_statuses in configuration')
 
-        if not self.sde_plugin.config['alm_standard_workflow']:
-            raise AlmException('Missing alm_standard_workflow in configuration')
-        if not self.sde_plugin.config['trac_card_type']:
-            raise AlmException('Missing trac_card_type in configuration')
-        if not self.sde_plugin.config['trac_new_status']:
-            raise AlmException('Missing trac_card_type in configuration')
+        if not self.config['alm_standard_workflow']:
+            raise UsageError('Missing alm_standard_workflow in configuration')
+
+        for action_type in ['alm_close_transition', 'alm_reopen_transition']:
+            action_to_take = self.config[action_type]
+
+            if not action_to_take:
+                raise UsageError('Missing %s value' % action_type)
+
+            if ',' in action_to_take:
+                action_to_take, action_args = action_to_take.split(',', 1)
+            else:
+                action_args = '{}'
+            try:
+                action_args = json.loads(action_args)
+            except:
+                raise UsageError('Unable to JSON decode action arguments: %s' % action_args)
+            if type(action_args) is not dict:
+                raise UsageError('Invalid action argument: %s' % repr(action_args))
+            self.config[action_type] = (action_to_take, action_args)
+            
 
     def alm_connect(self):
         """ Perform initial connect and verify that Trac connection works """
         self.alm_plugin.connect()
 
     def _vet_alm_tasks(self, tasks):
+        if len(tasks) > 1:
+            logger.warning('More than one task matched search ...')
         return tasks[0]
 
     def alm_get_task(self, task):
         task_id = task['title'].partition(':')[0]
         
         qstr = 'summary^=%s%s' % (self.alm_task_title_prefix, task_id)
-        result = self.alm_plugin.proxy.ticket.query(qstr)
-        if not result:
+        task_list = self.alm_plugin.proxy.ticket.query(qstr)
+        if not task_list:
             return None
 
-        alm_id = self._vet_alm_tasks(self, tasks)
+        alm_id = self._vet_alm_tasks(task_list)
 
         trac_task = self.alm_plugin.proxy.ticket.get(alm_id)
 
-        return TracTask(task_id, alm_id, trac_task['status'], trac_task['changetime'],
-                          self.sde_plugin.config['trac_done_statuses'])
+        return TracTask(task_id, alm_id, trac_task[3]['status'], trac_task[3]['changetime'],
+                          self.config['alm_done_statuses'])
 
     def alm_add_task(self, task):
         title = '%s%s' % (self.alm_task_title_prefix, task['title'])
 
         alm_id = self.alm_plugin.proxy.ticket.create(
             title,
-            self.sde_get_task_content(task))
-#            attributes={
-#                'status': self.sde_plugin.config['trac_new_status']
-#                })
+            self.sde_get_task_content(task),
+            {
+                'status': self.config['alm_new_status'],
+                'milestone': self.config['alm_project']
+            })
 
         if not alm_id:
             raise AlmException('Alm task not added sucessfully. Please '
                                'check ALM-specific settings in config file')
         alm_task = self.alm_plugin.proxy.ticket.get(alm_id)
 
-        if (self.sde_plugin.config['alm_standard_workflow']=='True' and
+        if (self.config['alm_standard_workflow']=='True' and
                 (task['status']=='DONE' or task['status']=='NA')):
             self.alm_update_task_status(alm_task, task['status'])
-        return 'Project: %s, Card: %s' % (self.sde_plugin.config['alm_project'],
-                                          alm_task.get_alm_id())
-
+        return 'Milestone: %s, Ticket: %s' % (self.config['alm_project'], alm_id)
 
     def alm_update_task_status(self, task, status):
-        if not task or not self.sde_plugin.config['alm_standard_workflow'] == 'True':
+        if not task or not self.config['alm_standard_workflow'] == 'True':
             logger.debug('Status synchronization disabled')
             return
 
+        comment = 'Syncing: Task %s set %s in SD Elements' % (task.task_id, status)
+
+        action_set = self.alm_plugin.proxy.ticket.getActions(task.get_alm_id())
+
         if status == 'DONE' or status=='NA':
-            try:
-                status_args = {
-                    'card[properties][][name]':'status',
-                    'card[properties][][value]': self.sde_plugin.config['trac_done_statuses'][0]
-                }
-                self.alm_plugin.call_api('cards/%s.xml' % task.get_alm_id(),
-                        args=status_args, method=URLRequest.PUT)
-            except APIError, err:
-                raise AlmException('Unable to update task status to DONE '
-                                   'for card: %s in Trac because of %s' %
-                                   (task.get_alm_id(),err))
-        elif status== 'TODO':
-            try:
-                status_args = {
-                    'card[properties][][name]':'status',
-                    'card[properties][][value]': self.sde_plugin.config['trac_new_status']
-                }
-                self.alm_plugin.call_api('cards/%s.xml' % task.get_alm_id(),
-                        args=status_args, method=URLRequest.PUT)
-            except APIError, err:
-                raise AlmException('Unable to update task status to TODO for '
-                                   'card: %s in Trac because of %s' %
-                                   (task.get_alm_id(), err))
+            action_to_take, action_args = self.config['alm_close_transition']
+        elif stats == 'TODO':
+            action_to_take, action_args = self.config['alm_reopen_transition']
+        else:
+            raise AlmException('Invalid SD Elements state: %s' % (status))
+
+        action = None
+        for entry in action_set:
+            if entry[0] == action_to_take:
+                action = action_to_take
+                break
+        if not action:
+            logger.error('Unable to find a matching available action for updating %s to %s' %
+                (task.task_id, status))
+            return
+
+        update_args = {
+            'action': action,
+            }
+        update_args.update(action_args)
+
+        task_list = self.alm_plugin.proxy.ticket.update(task.get_alm_id(),
+                comment, update_args)
+        if not task_list:
+            logging.error('Update failed for %s' % task.task_id)
+            return None
+
         logger.debug('Status changed to %s for task %s in Trac' %
                 (status, task.get_alm_id()))
 

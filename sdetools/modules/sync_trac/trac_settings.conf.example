@@ -12,11 +12,11 @@ sde_application = SDEApp
 sde_project = SDEProject
 
 ###################################################
-#### Mingle server and project settings       #####
+#### Trac server and project settings         #####
 ###################################################
 
-#Mingle Server name, includes port
-alm_server = mingleserver/org_name
+#Trac Server name, includes port
+alm_server = server_ip:port
 
 #HTTP or HTTPs protocol
 alm_method = https
@@ -31,7 +31,7 @@ alm_user = trac_user_name
 #in future versions of the plugin
 alm_pass = trac_password
               
-#Mingle project identifier
+#Trac milestone
 alm_project = trac_milestone
 
 #A comma-delimited list of statuses for tasks
@@ -69,22 +69,29 @@ conflict_policy = alm
 
 
 ###################################################
-#### Advanced Mingle Settings                 #####
+#### Advanced Trac Settings                   #####
 ###################################################
-
           
-#SD Elements has the ability to map status 
-#of a Mingle story to an SD Elements task.
-#This can be non-trivial if workflow is
-#customized. If this value is set to True
-#then the plugin will attempt to synchronize
-#task statuses. If not, then the plugin
-#will simply add new tasks from SD Element
-#into the Mingle project without attempting
-#to synchronized task status
-#Valid values: True, False
+#This value indicates whether or not task status
+#should be synchronized. In cases of difficult
+#custom workflow that can't easily be integrated,
+#you may wish to set this to False.
 alm_standard_workflow = True
 
+#issue type for new issues raised by SD Elements
+#Don't change unless you have deeply customized trac
+#and you know what you are doing
+alm_new_status = new
 
-######Base settings, do not modify######
-interactive = True
+#a comma delimited list of statuses that signify a task is 
+#Done in Trac
+alm_done_statuses = closed
+
+#How should we close the ticket in trac
+#Note that the status goes to closed and we need a resolution
+alm_close_transition = resolve,{"action_resolve_resolve_resolution":"fixed"}
+
+#How should we reopen tthe ticket in trac
+#Note that reopen automatically takes the status from closed to reopen
+alm_reopen_transition = reopen
+
