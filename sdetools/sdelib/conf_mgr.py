@@ -48,7 +48,7 @@ class Config(object):
             'proxy_auth': '',
         }
 
-    def __init__(self, command_list, args, call_src, call_options={}):
+    def __init__(self, command_list, args, ret_chn, call_src, call_options={}):
         if call_src not in ['shell', 'import']:
             raise UsageError("Invalid config source")
 
@@ -60,6 +60,8 @@ class Config(object):
         self.use_conf_file = True
         self.call_options = call_options
         self.args = args
+        self.ret_chn = ret_chn
+        self.emit = self.ret_chn.emit
 
     def __getitem__(self, key):
         if key in self.settings:
