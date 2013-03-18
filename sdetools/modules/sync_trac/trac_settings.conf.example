@@ -57,13 +57,13 @@ alm_phases = requirements
 
 #Which system takes precedence in case of
 #confliciting status. For example, if you mark
-#an issue as Closed in Mingle and the task is TODO in
+#an issue as Closed in Trac and the task is TODO in
 #SD Elements, it will be changed to DONE in SD Elemenets.
 #If you mark a task as Done in SD Elements, but it's still
-#Open in Mingle, the task will automatically revert back
+#Open in Trac, the task will automatically revert back
 #to TODO in SD Elements.
 #Valid values:
-#alm -> ALM tool (i.e Mingle) takes precedence
+#alm -> ALM tool (i.e Trac) takes precedence
 #sde -> SDE takes precedence
 conflict_policy = alm
 
