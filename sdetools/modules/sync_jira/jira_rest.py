@@ -30,7 +30,10 @@ class JIRARestAPI(RESTBase):
 
     def get_task(self, task, task_id):
         try:
-            url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s\'' % (
+            if self.config['jira_project_version']:
+                url = "search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s\'%%20AND%%20affectedVersion%%3D\'%s\'" % (self.config['alm_project'], task_id, self.config['jira_project_version'])
+            else:
+                url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s\'' % (
                     self.config['alm_project'], task_id)
             result = self.call_api(url)
         except APIError, err:
@@ -56,6 +59,11 @@ class JIRARestAPI(RESTBase):
                         self.config['jira_done_statuses'])
 
     def add_task(self, task, issue_type_id):
+ 
+        affected_versions = []
+        if self.config['jira_project_version']:
+            affected_versions.append({'id':self.config['jira_project_version']})
+
         #Add task
         args = {
            'fields': {
@@ -69,7 +77,9 @@ class JIRARestAPI(RESTBase):
                },
                'issuetype': {
                    'id': issue_type_id
-               }
+               },
+               'versions': affected_versions,
+               'labels':['SD-Elements']
            }
         }
         try:
