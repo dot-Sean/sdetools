@@ -29,6 +29,8 @@ class JIRAConnector(AlmConnector):
                 default='Reopen Issue')
         config.add_custom_option('jira_done_statuses', 'Statuses that signify a task is Done in JIRA',
                 default='Resolved,Closed')
+        config.add_custom_option('jira_project_version', 'Project version',
+                default='')
 
     def initialize(self):
         super(JIRAConnector, self).initialize()
