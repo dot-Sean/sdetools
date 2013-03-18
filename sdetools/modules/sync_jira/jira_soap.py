@@ -137,7 +137,7 @@ class JIRASoapAPI:
             affected_versions.append({'id':self.config['jira_project_version']})
 
         labels = []
-        labels.append({'id':'labels', 'values':['SDElements']})
+        labels.append({'id':'labels', 'values':['SD-Elements']})
             
         args = {
             'project': self.config['alm_project'],
