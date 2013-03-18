@@ -123,22 +123,26 @@ class TracConnector(AlmConnector):
             logger.warning('More than one task matched search ...')
         return tasks[0]
 
+    def _get_trac_task_by_id(self, sde_id, alm_id):
+        trac_task = self.alm_plugin.proxy.ticket.get(alm_id)
+
+        return TracTask(sde_id, alm_id, trac_task[3]['status'], trac_task[3]['changetime'],
+                          self.config['alm_done_statuses'])
+
     def alm_get_task(self, task):
-        task_id = task['title'].partition(':')[0]
+        sde_id = task['title'].partition(':')[0]
         
-        qstr = 'summary^=%s%s' % (self.alm_task_title_prefix, task_id)
+        qstr = 'summary^=%s%s' % (self.alm_task_title_prefix, sde_id)
         task_list = self.alm_plugin.proxy.ticket.query(qstr)
         if not task_list:
             return None
 
         alm_id = self._vet_alm_tasks(task_list)
 
-        trac_task = self.alm_plugin.proxy.ticket.get(alm_id)
-
-        return TracTask(task_id, alm_id, trac_task[3]['status'], trac_task[3]['changetime'],
-                          self.config['alm_done_statuses'])
+        return self._get_trac_task_by_id(sde_id, alm_id)
 
     def alm_add_task(self, task):
+        sde_id = task['title'].partition(':')[0]
         title = '%s%s' % (self.alm_task_title_prefix, task['title'])
 
         alm_id = self.alm_plugin.proxy.ticket.create(
@@ -152,7 +156,8 @@ class TracConnector(AlmConnector):
         if not alm_id:
             raise AlmException('Alm task not added sucessfully. Please '
                                'check ALM-specific settings in config file')
-        alm_task = self.alm_plugin.proxy.ticket.get(alm_id)
+
+        alm_task = self._get_trac_task_by_id(sde_id, alm_id)
 
         if (self.config['alm_standard_workflow']=='True' and
                 (task['status']=='DONE' or task['status']=='NA')):
