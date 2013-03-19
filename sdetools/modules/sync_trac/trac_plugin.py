@@ -3,7 +3,7 @@
 
 import xmlrpclib
 
-from sdetools.sdelib.commons import UsageError, json
+from sdetools.sdelib.commons import UsageError, json, urlencode_str
 from sdetools.sdelib.restclient import RESTBase
 from sdetools.sdelib.restclient import URLRequest, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
@@ -21,8 +21,8 @@ class TracXMLRPCAPI(RESTBase):
         self.server = self._get_conf('server') 
         self.base_uri = '%s://%s:%s@%s/%s' % (
             self._get_conf('method'), 
-            self._get_conf('user'),
-            self._get_conf('pass'),
+            urlencode_str(self._get_conf('user')),
+            urlencode_str(self._get_conf('pass')),
             self.server, 
             self.base_path)
 
