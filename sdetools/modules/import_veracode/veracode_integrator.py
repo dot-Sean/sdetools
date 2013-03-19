@@ -4,11 +4,10 @@ from xml.dom import minidom
 from sdetools.sdelib import commons
 from base_integrator import BaseIntegrator, IntegrationError
 
+__all__ = ['VeracodeIntegrator']
+
 REQUIRED_ATTRIBS = ['issueid', 'cweid', 'categoryid', 'categoryname', 'description', 'severity', 'module','remediation_status']
 LOCATION_ATTRIBS = ['sourcefilepath', 'sourcefile', 'line', 'location']
-SOURCE_NAME = "veracode"
-
-__all__ = ['VeracodeIntegrator']
 
 DEFAULT_MAPPING_FILE = os.path.join(commons.media_path, 'veracode', 'sde_veracode_map.xml')
 
@@ -16,6 +15,7 @@ class VeracodeIntegrationError(IntegrationError):
     pass
 
 class VeracodeIntegrator(BaseIntegrator):
+    TOOL_NAME = "veracode"
 
     def __init__(self, config):
         config.add_custom_option("report_xml", "Veracode Report XML", "x", None)
@@ -35,9 +35,6 @@ class VeracodeIntegrator(BaseIntegrator):
             if attr in node.attributes.keys():
                 entry[attr] = node.attributes[attr].value
         return entry
-
-    def get_tool_name(self):
-        return SOURCE_NAME
 
     def parse(self):
         try:
@@ -64,14 +61,6 @@ class VeracodeIntegrator(BaseIntegrator):
             if(flaw['remediation_status'] == 'Fixed'):
                 self.raw_findings.remove(flaw)
 
-    def output_raw_findings(self):
-        for item in self.raw_findings:
-            print '%5s,%5s,%5s' % (item['issueid'], item['cweid'], item['categoryid'])
-            print item['description'][:120]
-
-    def get_raw_findings(self):
-        return self.raw_findings
-
     def _make_finding(self, item):
         finding = {'cweid': item['cweid'], 'description': item['description']}
         if item.has_key('sourcefilepath'):
@@ -83,4 +72,5 @@ class VeracodeIntegrator(BaseIntegrator):
         return finding
 
     def generate_findings(self):
-        return [self._make_finding(item) for item in self.get_raw_findings()]
+        return [self._make_finding(item) for item in self.raw_findings]
+        

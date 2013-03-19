@@ -10,4 +10,5 @@ class Command(BaseCommand):
     def handle(self):
         self.vc_integrator.load_mapping_from_xml()
         self.vc_integrator.parse()
+        self.emit.info('Finding file parsed successfully. Starting the import')
         self.vc_integrator.import_findings()

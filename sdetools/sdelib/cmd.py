@@ -7,6 +7,7 @@ class BaseCommand(object):
 
     def __init__(self, config, args):
         self.config = config
+        self.emit = self.config.emit
         self.args = args
 
     def configure(self):
