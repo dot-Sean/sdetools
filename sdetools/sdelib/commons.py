@@ -2,6 +2,7 @@ __all__ = ['json', 'Error', 'show_error', 'get_password']
 
 import sys
 import os
+import urllib
 
 import getpass
 
@@ -60,3 +61,5 @@ def get_password():
         raise KeyboardInterrupt
     return password
 
+def urlencode_string(inp):
+    return urllib.urlencode({'a':inp})[2:]
