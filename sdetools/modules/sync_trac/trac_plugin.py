@@ -35,12 +35,13 @@ class TracXMLRPCAPI(RESTBase):
 class TracTask(AlmTask):
     """ Representation of a task in Trac"""
 
-    def __init__(self, task_id, alm_id, status, timestamp, done_statuses):
+    def __init__(self, task_id, alm_id, status, timestamp, done_statuses, milestone):
         self.task_id = task_id
         self.alm_id = alm_id
         self.status = status
         self.timestamp = timestamp
         self.done_statuses = done_statuses  # comma-separated list
+        self.milestone = milestone
 
     def get_task_id(self):
         return self.task_id
@@ -50,6 +51,9 @@ class TracTask(AlmTask):
 
     def get_priority(self):
         return self.priority
+
+    def get_milestone(self):
+        return self.milestone
 
     def get_status(self):
         """ Translates Mingle status into SDE status """
@@ -127,19 +131,26 @@ class TracConnector(AlmConnector):
         trac_task = self.alm_plugin.proxy.ticket.get(alm_id)
 
         return TracTask(sde_id, alm_id, trac_task[3]['status'], trac_task[3]['changetime'],
-                          self.config['alm_done_statuses'])
+                          self.config['alm_done_statuses'], trac_task[3]['milestone'])
 
     def alm_get_task(self, task):
         sde_id = task['title'].partition(':')[0]
-        
-        qstr = 'summary^=%s%s' % (self.alm_task_title_prefix, sde_id)
+
+        # The colon is needed, otherwise for "T6" we match on "T6" and "T68"
+        qstr = 'summary^=%s%s:' % (self.alm_task_title_prefix, sde_id)
         task_list = self.alm_plugin.proxy.ticket.query(qstr)
         if not task_list:
             return None
 
         alm_id = self._vet_alm_tasks(task_list)
 
-        return self._get_trac_task_by_id(sde_id, alm_id)
+        trac_ticket = self._get_trac_task_by_id(sde_id, alm_id)
+
+        # Option A - Re-use the same ticket across milestones
+        if trac_ticket.get_milestone() != self.config['alm_project']:
+            self.alm_update_task_milestone(trac_ticket, self.config['alm_project'])
+
+        return trac_ticket
 
     def alm_add_task(self, task):
         sde_id = task['title'].partition(':')[0]
@@ -164,6 +175,22 @@ class TracConnector(AlmConnector):
             self.alm_update_task_status(alm_task, task['status'])
         return 'Milestone: %s, Ticket: %s' % (self.config['alm_project'], alm_id)
 
+    def alm_update_task_milestone(self, task, milestone):
+        comment = 'Syncing: Task %s assigned to milestone %s via SD Elements' % (task.task_id, milestone)
+
+        update_args = {
+            'milestone': self.config['alm_project']
+            }
+
+        task_list = self.alm_plugin.proxy.ticket.update(task.get_alm_id(),
+                comment, update_args)
+        if not task_list:
+            logging.error('Update failed for %s' % task.task_id)
+            return None
+
+        logger.debug('Milestone changed to %s for ticket %s in Trac' %
+                (milestone, task.get_alm_id()))
+    
     def alm_update_task_status(self, task, status):
         if not task or not self.config['alm_standard_workflow'] == 'True':
             logger.debug('Status synchronization disabled')
@@ -175,7 +202,7 @@ class TracConnector(AlmConnector):
 
         if status == 'DONE' or status=='NA':
             action_to_take, action_args = self.config['alm_close_transition']
-        elif stats == 'TODO':
+        elif status == 'TODO':
             action_to_take, action_args = self.config['alm_reopen_transition']
         else:
             raise AlmException('Invalid SD Elements state: %s' % (status))
@@ -192,6 +219,7 @@ class TracConnector(AlmConnector):
 
         update_args = {
             'action': action,
+            'milestone': self.config['alm_project']
             }
         update_args.update(action_args)
 
