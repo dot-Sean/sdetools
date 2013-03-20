@@ -162,7 +162,7 @@
 		<cwe id="89" title="Improper Neutralization of Special Elements used in an SQL Command (SQL Injection)"/>
 		<cwe id="564" title="SQL Injection: Hibernate"/>
 	</task>
-	<task id="14" title="Principles of least privilege" c"onfidence="low">
+	<task id="14" title="Principles of least privilege" confidence="low">
 		<cwe id="732" title="Incorrect Permission Assignment for Critical Resource"/>
 		<cwe id="708" title="Incorrect Ownership Assignment"/>
 	</task>
