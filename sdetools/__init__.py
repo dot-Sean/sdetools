@@ -6,7 +6,7 @@ __all__ = [
     'extlib',
 ]
 
-VERSION = '3.0.5'
+VERSION = '3.1.0'
 
 def setup_path():
     import sys
