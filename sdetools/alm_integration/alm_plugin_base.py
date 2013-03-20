@@ -417,13 +417,15 @@ class AlmConnector(object):
                                           (task['id'], str(sde_time), str(alm_time)))
                             if (sde_time > alm_time):
                                 precedence = 'sde'
-                        
+
+                        status = alm_task.get_status()
                         if (precedence == 'alm'):
                             self.sde_update_task_status(task, alm_task.get_status())
                         else:
                             self.alm_update_task_status(alm_task, task['status'])
+                            status = task['status']
                             updated_system = self.alm_name
-                        self.emit.info('Updated status of task %s in %s to %s' % (tid, update_system, status))
+                        self.emit.info('Updated status of task %s in %s to %s' % (tid, updated_system, status))
                 else:
                     #Only exists in SD Elements, add it to ALM
                     ref = self.alm_add_task(task)
