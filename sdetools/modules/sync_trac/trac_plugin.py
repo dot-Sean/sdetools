@@ -124,8 +124,8 @@ class TracConnector(AlmConnector):
         try:
             self.alm_plugin.connect()
             api_version = self.alm_plugin.proxy.system.getAPIVersion()
-        except (xmlrpclib.ProtocolError, xmlrpclib.Fault, socket.error), err:
-            logger.info('Error is %s:', err)
+        except Exception, err:
+            logger.info('Error is: %s', err)
             raise AlmException('Unable to connect to Trac. Please verify '
                                'the server URL, username, and password')        
         trac_ver = '?'
