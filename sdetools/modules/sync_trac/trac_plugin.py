@@ -149,6 +149,7 @@ class TracConnector(AlmConnector):
         # Option A - Re-use the same ticket across milestones
         if trac_ticket.get_milestone() != self.config['alm_project']:
             self.alm_update_task_milestone(trac_ticket, self.config['alm_project'])
+            return self.alm_get_task(task)
 
         return trac_ticket
 
@@ -190,10 +191,16 @@ class TracConnector(AlmConnector):
 
         logger.debug('Milestone changed to %s for ticket %s in Trac' %
                 (milestone, task.get_alm_id()))
+
+        self.alm_update_task_status(task, "TODO")
     
     def alm_update_task_status(self, task, status):
         if not task or not self.config['alm_standard_workflow'] == 'True':
             logger.debug('Status synchronization disabled')
+            return
+
+        # We have the required status; do not update
+        if task.get_status() == status:
             return
 
         comment = 'Syncing: Task %s set %s in SD Elements' % (task.task_id, status)
