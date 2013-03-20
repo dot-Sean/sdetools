@@ -2,6 +2,7 @@
 # Extensible two way integration with Trac
 
 import xmlrpclib
+import socket
 
 from sdetools.sdelib.commons import UsageError, json, urlencode_str
 from sdetools.sdelib.restclient import RESTBase
@@ -123,7 +124,8 @@ class TracConnector(AlmConnector):
         try:
             self.alm_plugin.connect()
             api_version = self.alm_plugin.proxy.system.getAPIVersion()
-        except xmlrpclib.ProtocolError:
+        except (xmlrpclib.ProtocolError, xmlrpclib.Fault, socket.error), err:
+            logger.info('Error is %s:', err)
             raise AlmException('Unable to connect to Trac. Please verify '
                                'the server URL, username, and password')        
         trac_ver = '?'
