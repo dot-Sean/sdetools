@@ -236,7 +236,7 @@ class TracConnector(AlmConnector):
             logging.error('Update failed for %s' % task.task_id)
             return None
 
-        logger.debug('Status changed to %s for task %s in Trac' %
+        logger.debug('Status changed to %s for ticket %s in Trac' %
                 (status, task.get_alm_id()))
 
     def alm_disconnect(self):
