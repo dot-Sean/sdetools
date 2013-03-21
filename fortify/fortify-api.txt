@@ -1,0 +1,1318 @@
+ActiveProjectVersionList
+<empty>
+
+ActivityList
+<empty>
+
+ActivityTemplateAssignmentRuleList
+<empty>
+
+AddCustomTag
+(TagDefinition){
+       name = None
+       description = None
+       restriction = None
+       extensible = None
+       hidden = None
+       value[] = <empty>
+       _id = ""
+       _objectVersion = ""
+     }
+
+AddProject
+(Project){
+       Id = None
+       Name = None
+       Description = None
+     }
+
+AddProjectAndVersion
+(AddProjectAndVersionRequest){
+       ProjectVersion = 
+          (ProjectVersionLite){
+             Id = None
+             Mode = 
+                (TemplateMode){
+                   value = None
+                }
+             Name = None
+             Description = None
+             ProjectId = None
+             Committed = None
+             ProjectTemplateId = None
+          }
+       ProjectMetaDataSelectedValues[] = <empty>
+       RequirementTemplateId = None
+       Dependancy[] = <empty>
+       Project = 
+          (Project){
+             Id = None
+             Name = None
+             Description = None
+          }
+     }
+
+AddProjectMetaDataDefinition
+(MetaDataDefinition){
+       _publishVersion = ""
+       _objectVersion = ""
+       Name = None
+       Description = None
+       _id = ""
+       _type = ""
+       _multiple = ""
+       _hidden = ""
+       _required = ""
+       _appEntityType = ""
+     }
+
+AddProjectVersion
+(AddProjectVersionRequest){
+       ProjectVersion = 
+          (ProjectVersionLite){
+             Id = None
+             Mode = 
+                (TemplateMode){
+                   value = None
+                }
+             Name = None
+             Description = None
+             ProjectId = None
+             Committed = None
+             ProjectTemplateId = None
+          }
+       ProjectMetaDataSelectedValues[] = <empty>
+       RequirementTemplateId = None
+       Dependancy[] = <empty>
+     }
+
+AddRuntimeApplication
+(AddRuntimeApplicationRequest){
+       RuntimeApplication = 
+          (RuntimeApplication){
+             Id = None
+             Name = None
+             Description = None
+             CreationDate = None
+             CreatedBy = None
+             DefaultApplication = None
+          }
+       ProjectMetaDataSelectedValues[] = <empty>
+     }
+
+AddUser
+(User){
+       id = None
+       UserName = None
+       SeedClearPassword = None
+       Password = None
+       Salt = None
+       RequirePasswordChange = None
+       PasswordNeverExpire = None
+       FirstName = None
+       LastName = None
+       Email = None
+       LastPasswordChange = None
+       FailedLoginAttempts = None
+       DateFrozen = None
+       Suspended = None
+       remoteKey = None
+       PermissionTemplates = 
+          (PermissionTemplates){
+             PermissionTemplateName[] = <empty>
+          }
+     }
+
+AlertDefinition
+
+
+AlertDefinitionById
+(AlertDefinitionByIdRequest){
+       AlertDefinitionId = None
+     }
+
+AlertDefinitionList
+
+
+AllAlertDefinitionsList
+<empty>
+
+AnalysisComplete
+(AnalysisCompleteRequest){
+       ProjectVersionId = <empty>
+       _expectsAttachment = ""
+     }
+
+AnalysisPayloadDispatch
+(AnalysisPayloadDispatchRequest){
+       ProjectVersionId = <empty>
+       ConfirmedAnalysisFiles[] = <empty>
+     }
+
+AnalysisPayloadDownload
+(AnalysisPayloadDownloadRequest){
+       ProjectVersionId = <empty>
+     }
+
+AnalysisPayloadRedispatch
+(AnalysisPayloadRedispatchRequest){
+       ProjectVersionId = <empty>
+     }
+
+AnalysisPayloadUpload
+(AnalysisPayloadUploadRequest){
+       ProjectVersionId = <empty>
+       _expectsAttachment = ""
+     }
+
+AnalysisStatusUpdate
+(AnalysisStatusUpdateRequest){
+       ProjectVersionId = <empty>
+       NewStatus = 
+          (ArtifactStatus){
+             value = None
+          }
+       Message = None
+     }
+
+AnalysisUploadDelete
+(AnalysisUploadDeleteRequest){
+       ProjectVersionId = <empty>
+     }
+
+AnalysisUploadRelease
+(AnalysisUploadReleaseRequest){
+       ProjectVersionId = <empty>
+       JobId = None
+     }
+
+ArchiveRuntimeEvent
+(ArchiveRuntimeEventRequest){
+       RuntimeApplicationId[] = <empty>
+       Notes = None
+       StartDate = None
+       EndDate = None
+     }
+
+ArchiveRuntimeEventsInDateRange
+(ArchiveRuntimeEventsInDateRangeRequest){
+       Notes = None
+       StartDate = None
+       EndDate = None
+     }
+
+ArtifactDownload
+(ArtifactDownloadRequest){
+       ArtifactId = None
+     }
+
+AssignBugTracker
+(AssignBugTrackerRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       ProjectVersionId = None
+       BugTrackerPlugin = 
+          (BugTrackerPlugin){
+             PluginId = None
+             ShortDisplayName = None
+             LongDisplayName = None
+             RequiresAuthentication = None
+             Configuration[] = <empty>
+          }
+     }
+
+AssignCustomTagsToProjectTemplate
+(AssignCustomTagsToProjectTemplateRequest){
+       ProjectTemplateId = None
+       CustomTagId[] = <empty>
+     }
+
+AssignCustomTagsToProjectVersion
+(AssignCustomTagsToProjectVersionRequest){
+       ProjectVersionId = None
+       CustomTagId[] = <empty>
+     }
+
+AssignLdapEntityPermissions
+(LdapEntity){
+       DN = None
+       PermissionTemplates = 
+          (PermissionTemplates){
+             PermissionTemplateName[] = <empty>
+          }
+     }
+
+AssignToProjectVersion
+(AssignToProjectVersionRequest){
+       Username[] = <empty>
+       LdapDN[] = <empty>
+       ProjectIdentifier = <empty>
+     }
+
+AssignToRuntimeApplication
+(AssignToRuntimeApplicationRequest){
+       Username[] = <empty>
+       LdapDN[] = <empty>
+       RuntimeApplicationId = <empty>
+     }
+
+AuditView
+(AuditViewRequest){
+       _sessionId = ""
+       IssueListDescription = 
+          (IssueListDescription){
+             FilterSetId = None
+             FolderId = None
+             StartPage = None
+             PageSize = None
+             SearchRestriction = None
+             AssignedUserRestriction = None
+             IncludeSuppressed = None
+             IncludeRemoved = None
+             IncludeHidden = None
+             SortColumn = None
+             SortDescending = None
+             GroupingName = None
+             GroupingValues[] = <empty>
+          }
+       _projectVersionId = ""
+     }
+
+AuthenticationTokenList
+<empty>
+
+AvailableBugTrackers
+(AvailableBugTrackersRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+     }
+
+BatchCreateUpdateAndAssignCustomTags
+(BatchCreateUpdateAndAssignCustomTagsRequest){
+       ClientVersion = None
+       ProjectVersionId = None
+       ProjectTemplateId = None
+       TagDefinition[] = <empty>
+     }
+
+BugParams
+(BugParamsRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       ProjectVersionId = None
+       IssueInstanceId = None
+       BugTrackerUsername = None
+       BugTrackerPassword = None
+     }
+
+BugTrackerAssignment
+(BugTrackerAssignmentRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       ProjectVersionId = None
+     }
+
+CheckCurrentUserPermission
+(CheckCurrentUserPermissionRequest){
+       PermissionName = None
+       EntityId = None
+     }
+
+CloudCtrlUrl
+<empty>
+
+CloudOneTimeJobToken
+(CloudOneTimeJobTokenRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       projectName = None
+       versionName = None
+       projectVersionId = None
+     }
+
+ContentBundleUpload
+(ContentBundleUploadRequest){
+       filename = None
+       _expectsAttachment = ""
+     }
+
+CreateAlertDefinitionAndPropagate
+(CreateAlertDefinitionAndPropagateRequest){
+       ProjectVersionIds[] = <empty>
+       AlertDefinition = 
+          (AlertDefinition){
+             name = None
+             id = None
+             description = None
+             monitoredEntityType = 
+                (AlertableEntity){
+                   value = None
+                }
+             monitoredInstanceGuid = None
+             startDate = None
+             endDate = None
+             createdBy = None
+             creationDate = None
+             enabled = None
+             alertAllProjectVersionUsers = None
+             monitoredEntityName = None
+             alertAllChildren = None
+             userCanModify = None
+             alertTriggers[] = <empty>
+             alertStakeholders = None
+          }
+       PropagateToEveryone = None
+     }
+
+CreateAlertDefinitionForSelf
+(CreateAlertDefinitionForSelfRequest){
+       ProjectVersionIds[] = <empty>
+       AlertDefinition = 
+          (AlertDefinition){
+             name = None
+             id = None
+             description = None
+             monitoredEntityType = 
+                (AlertableEntity){
+                   value = None
+                }
+             monitoredInstanceGuid = None
+             startDate = None
+             endDate = None
+             createdBy = None
+             creationDate = None
+             enabled = None
+             alertAllProjectVersionUsers = None
+             monitoredEntityName = None
+             alertAllChildren = None
+             userCanModify = None
+             alertTriggers[] = <empty>
+             alertStakeholders = None
+          }
+     }
+
+CreateAuditSession
+<empty>
+
+CreateDynamicScan
+(CreateDynamicScanRequest){
+       DynamicScanDetails = 
+          (DynamicScanDetails){
+             Id = None
+             ProjectVersionIdentifier = 
+                (ProjectVersionIdentifier){
+                   ProjectName = None
+                   ProjectVersionName = None
+                   _ProjectVersionId = ""
+                   _ProjectId = ""
+                }
+             Status = 
+                (DynamicScanStatus){
+                   value = None
+                }
+             DateRequested = None
+             DateUpdated = None
+             Submitter = None
+             ObjectVersion = None
+             Parameter[] = <empty>
+          }
+     }
+
+CreateOrUpdateProjectMetaDataValuesList
+(CreateOrUpdateProjectMetaDataValuesListRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       ProjectMetaDataValue[] = <empty>
+     }
+
+CurrentUserPermissionTemplateList
+<empty>
+
+CustomTagList
+(CustomTagListRequest){
+       ClientVersion = None
+     }
+
+CustomTagListForProjectTemplate
+(CustomTagListForProjectTemplateRequest){
+       ClientVersion = None
+       ProjectTemplateId = None
+     }
+
+CustomTagListForProjectVersion
+(CustomTagListForProjectVersionRequest){
+       ClientVersion = None
+       ProjectVersionId = None
+     }
+
+Date
+
+
+Delete
+(status){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+     }
+
+DeleteCustomTag
+(DeleteCustomTagRequest){
+       CustomTagId[] = <empty>
+     }
+
+DeleteProject
+(DeleteProjectRequest){
+       ProjectId[] = <empty>
+     }
+
+DeleteProjectVersion
+(DeleteProjectVersionRequest){
+       ProjectVersionId[] = <empty>
+     }
+
+DeleteRuntimeApplication
+(DeleteRuntimeApplicationRequest){
+       RuntimeApplicationId[] = <empty>
+     }
+
+DeleteSavedReports
+(DeleteSavedReportsRequest){
+       SavedReportId[] = <empty>
+     }
+
+DeleteUser
+(DeleteUserRequest){
+       ProjectId[] = <empty>
+     }
+
+DeregisterWIE
+(DeregisterWIERequest){
+       WIEInstanceGuid = None
+     }
+
+DescriptionAndRecommendation
+(DescriptionAndRecommendationRequest){
+       _sessionId = ""
+       ProjectIdentifier = <empty>
+       IssueId = None
+     }
+
+DocumentArtifactDownload
+(DocumentArtifactDownloadRequest){
+       DocumentArtifactId = None
+     }
+
+DocumentArtifactUpload
+(DocumentArtifactUploadRequest){
+       DocumentArtifact = 
+          (DocumentArtifact){
+             ProjectIdentifier = <empty>
+             Name = None
+             Description = None
+             DocumentDefinitionId[] = <empty>
+          }
+       _expectsAttachment = ""
+     }
+
+DocumentDefinitionList
+<empty>
+
+DocumentTemplateDownload
+(DocumentTemplateDownloadRequest){
+       documentId = None
+     }
+
+EquationVariableList
+<empty>
+
+FPRDownload
+(FPRDownloadRequest){
+       ClientVersion = None
+       ProjectVersionId = <empty>
+     }
+
+FPRSimpleMigrate
+(FPRSimpleMigrateRequest){
+       ProjectVersionId = <empty>
+       filename = None
+       lastOne = None
+       originalUploadDate = None
+       originalUploadUser = None
+       originalUploadIP = None
+       SharedSecret = None
+       _expectsAttachment = ""
+     }
+
+FPRUpload
+(FPRUploadRequest){
+       ProjectVersionId = <empty>
+       filename = None
+       _expectsAttachment = ""
+     }
+
+FileBug
+(FileBugRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       ProjectVersionId = None
+       IssueInstanceId = None
+       BugParams[] = <empty>
+       BugTrackerUsername = None
+       BugTrackerPassword = None
+     }
+
+FilterSetsAndFoldersUpdate
+(FilterSetsAndFoldersUpdateRequest){
+       guid = None
+       _hasAttachment = ""
+     }
+
+FindLdapUserDN
+<empty>
+
+GenerateReport
+(GenerateReportRequest){
+       ClientVersion = None
+       ReportDefinition = 
+          (ReportDefinition){
+             _publishVersion = ""
+             _objectVersion = ""
+             Name = None
+             Description = None
+             RenderingEngine = None
+             ReportType = 
+                (ReportType){
+                   value = None
+                }
+             TemplateEntryName = None
+             Guid = None
+             ReportParameters = 
+                (ReportParameters){
+                   ReportParameter[] = <empty>
+                }
+             _id = ""
+          }
+       ReportName = None
+       ReportNote = None
+       OutputFormat = 
+          (ReportOutputFormat){
+             value = None
+          }
+       ReportParameters[] = <empty>
+     }
+
+Generic
+(status){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+     }
+
+GetAuthenticationToken
+(GetAuthenticationTokenRequest){
+       TokenType = None
+       DaysToLive = None
+     }
+
+GetDynamicScanDetails
+(GetDynamicScanDetailsRequest){
+       Id = None
+     }
+
+GetDynamicScanSummaries
+(GetDynamicScanSummariesRequest){
+       ProjectVersionId = None
+       SearchSpec = 
+          (SearchSpec){
+             SearchCondition = None
+             OrderCondition = 
+                (OrderCondition){
+                   SearchConstant = None
+                   _descending = ""
+                }
+             _startIndex = ""
+             _pageSize = ""
+          }
+     }
+
+GetFeaturesets
+<empty>
+
+GetProjectVersionIdentifiers
+(GetProjectVersionIdentifiersRequest){
+       ExcludeLinkedProjectVersions = None
+     }
+
+GetSingleUseFPRDownloadToken
+(GetSingleUseFPRDownloadTokenRequest){
+       DaysToLive = None
+     }
+
+GetSingleUseFPRUploadToken
+(GetSingleUseFPRUploadTokenRequest){
+       DaysToLive = None
+     }
+
+GroupingValues
+(GroupingValuesRequest){
+       _sessionId = ""
+       ProjectIdentifier = <empty>
+       IssueListDescription = 
+          (IssueListDescription){
+             FilterSetId = None
+             FolderId = None
+             StartPage = None
+             PageSize = None
+             SearchRestriction = None
+             AssignedUserRestriction = None
+             IncludeSuppressed = None
+             IncludeRemoved = None
+             IncludeHidden = None
+             SortColumn = None
+             SortDescending = None
+             GroupingName = None
+             GroupingValues[] = <empty>
+          }
+     }
+
+HistoricalDataMigrate
+(HistoricalDataMigrateRequest){
+       ProjectHistory[] = <empty>
+       SharedSecret = None
+     }
+
+InvalidateAuditSession
+(InvalidateAuditSessionRequest){
+       _sessionId = ""
+     }
+
+InvalidateToken
+<empty>
+
+IssueList
+(IssueListRequest){
+       _sessionId = ""
+       ProjectIdentifier = <empty>
+       IssueListDescription = 
+          (IssueListDescription){
+             FilterSetId = None
+             FolderId = None
+             StartPage = None
+             PageSize = None
+             SearchRestriction = None
+             AssignedUserRestriction = None
+             IncludeSuppressed = None
+             IncludeRemoved = None
+             IncludeHidden = None
+             SortColumn = None
+             SortDescending = None
+             GroupingName = None
+             GroupingValues[] = <empty>
+          }
+     }
+
+IssuesWithBug
+(IssuesWithBugRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       ProjectVersionId = None
+     }
+
+JobList
+<empty>
+
+JobStatus
+(JobStatusRequest){
+       JobId = None
+     }
+
+LdapEntityDelete
+(LdapEntityDeleteRequest){
+       DN[] = <empty>
+     }
+
+LicenseCapabilityList
+<empty>
+
+LinkProjectVersion
+(LinkProjectVersionRequest){
+       ProjectVersionId = None
+       SiteId = None
+       WIEInstanceGuid = None
+     }
+
+MeasurementHistoryList
+(MeasurementHistoryListRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       ProjectVersionIDs[] = <empty>
+       StartDate = None
+       EndDate = None
+       MeasurementGuids[] = <empty>
+     }
+
+MeasurementHistoryListForProjectVersionAndMeasurementAgent
+(MeasurementHistoryListForProjectVersionAndMeasurementAgentRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       ProjectVersionId = None
+       MeasurementAgentId = None
+     }
+
+MeasurementHistoryListForSnapshot
+(MeasurementHistoryListForSnapshotRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       SnapshotId = None
+     }
+
+MeasurementHistoryListForSnapshotAndMeasurementAgents
+(MeasurementHistoryListForSnapshotAndMeasurementAgentsRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       SnapshotId = None
+       MeasurementAgentIds[] = <empty>
+     }
+
+MigrateUser
+(MigrateUserRequest){
+       id = None
+       UserName = None
+       SeedClearPassword = None
+       Password = None
+       Salt = None
+       RequirePasswordChange = None
+       PasswordNeverExpire = None
+       FirstName = None
+       LastName = None
+       Email = None
+       LastPasswordChange = None
+       FailedLoginAttempts = None
+       DateFrozen = None
+       Suspended = None
+       remoteKey = None
+       PermissionTemplates = 
+          (PermissionTemplates){
+             PermissionTemplateName[] = <empty>
+          }
+       SharedSecret = None
+     }
+
+MostRecentMeasurementHistoryList
+(MostRecentMeasurementHistoryListRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       ProjectVersionIDs[] = <empty>
+       MeasurementGuids[] = <empty>
+     }
+
+MostRecentVariableHistoryList
+(MostRecentVariableHistoryListRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       ProjectVersionIDs[] = <empty>
+       VariableGuids[] = <empty>
+     }
+
+MyAlertDefinitionsList
+<empty>
+
+OnParameterChange
+(OnParameterChangeRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       ProjectVersionId = None
+       IssueInstanceId = None
+       ChangedParamIdentifier = None
+       BugParams[] = <empty>
+       BugTrackerUsername = None
+       BugTrackerPassword = None
+     }
+
+PerformAuditAction
+(PerformAuditActionRequest){
+       _sessionId = ""
+       AuditAction = 
+          (AuditAction){
+             ProjectIdentifier = <empty>
+             Issues = <empty>
+             Action = <empty>
+          }
+     }
+
+PerformanceIndicatorList
+<empty>
+
+PermissionTemplateList
+<empty>
+
+PersonaList
+<empty>
+
+ProjectList
+<empty>
+
+ProjectMetaDataDefinition
+
+
+ProjectMetaDataDefinitionByGuid
+(ProjectMetaDataDefinitionByGuidRequest){
+       ProjectMetaDataDefinitionGuid = None
+     }
+
+ProjectMetaDataDefinitionsList
+(ProjectMetaDataDefinitionsListRequest){
+       AppEntityType = 
+          (AppEntityType){
+             value = None
+          }
+     }
+
+ProjectMetaDataValue
+(ProjectMetaDataValueRequest){
+       ProjectVersionId = None
+       TechnologyStackMetaDataId = None
+     }
+
+ProjectMetaDataValuesList
+(ProjectMetaDataValuesListRequest){
+       ProjectVersionId = None
+     }
+
+ProjectTemplateDownload
+(ProjectTemplateDownloadRequest){
+       projectTemplateId = None
+     }
+
+ProjectTemplateList
+<empty>
+
+ProjectTemplateUpload
+(ProjectTemplateUploadRequest){
+       guid = None
+       name = None
+       description = None
+       _hasAttachment = ""
+     }
+
+ProjectVersionHasAuditedIssues
+(ProjectVersionHasAuditedIssuesRequest){
+       ProjectVersionId = None
+       StartDate = None
+       EndDate = None
+       EngineType = None
+     }
+
+ProjectVersionIssueAuditHistory
+(ProjectVersionIssueAuditHistoryRequest){
+       ProjectVersionId = None
+       StartDate = None
+       EndDate = None
+       EngineType = None
+     }
+
+PurgeProjectVersion
+(PurgeProjectVersionRequest){
+       ProjectVersionId = None
+       ScanDate = None
+     }
+
+RegisterWIE
+(RegisterWIERequest){
+       WIEInstanceGuid = None
+       Url = None
+     }
+
+RegisteredLdapEntityList
+<empty>
+
+ReportDefinition
+
+
+ReportDefinitionByID
+(ReportDefinitionByIDRequest){
+       ReportDefinitionId = None
+     }
+
+ReportDefinitionByName
+(ReportDefinitionByNameRequest){
+       ReportDefinitionName = None
+     }
+
+ReportDefinitionList
+(ReportDefinitionListRequest){
+       ReportType = 
+          (ReportType){
+             value = None
+          }
+     }
+
+RequirementTemplateList
+<empty>
+
+RestoreRuntimeEvent
+(RestoreRuntimeEventRequest){
+       RuntimeEventArchiveId = None
+     }
+
+RuntimeApplicationList
+<empty>
+
+RuntimeEventArchiveDownload
+(RuntimeEventArchiveDownloadRequest){
+       RuntimeEventArchiveId = None
+     }
+
+RuntimeEventArchiveList
+<empty>
+
+SDLBundleUpload
+(SDLBundleUploadRequest){
+       filename = None
+       overwrite = None
+       fortifyContentUpdate = None
+       _expectsAttachment = ""
+     }
+
+SavedReportById
+(SavedReportByIdRequest){
+       SavedReportId = None
+     }
+
+SavedReportDownload
+(SavedReportDownloadRequest){
+       SavedReportId = None
+     }
+
+SavedReportList
+<empty>
+
+SavedReportListForProjectVersion
+(SavedReportListForProjectVersionRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       ProjectVersionId = None
+     }
+
+SearchLdap
+(SearchLdapRequest){
+       LdapEntityType = 
+          (LdapEntityType){
+             value = None
+          }
+       SearchString = None
+       ExcludeAlreadyRegistered = None
+     }
+
+SetDynamicScanStatus
+(SetDynamicScanStatusRequest){
+       Id = None
+       Status = 
+          (DynamicScanStatus){
+             value = None
+          }
+     }
+
+SnapshotList
+
+
+SnapshotMostRecentFirstDate
+(SnapshotMostRecentFirstDateRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       StartDate = None
+       EndDate = None
+       ProjectVersionIds[] = <empty>
+     }
+
+SnapshotsForProjectVersion
+(SnapshotsForProjectVersionRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       ProjectVersionId = None
+     }
+
+SnapshotsForProjectVersionAndDate
+(SnapshotsForProjectVersionAndDateRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       ProjectVersionId = None
+       Date = None
+     }
+
+SnapshotsForProjectVersionAndPriorToDate
+(SnapshotsForProjectVersionAndPriorToDateRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       ProjectVersionId = None
+       Date = None
+     }
+
+SourceArchiveUpload
+(SourceArchiveUploadRequest){
+       ProjectVersionId = <empty>
+       filename = None
+       _expectsAttachment = ""
+     }
+
+TemplateAssignmentRuleBatchUpdate
+(TemplateAssignmentRuleBatchUpdateRequest){
+       SDLAssignmentRuleList = 
+          (SDLAssignmentRuleList){
+             TemplateAssignmentRule[] = <empty>
+          }
+       forceReplaceAll = None
+     }
+
+TemplateAssignmentRuleList
+<empty>
+
+TestBugTrackerConfiguration
+(TestBugTrackerConfigurationRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       BugTrackerPlugin = 
+          (BugTrackerPlugin){
+             PluginId = None
+             ShortDisplayName = None
+             LongDisplayName = None
+             RequiresAuthentication = None
+             Configuration[] = <empty>
+          }
+       BugTrackerUsername = None
+       BugTrackerPassword = None
+     }
+
+TraceNodes
+(TraceNodesRequest){
+       _sessionId = ""
+       IssueId = None
+       ProjectVersionId = None
+       Parameters = 
+          (StringMap){
+             entries[] = <empty>
+          }
+     }
+
+UnlinkProjectVersion
+(UnlinkProjectVersionRequest){
+       ProjectVersionId = None
+       WIEInstanceGuid = None
+     }
+
+Update
+(status){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+     }
+
+UpdateAlertDefinitionAndPropagate
+(UpdateAlertDefinitionAndPropagateRequest){
+       ProjectVersionIds[] = <empty>
+       AlertDefinition = 
+          (AlertDefinition){
+             name = None
+             id = None
+             description = None
+             monitoredEntityType = 
+                (AlertableEntity){
+                   value = None
+                }
+             monitoredInstanceGuid = None
+             startDate = None
+             endDate = None
+             createdBy = None
+             creationDate = None
+             enabled = None
+             alertAllProjectVersionUsers = None
+             monitoredEntityName = None
+             alertAllChildren = None
+             userCanModify = None
+             alertTriggers[] = <empty>
+             alertStakeholders = None
+          }
+       PropagateToEveryone = None
+     }
+
+UpdateAlertDefinitionForSelf
+(UpdateAlertDefinitionForSelfRequest){
+       ProjectVersionIds[] = <empty>
+       AlertDefinition = 
+          (AlertDefinition){
+             name = None
+             id = None
+             description = None
+             monitoredEntityType = 
+                (AlertableEntity){
+                   value = None
+                }
+             monitoredInstanceGuid = None
+             startDate = None
+             endDate = None
+             createdBy = None
+             creationDate = None
+             enabled = None
+             alertAllProjectVersionUsers = None
+             monitoredEntityName = None
+             alertAllChildren = None
+             userCanModify = None
+             alertTriggers[] = <empty>
+             alertStakeholders = None
+          }
+     }
+
+UpdateCustomTag
+(TagDefinition){
+       name = None
+       description = None
+       restriction = None
+       extensible = None
+       hidden = None
+       value[] = <empty>
+       _id = ""
+       _objectVersion = ""
+     }
+
+UpdateProject
+(Project){
+       Id = None
+       Name = None
+       Description = None
+     }
+
+UpdateProjectMetaDataDefinition
+(MetaDataDefinition){
+       _publishVersion = ""
+       _objectVersion = ""
+       Name = None
+       Description = None
+       _id = ""
+       _type = ""
+       _multiple = ""
+       _hidden = ""
+       _required = ""
+       _appEntityType = ""
+     }
+
+UpdateUser
+(User){
+       id = None
+       UserName = None
+       SeedClearPassword = None
+       Password = None
+       Salt = None
+       RequirePasswordChange = None
+       PasswordNeverExpire = None
+       FirstName = None
+       LastName = None
+       Email = None
+       LastPasswordChange = None
+       FailedLoginAttempts = None
+       DateFrozen = None
+       Suspended = None
+       remoteKey = None
+       PermissionTemplates = 
+          (PermissionTemplates){
+             PermissionTemplateName[] = <empty>
+          }
+     }
+
+Upload
+(status){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+     }
+
+UserList
+<empty>
+
+VariableHistoryList
+(VariableHistoryListRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       ProjectVersionIDs[] = <empty>
+       StartDate = None
+       EndDate = None
+       VariableGuids[] = <empty>
+     }
+
+VariableHistoryListForProjectVersionAndVariable
+(VariableHistoryListForProjectVersionAndVariableRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       ProjectVersionId = None
+       VariableId = None
+     }
+
+VariableHistoryListForSnapshot
+(VariableHistoryListForSnapshotRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       SnapshotId = None
+     }
+
+VariableHistoryListForSnapshotAndVariables
+(VariableHistoryListForSnapshotAndVariablesRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       SnapshotId = None
+       VariableIds[] = <empty>
+     }
+
+VariableHistoryListForVariable
+(VariableHistoryListForVariableRequest){
+       code = None
+       msg = None
+       rootCause[] = <empty>
+       Variable = 
+          (Variable){
+             _publishVersion = ""
+             _objectVersion = ""
+             Description = None
+             SearchString = None
+             Folder = 
+                (Folder){
+                   _publishVersion = ""
+                   _objectVersion = ""
+                   Description = None
+                   Color = None
+                   Editable = None
+                   ProjectVersionId = None
+                   _variable = ""
+                   _locked = ""
+                }
+             _variable = ""
+             _locked = ""
+          }
+     }
+
+VerifyCloudOneTimeJobToken
+<empty>
+
