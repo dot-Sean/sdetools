@@ -73,6 +73,13 @@ alm_phases = requirements
 #sde -> SDE takes precedence
 conflict_policy = alm
 
+#Select certain tasks to sync
+#Note that this will override the other selection options
+#such as Statues, Phases, and Priority
+#This can be comma seperate or a single Task ID (Txx or CTxx)
+#
+#selected_tasks = T21,T22
+
 
 ###################################################
 #### Advanced Mingle Settings                 #####

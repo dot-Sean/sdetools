@@ -13,7 +13,7 @@ from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
 RE_CODE_DOWNLOAD = re.compile(r'\{\{ USE_MEDIA_URL \}\}([^\)]+\))\{@class=code-download\}')
-
+RE_TASK_IDS = re.compile('^C?T\d+$')
 
 class AlmException(Error):
     """ Class for ALM Exceptions """
@@ -91,6 +91,9 @@ class AlmConnector(object):
                 default='7')
         self.config.add_custom_option('how_tos_in_scope', 'Whether or not HowTos should be included',
                 default='False')
+        self.config.add_custom_option('selected_tasks', 'Optionally limit the sync to certain tasks'
+                ' (comma seperated, e.g. T12,T13). Note: Overrides other selections.',
+                default='')
         self.config.add_custom_option('alm_project', 'Project in ALM Tool',
                 default=None)
         self.config.add_custom_option('conflict_policy', 'Conflict policy to use',
@@ -115,6 +118,12 @@ class AlmConnector(object):
             if status not in('TODO', 'DONE', 'NA'):
                 raise AlmException('Invalid status specified in '
                                    'sde_statuses_in_scope')
+
+        self.config['selected_tasks'] = [x.strip(' ') 
+                for x in self.config['selected_tasks'].split(',') if x.strip(' ')]
+        for task in self.config['selected_tasks']:
+            if not RE_TASK_IDS.match(task):
+                raise UsageError('Invalid Task ID: %s' % (task))
 
         if (not self.config['conflict_policy'] or
             not (self.config['conflict_policy'] == 'alm' or
@@ -272,9 +281,12 @@ class AlmConnector(object):
 
         For example, has one of the appropriate phases
         """
-        return (task['phase'] in self.config['alm_phases']  and
-                task['status'] in self.config['sde_statuses_in_scope'] and
-                task['priority'] >= self.config['sde_min_priority'])
+        tid = task['id'].split('-', 1)[-1]
+        if self.config['selected_tasks']:
+            return (tid in self.config['selected_tasks'])
+        return (task['phase'] in self.config['alm_phases'] and
+            task['status'] in self.config['sde_statuses_in_scope'] and
+            task['priority'] >= self.config['sde_min_priority'])
 
     def sde_update_task_status(self, task, status):
         """ Updates the status of the given task in SD Elements

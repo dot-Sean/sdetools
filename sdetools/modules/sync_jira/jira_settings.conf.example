@@ -46,6 +46,12 @@ alm_project = JIRAPROJECT
 #TODO,DONE,NA
 sde_statuses_in_scope = TODO,DONE,NA
 
+#Should HowTos be included in what's added
+#to the ALM tools?
+#Valid values are:
+#True or False
+how_tos_in_scope = True
+
 # Synchronize all SD Elements tasks having the following
 # minimum priority
 # Default: 1 (all tasks)
@@ -71,11 +77,13 @@ alm_phases = requirements
 #since JIRA does not provide timezone support
 conflict_policy = alm
 
-#Should HowTos be included in what's added
-#to the ALM tools?
-#Valid values are:
-#True or False
-how_tos_in_scope = True
+#Select certain tasks to sync
+#Note that this will override the other selection options
+#such as Statues, Phases, and Priority
+#This can be comma seperate or a single Task ID (Txx or CTxx)
+#
+#selected_tasks = T21,T22
+
 
 ###################################################
 #### Advanced JIRA Settings                   #####
