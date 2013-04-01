@@ -219,10 +219,9 @@ class AlmConnector(object):
             raise AlmException('Requires initialization')
         try:
             self.sde_plugin.connect()
-        except APIError:
-            raise AlmException('Unable to connect to SD Elements. ' +
-                           'Please review URL, id, and password in ' +
-                           'configuration file.')
+        except APIError, err:
+            raise AlmException('Unable to connect to SD Elements. Please review URL, id,'
+                    ' and password in configuration file. Reason: %s' % (str(err)))
 
     def is_sde_connected(self):
         """ Returns true if currently connected to SD Elements"""
@@ -243,10 +242,9 @@ class AlmConnector(object):
             return self.sde_plugin.get_task_list()
         except APIError, err:
             logger.error(err)
-            raise AlmException('Unable to get tasks from SD Elements. '
-                               'Please ensure the application and project '
-                               'are valid and that the user has sufficient '
-                               'permission to access the project')
+            raise AlmException('Unable to get tasks from SD Elements. Please ensure'
+                    ' the application and project are valid and that the user has'
+                    ' sufficient permission to access the project. Reason: %s' % (str(err)))
 
     def sde_get_task(self, task_id):
         """ Returns a single task from SD Elements w given task_id
@@ -260,7 +258,7 @@ class AlmConnector(object):
             return self.sde_plugin.api.get_task(task_id)
         except APIError, err:
             logger.error(err)
-            raise AlmException('Unable to get task in SD Elements')
+            raise AlmException('Unable to get task in SD Elements. Reason: %s' % (str(err)))
 
     def _add_note(self, task_id, note_msg, filename, status):
         """ Convenience method to add note """
@@ -274,7 +272,7 @@ class AlmConnector(object):
 
         except APIError, err:
             logger.error(err)
-            raise AlmException('Unable to add note in SD Elements')
+            raise AlmException('Unable to add note in SD Elements. Reason: %s' % (str(err)))
 
     def in_scope(self, task):
         """ Check to see if an SDE task is in scope
