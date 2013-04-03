@@ -1,0 +1,97 @@
+[global]
+###################################################
+#### SD Elements server and project settings  #####
+###################################################
+#SD Elements API Token
+sde_api_token = 1234567890abcdef1234567890abcdef@newcastle.sdelements.com
+
+#SD Elements application
+sde_application = SDEApp
+
+#SD Elements project
+sde_project = SDEProject
+
+###################################################
+#### Trac server and project settings         #####
+###################################################
+
+#Trac Server name, includes port
+alm_server = server_ip:port
+
+#HTTP or HTTPs protocol
+alm_method = https
+              
+#Username for Mingle user that can:
+# -create new issues for the project
+# -read existing issues in the project
+# -create transitions on issues (e.g. close an issue)
+alm_user = trac_user_name
+              
+#Password for above user. Note that this will be encrypted
+#in future versions of the plugin
+alm_pass = trac_password
+              
+#Trac milestone
+alm_project = trac_milestone
+
+#A comma-delimited list of statuses for tasks
+#that you wish to import into the ALM.
+#For example, if you only want to synchronize
+#tasks that are currently TODO in SD Elements
+#then just enter TODO
+#Valid values are:
+#TODO,DONE,NA
+sde_statuses_in_scope = TODO,DONE,NA
+
+#Should HowTos be included in what's added
+#to the ALM tools?
+#Valid values are:
+#True or False
+how_tos_in_scope = True
+
+#SD Elements task phases that are in scope.
+#Valid values: comma separated list-
+#requirements,architecture-design,development,testing
+#NOTE: please do not include any spaces in task names
+alm_phases = requirements
+
+#Which system takes precedence in case of
+#confliciting status. For example, if you mark
+#an issue as Closed in Trac and the task is TODO in
+#SD Elements, it will be changed to DONE in SD Elemenets.
+#If you mark a task as Done in SD Elements, but it's still
+#Open in Trac, the task will automatically revert back
+#to TODO in SD Elements.
+#Valid values:
+#alm -> ALM tool (i.e Trac) takes precedence
+#sde -> SDE takes precedence
+conflict_policy = alm
+
+
+###################################################
+#### Advanced Trac Settings                   #####
+###################################################
+          
+#This value indicates whether or not task status
+#should be synchronized. In cases of difficult
+#custom workflow that can't easily be integrated,
+#you may wish to set this to False.
+alm_standard_workflow = True
+
+#issue type for new issues raised by SD Elements
+#Don't change unless you have deeply customized trac
+#and you know what you are doing
+alm_new_status = new
+
+#a comma delimited list of statuses that signify a task is 
+#Done in Trac
+alm_done_statuses = closed
+
+#How should we close the ticket in trac
+#Note that the status goes to closed and we need a resolution
+alm_close_transition = resolve,{"action_resolve_resolve_resolution":"fixed"}
+
+#How should we reopen tthe ticket in trac
+#Note that reopen automatically takes the status from closed to reopen
+alm_reopen_transition = reopen
+
