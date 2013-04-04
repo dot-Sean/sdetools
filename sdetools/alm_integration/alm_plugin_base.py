@@ -6,6 +6,7 @@ from sdetools.sdelib.commons import abc
 abstractmethod = abc.abstractmethod
 
 from sdetools.sdelib.commons import Error
+from sdetools.sdelib.commons import UsageError
 from sdetools.sdelib.restclient import APIError
 from sdetools.sdelib.interactive_plugin import PlugInExperience
 
@@ -13,7 +14,7 @@ from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
 RE_CODE_DOWNLOAD = re.compile(r'\{\{ USE_MEDIA_URL \}\}([^\)]+\))\{@class=code-download\}')
-
+RE_TASK_IDS = re.compile('^C?T\d+$')
 
 class AlmException(Error):
     """ Class for ALM Exceptions """
@@ -91,6 +92,9 @@ class AlmConnector(object):
                 default='7')
         self.config.add_custom_option('how_tos_in_scope', 'Whether or not HowTos should be included',
                 default='False')
+        self.config.add_custom_option('selected_tasks', 'Optionally limit the sync to certain tasks'
+                ' (comma seperated, e.g. T12,T13). Note: Overrides other selections.',
+                default='')
         self.config.add_custom_option('alm_project', 'Project in ALM Tool',
                 default=None)
         self.config.add_custom_option('conflict_policy', 'Conflict policy to use',
@@ -102,19 +106,27 @@ class AlmConnector(object):
 
     def initialize(self):
         #Verify that the configuration options are set properly
-        if not self.config['alm_phases']:
-            raise AlmException('Missing alm_phases in configuration')
+        if not self.config['selected_tasks']:
+            if not self.config['alm_phases']:
+                raise AlmException('Missing alm_phases in configuration')
 
-        self.config['alm_phases'] = self.config['alm_phases'].split(',')
+            self.config['alm_phases'] = self.config['alm_phases'].split(',')
 
-        if not self.config['sde_statuses_in_scope']:
-            raise AlmException('Missing the SD Elements statuses in scope')
+            if not self.config['sde_statuses_in_scope']:
+                raise AlmException('Missing the SD Elements statuses in scope')
 
-        self.config['sde_statuses_in_scope'] = self.config['sde_statuses_in_scope'].split(',')
-        for status in self.config['sde_statuses_in_scope']:
-            if status not in('TODO', 'DONE', 'NA'):
-                raise AlmException('Invalid status specified in '
+            self.config['sde_statuses_in_scope'] = self.config['sde_statuses_in_scope'].split(',')
+            for status in self.config['sde_statuses_in_scope']:
+                if status not in('TODO', 'DONE', 'NA'):
+                    raise AlmException('Invalid status specified in '
                                    'sde_statuses_in_scope')
+
+        if self.config['selected_tasks']:
+            self.config['selected_tasks'] = [x.strip(' ') 
+                for x in self.config['selected_tasks'].split(',') if x.strip(' ')]
+            for task in self.config['selected_tasks']:
+                if not RE_TASK_IDS.match(task):
+                    raise UsageError('Invalid Task ID: %s' % (task))
 
         if (not self.config['conflict_policy'] or
             not (self.config['conflict_policy'] == 'alm' or
@@ -210,10 +222,9 @@ class AlmConnector(object):
             raise AlmException('Requires initialization')
         try:
             self.sde_plugin.connect()
-        except APIError:
-            raise AlmException('Unable to connect to SD Elements. ' +
-                           'Please review URL, id, and password in ' +
-                           'configuration file.')
+        except APIError, err:
+            raise AlmException('Unable to connect to SD Elements. Please review URL, id,'
+                    ' and password in configuration file. Reason: %s' % (str(err)))
 
     def is_sde_connected(self):
         """ Returns true if currently connected to SD Elements"""
@@ -234,10 +245,9 @@ class AlmConnector(object):
             return self.sde_plugin.get_task_list()
         except APIError, err:
             logger.error(err)
-            raise AlmException('Unable to get tasks from SD Elements. '
-                               'Please ensure the application and project '
-                               'are valid and that the user has sufficient '
-                               'permission to access the project')
+            raise AlmException('Unable to get tasks from SD Elements. Please ensure'
+                    ' the application and project are valid and that the user has'
+                    ' sufficient permission to access the project. Reason: %s' % (str(err)))
 
     def sde_get_task(self, task_id):
         """ Returns a single task from SD Elements w given task_id
@@ -251,7 +261,7 @@ class AlmConnector(object):
             return self.sde_plugin.api.get_task(task_id)
         except APIError, err:
             logger.error(err)
-            raise AlmException('Unable to get task in SD Elements')
+            raise AlmException('Unable to get task in SD Elements. Reason: %s' % (str(err)))
 
     def _add_note(self, task_id, note_msg, filename, status):
         """ Convenience method to add note """
@@ -265,16 +275,19 @@ class AlmConnector(object):
 
         except APIError, err:
             logger.error(err)
-            raise AlmException('Unable to add note in SD Elements')
+            raise AlmException('Unable to add note in SD Elements. Reason: %s' % (str(err)))
 
     def in_scope(self, task):
         """ Check to see if an SDE task is in scope
 
         For example, has one of the appropriate phases
         """
-        return (task['phase'] in self.config['alm_phases']  and
-                task['status'] in self.config['sde_statuses_in_scope'] and
-                task['priority'] >= self.config['sde_min_priority'])
+        tid = task['id'].split('-', 1)[-1]
+        if self.config['selected_tasks']:
+            return (tid in self.config['selected_tasks'])
+        return (task['phase'] in self.config['alm_phases'] and
+            task['status'] in self.config['sde_statuses_in_scope'] and
+            task['priority'] >= self.config['sde_min_priority'])
 
     def sde_update_task_status(self, task, status):
         """ Updates the status of the given task in SD Elements
@@ -417,11 +430,13 @@ class AlmConnector(object):
                                           (task['id'], str(sde_time), str(alm_time)))
                             if (sde_time > alm_time):
                                 precedence = 'sde'
-                        
+
+                        status = alm_task.get_status()
                         if (precedence == 'alm'):
                             self.sde_update_task_status(task, alm_task.get_status())
                         else:
                             self.alm_update_task_status(alm_task, task['status'])
+                            status = task['status']
                             updated_system = self.alm_name
                         self.emit.info('Updated status of task %s in %s to %s' % (tid, updated_system, status))
                 else:

@@ -1,6 +1,5 @@
 import os
 import sys
-import setuptools
 
 if sys.version < '2.4':
     print 'This package needs python 2.4+'
@@ -37,6 +36,7 @@ else:
     set_py2exe_options()
 
 if 'py2exe' not in sys.argv[1:]:
+    import setuptools
     ext_opt['packages'] = setuptools.find_packages()
     ext_opt['package_data'] = {'sdetools':['docs/*/*']}
 
