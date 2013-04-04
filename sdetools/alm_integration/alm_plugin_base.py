@@ -106,25 +106,27 @@ class AlmConnector(object):
 
     def initialize(self):
         #Verify that the configuration options are set properly
-        if not self.config['alm_phases']:
-            raise AlmException('Missing alm_phases in configuration')
+        if not self.config['selected_tasks']:
+            if not self.config['alm_phases']:
+                raise AlmException('Missing alm_phases in configuration')
 
-        self.config['alm_phases'] = self.config['alm_phases'].split(',')
+            self.config['alm_phases'] = self.config['alm_phases'].split(',')
 
-        if not self.config['sde_statuses_in_scope']:
-            raise AlmException('Missing the SD Elements statuses in scope')
+            if not self.config['sde_statuses_in_scope']:
+                raise AlmException('Missing the SD Elements statuses in scope')
 
-        self.config['sde_statuses_in_scope'] = self.config['sde_statuses_in_scope'].split(',')
-        for status in self.config['sde_statuses_in_scope']:
-            if status not in('TODO', 'DONE', 'NA'):
-                raise AlmException('Invalid status specified in '
+            self.config['sde_statuses_in_scope'] = self.config['sde_statuses_in_scope'].split(',')
+            for status in self.config['sde_statuses_in_scope']:
+                if status not in('TODO', 'DONE', 'NA'):
+                    raise AlmException('Invalid status specified in '
                                    'sde_statuses_in_scope')
 
-        self.config['selected_tasks'] = [x.strip(' ') 
+        if self.config['selected_tasks']:
+            self.config['selected_tasks'] = [x.strip(' ') 
                 for x in self.config['selected_tasks'].split(',') if x.strip(' ')]
-        for task in self.config['selected_tasks']:
-            if not RE_TASK_IDS.match(task):
-                raise UsageError('Invalid Task ID: %s' % (task))
+            for task in self.config['selected_tasks']:
+                if not RE_TASK_IDS.match(task):
+                    raise UsageError('Invalid Task ID: %s' % (task))
 
         if (not self.config['conflict_policy'] or
             not (self.config['conflict_policy'] == 'alm' or
