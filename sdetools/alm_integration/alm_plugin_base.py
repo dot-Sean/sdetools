@@ -6,6 +6,7 @@ from sdetools.sdelib.commons import abc
 abstractmethod = abc.abstractmethod
 
 from sdetools.sdelib.commons import Error
+from sdetools.sdelib.commons import UsageError
 from sdetools.sdelib.restclient import APIError
 from sdetools.sdelib.interactive_plugin import PlugInExperience
 
