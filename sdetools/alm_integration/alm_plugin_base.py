@@ -105,7 +105,18 @@ class AlmConnector(object):
                 default='False')
 
     def initialize(self):
-        #Verify that the configuration options are set properly
+        """
+        Verify that the configuration options are set properly
+        """
+
+        #Note: This will consider space as empty due to strip
+        #We do this before checking if the config is non-empty later
+        self.config['selected_tasks'] = [x.strip(' ') 
+            for x in self.config['selected_tasks'].split(',') if x.strip(' ')]
+        for task in self.config['selected_tasks']:
+            if not RE_TASK_IDS.match(task):
+                raise UsageError('Invalid Task ID: %s' % (task))
+
         if not self.config['selected_tasks']:
             if not self.config['alm_phases']:
                 raise AlmException('Missing alm_phases in configuration')
@@ -120,13 +131,6 @@ class AlmConnector(object):
                 if status not in('TODO', 'DONE', 'NA'):
                     raise AlmException('Invalid status specified in '
                                    'sde_statuses_in_scope')
-
-        if self.config['selected_tasks']:
-            self.config['selected_tasks'] = [x.strip(' ') 
-                for x in self.config['selected_tasks'].split(',') if x.strip(' ')]
-            for task in self.config['selected_tasks']:
-                if not RE_TASK_IDS.match(task):
-                    raise UsageError('Invalid Task ID: %s' % (task))
 
         if (not self.config['conflict_policy'] or
             not (self.config['conflict_policy'] == 'alm' or
