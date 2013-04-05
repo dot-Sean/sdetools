@@ -157,13 +157,12 @@ class JIRAConnector(AlmConnector):
                                "%s is not an integer priority" % priority)
         pmap = self.config['alm_priority_map']
         for key in pmap:
-            if '-' not in key:
+            if '-' in key:
                 lrange, hrange = key.split('-')
                 lrange = int(lrange)
                 hrange = int(hrange)
                 if lrange <= priority <= hrange:
                     return pmap[key]
             else:
-                index = int(index)
-                if index == priority:
+                if int(key) == priority:
                     return pmap[key]
