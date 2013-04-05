@@ -39,7 +39,7 @@ class JIRAConnector(AlmConnector):
                 default='Reopen Issue')
         config.add_custom_option('jira_done_statuses', 'Statuses that signify a task is Done in JIRA',
                 default='Resolved,Closed')
-        config.add_custom_option('jira_priority_map', 'Customized map from priority in SDE to JIRA',
+        config.add_custom_option('alm_priority_map', 'Customized map from priority in SDE to JIRA',
                 default='')
 
     def initialize(self):
@@ -62,22 +62,22 @@ class JIRAConnector(AlmConnector):
             raise AlmException('Missing jira_reopen_transition in configuration')
 
         try:
-            if not self.config['jira_priority_map']:
-                self.config['jira_priority_map'] = JIRA_DEFAULT_PRIORITY_MAP
-            if isinstance(self.config['jira_priority_map'], basestring):
-                self.config['jira_priority_map'] = json.loads(self.config['jira_priority_map'])
-            if type(self.config['jira_priority_map']) is not dict:
-                raise TypeError('Not a dict: %s' % self.config['jira_priority_map'])
-            for key in self.config['jira_priority_map']:
+            if not self.config['alm_priority_map']:
+                self.config['alm_priority_map'] = JIRA_DEFAULT_PRIORITY_MAP
+            if isinstance(self.config['alm_priority_map'], basestring):
+                self.config['alm_priority_map'] = json.loads(self.config['alm_priority_map'])
+            if type(self.config['alm_priority_map']) is not dict:
+                raise TypeError('Not a dict: %s' % self.config['alm_priority_map'])
+            for key in self.config['alm_priority_map']:
                 if not isinstance(key, basestring):
                     raise TypeError('Invalid range key: %s' % repr(key))
                 if not RE_MAP_RANGE_KEY.match(key):
                     raise TypeError('Invalid range key: %s' % key)
-                val = self.config['jira_priority_map'][key]
+                val = self.config['alm_priority_map'][key]
                 if not isinstance(val, basestring):
                     raise TypeError('Invalid value: %s' % repr(val))
         except Exception, err:
-            raise AlmException('Unable to process jira_priority_map (not a JSON dictionary). Reason: %s' % str(err))
+            raise AlmException('Unable to process alm_priority_map (not a JSON dictionary). Reason: %s' % str(err))
             
 
         self.transition_id = {
@@ -155,7 +155,7 @@ class JIRAConnector(AlmConnector):
             logger.error('Could not coerce %s into an integer' % priority)
             raise AlmException("Error in translating SDE priority to JIRA: "
                                "%s is not an integer priority" % priority)
-        pmap = self.config['jira_priority_map']
+        pmap = self.config['alm_priority_map']
         for key in pmap:
             if '-' not in key:
                 lrange, hrange = key.split('-')
