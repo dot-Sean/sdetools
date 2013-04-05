@@ -104,7 +104,7 @@ class VerifiedHTTPSHandler(urllib2.HTTPSHandler):
 
     https_request = urllib2.HTTPSHandler.do_request_
 
-def get_http_handler(mode, debuglevel):
+def get_http_handler(mode, debuglevel=0):
     global ssl_warned
 
     if mode == 'http':
