@@ -52,7 +52,7 @@ class JIRASoapAPI:
             proxy = SOAPpy.WSDL.Proxy('%s://%s/rpc/soap/jirasoapservice-v2?wsdl' %
                     (self.config['alm_method'], self.config['alm_server']), config=config)
         except (SOAPpy.Types.faultType, xml.parsers.expat.ExpatError, socket.error), err:
-            raise AlmException('Unable to connect to JIRA. Please check server URL')
+            raise AlmException('Unable to connect to JIRA. Please check server URL. Reason: %s' % (err))
         self.proxy = SOAPProxyWrap(proxy)
 
         # Attempt to login
@@ -122,12 +122,11 @@ class JIRASoapAPI:
         #Add task
         selected_priority = None
         for priority in self.priorities:
-            if priority['name'] == JIRATask.translate_priority(task['priority']):
+            if priority['name'] == task['alm_priority']:
                 selected_priority = priority['id']
                 break
         if not selected_priority:
-            raise AlmException('Unable to find priority %s' %
-                    JIRATask.translate_priority(task['priority']))        
+            raise AlmException('Unable to find priority %s' % task['alm_priority'])
 
         args = {
             'project': self.config['alm_project'],
