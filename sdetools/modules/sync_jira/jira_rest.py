@@ -62,7 +62,7 @@ class JIRARestAPI(RESTBase):
  
         affected_versions = []
         if self.config['jira_project_version']:
-            affected_versions.append({'id':self.config['jira_project_version']})
+            affected_versions.append({'name':self.config['jira_project_version']})
 
         #Add task
         args = {
@@ -83,7 +83,14 @@ class JIRARestAPI(RESTBase):
            }
         }
         try:
-            return self.call_api('issue', method=self.URLRequest.POST, args=args)
+            issue = self.call_api('issue', method=self.URLRequest.POST, args=args)
+            
+            # Add a link back to SD Elements
+            remoteurl_url = 'issue/%s/remotelink' % issue['key']
+            args = {"object": {"url":task['url'],"title":task['title']}}
+            self.call_api(remoteurl_url, method=self.URLRequest.POST, args=args)
+            
+            return issue
         except APIError:
             raise AlmException('Unable to add issue to JIRA')
 
