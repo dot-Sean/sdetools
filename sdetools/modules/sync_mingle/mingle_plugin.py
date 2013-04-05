@@ -10,6 +10,7 @@ from sdetools.sdelib.restclient import URLRequest, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from sdetools.alm_integration.alm_plugin_base import AlmException
 from sdetools.sdelib.conf_mgr import Config
+from sdetools.extlib import markdown
 
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
@@ -102,6 +103,8 @@ class MingleConnector(AlmConnector):
             raise AlmException('Missing mingle_card_type in configuration')
         if not self.sde_plugin.config['mingle_new_status']:
             raise AlmException('Missing mingle_card_type in configuration')
+
+        self.mark_down_converter = markdown.Markdown(safe_mode="escape")
 
     def alm_connect(self):
         """ Verifies that Mingle connection works """
@@ -221,3 +224,6 @@ class MingleConnector(AlmConnector):
 
     def alm_disconnect(self):
         pass
+
+    def convert_markdown_to_alm(self, content, ref): 
+        return self.mark_down_converter.convert(content)

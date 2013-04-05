@@ -97,7 +97,7 @@ class VerifiedHTTPSHandler(urllib2.HTTPSHandler):
         try:
             return self.do_open(https_class_wrapper, req)
         except urllib2.URLError, e:
-            if type(e.reason) == ssl.SSLError and e.reason.args[0] == 1:
+            if type(e.reason) is ssl.SSLError:
                 raise InvalidCertificateException(req.host, '',
                                                   e.reason.args[1])
             raise

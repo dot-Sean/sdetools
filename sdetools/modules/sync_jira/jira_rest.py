@@ -65,7 +65,7 @@ class JIRARestAPI(RESTBase):
                'summary': task['title'],
                'description': task['formatted_content'],
                'priority': {
-                   'name': JIRATask.translate_priority(task['priority'])
+                   'name': task['alm_priority']
                },
                'issuetype': {
                    'id': issue_type_id

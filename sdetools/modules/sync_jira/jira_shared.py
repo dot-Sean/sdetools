@@ -33,24 +33,3 @@ class JIRATask(AlmTask):
         """ Returns a datetime object """
         return datetime.strptime(self.timestamp.split('.')[0],
                                  '%Y-%m-%dT%H:%M:%S')
-
-    @classmethod
-    def translate_priority(cls, priority):
-        """ Translates an SDE priority into a JIRA priority """
-        try:
-            priority = int(priority)
-        except (TypeError):
-            logger.error('Could not coerce %s into an integer' % priority)
-            raise AlmException("Error in translating SDE priority to JIRA: "
-                               "%s is not an integer priority" % priority)
-        if priority == 10:
-            return 'Blocker'
-        elif 7 <= priority <= 9:
-            return 'Critical'
-        elif 5 <= priority <= 6:
-            return 'Major'
-        elif 3 <= priority <= 4:
-            return 'Minor'
-        else:
-            return 'Trivial'
-

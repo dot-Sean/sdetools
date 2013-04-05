@@ -2,41 +2,38 @@
 ###################################################
 #### SD Elements server and project settings  #####
 ###################################################
-#SD Elements server name, includes port
-sde_api_token = abcdef1234567890abcdef1234567890$m1.sdelements.com
+#SD Elements API Token
+sde_api_token = 1234567890abcdef1234567890abcdef@newcastle.sdelements.com
 
 #SD Elements application
-sde_application = SDEapp
+sde_application = SDEApp
 
 #SD Elements project
-sde_project = SDEproj
-
-#SD Elements connection method (Avoid http in production env)
-sde_method = https
+sde_project = SDEProject
 
 ###################################################
-#### JIRA server and project settings         #####
+#### Trac server and project settings         #####
 ###################################################
 
-#JIRA Server name, includes port
-alm_server = jira_server
+#Trac Server name, includes port
+alm_server = server_ip:port
 
 #HTTP or HTTPs protocol
 alm_method = https
               
-#Username for JIRA user that can:
+#Username for Mingle user that can:
 # -create new issues for the project
 # -read existing issues in the project
 # -create transitions on issues (e.g. close an issue)
-alm_user = jira_user
+alm_user = trac_user_name
               
 #Password for above user. Note that this will be encrypted
 #in future versions of the plugin
-alm_pass = jira_passsword
+alm_pass = trac_password
               
-#JIRA project key
-alm_project = JIRAPROJECT
-          
+#Trac milestone
+alm_project = trac_milestone
+
 #A comma-delimited list of statuses for tasks
 #that you wish to import into the ALM.
 #For example, if you only want to synchronize
@@ -52,11 +49,6 @@ sde_statuses_in_scope = TODO,DONE,NA
 #True or False
 how_tos_in_scope = True
 
-# Synchronize all SD Elements tasks having the following
-# minimum priority
-# Default: 1 (all tasks)
-#sde_min_priority = 1
-
 #SD Elements task phases that are in scope.
 #Valid values: comma separated list-
 #requirements,architecture-design,development,testing
@@ -65,33 +57,19 @@ alm_phases = requirements
 
 #Which system takes precedence in case of
 #confliciting status. For example, if you mark
-#an issue as Closed in JIRA and the task is TODO in
+#an issue as Closed in Trac and the task is TODO in
 #SD Elements, it will be changed to DONE in SD Elemenets.
 #If you mark a task as Done in SD Elements, but it's still
-#Open in JIRA, the task will automatically revert back
+#Open in Trac, the task will automatically revert back
 #to TODO in SD Elements.
 #Valid values:
-#alm -> ALM tool (i.e JIRA) takes precedence
+#alm -> ALM tool (i.e Trac) takes precedence
 #sde -> SDE takes precedence
-#Note that timezone is currently unsupported
-#since JIRA does not provide timezone support
 conflict_policy = alm
 
-#[Optional] Select certain tasks to sync
-#Note that this will override the other selection options
-#such as Statues, Phases, and Priority
-#This can be comma seperate or a single Task ID (Txx or CTxx)
-#
-#selected_tasks = T21,T22
-
-#[Optional] Specify a custom priority map
-#This is a JSON representation of a list of ranges mapped to certain
-#priority names. Make sure to cover all priorities 1 to 10. Note that
-#the ranges are inclusive
-#alm_priority_map = {"1-6":"Trivial", "7-9":"Major", "10":"Blocker"}
 
 ###################################################
-#### Advanced JIRA Settings                   #####
+#### Advanced Trac Settings                   #####
 ###################################################
           
 #This value indicates whether or not task status
@@ -101,19 +79,19 @@ conflict_policy = alm
 alm_standard_workflow = True
 
 #issue type for new issues raised by SD Elements
-jira_issue_type = Bug
-
-#transition for a closed issue in JIRA
-jira_close_transition = Close Issue
-
-#transition for a re-opened issue in JIRA
-jira_reopen_transition = Reopen Issue
+#Don't change unless you have deeply customized trac
+#and you know what you are doing
+alm_new_status = new
 
 #a comma delimited list of statuses that signify a task is 
-#Done in JIRA
-jira_done_statuses = Resolved,Closed
+#Done in Trac
+alm_done_statuses = closed
 
-######Base settings, do not modify######
-targets =  .
-skip_hidden = True
-interactive = True
+#How should we close the ticket in trac
+#Note that the status goes to closed and we need a resolution
+alm_close_transition = resolve,{"action_resolve_resolve_resolution":"fixed"}
+
+#How should we reopen tthe ticket in trac
+#Note that reopen automatically takes the status from closed to reopen
+alm_reopen_transition = reopen
+
