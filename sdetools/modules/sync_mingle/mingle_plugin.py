@@ -187,7 +187,7 @@ class MingleConnector(AlmConnector):
 
 
     def alm_update_task_status(self, task, status):
-        if (not task) or (not self.sde_plugin.config['alm_standard_workflow']):
+        if not task or not self.sde_plugin.config['alm_standard_workflow']:
             logger.debug('Status synchronization disabled')
             return
 

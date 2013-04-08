@@ -115,7 +115,7 @@ class JIRAConnector(AlmConnector):
         return 'Issue %s' % new_issue['key']
 
     def alm_update_task_status(self, task, status):
-        if (not task) or (not self.config['alm_standard_workflow']):
+        if not task or not self.config['alm_standard_workflow']:
             return
         
         alm_id = task.get_alm_id()

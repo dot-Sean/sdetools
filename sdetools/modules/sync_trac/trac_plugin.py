@@ -210,7 +210,7 @@ class TracConnector(AlmConnector):
         self.alm_update_task_status(task, "TODO")
     
     def alm_update_task_status(self, task, status):
-        if (not task) or (not self.config['alm_standard_workflow']):
+        if not task or not self.config['alm_standard_workflow']:
             logger.debug('Status synchronization disabled')
             return
 
