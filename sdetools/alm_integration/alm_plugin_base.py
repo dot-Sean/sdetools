@@ -99,10 +99,12 @@ class AlmConnector(object):
                 default=None)
         self.config.add_custom_option('conflict_policy', 'Conflict policy to use',
                 default='alm')
-        self.config.add_custom_option('show_progress','Show progress',
+        self.config.add_custom_option('show_progress', 'Show progress',
                 default='False')
         self.config.add_custom_option('test_alm_connection', 'Test Alm Connection Only',
                 default='False')
+        self.config.add_custom_option('alm_standard_workflow', 'Standard workflow in ALM?',
+                default='True')
 
     def initialize(self):
         """
@@ -154,11 +156,11 @@ class AlmConnector(object):
         else:
             self.config['sde_min_priority'] = 1
 
-        if (not self.sde_plugin.config['show_progress']):
-            self.sde_plugin.config['show_progress'] = False
-        else:
-            self.sde_plugin.config['show_progress'] = (self.sde_plugin.config['show_progress']=="True")
-            
+        self.config.process_boolean_config('show_progress')
+        self.config.process_boolean_config('how_tos_in_scope')
+        self.config.process_boolean_config('test_alm_connection')
+        self.config.process_boolean_config('alm_standard_workflow')
+
         logger.info('*** AlmConnector initialized ***')
 
     @abstractmethod
@@ -339,7 +341,7 @@ class AlmConnector(object):
                  ALM
         """
         content = '%s\n\nImported from SD Elements: [%s](%s)' % (task['content'], task['url'], task['url'])
-        if (self.config['how_tos_in_scope'] == 'True') and task['implementations']:
+        if self.config['how_tos_in_scope'] and task['implementations']:
             content += '\n\n# How Tos:\n\n'
             for implementation in task['implementations']:
                 content += '## %s\n\n' % (implementation['title'])
@@ -350,7 +352,7 @@ class AlmConnector(object):
         return self.convert_markdown_to_alm(content, ref=task['id'])
 
     def output_progress(self, percent):
-        if self.sde_plugin.config['show_progress']:
+        if self.config['show_progress']:
             print str(percent)+"% complete"
             sys.stdout.flush()
 
@@ -384,10 +386,9 @@ class AlmConnector(object):
             if not self.sde_plugin:
                 raise AlmException('Requires initialization')
 
-            if (self.sde_plugin.config['test_alm_connection']):
-                if(self.sde_plugin.config['test_alm_connection']=="True"):
-                    self.alm_connect()
-                    return
+            if self.config['test_alm_connection']:
+                self.alm_connect()
+                return
 
             #Attempt to connect to SDE & ALM
             progress = 0

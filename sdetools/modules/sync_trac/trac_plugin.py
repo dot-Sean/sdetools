@@ -75,8 +75,6 @@ class TracConnector(AlmConnector):
         """ Initializes connection to Trac """
         super(TracConnector, self).__init__(config, alm_plugin)
 
-        config.add_custom_option('alm_standard_workflow', 'Standard workflow in Trac?',
-            default='True')
         config.add_custom_option('alm_close_transition', 'Close transition in Trac',
                 default='resolve,{"action_resolve_resolve_resolution":"fixed"}')
         config.add_custom_option('alm_reopen_transition', 'Re-open transiiton in Trac',
@@ -96,9 +94,6 @@ class TracConnector(AlmConnector):
         if (not self.config['alm_done_statuses'] or
             len(self.config['alm_done_statuses']) < 1):
             raise UsageError('Missing alm_done_statuses in configuration')
-
-        if not self.config['alm_standard_workflow']:
-            raise UsageError('Missing alm_standard_workflow in configuration')
 
         for action_type in ['alm_close_transition', 'alm_reopen_transition']:
             action_to_take = self.config[action_type]
@@ -191,7 +186,7 @@ class TracConnector(AlmConnector):
 
         alm_task = self._get_trac_task_by_id(sde_id, alm_id)
 
-        if (self.config['alm_standard_workflow']=='True' and
+        if (self.config['alm_standard_workflow'] and
                 (task['status']=='DONE' or task['status']=='NA')):
             self.alm_update_task_status(alm_task, task['status'])
         return 'Milestone: %s, Ticket: %s' % (self.config['alm_project'], alm_id)
@@ -215,7 +210,7 @@ class TracConnector(AlmConnector):
         self.alm_update_task_status(task, "TODO")
     
     def alm_update_task_status(self, task, status):
-        if not task or not self.config['alm_standard_workflow'] == 'True':
+        if (not task) or (not self.config['alm_standard_workflow']):
             logger.debug('Status synchronization disabled')
             return
 
