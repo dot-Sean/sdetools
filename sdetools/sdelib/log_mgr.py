@@ -51,7 +51,8 @@ from sdetools import sdelib
 for modname in sdelib.__all__:
     mods.add_mod('%s.%s' % (__name__.rsplit('.', 1)[0], modname))
 
-console_handler = logging.StreamHandler()
-console_handler.setFormatter(logging.Formatter('%(levelname)s - %(name)s - %(message)s'))
-root_logger = logging.getLogger()
-root_logger.addHandler(console_handler)
+def setup_root_logger():
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logging.Formatter('%(levelname)s - %(name)s - %(message)s'))
+    root_logger = logging.getLogger()
+    root_logger.addHandler(console_handler)
