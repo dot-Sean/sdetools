@@ -99,9 +99,6 @@ class RESTBase(object):
         return urllib.urlencode({'a':instr})[2:]
 
     def post_conf_init(self):
-        self.server = self._get_conf('server') 
-        self.base_uri = '%s://%s/%s' % (self._get_conf('method'), self.server, self.base_path)
-        self.session_info = None
 
         urllib_debuglevel = 0
         if __name__ in self.config['debug_mods']:
@@ -112,6 +109,10 @@ class RESTBase(object):
             self._get_conf('server'),
             debuglevel=urllib_debuglevel)
         self.config['%s_server' % (self.conf_prefix)] = self.opener.server
+
+        self.session_info = None
+        self.server = self._get_conf('server') 
+        self.base_uri = '%s://%s/%s' % (self._get_conf('method'), self.server, self.base_path)
 
     def encode_post_args(self, args):
         return json.dumps(args)
