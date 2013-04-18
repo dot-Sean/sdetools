@@ -19,7 +19,7 @@ JIRA_DEFAULT_PRIORITY_MAP = {
     '7-9': 'Critical',
     '5-6': 'Major',
     '3-4': 'Minor',
-    '1-3': 'Trivial',
+    '1-2': 'Trivial',
     }
 
 class JIRAConnector(AlmConnector):
@@ -40,6 +40,7 @@ class JIRAConnector(AlmConnector):
         config.add_custom_option('jira_done_statuses', 'Statuses that signify a task is Done in JIRA',
                 default='Resolved,Closed')
         config.add_custom_option('jira_project_version', 'Project version',
+                default='')
         config.add_custom_option('alm_priority_map', 'Customized map from priority in SDE to JIRA',
                 default='')
 
