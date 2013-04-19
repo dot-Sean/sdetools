@@ -103,7 +103,15 @@ class JIRAConnector(AlmConnector):
     def alm_get_task(self, task):
         task_id = task['title'].partition(':')[0]
 
-        return self.alm_plugin.get_task(task, task_id)
+        task = self.alm_plugin.get_task(task, task_id)
+        if task:
+            # Assign a project version
+            if self.config['jira_project_version'] and not (self.config['jira_project_version'] in task.versions):
+                # new version needed, re-open it and add it
+                self.alm_update_task_status(task, "TODO")
+                self.alm_plugin.assign_version(task, self.config['jira_project_version'])
+            
+        return task
 
     def alm_add_task(self, task):
         task['formatted_content'] = self.sde_get_task_content(task)
@@ -124,8 +132,13 @@ class JIRAConnector(AlmConnector):
         if (not task or
             not self.config['alm_standard_workflow'] == 'True'):
             return
-        
+
         alm_id = task.get_alm_id()
+
+        # This is an unexpected situation
+        if (task.get_status() == status):
+            logger.debug('Status update in JIRA not required for issue %s' % alm_id)
+            return
 
         trans_table = self.alm_plugin.get_available_transitions(alm_id)
 

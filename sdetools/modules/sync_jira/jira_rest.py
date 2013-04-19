@@ -47,22 +47,10 @@ class JIRARestAPI(RESTBase):
         if jtask['fields']['resolution']:
             resolution = jtask['fields']['resolution']['name']
 
-        # The task may need to be added to a new version 
-        version_found = True
-        if self.config['jira_project_version']:
-            version_found = False
-            if jtask['fields']['versions']:
-                for version in jtask['fields']['versions']:
-                    if version['name'] == self.config['jira_project_version']:
-                        version_found = True
-                        break
-        if not version_found:
-            try:
-                remoteurl_url = 'issue/%s' % jtask['key']
-                version_update={'update':{'versions':[{'add':{'name' : self.config['jira_project_version']}}]}}
-                self.call_api(remoteurl_url, method=self.URLRequest.PUT, args=version_update)
-            except APIError:
-                raise AlmException('Unable to update issue %s with new version %s' % (jtask['key'], self.config['jira_project_version'] ))        
+        task_versions = []
+        if jtask['fields']['versions']:
+            for version in jtask['fields']['versions']:
+                task_versions.append(version['name'])
 
         return JIRATask(task['id'],
                         jtask['key'],
@@ -70,7 +58,26 @@ class JIRARestAPI(RESTBase):
                         jtask['fields']['status']['name'],
                         resolution,
                         jtask['fields']['updated'],
-                        self.config['jira_done_statuses'])
+                        self.config['jira_done_statuses'],
+                        task_versions)
+
+    def assign_version(self, task, project_version):
+    
+        if not project_version:
+            return False
+
+        if project_version in task.versions:
+            return False
+
+        # REST allows us to add versions ad hoc
+        try:
+            remoteurl_url = 'issue/%s' % task.get_alm_id()
+            version_update={'update':{'versions':[{'add':{'name' : project_version}}]}}
+            self.call_api(remoteurl_url, method=self.URLRequest.PUT, args=version_update)
+        except APIError:
+            raise AlmException('Unable to update issue %s with new version %s' % (task.get_alm_id(), project_version))
+
+        return True            
 
     def add_task(self, task, issue_type_id):
  

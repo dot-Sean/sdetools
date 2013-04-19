@@ -4,7 +4,7 @@ class JIRATask(AlmTask):
     """ Representation of a task in JIRA """
 
     def __init__(self, task_id, alm_id, priority, status, resolution,
-                 timestamp, done_statuses):
+                 timestamp, done_statuses, versions):
         self.task_id = task_id
         self.alm_id = alm_id
         self.priority = priority
@@ -12,6 +12,7 @@ class JIRATask(AlmTask):
         self.resolution = resolution
         self.timestamp = timestamp
         self.done_statuses = done_statuses  # comma-separated list
+        self.versions = versions # array of version names
 
     def get_task_id(self):
         return self.task_id
