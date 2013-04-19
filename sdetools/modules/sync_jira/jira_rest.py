@@ -57,9 +57,12 @@ class JIRARestAPI(RESTBase):
                         version_found = True
                         break
         if not version_found:
-            remoteurl_url = 'issue/%s' % jtask['key']
-            version_update={'update':{'versions':[{'add':{'name' : self.config['jira_project_version']}}]}}
-            self.call_api(remoteurl_url, method=self.URLRequest.PUT, args=version_update)
+            try:
+                remoteurl_url = 'issue/%s' % jtask['key']
+                version_update={'update':{'versions':[{'add':{'name' : self.config['jira_project_version']}}]}}
+                self.call_api(remoteurl_url, method=self.URLRequest.PUT, args=version_update)
+            except APIError:
+                raise AlmException('Unable to update issue %s with new version %s' % (jtask['key'], self.config['jira_project_version'] ))        
 
         return JIRATask(task['id'],
                         jtask['key'],

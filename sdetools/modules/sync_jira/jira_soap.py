@@ -136,7 +136,7 @@ class JIRASoapAPI:
                     update = [{'id':'versions', 'values':affected_versions}]
                     self.proxy.updateIssue(self.auth, jtask['key'], update)
                 except (SOAPpy.Types.faultType, AlmException), err:
-                    raise AlmException('Unable to add issue to JIRA')        
+                    raise AlmException('Unable to update issue %s with new version %s' % (jtask['key'], self.config['jira_project_version'] ))        
 
         return JIRATask(task['id'],
                         jtask['key'],
