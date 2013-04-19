@@ -35,7 +35,7 @@ class JIRAConnector(AlmConnector):
                 default='Bug')
         config.add_custom_option('jira_close_transition', 'Close transition in JIRA',
                 default='Close Issue')
-        config.add_custom_option('jira_reopen_transition', 'Re-open transiiton in JIRA',
+        config.add_custom_option('jira_reopen_transition', 'Re-open transition in JIRA',
                 default='Reopen Issue')
         config.add_custom_option('jira_done_statuses', 'Statuses that signify a task is Done in JIRA',
                 default='Resolved,Closed')
