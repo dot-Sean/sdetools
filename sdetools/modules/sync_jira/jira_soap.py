@@ -40,7 +40,7 @@ class JIRASoapAPI:
         self.statuses = None
         self.priorities = None
         self.auth = None
-        
+        self.versions = None
 
     def connect(self):
         config = SOAPpy.Config
@@ -71,7 +71,14 @@ class JIRASoapAPI:
         # For JIRA 4 we need the ID-Name mapping for status and priority
         self.statuses = self.proxy.getStatuses(self.auth)
         self.priorities = self.proxy.getPriorities(self.auth)
+        self.versions = self.proxy.getVersions(self.auth, self.config['alm_project'])
 
+    def get_version(self, version_name):
+        for v in self.versions:
+            if v['name']==version_name:
+                return v
+        return None
+ 
     def get_issue_types(self):
         try:
             return self.proxy.getIssueTypes(self.auth)
@@ -80,10 +87,7 @@ class JIRASoapAPI:
 
     def get_task(self, task, task_id):
         try:
-            if self.config['jira_project_version']:
-                jql = "project='%s' AND summary~'%s' AND affectedVersion='%s'" % (self.config['alm_project'], task_id, self.config['jira_project_version'])
-            else:
-                jql = "project='%s' AND summary~'%s'" % (self.config['alm_project'], task_id)
+            jql = "project='%s' AND summary~'%s'" % (self.config['alm_project'], task_id)
             issues = self.proxy.getIssuesFromJqlSearch(self.auth, jql, SOAPpy.Types.intType(1))
         except SOAPpy.Types.faultType:
             raise AlmException("Unable to get task %s from JIRA" % task_id)
@@ -131,25 +135,25 @@ class JIRASoapAPI:
         if not selected_priority:
             raise AlmException('Unable to find priority %s' % task['alm_priority'])
 
-        affected_versions = []
-        if self.config['jira_project_version']:
-            affected_versions.append({'name':self.config['jira_project_version']})
+        print self.config['jira_project_version']
 
-        labels = []
-        labels.append({'id':'labels', 'values':['SD-Elements']})
-            
+        updates = []
+        updates.append({'id':'labels', 'values':['SD-Elements']})
+        if self.config['jira_project_version']:
+            version = self.get_version(self.config['jira_project_version'])
+            if version:
+                updates.append({'id':'versions', 'values':[version['id']]})
         args = {
             'project': self.config['alm_project'],
             'summary': task['title'],
             'description': task['formatted_content'],
             'priority': selected_priority,
-            'type': issue_type_id,
-            'affectsVersions': affected_versions
+            'type': issue_type_id
         }
 
         try:
             ref = self.proxy.createIssue(self.auth, args)
-            self.proxy.updateIssue(self.auth, ref['key'], labels)
+            self.proxy.updateIssue(self.auth, ref['key'], updates)
             return ref
         except (SOAPpy.Types.faultType, AlmException), err:
             raise AlmException('Unable to add issue to JIRA')
