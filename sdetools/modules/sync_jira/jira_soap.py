@@ -117,6 +117,27 @@ class JIRASoapAPI:
                     task_priority = priority['name']
                     break
 
+        # The task may need to be added to a new version 
+        version_found = True
+        affected_versions = []
+        if self.config['jira_project_version']:
+            version_found = False
+            if jtask['affectsVersions']:
+                for version in jtask['affectsVersions']:
+                    if version['name'] == self.config['jira_project_version']:
+                        version_found = True
+                        break
+                    affected_versions.append(version['id'])
+        if not version_found:
+            version = self.get_version(self.config['jira_project_version'])
+            if version:
+                affected_versions.append(version['id'])
+                try:
+                    update = [{'id':'versions', 'values':affected_versions}]
+                    self.proxy.updateIssue(self.auth, jtask['key'], update)
+                except (SOAPpy.Types.faultType, AlmException), err:
+                    raise AlmException('Unable to add issue to JIRA')        
+
         return JIRATask(task['id'],
                         jtask['key'],
                         task_priority,
@@ -134,8 +155,6 @@ class JIRASoapAPI:
                 break
         if not selected_priority:
             raise AlmException('Unable to find priority %s' % task['alm_priority'])
-
-        print self.config['jira_project_version']
 
         updates = []
         updates.append({'id':'labels', 'values':['SD-Elements']})
