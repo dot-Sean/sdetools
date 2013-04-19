@@ -116,6 +116,8 @@ class RESTBase(object):
         return json.dumps(args)
 
     def parse_response(self, result):
+        if result == "":
+            return "{}"
         try:
             result = json.loads(result)
         except:

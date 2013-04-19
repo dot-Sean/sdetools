@@ -30,10 +30,7 @@ class JIRARestAPI(RESTBase):
 
     def get_task(self, task, task_id):
         try:
-            if self.config['jira_project_version']:
-                url = "search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s\'%%20AND%%20affectedVersion%%3D\'%s\'" % (self.config['alm_project'], task_id, self.config['jira_project_version'])
-            else:
-                url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s\'' % (
+            url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s\'' % (
                     self.config['alm_project'], task_id)
             result = self.call_api(url)
         except APIError, err:
@@ -42,14 +39,28 @@ class JIRARestAPI(RESTBase):
         if not result['total']:
             #No result was found from query
             return None
-        #We will use the first result from the query
-        jtask = result['issues'][0]
 
         #We will use the first result from the query
         jtask = result['issues'][0]
+
         resolution = None
         if jtask['fields']['resolution']:
             resolution = jtask['fields']['resolution']['name']
+
+        # The task may need to be added to a new version 
+        version_found = True
+        if self.config['jira_project_version']:
+            version_found = False
+            if jtask['fields']['versions']:
+                for version in jtask['fields']['versions']:
+                    if version['name'] == self.config['jira_project_version']:
+                        version_found = True
+                        break
+        if not version_found:
+            remoteurl_url = 'issue/%s' % jtask['key']
+            version_update={'update':{'versions':[{'add':{'name' : self.config['jira_project_version']}}]}}
+            self.call_api(remoteurl_url, method=self.URLRequest.PUT, args=version_update)
+
         return JIRATask(task['id'],
                         jtask['key'],
                         jtask['fields']['priority']['name'],
