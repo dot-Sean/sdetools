@@ -4,6 +4,9 @@ import sys
 import sdetools
 from sdetools.sdelib import commons
 from sdetools.sdelib import mod_mgr
+from sdetools.sdelib import log_mgr
+
+log_mgr.setup_root_logger()
 
 def main(argv):
     if len(argv) < 2:

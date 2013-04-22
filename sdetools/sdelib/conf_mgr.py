@@ -304,3 +304,8 @@ class Config(object):
             protocol, val = proxy.split('://')
             proxy = '%s://%s@%s' % (protocol, self['proxy_auth'], val)
             os.environ['%s_proxy' % ptype] = proxy
+
+    def process_boolean_config(self, key):
+        if self[key] in [True, False]:
+            return
+        self[key] = (str(self[key]).lower() == 'true')

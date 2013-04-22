@@ -29,8 +29,6 @@ class JIRAConnector(AlmConnector):
         """ Initializes connection to JIRA """
         super(JIRAConnector, self).__init__(config, alm_plugin)
 
-        config.add_custom_option('alm_standard_workflow', 'Standard workflow in JIRA?',
-                default='True')
         config.add_custom_option('jira_issue_type', 'IDs for issues raised in JIRA',
                 default='Bug')
         config.add_custom_option('jira_close_transition', 'Close transition in JIRA',
@@ -54,8 +52,6 @@ class JIRAConnector(AlmConnector):
 
         self.config['jira_done_statuses'] = (self.config['jira_done_statuses'].split(','))
 
-        if not self.config['alm_standard_workflow']:
-            raise AlmException('Missing alm_standard_workflow in configuration')
         if not self.config['jira_issue_type']:
             raise AlmException('Missing jira_issue_type in configuration')
         if not self.config['jira_close_transition']:
@@ -120,7 +116,7 @@ class JIRAConnector(AlmConnector):
         new_issue = self.alm_plugin.add_task(task, self.jira_issue_type_id)
         logger.info('Create new task in JIRA: %s' % new_issue['key'])
 
-        if (self.config['alm_standard_workflow'] == 'True' and
+        if (self.config['alm_standard_workflow'] and
             (task['status'] == 'DONE' or task['status'] == 'NA')):
             alm_task = self.alm_get_task(task)
             self.alm_update_task_status(alm_task, task['status'])
@@ -129,8 +125,7 @@ class JIRAConnector(AlmConnector):
         return 'Issue %s' % new_issue['key']
 
     def alm_update_task_status(self, task, status):
-        if (not task or
-            not self.config['alm_standard_workflow'] == 'True'):
+        if not task or not self.config['alm_standard_workflow']:
             return
 
         alm_id = task.get_alm_id()
