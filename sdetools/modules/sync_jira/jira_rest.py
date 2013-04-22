@@ -7,6 +7,8 @@ class JIRARestAPI(RESTBase):
 
     def __init__(self, config):
         super(JIRARestAPI, self).__init__('alm', 'JIRA', config, 'rest/api/2')
+        self.versions = None
+
 
     def connect(self):
         """ Verifies that JIRA connection works """
@@ -16,9 +18,9 @@ class JIRARestAPI(RESTBase):
         except APIError:
             raise AlmException('Unable to connect to JIRA. Check server URL, ID, password')
 
-        #verify that we can access project
+        #verify that we can access project by retrieving its versions
         try:
-            self.call_api('project/%s' % (self.urlencode_str(self.config['alm_project'])))
+            self.versions = self.call_api('project/%s/versions' % (self.urlencode_str(self.config['alm_project'])))
         except APIError:
             raise AlmException('Unable to connect to JIRA project %s' % self.config['alm_project'])
 
@@ -61,6 +63,13 @@ class JIRARestAPI(RESTBase):
                         self.config['jira_done_statuses'],
                         task_versions)
 
+    def get_version(self, version_name):
+        if self.versions:
+            for v in self.versions:
+                if v['name']==version_name:
+                    return v
+        return None
+        
     def assign_version(self, task, project_version):
     
         if not project_version:
@@ -69,6 +78,11 @@ class JIRARestAPI(RESTBase):
         if project_version in task.versions:
             return False
 
+        # validate that the project version exists
+        jira_version = self.get_version(project_version)
+        if not jira_version:
+            raise AlmException("Version %s could not be found in JIRA. Check your sync settings or add the version to JIRA" % project_version)
+       
         # REST allows us to add versions ad hoc
         try:
             remoteurl_url = 'issue/%s' % task.get_alm_id()
