@@ -77,8 +77,6 @@ class MingleConnector(AlmConnector):
         """ Initializes connection to Mingle """
         super(MingleConnector, self).__init__(config, alm_plugin)
 
-        config.add_custom_option('alm_standard_workflow', 'Standard workflow in Mingle?',
-            default='True')
         config.add_custom_option('mingle_card_type', 'IDs for issues raised in Mingle',
             default='Story')
         config.add_custom_option('mingle_new_status', 'Status to set for new tasks in Mingle',
@@ -97,8 +95,6 @@ class MingleConnector(AlmConnector):
         self.sde_plugin.config['mingle_done_statuses'] =  (
                 self.sde_plugin.config['mingle_done_statuses'].split(','))
 
-        if not self.sde_plugin.config['alm_standard_workflow']:
-            raise AlmException('Missing alm_standard_workflow in configuration')
         if not self.sde_plugin.config['mingle_card_type']:
             raise AlmException('Missing mingle_card_type in configuration')
         if not self.sde_plugin.config['mingle_new_status']:
@@ -183,7 +179,7 @@ class MingleConnector(AlmConnector):
             raise AlmException('Alm task not added sucessfully. Please '
                                'check ALM-specific settings in config file')
 
-        if (self.sde_plugin.config['alm_standard_workflow']=='True' and
+        if (self.sde_plugin.config['alm_standard_workflow'] and
                 (task['status']=='DONE' or task['status']=='NA')):
             self.alm_update_task_status(alm_task, task['status'])
         return 'Project: %s, Card: %s' % (self.sde_plugin.config['alm_project'],
@@ -191,7 +187,7 @@ class MingleConnector(AlmConnector):
 
 
     def alm_update_task_status(self, task, status):
-        if not task or not self.sde_plugin.config['alm_standard_workflow'] == 'True':
+        if not task or not self.sde_plugin.config['alm_standard_workflow']:
             logger.debug('Status synchronization disabled')
             return
 

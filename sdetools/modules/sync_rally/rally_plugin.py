@@ -96,8 +96,6 @@ class RallyConnector(AlmConnector):
         super(RallyConnector, self).__init__(config, alm_plugin)
 
         """ Adds Rally specific config options to the config file"""
-        config.add_custom_option('alm_standard_workflow', 'Standard workflow in Rally?',
-            default='True')
         config.add_custom_option('rally_card_type', 'IDs for issues raised in Rally',
             default='Story')
         config.add_custom_option('rally_new_status', 'status to set for new tasks in Rally',
@@ -110,8 +108,7 @@ class RallyConnector(AlmConnector):
         super(RallyConnector, self).initialize()
 
         #Verify that the configuration options are set properly
-        for item in ['rally_done_statuses', 'alm_standard_workflow', 'rally_card_type',
-            'rally_new_status', 'rally_workspace']:
+        for item in ['rally_done_statuses', 'rally_card_type', 'rally_new_status', 'rally_workspace']:
             if not self.sde_plugin.config[item]:
                 raise AlmException('Missing %s in configuration' % item)
 
@@ -242,7 +239,7 @@ class RallyConnector(AlmConnector):
             raise AlmException('Alm task not added sucessfully. Please '
                                'check ALM-specific settings in config file')
 
-        if (self.sde_plugin.config['alm_standard_workflow'] == 'True' and
+        if (self.sde_plugin.config['alm_standard_workflow'] and
             (task['status'] == 'DONE' or task['status'] == 'NA')):
             self.alm_update_task_status(alm_task, task['status'])
 
@@ -252,8 +249,7 @@ class RallyConnector(AlmConnector):
 
     def alm_update_task_status(self, task, status):
 
-        if (not task or
-            not self.sde_plugin.config['alm_standard_workflow'] == 'True'):
+        if not task or not self.sde_plugin.config['alm_standard_workflow']:
             logger.debug('Status synchronization disabled')
             return
 
