@@ -75,34 +75,20 @@ class JIRARestAPI(RESTBase):
                     return v
         return None
         
-    def assign_version(self, task, project_version):
-    
-        if not project_version:
-            return False
-
-        if project_version in task.versions:
-            return False
-
-        # validate that the project version exists
-        jira_version = self.get_version(project_version)
-        if not jira_version:
-            raise AlmException("Version %s could not be found in JIRA. Check your sync settings or add the version to JIRA" % project_version)
+    def set_version(self, task, version):
        
         # REST allows us to add versions ad hoc
         try:
             remoteurl_url = 'issue/%s' % task.get_alm_id()
-            version_update={'update':{'versions':[{'add':{'name' : project_version}}]}}
+            version_update = {'update':{'versions':[{'add':{'name':version}}]}}
             self.call_api(remoteurl_url, method=self.URLRequest.PUT, args=version_update)
         except APIError:
-            raise AlmException('Unable to update issue %s with new version %s' % (task.get_alm_id(), project_version))
-
-        return True            
+            raise AlmException('Unable to update issue %s with new version %s' % (task.get_alm_id(), version))
 
     def add_task(self, task, issue_type_id):
- 
         affected_versions = []
-        if self.config['jira_project_version']:
-            affected_versions.append({'name':self.config['jira_project_version']})
+        if self.config['alm_project_version']:
+            affected_versions.append({'name':self.config['alm_project_version']})
 
         #Add task
         args = {

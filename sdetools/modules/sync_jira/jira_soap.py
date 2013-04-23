@@ -131,16 +131,9 @@ class JIRASoapAPI:
                         self.config['jira_done_statuses'],
                         task_versions)
 
-    def assign_version(self, task, project_version):
-    
-        if not project_version:
-            return False
-
+    def set_version(self, task, version):
         # For SOAP, we must assign all versions (including the new one) to the task
-        if project_version in task.versions:
-            return False
-        else:
-            task.versions.append(project_version)
+        task.versions.append(version)
 
         affected_versions = []
         for version_name in task.versions:
@@ -148,13 +141,14 @@ class JIRASoapAPI:
             if jira_version:
                 affected_versions.append(jira_version['id'])
             else:
-                raise AlmException("Version %s could not be found in JIRA. Check your sync settings or add the version to JIRA" % version_name)
+                raise AlmException("Version %s could not be found in JIRA. '\
+                        'Check your sync settings or add the version to JIRA" % version_name)
 
         try:
             update = [{'id':'versions', 'values':affected_versions}]
             self.proxy.updateIssue(self.auth, task.get_alm_id(), update)
         except (SOAPpy.Types.faultType, AlmException), err:
-            raise AlmException('Unable to update issue %s with new version %s' % (task.get_alm_id(), project_version ))        
+            raise AlmException('Unable to update issue %s with new version %s' % (task.get_alm_id(), version))
     
         return True
 
@@ -170,8 +164,8 @@ class JIRASoapAPI:
 
         updates = []
         updates.append({'id':'labels', 'values':['SD-Elements']})
-        if self.config['jira_project_version']:
-            version = self.get_version(self.config['jira_project_version'])
+        if self.config['alm_project_version']:
+            version = self.get_version(self.config['alm_project_version'])
             if version:
                 updates.append({'id':'versions', 'values':[version['id']]})
         args = {

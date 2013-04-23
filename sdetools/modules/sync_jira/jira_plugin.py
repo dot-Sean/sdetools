@@ -37,7 +37,7 @@ class JIRAConnector(AlmConnector):
                 default='Reopen Issue')
         config.add_custom_option('jira_done_statuses', 'Statuses that signify a task is Done in JIRA',
                 default='Resolved,Closed')
-        config.add_custom_option('jira_project_version', 'Project version',
+        config.add_custom_option('alm_project_version', 'Project version',
                 default='')
         config.add_custom_option('alm_priority_map', 'Customized map from priority in SDE to JIRA',
                 default='')
@@ -102,10 +102,10 @@ class JIRAConnector(AlmConnector):
         task = self.alm_plugin.get_task(task, task_id)
         if task:
             # Assign a project version
-            if self.config['jira_project_version'] and not (self.config['jira_project_version'] in task.versions):
+            if self.config['alm_project_version'] and not (self.config['alm_project_version'] in task.versions):
                 # new version needed, re-open it and add it
                 self.alm_update_task_status(task, "TODO")
-                self.alm_plugin.assign_version(task, self.config['jira_project_version'])
+                self.alm_plugin.set_version(task, self.config['alm_project_version'])
             
         return task
 
@@ -150,6 +150,23 @@ class JIRAConnector(AlmConnector):
         self.alm_plugin.update_task_status(alm_id, trans_id)
 
         logger.info('Updated task status in JIRA for task %s' % alm_id)
+
+    def alm_set_version(self, task, version):
+        if not version:
+            return False
+
+        if version in task.versions:
+            return False
+
+        # validate that the project version exists
+        jira_version = self.get_version(version)
+        if not jira_version:
+            raise AlmException("Version %s could not be found in JIRA. '\
+                    'Check your sync settings or add the version to JIRA" % version)
+
+        self.alm_plugin.set_version(task, version)
+
+        return True
 
     def alm_disconnect(self):
         pass
