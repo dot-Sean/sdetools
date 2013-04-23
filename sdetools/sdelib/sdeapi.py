@@ -39,7 +39,7 @@ class ExtAPI(restclient.RESTBase):
             #In 'basic' mode, we make an extra call just to verify that credentials are correct
             result = self.get_applications()
         self.connected = True
-        return result
+        return not not result
 
     def get_applications(self, **filters):
         """
