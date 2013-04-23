@@ -18,7 +18,10 @@ class Info(object):
         self.items = items
 
     def __str__(self):
-        return '%s: %s' % (self.ev_type.title(), self.msg)
+        ev_type = self.ev_type
+        if ev_type == 'close':
+            ev_type = 'done'
+        return '%s: %s' % (ev_type.title(), self.msg)
 
 class EmitShortCut:
     def __init__(self, ret_chn):
@@ -53,7 +56,7 @@ class ReturnChannel:
         kwargs.update(self.queued_objs)
         self.queued_objs = {}
         info = self.info_container(*args, **kwargs)
-        logger.debug('Emitting Msg: %s' % str(info))
+        logger.debug('Emitting Msg: "%s"' % str(info))
         self.emit_obj(info)
 
     def queue(self, **kwargs):
