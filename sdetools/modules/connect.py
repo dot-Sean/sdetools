@@ -11,7 +11,7 @@ def has_method(obj, name):
     return name in v and inspect.isroutine(v[name])
 
 class Command(BaseCommand):
-    help = 'Call SD Elements API'
+    help = 'Tests connectivity to SD Elements'
 
     def configure(self):
         self.api = sdeapi.APIBase(self.config)
