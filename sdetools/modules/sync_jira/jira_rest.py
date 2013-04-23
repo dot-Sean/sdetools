@@ -50,9 +50,9 @@ class JIRARestAPI(RESTBase):
         #We will use the first result from the query
         jtask = result['issues'][0]
 
-        resolution = None
-        if jtask['fields']['resolution']:
-            resolution = jtask['fields']['resolution']['name']
+        task_resolution = None
+        if 'resolution' in jtask['fields'] and jtask['fields']['resolution']:
+            task_resolution = jtask['fields']['resolution']['name']
 
         task_versions = []
         if jtask['fields']['versions']:
@@ -63,7 +63,7 @@ class JIRARestAPI(RESTBase):
                         jtask['key'],
                         jtask['fields']['priority']['name'],
                         jtask['fields']['status']['name'],
-                        resolution,
+                        task_resolution,
                         jtask['fields']['updated'],
                         self.config['jira_done_statuses'],
                         task_versions)

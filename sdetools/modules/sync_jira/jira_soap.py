@@ -105,7 +105,7 @@ class JIRASoapAPI:
         task_priority = None
         task_versions = []
 
-        if jtask['resolution']:
+        if 'resolution' in jtask and jtask['resolution']:
             task_resolution = jtask['resolution']
         if jtask['status']:
             for status in self.statuses:

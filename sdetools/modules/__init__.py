@@ -9,4 +9,5 @@ __all__ = [
     'api_proxy',
     'list_projects',
     'sync_trac',
+    'connect',
 ]
