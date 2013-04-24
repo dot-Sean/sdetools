@@ -132,10 +132,6 @@ def run_command(cmd_name, args, call_src, call_options={},
 
         ret_status = cmd_inst.parse_args()
 
-        if not ret_status:
-            config.ret_chn.close(status=False)
-            return False
-
         cmd_inst.args = config.args
         cmd_inst.process_args()
 
