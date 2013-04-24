@@ -36,6 +36,10 @@ class Proxy:
 
     def __init__(self, wsdlsource, config=Config, **kw ):
 
+        if 'opener' in kw:
+            opener = kw.pop('opener')
+        else:
+            opener = urllib.URLopener(key_file=config.SSL.key_file, cert_file=config.SSL.cert_file)
         reader = wstools.WSDLTools.WSDLReader()
         self.wsdl = None
 
@@ -45,7 +49,7 @@ class Proxy:
             try:
                 self.wsdl = reader.loadFromStream(wsdlsource)
             except xml.parsers.expat.ExpatError, e:
-                newstream = urllib.URLopener(key_file=config.SSL.key_file, cert_file=config.SSL.cert_file).open(wsdlsource)
+                newstream = opener.open(wsdlsource)
                 buf = newstream.readlines()
                 raise Error, "Unable to parse WSDL file at %s: \n\t%s" % \
                       (wsdlsource, "\t".join(buf))
@@ -71,7 +75,7 @@ class Proxy:
             
         if self.wsdl is None:
             try:
-                stream = urllib.URLopener(key_file=config.SSL.key_file, cert_file=config.SSL.cert_file).open(wsdlsource)
+                stream = opener.open(wsdlsource)
                 self.wsdl = reader.loadFromStream(stream, wsdlsource)
             except (IOError, OSError): pass
             except xml.parsers.expat.ExpatError, e:
