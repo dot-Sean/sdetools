@@ -79,12 +79,6 @@ class JIRASoapAPI:
         self.priorities = self.proxy.getPriorities(self.auth)
         self.versions = self.proxy.getVersions(self.auth, self.config['alm_project'])
 
-    def get_version(self, version_name):
-        for v in self.versions:
-            if v['name']==version_name:
-                return v
-        return None
- 
     def get_issue_types(self):
         try:
             return self.proxy.getIssueTypes(self.auth)
@@ -137,10 +131,13 @@ class JIRASoapAPI:
                         self.config['jira_done_statuses'],
                         task_versions)
 
-    def set_version(self, task, version):
-        # For SOAP, we must assign all versions (including the new one) to the task
-        task.versions.append(version)
+    def get_version(self, version_name):
+        for v in self.versions:
+            if v['name']==version_name:
+                return v
+        return None
 
+    def get_affected_versions(self, task):
         affected_versions = []
         for version_name in task.versions:
             jira_version = self.get_version(version_name)
@@ -149,16 +146,18 @@ class JIRASoapAPI:
             else:
                 raise AlmException("Version %s could not be found in JIRA. '\
                         'Check your sync settings or add the version to JIRA" % version_name)
+        return affected_versions
 
+    def set_version(self, task, project_version):
+        update = [{'id':'versions', 'values':self.get_affected_versions(task)}]
         try:
-            update = [{'id':'versions', 'values':affected_versions}]
             self.proxy.updateIssue(self.auth, task.get_alm_id(), update)
         except (SOAPpy.Types.faultType, AlmException), err:
-            raise AlmException('Unable to update issue %s with new version %s' % (task.get_alm_id(), version))
+            raise AlmException('Unable to update issue %s with new version %s' % (task.get_alm_id(), project_version))
     
         return True
 
-    def add_task(self, task, issue_type_id):
+    def add_task(self, task, issue_type_id, project_version):
         #Add task
         selected_priority = None
         for priority in self.priorities:
@@ -170,10 +169,8 @@ class JIRASoapAPI:
 
         updates = []
         updates.append({'id':'labels', 'values':['SD-Elements']})
-        if self.config['alm_project_version']:
-            version = self.get_version(self.config['alm_project_version'])
-            if version:
-                updates.append({'id':'versions', 'values':[version['id']]})
+        if project_version:
+            updates.append({'id':'versions', 'values':[project_version['id']]})
         args = {
             'project': self.config['alm_project'],
             'summary': task['title'],

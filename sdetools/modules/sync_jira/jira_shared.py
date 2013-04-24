@@ -34,3 +34,4 @@ class JIRATask(AlmTask):
         """ Returns a datetime object """
         return datetime.strptime(self.timestamp.split('.')[0],
                                  '%Y-%m-%dT%H:%M:%S')
+
