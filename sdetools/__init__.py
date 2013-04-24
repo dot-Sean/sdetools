@@ -6,7 +6,7 @@ __all__ = [
     'extlib',
 ]
 
-VERSION = '3.3.1'
+VERSION = '3.3.2'
 
 from sdetools.sdelib import mod_mgr
 
@@ -32,7 +32,7 @@ def set_api_connector(api_module):
 
     sdeapi.APIBase = api_module
 
-def call(cmd_name, options, args, call_back=mod_mgr.stdout_callback, call_back_args={}):
+def call(cmd_name, options, args=(), call_back=mod_mgr.stdout_callback, call_back_args={}):
     exit_stat = mod_mgr.run_command(cmd_name, args, 'import', call_options=options, 
             call_back=call_back, call_back_args=call_back_args)
 
