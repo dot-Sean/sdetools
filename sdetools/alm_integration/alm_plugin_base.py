@@ -105,6 +105,10 @@ class AlmConnector(object):
                 default='False')
         self.config.add_custom_option('alm_standard_workflow', 'Standard workflow in ALM?',
                 default='True')
+        self.config.add_custom_option('alm_custom_fields', 
+                'Customized fields to include when creating a task in ALM '
+                '(JSON encoded dictionary of strings)',
+                default='')
 
     def initialize(self):
         """
@@ -160,6 +164,7 @@ class AlmConnector(object):
         self.config.process_boolean_config('how_tos_in_scope')
         self.config.process_boolean_config('test_alm_connection')
         self.config.process_boolean_config('alm_standard_workflow')
+        self.config.process_json_str_dict('alm_custom_fields')
 
         logger.info('*** AlmConnector initialized ***')
 

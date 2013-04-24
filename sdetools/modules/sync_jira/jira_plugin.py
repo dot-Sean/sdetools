@@ -4,7 +4,6 @@
 import re
 from datetime import datetime
 
-from sdetools.sdelib.commons import json
 from sdetools.alm_integration.alm_plugin_base import AlmConnector, AlmException
 from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
 from sdetools.modules.sync_jira.jira_markdown import convert_markdown
@@ -37,7 +36,8 @@ class JIRAConnector(AlmConnector):
                 default='Reopen Issue')
         config.add_custom_option('jira_done_statuses', 'Statuses that signify a task is Done in JIRA',
                 default='Resolved,Closed')
-        config.add_custom_option('alm_priority_map', 'Customized map from priority in SDE to JIRA',
+        config.add_custom_option('alm_priority_map', 'Customized map from priority in SDE to JIRA '
+                '(JSON encoded dictionary of strings)',
                 default='')
 
     def initialize(self):
@@ -57,24 +57,13 @@ class JIRAConnector(AlmConnector):
         if not self.config['jira_reopen_transition']:
             raise AlmException('Missing jira_reopen_transition in configuration')
 
-        try:
-            if not self.config['alm_priority_map']:
-                self.config['alm_priority_map'] = JIRA_DEFAULT_PRIORITY_MAP
-            if isinstance(self.config['alm_priority_map'], basestring):
-                self.config['alm_priority_map'] = json.loads(self.config['alm_priority_map'])
-            if type(self.config['alm_priority_map']) is not dict:
-                raise TypeError('Not a dict: %s' % self.config['alm_priority_map'])
-            for key in self.config['alm_priority_map']:
-                if not isinstance(key, basestring):
-                    raise TypeError('Invalid range key: %s' % repr(key))
-                if not RE_MAP_RANGE_KEY.match(key):
-                    raise TypeError('Invalid range key: %s' % key)
-                val = self.config['alm_priority_map'][key]
-                if not isinstance(val, basestring):
-                    raise TypeError('Invalid value: %s' % repr(val))
-        except Exception, err:
-            raise AlmException('Unable to process alm_priority_map (not a JSON dictionary). Reason: %s' % str(err))
-            
+        self.config.process_json_str_dict('alm_priority_map')
+        if not self.config['alm_priority_map']:
+            self.config['alm_priority_map'] = JIRA_DEFAULT_PRIORITY_MAP
+        for key in self.config['alm_priority_map']:
+            if not RE_MAP_RANGE_KEY.match(key):
+                raise AlmException('Unable to process alm_priority_map (not a JSON dictionary). '
+                        'Reason: Invalid range key %s' % key)
 
         self.transition_id = {
             'close': None,
