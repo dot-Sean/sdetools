@@ -3,7 +3,7 @@ import urllib2
 import base64
 
 from commons import json, Error, UsageError
-from sdetools.extlib import sslcert_compat
+from sdetools.extlib import http_req
 
 import logging
 logger = logging.getLogger(__name__)
@@ -99,18 +99,20 @@ class RESTBase(object):
         return urllib.urlencode({'a':instr})[2:]
 
     def post_conf_init(self):
-        self.server = self._get_conf('server') 
-        self.base_uri = '%s://%s/%s' % (self._get_conf('method'), self.server, self.base_path)
-        self.session_info = None
 
         urllib_debuglevel = 0
         if __name__ in self.config['debug_mods']:
             urllib_debuglevel = 1
 
-        handler = sslcert_compat.get_http_handler(
-            self._get_conf('method'), 
+        self.opener = http_req.get_opener(
+            self._get_conf('method'),
+            self._get_conf('server'),
             debuglevel=urllib_debuglevel)
-        self.opener = urllib2.build_opener(handler)
+        self.config['%s_server' % (self.conf_prefix)] = self.opener.server
+
+        self.session_info = None
+        self.server = self._get_conf('server') 
+        self.base_uri = '%s://%s/%s' % (self._get_conf('method'), self.server, self.base_path)
 
     def encode_post_args(self, args):
         return json.dumps(args)
@@ -192,7 +194,7 @@ class RESTBase(object):
         call_success = True
         try:
             handle = self.opener.open(req)
-        except sslcert_compat.InvalidCertificateException, err:
+        except http_req.InvalidCertificateException, err:
             raise ServerError('Unable to verify SSL certificate for host: %s' % (self.server))
         except urllib2.URLError, err:
             handle = err

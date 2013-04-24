@@ -18,7 +18,7 @@ JIRA_DEFAULT_PRIORITY_MAP = {
     '7-9': 'Critical',
     '5-6': 'Major',
     '3-4': 'Minor',
-    '1-3': 'Trivial',
+    '1-2': 'Trivial',
     }
 
 class JIRAConnector(AlmConnector):
@@ -32,10 +32,12 @@ class JIRAConnector(AlmConnector):
                 default='Bug')
         config.add_custom_option('jira_close_transition', 'Close transition in JIRA',
                 default='Close Issue')
-        config.add_custom_option('jira_reopen_transition', 'Re-open transiiton in JIRA',
+        config.add_custom_option('jira_reopen_transition', 'Re-open transition in JIRA',
                 default='Reopen Issue')
         config.add_custom_option('jira_done_statuses', 'Statuses that signify a task is Done in JIRA',
                 default='Resolved,Closed')
+        config.add_custom_option('alm_project_version', 'Project version',
+                default='')
         config.add_custom_option('alm_priority_map', 'Customized map from priority in SDE to JIRA '
                 '(JSON encoded dictionary of strings)',
                 default='')
@@ -83,16 +85,28 @@ class JIRAConnector(AlmConnector):
         if self.jira_issue_type_id is None:
             raise AlmException('Issue type %s not available' % self.config['jira_issue_type'])
 
+        self.project_version = self.alm_get_version(self.config['alm_project_version'])
+        if self.config['alm_project_version'] and not self.project_version:
+            raise AlmException('Version %s not found in the project' % (self.config['alm_project_version']))
+
     def alm_get_task(self, task):
         task_id = task['title'].partition(':')[0]
 
-        return self.alm_plugin.get_task(task, task_id)
+        task = self.alm_plugin.get_task(task, task_id)
+        if task:
+            # Assign a project version
+            if self.config['alm_project_version'] and not (self.config['alm_project_version'] in task.versions):
+                # new version needed, re-open it and add it
+                self.alm_update_task_status(task, "TODO")
+                self.alm_set_version(task, self.config['alm_project_version'])
+            
+        return task
 
     def alm_add_task(self, task):
         task['formatted_content'] = self.sde_get_task_content(task)
         task['alm_priority'] = self.translate_priority(task['priority'])
 
-        new_issue = self.alm_plugin.add_task(task, self.jira_issue_type_id)
+        new_issue = self.alm_plugin.add_task(task, self.jira_issue_type_id, self.project_version)
         logger.info('Create new task in JIRA: %s' % new_issue['key'])
 
         if (self.config['alm_standard_workflow'] and
@@ -106,8 +120,13 @@ class JIRAConnector(AlmConnector):
     def alm_update_task_status(self, task, status):
         if not task or not self.config['alm_standard_workflow']:
             return
-        
+
         alm_id = task.get_alm_id()
+
+        # This is an unexpected situation
+        if (task.get_status() == status):
+            logger.debug('Status update in JIRA not required for issue %s' % alm_id)
+            return
 
         trans_table = self.alm_plugin.get_available_transitions(alm_id)
 
@@ -124,6 +143,32 @@ class JIRAConnector(AlmConnector):
         self.alm_plugin.update_task_status(alm_id, trans_id)
 
         logger.info('Updated task status in JIRA for task %s' % alm_id)
+
+    def alm_get_version(self, version_name):
+        for v in self.alm_plugin.versions:
+            if v['name']==version_name:
+                return v
+        return None
+ 
+    def alm_set_version(self, task, version):
+        if not version:
+            return False
+
+        if version in task.versions:
+            return False
+
+        # validate that the project version exists
+        jira_version = self.alm_get_version(version)
+        if not jira_version:
+            raise AlmException("Version %s could not be found in JIRA. '\
+                    'Check your sync settings or add the version to JIRA" % version)
+
+        # For SOAP, we must assign all versions (including the new one) to the task
+        task.versions.append(version)
+
+        self.alm_plugin.set_version(task, version)
+
+        return True
 
     def alm_disconnect(self):
         pass

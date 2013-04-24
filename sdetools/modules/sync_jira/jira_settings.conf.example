@@ -90,6 +90,12 @@ conflict_policy = alm
 #the ranges are inclusive
 #alm_priority_map = {"1-6":"Trivial", "7-9":"Major", "10":"Blocker"}
 
+#[Optional] ALM Project Version
+#This is the target project version we want to sync the tickets to
+#If there is a matching ticket in prior versions, we will reopen
+#and set the version to this. Otherwise, we'll create a new ticket.
+#project_version = NewRelease
+
 ###################################################
 #### Advanced JIRA Settings                   #####
 ###################################################
