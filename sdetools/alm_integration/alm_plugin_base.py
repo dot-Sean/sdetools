@@ -457,5 +457,5 @@ class AlmConnector(object):
 
         except AlmException, err:
             self.alm_disconnect()
-            raise err
+            raise 
 
