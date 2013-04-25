@@ -23,7 +23,7 @@ class AlmException(Error):
         self.value = value
 
     def __str__(self):
-        return repr(self.value)
+        return str(self.value)
 
 class AlmTask(object):
     """
