@@ -109,11 +109,11 @@ class RallyConnector(AlmConnector):
 
         #Verify that the configuration options are set properly
         for item in ['rally_done_statuses', 'rally_card_type', 'rally_new_status', 'rally_workspace']:
-            if not self.sde_plugin.config[item]:
+            if not self.config[item]:
                 raise AlmException('Missing %s in configuration' % item)
 
-        self.sde_plugin.config['rally_done_statuses'] = (
-                self.sde_plugin.config['rally_done_statuses'].split(','))
+        self.config['rally_done_statuses'] = (
+                self.config['rally_done_statuses'].split(','))
 
         self.project_ref = None
         self.workspace_ref = None
@@ -131,49 +131,35 @@ class RallyConnector(AlmConnector):
         #Check to make sure that we can do a simple API call
         try:
             self.alm_plugin.call_api('task.js')
-        except APIError:
-            raise AlmException('Unable to connect to Rally. Please check '
-                               'server URL, ID, password, workspace and project')
+        except APIError, err:
+            raise AlmException('Unable to connect to Rally service (Check server URL, '
+                    'user, pass). Reason: %s' % str(err))
 
         #Now try to get workspace ID
-        try:
-            subscription_ref = self.alm_plugin.call_api('subscription.js')
-            for workspace in subscription_ref['Subscription']['Workspaces']:
-                if workspace['_refObjectName'] == self.sde_plugin.config['rally_workspace']:
-                    workspace_ref = workspace['_ref']
-                    break
+        subscription_ref = self.alm_plugin.call_api('subscription.js')
+        for workspace in subscription_ref['Subscription']['Workspaces']:
+            if workspace['_refObjectName'] == self.config['rally_workspace']:
+                workspace_ref = workspace['_ref']
+                break
 
-            if not workspace_ref:
-                raise AlmException('Workspace is not valid, please check '
-                                   'config value: '
-                                   '%s' % self.sde_plugin.config['rally_workspace'])
-            self.workspace_ref = workspace_ref
+        if not workspace_ref:
+            raise AlmException('Workspace is not valid, please check config value: '
+                    '%s' % self.config['rally_workspace'])
+        self.workspace_ref = workspace_ref
 
-        except APIError:
-            raise AlmException('Unable to connect to Rally. Please check '
-                               'server URL, ID, password and project')
 
         #Now get project ID
-        try:
-            query_args = {
-                'query': '(Name = \"%s\")' % self.sde_plugin.config['alm_project'],
-                'workspace': self.workspace_ref,
-            }
-            project_ref = self.alm_plugin.call_api('project.js',
-                                                    args = query_args)
-            num_results = project_ref['QueryResult']['TotalResultCount']
-            if not num_results:
-                raise AlmException('Rally project is not valid, please check '
-                                   'config value: %s' %
-                                   self.sde_plugin.config['alm_project'])
-            project_ref = project_ref['QueryResult']['Results'][0]['_ref']
-            self.project_ref = project_ref
-
-        except APIError:
-            raise AlmException('Unable to connect to Rally. Please '
-                               'check server URL, ID, password and project')
-
-
+        query_args = {
+            'query': '(Name = \"%s\")' % self.config['alm_project'],
+            'workspace': self.workspace_ref,
+        }
+        project_ref = self.alm_plugin.call_api('project.js',
+                                                args = query_args)
+        num_results = project_ref['QueryResult']['TotalResultCount']
+        if not num_results:
+            raise AlmException('Rally project not found: %s' % self.config['alm_project'])
+        project_ref = project_ref['QueryResult']['Results'][0]['_ref']
+        self.project_ref = project_ref
 
     def alm_get_task(self, task):
         task_id = task['title']
@@ -188,28 +174,27 @@ class RallyConnector(AlmConnector):
             result = self.alm_plugin.call_api('hierarchicalrequirement.js',
                                                args = query_args)
         except APIError, err:
-            logger.info('Error is %s:', err)
-            raise AlmException('Unable to get task %s from Rally' % task_id)
+            raise AlmException('Unable to get task %s from Rally. '
+                    'Reason: %s' % (task_id, str(err)))
         num_results = result['QueryResult']['TotalResultCount']
 
         if not num_results:
             return None
 
+        task_result_url =  result['QueryResult']['Results'][0]['_ref']
+        task_result_url = task_result_url.split('/%s/' % API_VERSION)[1]
         try:
-            task_result_url =  result['QueryResult']['Results'][0]['_ref']
-            task_result_url = task_result_url.split('/%s/' % API_VERSION)[1]
             task_data = self.alm_plugin.call_api(task_result_url)
-            task_data = task_data['HierarchicalRequirement']
-            return RallyTask(task_id,
-                             task_data['FormattedID'],
-                             task_data['_ref'].split('/%s/' % API_VERSION)[1],
-                             task_data['ScheduleState'],
-                             task_data['LastUpdateDate'],
-                             self.sde_plugin.config['rally_done_statuses'])
-        except Exception, err:
-            logger.info('Error is %s:', err)
-            raise AlmException('Unable to get card # for task '
-                               '%s from Rally' % task_id)
+        except APIError, err:
+            raise AlmException('Unable to get card # for task %s from Rally. '
+                    'Reason: %s' % (task_id, str(err)))
+        task_data = task_data['HierarchicalRequirement']
+        return RallyTask(task_id,
+                         task_data['FormattedID'],
+                         task_data['_ref'].split('/%s/' % API_VERSION)[1],
+                         task_data['ScheduleState'],
+                         task_data['LastUpdateDate'],
+                         self.config['rally_done_statuses'])
 
     def alm_add_task(self, task):
         try:
@@ -223,7 +208,6 @@ class RallyConnector(AlmConnector):
             }
             rsp = self.alm_plugin.call_api('hierarchicalrequirement/create.js',
                     method = self.alm_plugin.URLRequest.POST, args = create_args)
-            logger.info('Response was %s', rsp)
             logger.debug('Task %s added to Rally Project', task['id'])
 
         except APIError, err:
@@ -238,17 +222,17 @@ class RallyConnector(AlmConnector):
             raise AlmException('Alm task not added sucessfully. Please '
                                'check ALM-specific settings in config file')
 
-        if (self.sde_plugin.config['alm_standard_workflow'] and
+        if (self.config['alm_standard_workflow'] and
             (task['status'] == 'DONE' or task['status'] == 'NA')):
             self.alm_update_task_status(alm_task, task['status'])
 
-        return 'Project: %s, Story: %s' % (self.sde_plugin.config['alm_project'],
+        return 'Project: %s, Story: %s' % (self.config['alm_project'],
                                            alm_task.get_alm_id())
 
 
     def alm_update_task_status(self, task, status):
 
-        if not task or not self.sde_plugin.config['alm_standard_workflow']:
+        if not task or not self.config['alm_standard_workflow']:
             logger.debug('Status synchronization disabled')
             return
 
@@ -257,7 +241,7 @@ class RallyConnector(AlmConnector):
                 trans_args = {
                         'HierarchicalRequirement' : {
                                 'ScheduleState':
-                                        self.sde_plugin.config['rally_done_statuses'][0]
+                                        self.config['rally_done_statuses'][0]
                         }
                 }
                 self.alm_plugin.call_api(task.get_alm_task_ref(),
@@ -273,7 +257,7 @@ class RallyConnector(AlmConnector):
                 trans_args = {
                     'HierarchicalRequirement' : {
                         'ScheduleState': 
-                            self.sde_plugin.config['rally_new_status']
+                            self.config['rally_new_status']
                     }
                 }
                 self.alm_plugin.call_api(task.get_alm_task_ref(),

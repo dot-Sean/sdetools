@@ -24,7 +24,7 @@ class APIHTTPError(APIError):
         self.code = code
 
     def __str__(self):
-        return '%s (Error Code: %s)' % (Error.__str__(self), self.code)
+        return 'HTTP Error %s. Explanation returned: %s' % (self.code, Error.__str__(self).replace('\n', ''))
 
 class APICallError(APIHTTPError):
     pass
@@ -215,7 +215,7 @@ class RESTBase(object):
                 pass
             if handle.code == 401:
                 raise APIAuthError('Invalid Credentials for %s' % self.conf_name)
-            raise APICallError(handle.code, err_msg)
+            raise APICallError(handle.code, err_msg[:255])
 
         result = ''
         while True:
