@@ -1,5 +1,6 @@
 import xml.parsers.expat
 import socket
+import urllib2
 
 from sdetools.extlib import SOAPpy
 from sdetools.extlib import http_req
@@ -51,14 +52,19 @@ class JIRASoapAPI:
         opener = http_req.get_opener(self.config['alm_method'], self.config['alm_server'])
         self.config['alm_server'] = opener.server
 
+        try:
+            stream = opener.open('%s://%s/rpc/soap/jirasoapservice-v2?wsdl' %
+                    (self.config['alm_method'], self.config['alm_server']))
+        except urllib2.URLError, err:
+            raise AlmException('Unable to reach JIRA service (Check URL). Reason: %s' % (err))
+        except http_req.InvalidCertificateException, err:
+            raise AlmException('Unable to verify SSL certificate for host: %s' % (self.config['alm_server']))
+
         # Get a proxy to the server
         try:
-            proxy = SOAPpy.WSDL.Proxy('%s://%s/rpc/soap/jirasoapservice-v2?wsdl' %
-                    (self.config['alm_method'], self.config['alm_server']), config=config, opener=opener)
-        except http_req.InvalidCertificateException, err:
-            raise ServerError('Unable to verify SSL certificate for host: %s' % (self.config['alm_server']))
-        except (SOAPpy.Types.faultType, xml.parsers.expat.ExpatError, socket.error), err:
-            raise AlmException('Unable to connect to JIRA. Please check server URL. Reason: %s' % (err))
+            proxy = SOAPpy.WSDL.Proxy(stream, config=config)
+        except (SOAPpy.Types.faultType, xml.parsers.expat.ExpatError), err:
+            raise AlmException('Error talking to JIRA service. Please check server URL. Reason: %s' % (err))
         self.proxy = SOAPProxyWrap(proxy)
 
         # Attempt to login
