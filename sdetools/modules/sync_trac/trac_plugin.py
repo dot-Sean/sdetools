@@ -123,7 +123,7 @@ class TracConnector(AlmConnector):
             raise AlmException('Unable to connect to Trac server (check the server URL) '
                     'Reason: %s' % (str(err)))
         except (xmlrpclib.ProtocolError, xmlrpclib.Fault), err:
-            raise AlmException('Unable to connect to contact trac XMLRPC. Please verify '
+            raise AlmException('Unable to connect to Trac XML-RPC. Please verify '
                     'the server URL, username, and password. Reason: %s' % (str(err)))
         except Exception, err:
             raise AlmException('Unknown error when attempting to connect '
