@@ -57,7 +57,7 @@ class TracTask(AlmTask):
         return self.milestone
 
     def get_status(self):
-        """ Translates Mingle status into SDE status """
+        """ Translates Trac status into SDE status """
         if self.status in self.done_statuses:
             return 'DONE'
         else:
