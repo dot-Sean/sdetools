@@ -8,6 +8,8 @@ from sdetools.extlib import http_req
 import logging
 logger = logging.getLogger(__name__)
 
+URLRequest = http_req.ExtendedMethodRequest
+
 CONF_OPTS = [
     ['%(prefix)s_user', 'Username for %(name)s Tool', None],
     ['%(prefix)s_pass', 'Password for %(name)s Tool', None],
@@ -46,23 +48,6 @@ class APIFormatError(APIError):
     API return format is not a proper JSON or is missing some needed fields
     """
     pass
-
-class URLRequest(urllib2.Request):
-    GET = 'GET'
-    POST = 'POST'
-    PUT = 'PUT'
-    DELETE = 'DELETE'
-
-    def __init__(self, url, data=None, headers={},
-                 origin_req_host=None, unverifiable=False, method=None):
-        urllib2.Request.__init__(self, url, data, headers, origin_req_host, unverifiable)
-        self.method = method
-
-    def get_method(self):
-        if self.method:
-            return self.method
-
-        return urllib2.Request.get_method(self)
 
 class RESTBase(object):
     URLRequest = URLRequest

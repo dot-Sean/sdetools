@@ -206,14 +206,16 @@ class RallyConnector(AlmConnector):
                     'Project': self.project_ref
                 }
             }
-            rsp = self.alm_plugin.call_api('hierarchicalrequirement/create.js',
+            result = self.alm_plugin.call_api('hierarchicalrequirement/create.js',
                     method = self.alm_plugin.URLRequest.POST, args = create_args)
             logger.debug('Task %s added to Rally Project', task['id'])
 
         except APIError, err:
-            raise AlmException('Please check ALM-specific settings in config '
-                               'file. Unable to add task '
-                               '%s because of %s' % (task['id'], err))
+            raise AlmException('Unable to add task to Rally %s because of %s' % 
+                    (task['id'], err))
+        if result['CreateResult']['Errors']:
+            raise AlmException('Unable to add task to Rally %s. Reason: %s' % 
+                    (task['id'], str(result['CreateResult']['Errors'])[:200]))
 
         #Return a unique identifier to this task in Rally
         logger.info('Getting task %s', task['id'])
