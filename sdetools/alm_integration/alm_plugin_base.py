@@ -87,7 +87,7 @@ class AlmConnector(object):
         self.config.add_custom_option('alm_phases', 'Phases of the ALM',
                 default='requirements,architecture-design,development')
         self.config.add_custom_option('sde_statuses_in_scope', 'SDE statuses that are in scope', 
-                default='DONE,TODO,NA')
+                default='TODO')
         self.config.add_custom_option('sde_min_priority', 'Minimum SDE priority in scope',
                 default='7')
         self.config.add_custom_option('how_tos_in_scope', 'Whether or not HowTos should be included',
@@ -292,7 +292,6 @@ class AlmConnector(object):
         if self.config['selected_tasks']:
             return (tid in self.config['selected_tasks'])
         return (task['phase'] in self.config['alm_phases'] and
-            task['status'] in self.config['sde_statuses_in_scope'] and
             task['priority'] >= self.config['sde_min_priority'])
 
     def sde_update_task_status(self, task, status):
@@ -445,12 +444,14 @@ class AlmConnector(object):
                             updated_system = self.alm_name
                         self.emit.info('Updated status of task %s in %s to %s' % (tid, updated_system, status))
                 else:
-                    #Only exists in SD Elements, add it to ALM
-                    ref = self.alm_add_task(task)
-                    self.emit.info('Added task %s to %s' % (tid, self.alm_name))
-                    note_msg = 'Task synchronized in %s. Reference: %s' % (self.alm_name, ref)
-                    self._add_note(task['id'], note_msg, '', task['status'])
-                    logger.debug(note_msg)
+                    #Only exists in SD Elements, check first if this task should be added to ALM
+                    if task['status'] in self.config['sde_statuses_in_scope']:
+                    
+                        ref = self.alm_add_task(task)
+                        self.emit.info('Added task %s to %s' % (tid, self.alm_name))
+                        note_msg = 'Task synchronized in %s. Reference: %s' % (self.alm_name, ref)
+                        self._add_note(task['id'], note_msg, '', task['status'])
+                        logger.debug(note_msg)
 
             logger.info('Synchronization complete')
             self.alm_disconnect()
