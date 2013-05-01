@@ -101,6 +101,9 @@ class JIRARestAPI(RESTBase):
                'labels':['SD-Elements']
            }
         }
+        if self.config['alm_parent_issue']:
+            args['fields']['parent'] = {'key':self.config['alm_parent_issue']}
+
         try:
             issue = self.call_api('issue', method=self.URLRequest.POST, args=args)
             

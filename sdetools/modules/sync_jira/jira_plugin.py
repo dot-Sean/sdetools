@@ -39,6 +39,8 @@ class JIRAConnector(AlmConnector):
                 default='Resolved,Closed')
         config.add_custom_option('alm_project_version', 'Project version',
                 default='')
+        config.add_custom_option('alm_parent_issue', 'Create sub-tasks under this issue',
+                default='')
         config.add_custom_option('alm_priority_map', 'Customized map from priority in SDE to JIRA',
                 default='')
 
