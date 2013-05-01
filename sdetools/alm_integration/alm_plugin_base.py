@@ -445,8 +445,7 @@ class AlmConnector(object):
                         self.emit.info('Updated status of task %s in %s to %s' % (tid, updated_system, status))
                 else:
                     #Only exists in SD Elements, check first if this task should be added to ALM
-                    if task['status'] in self.config['sde_statuses_in_scope']:
-                    
+                    if task['status'] in self.config['sde_statuses_in_scope']:                    
                         ref = self.alm_add_task(task)
                         self.emit.info('Added task %s to %s' % (tid, self.alm_name))
                         note_msg = 'Task synchronized in %s. Reference: %s' % (self.alm_name, ref)
