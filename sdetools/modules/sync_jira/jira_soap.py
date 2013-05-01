@@ -89,13 +89,13 @@ class JIRASoapAPI:
         try:
             return self.proxy.getIssueTypes(self.auth)
         except SOAPpy.Types.faultType:
-            raise AlmException('Unable to get issuetype from JIRA')
+            raise AlmException('Unable to get issuetypes from JIRA')
 
     def get_subtask_issue_types(self):
         try:
             return self.proxy.getSubTaskIssueTypes(self.auth)
         except SOAPpy.Types.faultType:
-            raise AlmException('Unable to get issuetype from JIRA')
+            raise AlmException('Unable to get subtask issuetypes from JIRA')
 
     def get_task(self, task, task_id):
         try:
