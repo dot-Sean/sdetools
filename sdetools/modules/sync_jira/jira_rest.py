@@ -36,6 +36,9 @@ class JIRARestAPI(RESTBase):
         except APIError:
             raise AlmException('Unable to get issuetype from JIRA API')
 
+    def get_subtask_issue_types(self):
+        return self.get_issue_types()
+
     def get_task(self, task, task_id):
         try:
             url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s\'' % (

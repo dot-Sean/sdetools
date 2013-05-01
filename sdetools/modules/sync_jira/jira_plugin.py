@@ -87,9 +87,12 @@ class JIRAConnector(AlmConnector):
     def alm_connect(self):
         self.alm_plugin.connect()
 
-        #get Issue ID for given type name
-        issue_types = self.alm_plugin.get_issue_types()
-
+        if self.config['alm_parent_issue']:
+            #get Issue ID for given type name
+            issue_types = self.alm_plugin.get_subtask_issue_types()
+        else:
+            issue_types = self.alm_plugin.get_issue_types()
+        
         self.jira_issue_type_id = None
         for issue_type in issue_types:
             if (issue_type['name'] == self.config['jira_issue_type']):
