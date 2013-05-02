@@ -39,12 +39,12 @@ alm_project = JIRAPROJECT
           
 #A comma-delimited list of statuses for tasks
 #that you wish to import into the ALM.
-#For example, if you only want to synchronize
+#For example, if you only want to import
 #tasks that are currently TODO in SD Elements
 #then just enter TODO
 #Valid values are:
 #TODO,DONE,NA
-sde_statuses_in_scope = TODO,DONE,NA
+sde_statuses_in_scope = TODO
 
 #Should HowTos be included in what's added
 #to the ALM tools?
