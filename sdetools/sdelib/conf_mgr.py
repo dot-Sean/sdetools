@@ -230,7 +230,6 @@ class Config(object):
         for key in self.call_options:
             self[key] = self.call_options[key]
         #TODO: Perform validation
-        return True
 
     def parse_shell_args(self, cmd_inst):
         if self.parser is None:
@@ -241,7 +240,7 @@ class Config(object):
         except:
             if (str(sys.exc_info()[1]) == '0'):
                 # This happens when -h is used
-                return False
+                sys.exit(0)
             else:
                 raise UsageError("Invalid options specified.")
 
@@ -291,8 +290,6 @@ class Config(object):
                 # Check for missing mandatory options
                 if type(self[name]) is not str:
                     raise UsageError("Missing value for option '%s'" % (name))
-
-        return True
 
     def fix_proxy_env(self):
         import urllib

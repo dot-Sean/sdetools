@@ -23,7 +23,7 @@ class AlmException(Error):
         self.value = value
 
     def __str__(self):
-        return repr(self.value)
+        return str(self.value)
 
 class AlmTask(object):
     """
@@ -86,14 +86,15 @@ class AlmConnector(object):
         """ Adds ALM config options to the config file"""
         self.config.add_custom_option('alm_phases', 'Phases of the ALM',
                 default='requirements,architecture-design,development')
-        self.config.add_custom_option('sde_statuses_in_scope', 'SDE statuses that are in scope', 
-                default='DONE,TODO,NA')
+        self.config.add_custom_option('sde_statuses_in_scope', 'SDE statuses for adding to ALM '
+                '(comma seperated DONE,TODO,NA)', 
+                default='TODO')
         self.config.add_custom_option('sde_min_priority', 'Minimum SDE priority in scope',
                 default='7')
         self.config.add_custom_option('how_tos_in_scope', 'Whether or not HowTos should be included',
                 default='False')
-        self.config.add_custom_option('selected_tasks', 'Optionally limit the sync to certain tasks'
-                ' (comma seperated, e.g. T12,T13). Note: Overrides other selections.',
+        self.config.add_custom_option('selected_tasks', 'Optionally limit the sync to certain tasks '
+                '(comma seperated, e.g. T12,T13). Note: Overrides other selections.',
                 default='')
         self.config.add_custom_option('alm_project', 'Project in ALM Tool',
                 default=None)
@@ -297,7 +298,6 @@ class AlmConnector(object):
         if self.config['selected_tasks']:
             return (tid in self.config['selected_tasks'])
         return (task['phase'] in self.config['alm_phases'] and
-            task['status'] in self.config['sde_statuses_in_scope'] and
             task['priority'] >= self.config['sde_min_priority'])
 
     def sde_update_task_status(self, task, status):
@@ -450,7 +450,10 @@ class AlmConnector(object):
                             updated_system = self.alm_name
                         self.emit.info('Updated status of task %s in %s to %s' % (tid, updated_system, status))
                 else:
-                    #Only exists in SD Elements, add it to ALM
+                    # Only exists in SD Elements
+                    # Skip if this task should not be added to ALM
+                    if task['status'] not in self.config['sde_statuses_in_scope']:
+                        continue
                     ref = self.alm_add_task(task)
                     self.emit.info('Added task %s to %s' % (tid, self.alm_name))
                     note_msg = 'Task synchronized in %s. Reference: %s' % (self.alm_name, ref)
@@ -462,5 +465,5 @@ class AlmConnector(object):
 
         except AlmException, err:
             self.alm_disconnect()
-            raise err
+            raise 
 

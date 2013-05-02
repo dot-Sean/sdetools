@@ -20,14 +20,15 @@ class JIRARestAPI(RESTBase):
         #verify that we can connect to JIRA
         try:
             result = self.call_api('project')
-        except APIError:
-            raise AlmException('Unable to connect to JIRA. Check server URL, ID, password')
+        except APIError, err:
+            raise AlmException('Unable to connect to JIRA service (Check server URL, '
+                    'user, pass). Reason: %s' % str(err))
 
         #verify that we can access project by retrieving its versions
         try:
             self.versions = self.call_api('project/%s/versions' % (self.urlencode_str(self.config['alm_project'])))
         except APIError:
-            raise AlmException('Unable to connect to JIRA project %s' % self.config['alm_project'])
+            raise AlmException('JIRA project not found: %s' % self.config['alm_project'])
 
     def get_issue_types(self):
         try:
@@ -109,8 +110,8 @@ class JIRARestAPI(RESTBase):
             self.call_api(remoteurl_url, method=self.URLRequest.POST, args=args)
             
             return issue
-        except APIError:
-            raise AlmException('Unable to add issue to JIRA')
+        except APIError, err:
+            raise AlmException('Unable to add issue to JIRA. Reason: %s' % (err))
 
     def get_available_transitions(self, task_id):
         trans_url = 'issue/%s/transitions' % task_id
