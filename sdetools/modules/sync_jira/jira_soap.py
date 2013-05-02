@@ -188,9 +188,9 @@ class JIRASoapAPI:
         try:
             ref = self.proxy.createIssue(self.auth, args)
             self.proxy.updateIssue(self.auth, ref['key'], updates)
-            return ref
-        except (SOAPpy.Types.faultType, AlmException), err:
-            raise AlmException('Unable to add issue to JIRA')
+        except SOAPpy.Types.faultType, err:
+            raise AlmException('Unable to add issue to JIRA. Reason: %s' % (err.faultstring))
+        return ref
 
     def get_available_transitions(self, task_id):
         transitions = self.proxy.getAvailableActions(self.auth, task_id)

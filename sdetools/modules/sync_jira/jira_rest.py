@@ -110,8 +110,8 @@ class JIRARestAPI(RESTBase):
             self.call_api(remoteurl_url, method=self.URLRequest.POST, args=args)
             
             return issue
-        except APIError:
-            raise AlmException('Unable to add issue to JIRA')
+        except APIError, err:
+            raise AlmException('Unable to add issue to JIRA. Reason: %s' % (err))
 
     def get_available_transitions(self, task_id):
         trans_url = 'issue/%s/transitions' % task_id
