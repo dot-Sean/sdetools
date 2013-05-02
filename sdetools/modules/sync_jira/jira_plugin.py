@@ -39,6 +39,8 @@ class JIRAConnector(AlmConnector):
                 default='Resolved,Closed')
         config.add_custom_option('alm_project_version', 'Project version',
                 default='')
+        config.add_custom_option('alm_parent_issue', 'Create sub-tasks under this issue',
+                default='')
         config.add_custom_option('alm_priority_map', 'Customized map from priority in SDE to JIRA',
                 default='')
 
@@ -86,8 +88,11 @@ class JIRAConnector(AlmConnector):
         self.alm_plugin.connect()
 
         #get Issue ID for given type name
-        issue_types = self.alm_plugin.get_issue_types()
-
+        if self.config['alm_parent_issue']:
+            issue_types = self.alm_plugin.get_subtask_issue_types()
+        else:
+            issue_types = self.alm_plugin.get_issue_types()
+        
         self.jira_issue_type_id = None
         for issue_type in issue_types:
             if (issue_type['name'] == self.config['jira_issue_type']):

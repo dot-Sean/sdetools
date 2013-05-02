@@ -89,7 +89,13 @@ class JIRASoapAPI:
         try:
             return self.proxy.getIssueTypes(self.auth)
         except SOAPpy.Types.faultType:
-            raise AlmException('Unable to get issuetype from JIRA')
+            raise AlmException('Unable to get issuetypes from JIRA')
+
+    def get_subtask_issue_types(self):
+        try:
+            return self.proxy.getSubTaskIssueTypes(self.auth)
+        except SOAPpy.Types.faultType:
+            raise AlmException('Unable to get subtask issuetypes from JIRA')
 
     def get_task(self, task, task_id):
         try:
@@ -186,7 +192,10 @@ class JIRASoapAPI:
         }
 
         try:
-            ref = self.proxy.createIssue(self.auth, args)
+            if self.config['alm_parent_issue']:
+                ref = self.proxy.createIssueWithParent(self.auth, args, self.config['alm_parent_issue'])
+            else:
+                ref = self.proxy.createIssue(self.auth, args)
             self.proxy.updateIssue(self.auth, ref['key'], updates)
         except SOAPpy.Types.faultType, err:
             raise AlmException('Unable to add issue to JIRA. Reason: %s' % (err.faultstring))
