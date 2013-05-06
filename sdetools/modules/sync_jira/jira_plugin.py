@@ -36,6 +36,8 @@ class JIRAConnector(AlmConnector):
                 default='Reopen Issue')
         config.add_custom_option('jira_done_statuses', 'Statuses that signify a task is Done in JIRA',
                 default='Resolved,Closed')
+        config.add_custom_option('jira_existing_issue', 'Provide the key of an existing issue to support custom fields (JIRA 4.x only)',
+                default='')
         config.add_custom_option('alm_project_version', 'Project version',
                 default='')
         config.add_custom_option('alm_parent_issue', 'Create sub-tasks under this issue',
@@ -69,6 +71,10 @@ class JIRAConnector(AlmConnector):
                 raise AlmException('Unable to process alm_priority_map (not a JSON dictionary). '
                         'Reason: Invalid range key %s' % key)
 
+        if self.config['alm_custom_fields'] and self.config.jira_api_ver == 4 and not self.config['jira_existing_issue']:
+                raise AlmException('Unable to process alm_custom_fields. '
+                        'Reason: jira_existing_issue must be specified')
+        
         self.transition_id = {
             'close': None,
             'reopen': None}
@@ -100,9 +106,9 @@ class JIRAConnector(AlmConnector):
             self.custom_fields = []
             fields = self.alm_plugin.get_fields()
             for key, value in self.config['alm_custom_fields'].items():
-                for field_key in fields:
-                    if (key == fields[field_key]['name']):
-                        self.custom_fields.append({'field': field_key,'value':value})
+                for field in fields:
+                    if (key == field['name']):
+                        self.custom_fields.append({'field': field['id'],'value':value})
 
             if len(self.custom_fields) <> len(self.config['alm_custom_fields']):
                 raise AlmException('At least one custom fields could not be found')

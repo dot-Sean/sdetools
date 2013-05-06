@@ -165,7 +165,7 @@ def get_http_handler(mode, debuglevel=0):
                 ssl_warned = True
             return urllib2.HTTPSHandler(debuglevel=debuglevel)
         else:
-            return VerifiedHTTPSHandler(debuglevel=debuglevel, ca_certs=CA_CERTS_FILE)
+            return VerifiedHTTPSHandler(debuglevel=debuglevel)#, ca_certs=CA_CERTS_FILE)
     raise KeyError, mode
 
 def get_opener(method, server, proxy=None, debuglevel=0):
