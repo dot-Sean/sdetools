@@ -41,7 +41,6 @@ class Proxy:
 
         # From Mark Pilgrim's "Dive Into Python" toolkit.py--open anything.
         if self.wsdl is None and hasattr(wsdlsource, "read"):
-            print 'stream:', wsdlsource
             try:
                 self.wsdl = reader.loadFromStream(wsdlsource)
             except xml.parsers.expat.ExpatError, e:
