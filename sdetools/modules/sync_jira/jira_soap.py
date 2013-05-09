@@ -152,13 +152,14 @@ class JIRASoapAPI:
     def get_fields(self):
         try:
             issue_fields = self.proxy.getFieldsForEdit(self.auth, self.config['jira_existing_issue'])
-            fields = []
-            if issue_fields:
-                for f in issue_fields:
-                    fields.append({'name':f['name'],'id':f['id']})
-            return fields
         except SOAPpy.Types.faultType, fault:
-            raise AlmException('Could not retrieve custom fields for JIRA project: %s: %s' % (self.config['alm_project'], fault))
+            raise AlmException('Could not retrieve custom fields for JIRA project %s: %s' % (self.config['alm_project'], fault))
+
+        fields = []
+        if issue_fields:
+            for f in issue_fields:
+                fields.append({'name':f['name'], 'id':f['id']})
+        return fields
         
     def get_affected_versions(self, task):
         affected_versions = []
@@ -205,11 +206,9 @@ class JIRASoapAPI:
 
         if custom_fields:
             arg_custom_fields = []
-            print custom_fields
             for custom_field in custom_fields:
                 arg_custom_fields.append({'customfieldId':custom_field['field'],'values':[custom_field['value']]})
             args['customFieldValues'] = arg_custom_fields
-        print args
         try:
             if self.config['alm_parent_issue']:
                 ref = self.proxy.createIssueWithParent(self.auth, args, self.config['alm_parent_issue'])

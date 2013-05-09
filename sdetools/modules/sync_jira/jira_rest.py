@@ -119,9 +119,8 @@ class JIRARestAPI(RESTBase):
         if self.config['alm_parent_issue']:
             args['fields']['parent'] = {'key':self.config['alm_parent_issue']}
 
-        if custom_fields:
-            for field in custom_fields:
-                args['fields'][field['field']]={'value':field['value']}
+        for field in custom_fields:
+            args['fields'][field['field']] = {'value':field['value']}
 
         try:
             issue = self.call_api('issue', method=self.URLRequest.POST, args=args)

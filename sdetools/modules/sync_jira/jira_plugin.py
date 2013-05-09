@@ -72,8 +72,8 @@ class JIRAConnector(AlmConnector):
                         'Reason: Invalid range key %s' % key)
 
         if self.config['alm_custom_fields'] and self.config.jira_api_ver == 4 and not self.config['jira_existing_issue']:
-                raise AlmException('Unable to process alm_custom_fields. '
-                        'Reason: jira_existing_issue must be specified')
+            raise AlmException('Unable to process alm_custom_fields. '
+                    'Reason: jira_existing_issue must be specified')
         
         self.transition_id = {
             'close': None,
@@ -100,17 +100,15 @@ class JIRAConnector(AlmConnector):
         if self.config['alm_project_version'] and not self.project_version:
             raise AlmException('Version %s not found in the project' % (self.config['alm_project_version']))
 
-        self.custom_fields = None
-        
+        self.custom_fields = []
         if self.config['alm_custom_fields']:
-            self.custom_fields = []
             fields = self.alm_plugin.get_fields()
-            for key, value in self.config['alm_custom_fields'].items():
+            for key in self.config['alm_custom_fields']:
                 for field in fields:
                     if (key == field['name']):
-                        self.custom_fields.append({'field': field['id'],'value':value})
+                        self.custom_fields.append({'field': field['id'],'value':self.config['alm_custom_fields'][key]})
 
-            if len(self.custom_fields) <> len(self.config['alm_custom_fields']):
+            if len(self.custom_fields) != len(self.config['alm_custom_fields']):
                 raise AlmException('At least one custom fields could not be found')
 
     def alm_get_task(self, task):
