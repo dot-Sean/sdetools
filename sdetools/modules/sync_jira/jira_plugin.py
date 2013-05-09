@@ -4,7 +4,6 @@
 import re
 from datetime import datetime
 
-from sdetools.sdelib.commons import json
 from sdetools.alm_integration.alm_plugin_base import AlmConnector, AlmException
 from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
 from sdetools.modules.sync_jira.jira_markdown import convert_markdown
@@ -37,11 +36,14 @@ class JIRAConnector(AlmConnector):
                 default='Reopen Issue')
         config.add_custom_option('jira_done_statuses', 'Statuses that signify a task is Done in JIRA',
                 default='Resolved,Closed')
+        config.add_custom_option('jira_existing_issue', 'Provide the key of an existing issue to support custom fields (JIRA 4.x only)',
+                default='')
         config.add_custom_option('alm_project_version', 'Project version',
                 default='')
         config.add_custom_option('alm_parent_issue', 'Create sub-tasks under this issue',
                 default='')
-        config.add_custom_option('alm_priority_map', 'Customized map from priority in SDE to JIRA',
+        config.add_custom_option('alm_priority_map', 'Customized map from priority in SDE to JIRA '
+                '(JSON encoded dictionary of strings)',
                 default='')
 
     def initialize(self):
@@ -61,25 +63,18 @@ class JIRAConnector(AlmConnector):
         if not self.config['jira_reopen_transition']:
             raise AlmException('Missing jira_reopen_transition in configuration')
 
-        try:
-            if not self.config['alm_priority_map']:
-                self.config['alm_priority_map'] = JIRA_DEFAULT_PRIORITY_MAP
-            if isinstance(self.config['alm_priority_map'], basestring):
-                self.config['alm_priority_map'] = json.loads(self.config['alm_priority_map'])
-            if type(self.config['alm_priority_map']) is not dict:
-                raise TypeError('Not a dict: %s' % self.config['alm_priority_map'])
-            for key in self.config['alm_priority_map']:
-                if not isinstance(key, basestring):
-                    raise TypeError('Invalid range key: %s' % repr(key))
-                if not RE_MAP_RANGE_KEY.match(key):
-                    raise TypeError('Invalid range key: %s' % key)
-                val = self.config['alm_priority_map'][key]
-                if not isinstance(val, basestring):
-                    raise TypeError('Invalid value: %s' % repr(val))
-        except Exception, err:
-            raise AlmException('Unable to process alm_priority_map (not a JSON dictionary). Reason: %s' % str(err))
-            
+        self.config.process_json_str_dict('alm_priority_map')
+        if not self.config['alm_priority_map']:
+            self.config['alm_priority_map'] = JIRA_DEFAULT_PRIORITY_MAP
+        for key in self.config['alm_priority_map']:
+            if not RE_MAP_RANGE_KEY.match(key):
+                raise AlmException('Unable to process alm_priority_map (not a JSON dictionary). '
+                        'Reason: Invalid range key %s' % key)
 
+        if self.config['alm_custom_fields'] and self.config.jira_api_ver == 4 and not self.config['jira_existing_issue']:
+            raise AlmException('Unable to process alm_custom_fields. '
+                    'Reason: jira_existing_issue must be specified')
+        
         self.transition_id = {
             'close': None,
             'reopen': None}
@@ -105,6 +100,17 @@ class JIRAConnector(AlmConnector):
         if self.config['alm_project_version'] and not self.project_version:
             raise AlmException('Version %s not found in the project' % (self.config['alm_project_version']))
 
+        self.custom_fields = []
+        if self.config['alm_custom_fields']:
+            fields = self.alm_plugin.get_fields()
+            for key in self.config['alm_custom_fields']:
+                for field in fields:
+                    if (key == field['name']):
+                        self.custom_fields.append({'field': field['id'],'value':self.config['alm_custom_fields'][key]})
+
+            if len(self.custom_fields) != len(self.config['alm_custom_fields']):
+                raise AlmException('At least one custom fields could not be found')
+
     def alm_get_task(self, task):
         task_id = task['title'].partition(':')[0]
 
@@ -122,7 +128,7 @@ class JIRAConnector(AlmConnector):
         task['formatted_content'] = self.sde_get_task_content(task)
         task['alm_priority'] = self.translate_priority(task['priority'])
 
-        new_issue = self.alm_plugin.add_task(task, self.jira_issue_type_id, self.project_version)
+        new_issue = self.alm_plugin.add_task(task, self.jira_issue_type_id, self.project_version, self.custom_fields)
         logger.info('Create new task in JIRA: %s' % new_issue['key'])
 
         if (self.config['alm_standard_workflow'] and

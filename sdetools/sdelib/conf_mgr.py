@@ -7,7 +7,7 @@ import logging
 
 import log_mgr
 
-from commons import UsageError
+from sdetools.sdelib.commons import UsageError, json
 
 __all__ = ['Config']
 
@@ -306,3 +306,21 @@ class Config(object):
         if self[key] in [True, False]:
             return
         self[key] = (str(self[key]).lower() == 'true')
+
+    def process_json_str_dict(self, key):
+        try:
+            if not self[key]:
+                self[key] = {}
+            elif isinstance(self[key], basestring):
+                self[key] = json.loads(self[key])
+            if type(self[key]) is not dict:
+                raise TypeError('Not a dictionary: %s' % self[key])
+            for name in self[key]:
+                if not isinstance(name, basestring):
+                    raise TypeError('Invalid key for %s: %s' % (key, str(name)))
+                val = self[key][name]
+                if not isinstance(val, basestring):
+                    raise TypeError('Invalid value for %s: %s' % (key, repr(val)))
+        except Exception, err:
+            raise UsageError('Unable to process %s (not a JSON dictionary). Reason: %s' % (key, str(err)))
+

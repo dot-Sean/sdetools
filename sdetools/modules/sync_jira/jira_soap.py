@@ -27,7 +27,7 @@ class SOAPProxyWrap:
                 return self.__fobj(*args)
             except (xml.parsers.expat.ExpatError, socket.error), err:
                 raise AlmException('Unable to access JIRA (for %s). '
-                        ' Please check network connectivity.' % (self.fname))
+                        ' Please check network connectivity.' % (self.__fname))
 
     def __init__(self, proxy):
         self.proxy = proxy
@@ -148,7 +148,19 @@ class JIRASoapAPI:
             if v['name']==version_name:
                 return v
         return None
+         
+    def get_fields(self):
+        try:
+            issue_fields = self.proxy.getFieldsForEdit(self.auth, self.config['jira_existing_issue'])
+        except SOAPpy.Types.faultType, fault:
+            raise AlmException('Could not retrieve custom fields for JIRA project %s: %s' % (self.config['alm_project'], fault))
 
+        fields = []
+        if issue_fields:
+            for f in issue_fields:
+                fields.append({'name':f['name'], 'id':f['id']})
+        return fields
+        
     def get_affected_versions(self, task):
         affected_versions = []
         for version_name in task.versions:
@@ -169,7 +181,7 @@ class JIRASoapAPI:
     
         return True
 
-    def add_task(self, task, issue_type_id, project_version):
+    def add_task(self, task, issue_type_id, project_version, custom_fields):
         #Add task
         selected_priority = None
         for priority in self.priorities:
@@ -181,6 +193,7 @@ class JIRASoapAPI:
 
         updates = []
         updates.append({'id':'labels', 'values':['SD-Elements']})
+                
         if project_version:
             updates.append({'id':'versions', 'values':[project_version['id']]})
         args = {
@@ -191,6 +204,11 @@ class JIRASoapAPI:
             'type': issue_type_id
         }
 
+        if custom_fields:
+            arg_custom_fields = []
+            for custom_field in custom_fields:
+                arg_custom_fields.append({'customfieldId':custom_field['field'],'values':[custom_field['value']]})
+            args['customFieldValues'] = arg_custom_fields
         try:
             if self.config['alm_parent_issue']:
                 ref = self.proxy.createIssueWithParent(self.auth, args, self.config['alm_parent_issue'])

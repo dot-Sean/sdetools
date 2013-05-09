@@ -30,6 +30,18 @@ class JIRARestAPI(RESTBase):
         except APIError:
             raise AlmException('JIRA project not found: %s' % self.config['alm_project'])
 
+    def get_fields(self):
+        try:
+            meta_info = self.call_api('issue/createmeta', method=self.URLRequest.GET, args={'projectKeys':self.config['alm_project'], 'expand':'projects.issuetypes.fields'})
+            fields = []
+            for item in meta_info['projects'][0]['issuetypes']:
+                if item['name'] == self.config['jira_issue_type']:
+                    for key in item['fields']:
+                        fields.append({'id':key,'name':item['fields'][key]['name']})
+            return fields
+        except APIError:
+            raise AlmException('Could not retrieve custom fields for JIRA project: %s' % self.config['alm_project'])
+       
     def get_issue_types(self):
         try:
             return self.call_api('issuetype')
@@ -81,7 +93,7 @@ class JIRARestAPI(RESTBase):
         except APIError:
             raise AlmException('Unable to update issue %s with new version %s' % (task.get_alm_id(), project_version))
 
-    def add_task(self, task, issue_type_id, project_version):
+    def add_task(self, task, issue_type_id, project_version, custom_fields):
         affected_versions = []
         if self.config['alm_project_version']:
             affected_versions.append({'name':self.config['alm_project_version']})
@@ -106,6 +118,9 @@ class JIRARestAPI(RESTBase):
         }
         if self.config['alm_parent_issue']:
             args['fields']['parent'] = {'key':self.config['alm_parent_issue']}
+
+        for field in custom_fields:
+            args['fields'][field['field']] = {'value':field['value']}
 
         try:
             issue = self.call_api('issue', method=self.URLRequest.POST, args=args)
