@@ -424,6 +424,9 @@ class AlmConnector(object):
 
                 alm_task = self.alm_get_task(task)
                 if alm_task:
+                    if not self.config['alm_standard_workflow']:
+                        continue
+
                     # Exists in both SDE & ALM
                     if not self.status_match(alm_task.get_status(), task['status']):
                         # What takes precedence in case of a conflict of
