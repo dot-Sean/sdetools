@@ -39,12 +39,12 @@ alm_project = JIRAPROJECT
           
 #A comma-delimited list of statuses for tasks
 #that you wish to import into the ALM.
-#For example, if you only want to synchronize
+#For example, if you only want to import
 #tasks that are currently TODO in SD Elements
 #then just enter TODO
 #Valid values are:
 #TODO,DONE,NA
-sde_statuses_in_scope = TODO,DONE,NA
+sde_statuses_in_scope = TODO
 
 #Should HowTos be included in what's added
 #to the ALM tools?
@@ -89,6 +89,12 @@ conflict_policy = alm
 #priority names. Make sure to cover all priorities 1 to 10. Note that
 #the ranges are inclusive
 #alm_priority_map = {"1-6":"Trivial", "7-9":"Major", "10":"Blocker"}
+
+#[Optional] ALM Project Version
+#This is the target project version we want to sync the tickets to
+#If there is a matching ticket in prior versions, we will reopen
+#and set the version to this. Otherwise, we'll create a new ticket.
+#project_version = NewRelease
 
 ###################################################
 #### Advanced JIRA Settings                   #####

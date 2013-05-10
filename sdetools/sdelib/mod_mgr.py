@@ -18,7 +18,18 @@ class Info(object):
         self.items = items
 
     def __str__(self):
-        return '%s: %s' % (self.ev_type.title(), self.msg)
+        ev_type = self.ev_type
+        if ev_type == 'close':
+            msg = 'Done - '
+            if self.items['status']:
+                msg += 'Success'
+            else:
+                msg += 'Failed'
+            if self.msg:
+                msg += ': %s' % self.msg
+            return msg
+        else:
+            return '%s: %s' % (ev_type.title(), self.msg)
 
 class EmitShortCut:
     def __init__(self, ret_chn):
@@ -53,7 +64,7 @@ class ReturnChannel:
         kwargs.update(self.queued_objs)
         self.queued_objs = {}
         info = self.info_container(*args, **kwargs)
-        logger.debug('Emitting Msg: %s' % str(info))
+        logger.debug('Emitting Msg: "%s"' % str(info))
         self.emit_obj(info)
 
     def queue(self, **kwargs):
@@ -64,6 +75,11 @@ class ReturnChannel:
         self.queued_objs.update(kwargs)
 
     def close(self, *args, **kwargs):
+        """
+        Note that close always expects a status
+        """
+        if 'status' not in kwargs:
+            raise ValueError('Missing status for close')
         self.emit_it('close', *args, **kwargs)
         self.is_open = False
 
@@ -109,20 +125,25 @@ def run_command(cmd_name, args, call_src, call_options={},
     ret_chn = ReturnChannel(call_back, call_back_args)
     config = conf_mgr.Config(command, args, ret_chn, call_src, call_options)
 
-    cmd_inst = curr_cmd(config, args)
+    try:
+        cmd_inst = curr_cmd(config, args)
 
-    cmd_inst.configure()
+        cmd_inst.configure()
 
-    ret_status = cmd_inst.parse_args()
+        ret_status = cmd_inst.parse_args()
 
-    if not ret_status:
+        cmd_inst.args = config.args
+        cmd_inst.process_args()
+
+        ret_status = cmd_inst.handle()
+    except commons.Error, e:
+        logger.exception(str(e))
+        if call_src == 'shell':
+            raise
+        config.ret_chn.close(status=False, msg=str(e))
         return False
 
-    cmd_inst.args = config.args
-    cmd_inst.process_args()
-
-    ret_status = cmd_inst.handle()
-    config.ret_chn.close()
+    config.ret_chn.close(status=True)
 
     if ret_status is None:
         ret_status = True

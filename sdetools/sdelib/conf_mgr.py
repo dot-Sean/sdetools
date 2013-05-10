@@ -7,7 +7,7 @@ import logging
 
 import log_mgr
 
-from commons import UsageError
+from sdetools.sdelib.commons import UsageError, json
 
 __all__ = ['Config']
 
@@ -230,7 +230,6 @@ class Config(object):
         for key in self.call_options:
             self[key] = self.call_options[key]
         #TODO: Perform validation
-        return True
 
     def parse_shell_args(self, cmd_inst):
         if self.parser is None:
@@ -241,7 +240,7 @@ class Config(object):
         except:
             if (str(sys.exc_info()[1]) == '0'):
                 # This happens when -h is used
-                return False
+                sys.exit(0)
             else:
                 raise UsageError("Invalid options specified.")
 
@@ -292,8 +291,6 @@ class Config(object):
                 if type(self[name]) is not str:
                     raise UsageError("Missing value for option '%s'" % (name))
 
-        return True
-
     def fix_proxy_env(self):
         import urllib
         proxy_settings = urllib.getproxies()
@@ -304,3 +301,26 @@ class Config(object):
             protocol, val = proxy.split('://')
             proxy = '%s://%s@%s' % (protocol, self['proxy_auth'], val)
             os.environ['%s_proxy' % ptype] = proxy
+
+    def process_boolean_config(self, key):
+        if self[key] in [True, False]:
+            return
+        self[key] = (str(self[key]).lower() == 'true')
+
+    def process_json_str_dict(self, key):
+        try:
+            if not self[key]:
+                self[key] = {}
+            elif isinstance(self[key], basestring):
+                self[key] = json.loads(self[key])
+            if type(self[key]) is not dict:
+                raise TypeError('Not a dictionary: %s' % self[key])
+            for name in self[key]:
+                if not isinstance(name, basestring):
+                    raise TypeError('Invalid key for %s: %s' % (key, str(name)))
+                val = self[key][name]
+                if not isinstance(val, basestring):
+                    raise TypeError('Invalid value for %s: %s' % (key, repr(val)))
+        except Exception, err:
+            raise UsageError('Unable to process %s (not a JSON dictionary). Reason: %s' % (key, str(err)))
+

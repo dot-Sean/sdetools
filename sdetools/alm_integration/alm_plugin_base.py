@@ -23,7 +23,7 @@ class AlmException(Error):
         self.value = value
 
     def __str__(self):
-        return repr(self.value)
+        return str(self.value)
 
 class AlmTask(object):
     """
@@ -86,23 +86,30 @@ class AlmConnector(object):
         """ Adds ALM config options to the config file"""
         self.config.add_custom_option('alm_phases', 'Phases of the ALM',
                 default='requirements,architecture-design,development')
-        self.config.add_custom_option('sde_statuses_in_scope', 'SDE statuses that are in scope', 
-                default='DONE,TODO,NA')
+        self.config.add_custom_option('sde_statuses_in_scope', 'SDE statuses for adding to ALM '
+                '(comma seperated DONE,TODO,NA)', 
+                default='TODO')
         self.config.add_custom_option('sde_min_priority', 'Minimum SDE priority in scope',
                 default='7')
         self.config.add_custom_option('how_tos_in_scope', 'Whether or not HowTos should be included',
                 default='False')
-        self.config.add_custom_option('selected_tasks', 'Optionally limit the sync to certain tasks'
-                ' (comma seperated, e.g. T12,T13). Note: Overrides other selections.',
+        self.config.add_custom_option('selected_tasks', 'Optionally limit the sync to certain tasks '
+                '(comma seperated, e.g. T12,T13). Note: Overrides other selections.',
                 default='')
         self.config.add_custom_option('alm_project', 'Project in ALM Tool',
                 default=None)
         self.config.add_custom_option('conflict_policy', 'Conflict policy to use',
                 default='alm')
-        self.config.add_custom_option('show_progress','Show progress',
+        self.config.add_custom_option('show_progress', 'Show progress',
                 default='False')
         self.config.add_custom_option('test_alm_connection', 'Test Alm Connection Only',
                 default='False')
+        self.config.add_custom_option('alm_standard_workflow', 'Standard workflow in ALM?',
+                default='True')
+        self.config.add_custom_option('alm_custom_fields', 
+                'Customized fields to include when creating a task in ALM '
+                '(JSON encoded dictionary of strings)',
+                default='')
 
     def initialize(self):
         """
@@ -154,11 +161,12 @@ class AlmConnector(object):
         else:
             self.config['sde_min_priority'] = 1
 
-        if (not self.sde_plugin.config['show_progress']):
-            self.sde_plugin.config['show_progress'] = False
-        else:
-            self.sde_plugin.config['show_progress'] = (self.sde_plugin.config['show_progress']=="True")
-            
+        self.config.process_boolean_config('show_progress')
+        self.config.process_boolean_config('how_tos_in_scope')
+        self.config.process_boolean_config('test_alm_connection')
+        self.config.process_boolean_config('alm_standard_workflow')
+        self.config.process_json_str_dict('alm_custom_fields')
+
         logger.info('*** AlmConnector initialized ***')
 
     @abstractmethod
@@ -290,7 +298,6 @@ class AlmConnector(object):
         if self.config['selected_tasks']:
             return (tid in self.config['selected_tasks'])
         return (task['phase'] in self.config['alm_phases'] and
-            task['status'] in self.config['sde_statuses_in_scope'] and
             task['priority'] >= self.config['sde_min_priority'])
 
     def sde_update_task_status(self, task, status):
@@ -339,7 +346,7 @@ class AlmConnector(object):
                  ALM
         """
         content = '%s\n\nImported from SD Elements: [%s](%s)' % (task['content'], task['url'], task['url'])
-        if (self.config['how_tos_in_scope'] == 'True') and task['implementations']:
+        if self.config['how_tos_in_scope'] and task['implementations']:
             content += '\n\n# How Tos:\n\n'
             for implementation in task['implementations']:
                 content += '## %s\n\n' % (implementation['title'])
@@ -350,7 +357,7 @@ class AlmConnector(object):
         return self.convert_markdown_to_alm(content, ref=task['id'])
 
     def output_progress(self, percent):
-        if self.sde_plugin.config['show_progress']:
+        if self.config['show_progress']:
             print str(percent)+"% complete"
             sys.stdout.flush()
 
@@ -384,10 +391,9 @@ class AlmConnector(object):
             if not self.sde_plugin:
                 raise AlmException('Requires initialization')
 
-            if (self.sde_plugin.config['test_alm_connection']):
-                if(self.sde_plugin.config['test_alm_connection']=="True"):
-                    self.alm_connect()
-                    return
+            if self.config['test_alm_connection']:
+                self.alm_connect()
+                return
 
             #Attempt to connect to SDE & ALM
             progress = 0
@@ -418,6 +424,9 @@ class AlmConnector(object):
 
                 alm_task = self.alm_get_task(task)
                 if alm_task:
+                    if not self.config['alm_standard_workflow']:
+                        continue
+
                     # Exists in both SDE & ALM
                     if not self.status_match(alm_task.get_status(), task['status']):
                         # What takes precedence in case of a conflict of
@@ -444,7 +453,10 @@ class AlmConnector(object):
                             updated_system = self.alm_name
                         self.emit.info('Updated status of task %s in %s to %s' % (tid, updated_system, status))
                 else:
-                    #Only exists in SD Elements, add it to ALM
+                    # Only exists in SD Elements
+                    # Skip if this task should not be added to ALM
+                    if not self.in_scope(task) and task['status'] not in self.config['sde_statuses_in_scope']:
+                        continue
                     ref = self.alm_add_task(task)
                     self.emit.info('Added task %s to %s' % (tid, self.alm_name))
                     note_msg = 'Task synchronized in %s. Reference: %s' % (self.alm_name, ref)
@@ -456,5 +468,5 @@ class AlmConnector(object):
 
         except AlmException, err:
             self.alm_disconnect()
-            raise err
+            raise 
 

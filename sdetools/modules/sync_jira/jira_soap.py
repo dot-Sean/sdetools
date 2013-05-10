@@ -1,7 +1,9 @@
 import xml.parsers.expat
 import socket
+import urllib2
 
 from sdetools.extlib import SOAPpy
+from sdetools.extlib import http_req
 
 from sdetools.alm_integration.alm_plugin_base import AlmException
 from sdetools.modules.sync_jira.jira_shared import JIRATask
@@ -25,7 +27,7 @@ class SOAPProxyWrap:
                 return self.__fobj(*args)
             except (xml.parsers.expat.ExpatError, socket.error), err:
                 raise AlmException('Unable to access JIRA (for %s). '
-                        ' Please check network connectivity.' % (self.fname))
+                        ' Please check network connectivity.' % (self.__fname))
 
     def __init__(self, proxy):
         self.proxy = proxy
@@ -40,19 +42,29 @@ class JIRASoapAPI:
         self.statuses = None
         self.priorities = None
         self.auth = None
-        
+        self.versions = None
 
     def connect(self):
         config = SOAPpy.Config
         if __name__ in self.config['debug_mods']:
             config.debug = 1
 
+        opener = http_req.get_opener(self.config['alm_method'], self.config['alm_server'])
+        self.config['alm_server'] = opener.server
+
+        try:
+            stream = opener.open('%s://%s/rpc/soap/jirasoapservice-v2?wsdl' %
+                    (self.config['alm_method'], self.config['alm_server']))
+        except urllib2.URLError, err:
+            raise AlmException('Unable to reach JIRA service (Check URL). Reason: %s' % (err))
+        except http_req.InvalidCertificateException, err:
+            raise AlmException('Unable to verify SSL certificate for host: %s' % (self.config['alm_server']))
+
         # Get a proxy to the server
         try:
-            proxy = SOAPpy.WSDL.Proxy('%s://%s/rpc/soap/jirasoapservice-v2?wsdl' %
-                    (self.config['alm_method'], self.config['alm_server']), config=config)
-        except (SOAPpy.Types.faultType, xml.parsers.expat.ExpatError, socket.error), err:
-            raise AlmException('Unable to connect to JIRA. Please check server URL. Reason: %s' % (err))
+            proxy = SOAPpy.WSDL.Proxy(stream, config=config)
+        except (SOAPpy.Types.faultType, xml.parsers.expat.ExpatError), err:
+            raise AlmException('Error talking to JIRA service. Please check server URL. Reason: %s' % (err))
         self.proxy = SOAPProxyWrap(proxy)
 
         # Attempt to login
@@ -71,12 +83,19 @@ class JIRASoapAPI:
         # For JIRA 4 we need the ID-Name mapping for status and priority
         self.statuses = self.proxy.getStatuses(self.auth)
         self.priorities = self.proxy.getPriorities(self.auth)
+        self.versions = self.proxy.getVersions(self.auth, self.config['alm_project'])
 
     def get_issue_types(self):
         try:
             return self.proxy.getIssueTypes(self.auth)
         except SOAPpy.Types.faultType:
-            raise AlmException('Unable to get issuetype from JIRA')
+            raise AlmException('Unable to get issuetypes from JIRA')
+
+    def get_subtask_issue_types(self):
+        try:
+            return self.proxy.getSubTaskIssueTypes(self.auth)
+        except SOAPpy.Types.faultType:
+            raise AlmException('Unable to get subtask issuetypes from JIRA')
 
     def get_task(self, task, task_id):
         try:
@@ -96,8 +115,9 @@ class JIRASoapAPI:
         task_resolution = None
         task_status = None
         task_priority = None
+        task_versions = []
 
-        if jtask['resolution']:
+        if 'resolution' in jtask and jtask['resolution']:
             task_resolution = jtask['resolution']
         if jtask['status']:
             for status in self.statuses:
@@ -109,6 +129,10 @@ class JIRASoapAPI:
                 if priority['id'] == jtask['priority']:
                     task_priority = priority['name']
                     break
+        if jtask['affectsVersions']:
+            for version in jtask['affectsVersions']:
+                task_versions.append(version['name'])
+
 
         return JIRATask(task['id'],
                         jtask['key'],
@@ -116,9 +140,48 @@ class JIRASoapAPI:
                         task_status,
                         task_resolution,
                         jtask['updated'],
-                        self.config['jira_done_statuses'])
+                        self.config['jira_done_statuses'],
+                        task_versions)
 
-    def add_task(self, task, issue_type_id):
+    def get_version(self, version_name):
+        for v in self.versions:
+            if v['name']==version_name:
+                return v
+        return None
+         
+    def get_fields(self):
+        try:
+            issue_fields = self.proxy.getFieldsForEdit(self.auth, self.config['jira_existing_issue'])
+        except SOAPpy.Types.faultType, fault:
+            raise AlmException('Could not retrieve custom fields for JIRA project %s: %s' % (self.config['alm_project'], fault))
+
+        fields = []
+        if issue_fields:
+            for f in issue_fields:
+                fields.append({'name':f['name'], 'id':f['id']})
+        return fields
+        
+    def get_affected_versions(self, task):
+        affected_versions = []
+        for version_name in task.versions:
+            jira_version = self.get_version(version_name)
+            if jira_version:
+                affected_versions.append(jira_version['id'])
+            else:
+                raise AlmException("Version %s could not be found in JIRA. '\
+                        'Check your sync settings or add the version to JIRA" % version_name)
+        return affected_versions
+
+    def set_version(self, task, project_version):
+        update = [{'id':'versions', 'values':self.get_affected_versions(task)}]
+        try:
+            self.proxy.updateIssue(self.auth, task.get_alm_id(), update)
+        except (SOAPpy.Types.faultType, AlmException), err:
+            raise AlmException('Unable to update issue %s with new version %s' % (task.get_alm_id(), project_version))
+    
+        return True
+
+    def add_task(self, task, issue_type_id, project_version, custom_fields):
         #Add task
         selected_priority = None
         for priority in self.priorities:
@@ -128,6 +191,11 @@ class JIRASoapAPI:
         if not selected_priority:
             raise AlmException('Unable to find priority %s' % task['alm_priority'])
 
+        updates = []
+        updates.append({'id':'labels', 'values':['SD-Elements']})
+                
+        if project_version:
+            updates.append({'id':'versions', 'values':[project_version['id']]})
         args = {
             'project': self.config['alm_project'],
             'summary': task['title'],
@@ -136,10 +204,20 @@ class JIRASoapAPI:
             'type': issue_type_id
         }
 
+        if custom_fields:
+            arg_custom_fields = []
+            for custom_field in custom_fields:
+                arg_custom_fields.append({'customfieldId':custom_field['field'],'values':[custom_field['value']]})
+            args['customFieldValues'] = arg_custom_fields
         try:
-            return self.proxy.createIssue(self.auth, args)
-        except (SOAPpy.Types.faultType, AlmException), err:
-            raise AlmException('Unable to add issue to JIRA')
+            if self.config['alm_parent_issue']:
+                ref = self.proxy.createIssueWithParent(self.auth, args, self.config['alm_parent_issue'])
+            else:
+                ref = self.proxy.createIssue(self.auth, args)
+            self.proxy.updateIssue(self.auth, ref['key'], updates)
+        except SOAPpy.Types.faultType, err:
+            raise AlmException('Unable to add issue to JIRA. Reason: %s' % (err.faultstring))
+        return ref
 
     def get_available_transitions(self, task_id):
         transitions = self.proxy.getAvailableActions(self.auth, task_id)
