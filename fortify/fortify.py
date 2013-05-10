@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import sys
 import logging
 import suds
 
@@ -7,10 +8,16 @@ logging.getLogger('suds.client').setLevel(logging.DEBUG)
 logging.getLogger('suds.transport').setLevel(logging.DEBUG)
 logging.getLogger('suds.transport.http').setLevel(logging.DEBUG)
 
-client = suds.client.Client("http://127.0.0.1:8180/ssc/fm-ws/services/fws.wsdl", autoblend=True)
-import pdb
-pdb.set_trace()
-client.service.CreateAuditSession()
+security = suds.wsse.Security()
+token = suds.wsse.UsernameToken(sys.argv[1], sys.argv[2])
+security.tokens.append(token)
+
+client = suds.client.Client("http://127.0.0.1:8180/ssc/fm-ws/services/fws.wsdl", 
+    autoblend=True,
+    location="http://127.0.0.1:8180/ssc/fm-ws/services/",
+    wsse=security)
+ret = client.service.CreateAuditSession()
+import pdb; pdb.set_trace()
 
 spec = []
 for method in client.wsdl.services[0].ports[0].methods.values(): 
