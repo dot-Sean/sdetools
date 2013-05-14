@@ -57,7 +57,9 @@ class BaseIntegrator(object):
         self.cwe_title = {}
         self.confidence = {}
         for task in base.getElementsByTagName('task'):
-            self.confidence[task.attributes['id'].value] = task.attributes['confidence'].value
+            if task.attributes.has_key('confidence'):
+                self.confidence[task.attributes['id'].value] = task.attributes['confidence'].value
+
             for cwe in task.getElementsByTagName('cwe'):
                 cwe_id = cwe.attributes['id'].value
                 cwe_mapping[cwe_id].append(task.attributes['id'].value)

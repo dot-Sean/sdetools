@@ -1,0 +1,747 @@
+<?xml version="1.0"?>
+<mapping>
+    <task id="62" title="Lockdown passwords in property and configuration files (e.g. database connection strings)">
+        <cwe id="ASP.NET Misconfiguration: Weak Password Protection" title="ASP.NET Misconfiguration: Weak Password Protection"/>
+    </task>
+    <task id="153" title="Scrub buffers holding sensitive information when releasing/deleting">
+        <cwe id="Password Management: Heap Inspection" title="Password Management: Heap Inspection"/>
+    </task>
+    <task id="31" title="Perform input validation on all forms of input">
+        <cwe id="PHP Misconfiguration: magic_quotes_runtime Enabled" title="PHP Misconfiguration: magic_quotes_runtime Enabled"/>
+    </task>
+    <task id="36" title="Escape untrusted data in HTML">
+        <cwe id="Cross-Site Scripting: Persistent" title="Cross-Site Scripting: Persistent"/>
+    </task>
+    <task id="56" title="Restrict access to WSDL">
+        <cwe id="WCF Misconfiguration: Service Enumeration" title="WCF Misconfiguration: Service Enumeration"/>
+    </task>
+    <task id="38" title="Bind variables in SQL statements">
+        <cwe id="SQL Injection: Persistence" title="SQL Injection: Persistence"/>
+    </task>
+    <task id="14" title="Principles of least privilege">
+        <cwe id="WCF Misconfiguration: Anonymous Transport Client" title="WCF Misconfiguration: Anonymous Transport Client"/>
+    </task>
+    <task id="36" title="Escape untrusted data in HTML">
+        <cwe id="Cross-Site Scripting: External Links" title="Cross-Site Scripting: External Links"/>
+    </task>
+    <task id="153" title="Scrub buffers holding sensitive information when releasing/deleting">
+        <cwe id="Heap Inspection" title="Heap Inspection"/>
+    </task>
+    <task id="203" title="Avoid uncontrolled format string">
+        <cwe id="Buffer Overflow: Format String (%f/%F)" title="Buffer Overflow: Format String (%f/%F)"/>
+    </task>
+    <task id="50" title="Use indirect object reference maps if accessing files">
+        <cwe id="Access Control: MQ" title="Access Control: MQ"/>
+    </task>
+    <task id="65" title="Restrict accepted HTTP verbs">
+        <cwe id="HTTP Verb Tampering" title="HTTP Verb Tampering"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="WebSphere Service Provider Misconfiguration: Weak Token" title="WebSphere Service Provider Misconfiguration: Weak Token"/>
+    </task>
+    <task id="204" title="Follow security best practices when dealing with pointers">
+        <cwe id="Null Dereference: Check before Dereference" title="Null Dereference: Check before Dereference"/>
+    </task>
+    <task id="152" title="Avoid asking for and using excessive permissions">
+        <cwe id="Privilege Management: Android Network" title="Privilege Management: Android Network"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Weak WS-SecurityPolicy: Missing Recipient Encryption Token" title="Weak WS-SecurityPolicy: Missing Recipient Encryption Token"/>
+    </task>
+    <task id="20" title="Invalidate old session ID after authentication">
+        <cwe id="Session Fixation" title="Session Fixation"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Axis 2 Service Provider Misconfiguration: Missing Inbound Encryption" title="Axis 2 Service Provider Misconfiguration: Missing Inbound Encryption"/>
+    </task>
+    <task id="60" title="Only use approved cryptographic algorithms and key lengths">
+        <cwe id="Weak Encryption: Inadequate RSA Padding" title="Weak Encryption: Inadequate RSA Padding"/>
+    </task>
+    <task id="22" title="Set secure flag on session cookies">
+        <cwe id="Cookie Security: Cookie not Sent Over SSL" title="Cookie Security: Cookie not Sent Over SSL"/>
+    </task>
+    <task id="161" title="Treat Unique Device IDs as Personally Identifiable Information">
+        <cwe id="Privacy Violation: Password" title="Privacy Violation: Password"/>
+    </task>
+    <task id="38" title="Bind variables in SQL statements">
+        <cwe id="SQL Injection: Hibernate" title="SQL Injection: Hibernate"/>
+    </task>
+    <task id="60" title="Only use approved cryptographic algorithms and key lengths">
+        <cwe id="Weak Cryptographic Hash" title="Weak Cryptographic Hash"/>
+    </task>
+    <task id="49" title="Remove/disable unused, test or debug code and data">
+        <cwe id="Dead Code" title="Dead Code"/>
+    </task>
+    <task id="50" title="Use indirect object reference maps if accessing files">
+        <cwe id="Resource Injection" title="Resource Injection"/>
+    </task>
+    <task id="38" title="Bind variables in SQL statements">
+        <cwe id="SQL Injection: SubSonic" title="SQL Injection: SubSonic"/>
+    </task>
+    <task id="26" title="Destroy sessions on logout">
+        <cwe id="Cookie Security: Persistent Session Cookie" title="Cookie Security: Persistent Session Cookie"/>
+    </task>
+    <task id="21" title="Ensure password and session ID are sent over SSL">
+        <cwe id="Tomcat Configuration: Insecure Transport" title="Tomcat Configuration: Insecure Transport"/>
+    </task>
+    <task id="202" title="Prevent buffer overflow/underflow">
+        <cwe id="Buffer Overflow" title="Buffer Overflow"/>
+    </task>
+    <task id="33" title="Verify integrity of client-supplied read-only data">
+        <cwe id="Hidden Field" title="Hidden Field"/>
+    </task>
+    <task id="47" title="Implement a global error handler and generic default error page for end users">
+        <cwe id="System Information Leak" title="System Information Leak"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Axis 2 Service Provider Misconfiguration: Outbound WS-Security Not Enabled" title="Axis 2 Service Provider Misconfiguration: Outbound WS-Security Not Enabled"/>
+    </task>
+    <task id="161" title="Treat Unique Device IDs as Personally Identifiable Information">
+        <cwe id="Privacy Violation: Image" title="Privacy Violation: Image"/>
+    </task>
+    <task id="21" title="Ensure password and session ID are sent over SSL">
+        <cwe id="Acegi Misconfiguration: Insecure Channel Mixing" title="Acegi Misconfiguration: Insecure Channel Mixing"/>
+    </task>
+    <task id="152" title="Avoid asking for and using excessive permissions">
+        <cwe id="Privilege Management: Android Telephony" title="Privilege Management: Android Telephony"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Axis 2 Misconfiguration: Insecure Message Security" title="Axis 2 Misconfiguration: Insecure Message Security"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Axis 2 Service Provider Misconfiguration: Inbound WS-Security Not Enabled" title="Axis 2 Service Provider Misconfiguration: Inbound WS-Security Not Enabled"/>
+    </task>
+    <task id="159" title="Avoid sending detailed error messages to remote systems">
+        <cwe id="System Information Leak: PHP Errors" title="System Information Leak: PHP Errors"/>
+    </task>
+    <task id="204" title="Follow security best practices when dealing with pointers">
+        <cwe id="Null Dereference: Dereference before Check" title="Null Dereference: Dereference before Check"/>
+    </task>
+    <task id="191" title="Follow best practices when handling primitive data types">
+        <cwe id="Buffer Overflow: Signed Comparison" title="Buffer Overflow: Signed Comparison"/>
+    </task>
+    <task id="53" title="Virus scan all uploaded files using an inline virus scanner">
+        <cwe id="Often Misused: File Upload" title="Often Misused: File Upload"/>
+    </task>
+    <task id="205" title="Avoid inter-process race conditions">
+        <cwe id="Race Condition: Singleton Member Field" title="Race Condition: Singleton Member Field"/>
+    </task>
+    <task id="159" title="Avoid sending detailed error messages to remote systems">
+        <cwe id="System Information Leak: Incomplete Servlet Error Handling" title="System Information Leak: Incomplete Servlet Error Handling"/>
+    </task>
+    <task id="204" title="Follow security best practices when dealing with pointers">
+        <cwe id="Out-of-Bounds Read: Off-by-One" title="Out-of-Bounds Read: Off-by-One"/>
+    </task>
+    <task id="30" title="Protect forms authentication submissions">
+        <cwe id="Axis Service Provider Misconfiguration: Plain Text Password" title="Axis Service Provider Misconfiguration: Plain Text Password"/>
+    </task>
+    <task id="161" title="Treat Unique Device IDs as Personally Identifiable Information">
+        <cwe id="Privacy Violation: Screen Caching" title="Privacy Violation: Screen Caching"/>
+    </task>
+    <task id="152" title="Avoid asking for and using excessive permissions">
+        <cwe id="Privilege Management: Android Data Storage" title="Privilege Management: Android Data Storage"/>
+    </task>
+    <task id="161" title="Treat Unique Device IDs as Personally Identifiable Information">
+        <cwe id="Privacy Violation: Keyboard Caching" title="Privacy Violation: Keyboard Caching"/>
+    </task>
+    <task id="151" title="Use cryptographically secure random numbers">
+        <cwe id="Insecure Randomness" title="Insecure Randomness"/>
+    </task>
+    <task id="203" title="Avoid uncontrolled format string">
+        <cwe id="Buffer Overflow: Format String" title="Buffer Overflow: Format String"/>
+    </task>
+    <task id="202" title="Prevent buffer overflow/underflow">
+        <cwe id="String Termination Error" title="String Termination Error"/>
+    </task>
+    <task id="182" title="Turn off nested expression language evaluation">
+        <cwe id="Dynamic Code Evaluation: Script Injection" title="Dynamic Code Evaluation: Script Injection"/>
+    </task>
+    <task id="52" title="Do not store confidential data in temporary files">
+        <cwe id="Insecure Temporary File" title="Insecure Temporary File"/>
+    </task>
+    <task id="31" title="Perform input validation on all forms of input">
+        <cwe id="Encoded Data Validation" title="Encoded Data Validation"/>
+    </task>
+    <task id="19" title="Restrict application's access to database">
+        <cwe id="Often Misused: Privilege Management" title="Often Misused: Privilege Management"/>
+    </task>
+    <task id="21" title="Ensure password and session ID are sent over SSL">
+        <cwe id="WebSphere Service Requester Misconfiguration: Weak Token" title="WebSphere Service Requester Misconfiguration: Weak Token"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="WebSphere Service Requester Misconfiguration: Missing Inbound Encryption" title="WebSphere Service Requester Misconfiguration: Missing Inbound Encryption"/>
+    </task>
+    <task id="31" title="Perform input validation on all forms of input">
+        <cwe id="Weak XML Schema: Type Any" title="Weak XML Schema: Type Any"/>
+    </task>
+    <task id="204" title="Follow security best practices when dealing with pointers">
+        <cwe id="Use After Free" title="Use After Free"/>
+    </task>
+    <task id="43" title="Avoid unsafe operating system interaction">
+        <cwe id="Command Injection" title="Command Injection"/>
+    </task>
+    <task id="159" title="Avoid sending detailed error messages to remote systems">
+        <cwe id="Axis Misconfiguration: Debug Information" title="Axis Misconfiguration: Debug Information"/>
+    </task>
+    <task id="204" title="Follow security best practices when dealing with pointers">
+        <cwe id="Memory Leak" title="Memory Leak"/>
+    </task>
+    <task id="38" title="Bind variables in SQL statements">
+        <cwe id="SQL Injection: NHibernate" title="SQL Injection: NHibernate"/>
+    </task>
+    <task id="205" title="Avoid inter-process race conditions">
+        <cwe id="Race Condition: Static Database Connection" title="Race Condition: Static Database Connection"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Weak WS-SecurityPolicy: Missing Encryption on Message Headers" title="Weak WS-SecurityPolicy: Missing Encryption on Message Headers"/>
+    </task>
+    <task id="49" title="Remove/disable unused, test or debug code and data">
+        <cwe id="Dead Code: Unused Field" title="Dead Code: Unused Field"/>
+    </task>
+    <task id="205" title="Avoid inter-process race conditions">
+        <cwe id="Race Condition: PHP Design Flaw" title="Race Condition: PHP Design Flaw"/>
+    </task>
+    <task id="206" title="Avoid time of check time of use race condition against external resources">
+        <cwe id="Race Condition: PHP Design Flaw" title="Race Condition: PHP Design Flaw"/>
+    </task>
+    <task id="196" title="Avoid dangerous functions">
+        <cwe id="Often Misused: Strings" title="Often Misused: Strings"/>
+    </task>
+    <task id="21" title="Ensure password and session ID are sent over SSL">
+        <cwe id="WCF Misconfiguration: Weak Token" title="WCF Misconfiguration: Weak Token"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Insecure Storage: Missing Encryption on Stored Private Media" title="Insecure Storage: Missing Encryption on Stored Private Media"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="WebSphere Service Requester Misconfiguration: Inbound WS-Security Not Enabled" title="WebSphere Service Requester Misconfiguration: Inbound WS-Security Not Enabled"/>
+    </task>
+    <task id="161" title="Treat Unique Device IDs as Personally Identifiable Information">
+        <cwe id="Password Management: Password in Redirect" title="Password Management: Password in Redirect"/>
+    </task>
+    <task id="53" title="Virus scan all uploaded files using an inline virus scanner">
+        <cwe id="Often Misused: File Uploads" title="Often Misused: File Uploads"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Axis 2 Service Requester Misconfiguration: Weak Token" title="Axis 2 Service Requester Misconfiguration: Weak Token"/>
+    </task>
+    <task id="46" title="Do not log confidential data">
+        <cwe id="System Information Leak: Overly Broad SQL Logging" title="System Information Leak: Overly Broad SQL Logging"/>
+    </task>
+    <task id="49" title="Remove/disable unused, test or debug code and data">
+        <cwe id="Dead Code: Empty Try Block" title="Dead Code: Empty Try Block"/>
+    </task>
+    <task id="165" title="Do not rely on Unique Device ID values in security controls">
+        <cwe id="ASP.NET Misconfiguration: Role Protection Disabled" title="ASP.NET Misconfiguration: Role Protection Disabled"/>
+    </task>
+    <task id="204" title="Follow security best practices when dealing with pointers">
+        <cwe id="Redundant Null Check" title="Redundant Null Check"/>
+    </task>
+    <task id="156" title="Validate certificate and its chain of trust properly">
+        <cwe id="WCF Misconfiguration: Unsafe Revocation Mode" title="WCF Misconfiguration: Unsafe Revocation Mode"/>
+    </task>
+    <task id="38" title="Bind variables in SQL statements">
+        <cwe id="SQL Injection: Lateral SQL Injection" title="SQL Injection: Lateral SQL Injection"/>
+    </task>
+    <task id="76" title="Do not hard code passwords">
+        <cwe id="Password Management: Hardcoded Password" title="Password Management: Hardcoded Password"/>
+    </task>
+    <task id="35" title="Specify maximum HTTP message size in web server">
+        <cwe id="WCF Misconfiguration: Throttling Not Enabled" title="WCF Misconfiguration: Throttling Not Enabled"/>
+    </task>
+    <task id="196" title="Avoid dangerous functions">
+        <cwe id="Dangerous Function" title="Dangerous Function"/>
+    </task>
+    <task id="14" title="Principles of least privilege">
+        <cwe id="Access Control: Weak Security Constraint" title="Access Control: Weak Security Constraint"/>
+    </task>
+    <task id="31" title="Perform input validation on all forms of input">
+        <cwe id="Spring MVC Bad Practices: Flow Bypass" title="Spring MVC Bad Practices: Flow Bypass"/>
+    </task>
+    <task id="29" title="Use anti cross site request forgery (CSRF) tokens">
+        <cwe id="Cross-Site Request Forgery" title="Cross-Site Request Forgery"/>
+    </task>
+    <task id="205" title="Avoid inter-process race conditions">
+        <cwe id="Race Condition: File System Access" title="Race Condition: File System Access"/>
+    </task>
+    <task id="206" title="Avoid time of check time of use race condition against external resources">
+        <cwe id="Race Condition: File System Access" title="Race Condition: File System Access"/>
+    </task>
+    <task id="203" title="Avoid uncontrolled format string">
+        <cwe id="Format String" title="Format String"/>
+    </task>
+    <task id="76" title="Do not hard code passwords">
+        <cwe id="Password Management: Null Password" title="Password Management: Null Password"/>
+    </task>
+    <task id="36" title="Escape untrusted data in HTML">
+        <cwe id="Cross-Site Scripting: Poor Validation" title="Cross-Site Scripting: Poor Validation"/>
+    </task>
+    <task id="204" title="Follow security best practices when dealing with pointers">
+        <cwe id="Illegal Pointer Value" title="Illegal Pointer Value"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Axis Service Requester Misconfiguration: Weak Token" title="Axis Service Requester Misconfiguration: Weak Token"/>
+    </task>
+    <task id="31" title="Perform input validation on all forms of input">
+        <cwe id="Spring Webflow Bad Practices: Flow Bypass" title="Spring Webflow Bad Practices: Flow Bypass"/>
+    </task>
+    <task id="49" title="Remove/disable unused, test or debug code and data">
+        <cwe id="ColdFusion Bad Practices: Leftover Debug Code" title="ColdFusion Bad Practices: Leftover Debug Code"/>
+    </task>
+    <task id="7" title="Salt and hash stored password">
+        <cwe id="Weak Cryptographic Hash: Hardcoded Salt" title="Weak Cryptographic Hash: Hardcoded Salt"/>
+    </task>
+    <task id="50" title="Use indirect object reference maps if accessing files">
+        <cwe id="Access Control: LDAP" title="Access Control: LDAP"/>
+    </task>
+    <task id="49" title="Remove/disable unused, test or debug code and data">
+        <cwe id="Axis 2 Misconfiguration: Debug Information" title="Axis 2 Misconfiguration: Debug Information"/>
+    </task>
+    <task id="38" title="Bind variables in SQL statements">
+        <cwe id="SQL Injection: JDO" title="SQL Injection: JDO"/>
+    </task>
+    <task id="60" title="Only use approved cryptographic algorithms and key lengths">
+        <cwe id="Weak Encryption: Insufficient Key Size" title="Weak Encryption: Insufficient Key Size"/>
+    </task>
+    <task id="24" title="Enforce idle session timeouts">
+        <cwe id="CakePHP Misconfiguration: Excessive Session Timeout" title="CakePHP Misconfiguration: Excessive Session Timeout"/>
+    </task>
+    <task id="49" title="Remove/disable unused, test or debug code and data">
+        <cwe id="Dead Code: Unused Method" title="Dead Code: Unused Method"/>
+    </task>
+    <task id="49" title="Remove/disable unused, test or debug code and data">
+        <cwe id="ASP.NET Bad Practices: Leftover Debug Code" title="ASP.NET Bad Practices: Leftover Debug Code"/>
+    </task>
+    <task id="76" title="Do not hard code passwords">
+        <cwe id="Password Management: Empty Password" title="Password Management: Empty Password"/>
+    </task>
+    <task id="205" title="Avoid inter-process race conditions">
+        <cwe id="Race Condition: Format Flaw" title="Race Condition: Format Flaw"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Unsafe Mobile Code: Insecure Transport" title="Unsafe Mobile Code: Insecure Transport"/>
+    </task>
+    <task id="38" title="Bind variables in SQL statements">
+        <cwe id="SQL Injection: LINQ" title="SQL Injection: LINQ"/>
+    </task>
+    <task id="182" title="Turn off nested expression language evaluation">
+        <cwe id="Dynamic Code Evaluation: Code Injection" title="Dynamic Code Evaluation: Code Injection"/>
+    </task>
+    <task id="156" title="Validate certificate and its chain of trust properly">
+        <cwe id="ASP.NET Misconfiguration: Incomplete Certificate Validation" title="ASP.NET Misconfiguration: Incomplete Certificate Validation"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Weak WS-SecurityPolicy: Missing Encryption on Message Attachments" title="Weak WS-SecurityPolicy: Missing Encryption on Message Attachments"/>
+    </task>
+    <task id="14" title="Principles of least privilege">
+        <cwe id="WCF Misconfiguration: Anonymous Message Client" title="WCF Misconfiguration: Anonymous Message Client"/>
+    </task>
+    <task id="23" title="Set HttpOnly flag on session cookies">
+        <cwe id="ASP.NET Misconfiguration: HttpOnly Unset" title="ASP.NET Misconfiguration: HttpOnly Unset"/>
+    </task>
+    <task id="40" title="Use XML encoding when interacting with XML data">
+        <cwe id="JSON Injection" title="JSON Injection"/>
+    </task>
+    <task id="41" title="Use Lightweight Directory Access Protocol (LDAP) encoding when interacting with LDAP data">
+        <cwe id="LDAP Manipulation" title="LDAP Manipulation"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Axis 2 Misconfiguration: Insecure Transport Sender" title="Axis 2 Misconfiguration: Insecure Transport Sender"/>
+    </task>
+    <task id="7" title="Salt and hash stored password">
+        <cwe id="Password Management: Weak Cryptography" title="Password Management: Weak Cryptography"/>
+    </task>
+    <task id="62" title="Lockdown passwords in property and configuration files (e.g. database connection strings)">
+        <cwe id="ASP.NET Misconfiguration: Password Protection Disabled" title="ASP.NET Misconfiguration: Password Protection Disabled"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="WebSphere Service Provider Misconfiguration: Outbound WS-Security Not Enabled" title="WebSphere Service Provider Misconfiguration: Outbound WS-Security Not Enabled"/>
+    </task>
+    <task id="31" title="Perform input validation on all forms of input">
+        <cwe id="PHP Misconfiguration: magic_quotes_gpc Enabled" title="PHP Misconfiguration: magic_quotes_gpc Enabled"/>
+    </task>
+    <task id="11" title="Disallow external redirects">
+        <cwe id="Open Redirect" title="Open Redirect"/>
+    </task>
+    <task id="24" title="Enforce idle session timeouts">
+        <cwe id="J2EE Misconfiguration: Excessive Session Timeout" title="J2EE Misconfiguration: Excessive Session Timeout"/>
+    </task>
+    <task id="204" title="Follow security best practices when dealing with pointers">
+        <cwe id="Insecure Compiler Optimization: Pointer Arithmetic" title="Insecure Compiler Optimization: Pointer Arithmetic"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Axis 2 Service Requester Misconfiguration: WS-Security Not Enabled" title="Axis 2 Service Requester Misconfiguration: WS-Security Not Enabled"/>
+    </task>
+    <task id="14" title="Principles of least privilege">
+        <cwe id="WCF Misconfiguration: MSMQ Anonymous Transport Client" title="WCF Misconfiguration: MSMQ Anonymous Transport Client"/>
+    </task>
+    <task id="31" title="Perform input validation on all forms of input">
+        <cwe id="Weak XML Schema: Undefined Namespace" title="Weak XML Schema: Undefined Namespace"/>
+    </task>
+    <task id="196" title="Avoid dangerous functions">
+        <cwe id="Dangerous Function: strcpy()" title="Dangerous Function: strcpy()"/>
+    </task>
+    <task id="55" title="Validate all untrusted XML input">
+        <cwe id="Missing XML Validation" title="Missing XML Validation"/>
+    </task>
+    <task id="203" title="Avoid uncontrolled format string">
+        <cwe id="Format String: Argument Type Mismatch" title="Format String: Argument Type Mismatch"/>
+    </task>
+    <task id="204" title="Follow security best practices when dealing with pointers">
+        <cwe id="Format String: Argument Type Mismatch" title="Format String: Argument Type Mismatch"/>
+    </task>
+    <task id="159" title="Avoid sending detailed error messages to remote systems">
+        <cwe id="ASP.NET Misconfiguration: Debug Information" title="ASP.NET Misconfiguration: Debug Information"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="WCF Misconfiguration: Insecure Transport" title="WCF Misconfiguration: Insecure Transport"/>
+    </task>
+    <task id="38" title="Bind variables in SQL statements">
+        <cwe id="SQL Injection: iBatis Data Map" title="SQL Injection: iBatis Data Map"/>
+    </task>
+    <task id="152" title="Avoid asking for and using excessive permissions">
+        <cwe id="Privilege Management: Android Messaging" title="Privilege Management: Android Messaging"/>
+    </task>
+    <task id="14" title="Principles of least privilege">
+        <cwe id="WSE Misconfiguration: Missing Authorization" title="WSE Misconfiguration: Missing Authorization"/>
+    </task>
+    <task id="59" title="Use standard libraries for encryption">
+        <cwe id="Weak Encryption" title="Weak Encryption"/>
+    </task>
+    <task id="20" title="Invalidate old session ID after authentication">
+        <cwe id="Cookie Security: Session Cookies Disabled" title="Cookie Security: Session Cookies Disabled"/>
+    </task>
+    <task id="47" title="Implement a global error handler and generic default error page for end users">
+        <cwe id="J2EE Misconfiguration: Missing Error Handling" title="J2EE Misconfiguration: Missing Error Handling"/>
+    </task>
+    <task id="36" title="Escape untrusted data in HTML">
+        <cwe id="Cross-Site Scripting: Reflected" title="Cross-Site Scripting: Reflected"/>
+    </task>
+    <task id="53" title="Virus scan all uploaded files using an inline virus scanner">
+        <cwe id="PHP Misconfiguration: file_uploads Enabled" title="PHP Misconfiguration: file_uploads Enabled"/>
+    </task>
+    <task id="159" title="Avoid sending detailed error messages to remote systems">
+        <cwe id="CakePHP Misconfiguration: Debug Information" title="CakePHP Misconfiguration: Debug Information"/>
+    </task>
+    <task id="161" title="Treat Unique Device IDs as Personally Identifiable Information">
+        <cwe id="Privacy Violation" title="Privacy Violation"/>
+    </task>
+    <task id="38" title="Bind variables in SQL statements">
+        <cwe id="SQL Injection" title="SQL Injection"/>
+    </task>
+    <task id="159" title="Avoid sending detailed error messages to remote systems">
+        <cwe id="Flex Misconfiguration: Debug Information" title="Flex Misconfiguration: Debug Information"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="WSE Misconfiguration: Insufficient Encryption" title="WSE Misconfiguration: Insufficient Encryption"/>
+    </task>
+    <task id="20" title="Invalidate old session ID after authentication">
+        <cwe id="J2EE Misconfiguration: Cookies Disabled" title="J2EE Misconfiguration: Cookies Disabled"/>
+    </task>
+    <task id="20" title="Invalidate old session ID after authentication">
+        <cwe id="ASP.NET Misconfiguration: Sensitive File Persistence" title="ASP.NET Misconfiguration: Sensitive File Persistence"/>
+    </task>
+    <task id="38" title="Bind variables in SQL statements">
+        <cwe id="Query String Injection: Amazon Web Services" title="Query String Injection: Amazon Web Services"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Axis 2 Service Requester Misconfiguration: Missing Outbound Encryption" title="Axis 2 Service Requester Misconfiguration: Missing Outbound Encryption"/>
+    </task>
+    <task id="14" title="Principles of least privilege">
+        <cwe id="Least Privilege Violation" title="Least Privilege Violation"/>
+    </task>
+    <task id="39" title="Disallow carriage returns and line feeds when adding data to HTTP response headers">
+        <cwe id="Header Manipulation: Cookies" title="Header Manipulation: Cookies"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Weak WS-SecurityPolicy: Missing Encryption on Message Body" title="Weak WS-SecurityPolicy: Missing Encryption on Message Body"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Weak WS-SecurityPolicy: Missing Encryption Token" title="Weak WS-SecurityPolicy: Missing Encryption Token"/>
+    </task>
+    <task id="14" title="Principles of least privilege">
+        <cwe id="Access Control: Missing Authorization Check" title="Access Control: Missing Authorization Check"/>
+    </task>
+    <task id="159" title="Avoid sending detailed error messages to remote systems">
+        <cwe id="System Information Leak: Apache Axis 2" title="System Information Leak: Apache Axis 2"/>
+    </task>
+    <task id="7" title="Salt and hash stored password">
+        <cwe id="Password Management" title="Password Management"/>
+    </task>
+    <task id="38" title="Bind variables in SQL statements">
+        <cwe id="SQL Injection: Castle ActiveRecord" title="SQL Injection: Castle ActiveRecord"/>
+    </task>
+    <task id="31" title="Perform input validation on all forms of input">
+        <cwe id="HTML5: Form Validation Turned Off" title="HTML5: Form Validation Turned Off"/>
+    </task>
+    <task id="165" title="Do not rely on Unique Device ID values in security controls">
+        <cwe id="ASP.NET Misconfiguration: Incomplete Role Protection" title="ASP.NET Misconfiguration: Incomplete Role Protection"/>
+    </task>
+    <task id="47" title="Implement a global error handler and generic default error page for end users">
+        <cwe id="ASP.NET Misconfiguration: Missing Error Handling" title="ASP.NET Misconfiguration: Missing Error Handling"/>
+    </task>
+    <task id="39" title="Disallow carriage returns and line feeds when adding data to HTTP response headers">
+        <cwe id="Header Manipulation" title="Header Manipulation"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="WebSphere Service Requester Misconfiguration: Outbound WS-Security Not Enabled" title="WebSphere Service Requester Misconfiguration: Outbound WS-Security Not Enabled"/>
+    </task>
+    <task id="156" title="Validate certificate and its chain of trust properly">
+        <cwe id="Often Misused: Weak SSL Certificate" title="Often Misused: Weak SSL Certificate"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="WebSphere Service Provider Misconfiguration: Missing Inbound Encryption" title="WebSphere Service Provider Misconfiguration: Missing Inbound Encryption"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Weak WS-SecurityPolicy: Missing Initiator Encryption Token" title="Weak WS-SecurityPolicy: Missing Initiator Encryption Token"/>
+    </task>
+    <task id="38" title="Bind variables in SQL statements">
+        <cwe id="Query String Injection: Android Provider" title="Query String Injection: Android Provider"/>
+    </task>
+    <task id="36" title="Escape untrusted data in HTML">
+        <cwe id="Cross-Site Scripting: DOM" title="Cross-Site Scripting: DOM"/>
+    </task>
+    <task id="37" title="Avoid DOM-based cross site scripting (XSS)">
+        <cwe id="Cross-Site Scripting: DOM" title="Cross-Site Scripting: DOM"/>
+    </task>
+    <task id="49" title="Remove/disable unused, test or debug code and data">
+        <cwe id="J2EE Bad Practices: Leftover Debug Code" title="J2EE Bad Practices: Leftover Debug Code"/>
+    </task>
+    <task id="191" title="Follow best practices when handling primitive data types">
+        <cwe id="Array Bounds Error" title="Array Bounds Error"/>
+    </task>
+    <task id="202" title="Prevent buffer overflow/underflow">
+        <cwe id="Array Bounds Error" title="Array Bounds Error"/>
+    </task>
+    <task id="40" title="Use XML encoding when interacting with XML data">
+        <cwe id="XML External Entity Injection" title="XML External Entity Injection"/>
+    </task>
+    <task id="45" title="Log potential application security events">
+        <cwe id="WCF Misconfiguration: Insufficient Logging" title="WCF Misconfiguration: Insufficient Logging"/>
+    </task>
+    <task id="35" title="Specify maximum HTTP message size in web server">
+        <cwe id="Weak XML Schema: Unbounded Occurences" title="Weak XML Schema: Unbounded Occurences"/>
+    </task>
+    <task id="31" title="Perform input validation on all forms of input">
+        <cwe id="ADF Bad Practices: Missing URL Parameter Converter" title="ADF Bad Practices: Missing URL Parameter Converter"/>
+    </task>
+    <task id="36" title="Escape untrusted data in HTML">
+        <cwe id="Cross-Site Scripting" title="Cross-Site Scripting"/>
+    </task>
+    <task id="22" title="Set secure flag on session cookies">
+        <cwe id="Cookie Security: Session Cookie not Sent Over SSL" title="Cookie Security: Session Cookie not Sent Over SSL"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Axis 2 Misconfiguration: Insecure Transport Receiver" title="Axis 2 Misconfiguration: Insecure Transport Receiver"/>
+    </task>
+    <task id="76" title="Do not hard code passwords">
+        <cwe id="Key Management: Hardcoded Encryption Key" title="Key Management: Hardcoded Encryption Key"/>
+    </task>
+    <task id="149" title="Avoid hard-coded secret keys or passwords on client">
+        <cwe id="Key Management: Hardcoded Encryption Key" title="Key Management: Hardcoded Encryption Key"/>
+    </task>
+    <task id="20" title="Invalidate old session ID after authentication">
+        <cwe id="ASP.NET Misconfiguration: Session Cookies Disabled" title="ASP.NET Misconfiguration: Session Cookies Disabled"/>
+    </task>
+    <task id="14" title="Principles of least privilege">
+        <cwe id="Access Control: Anonymous LDAP Bind" title="Access Control: Anonymous LDAP Bind"/>
+    </task>
+    <task id="196" title="Avoid dangerous functions">
+        <cwe id="Dangerous Function: Strcpy" title="Dangerous Function: Strcpy"/>
+    </task>
+    <task id="49" title="Remove/disable unused, test or debug code and data">
+        <cwe id="WCF Misconfiguration: Debug Information" title="WCF Misconfiguration: Debug Information"/>
+    </task>
+    <task id="40" title="Use XML encoding when interacting with XML data">
+        <cwe id="XPath Injection" title="XPath Injection"/>
+    </task>
+    <task id="203" title="Avoid uncontrolled format string">
+        <cwe id="Format String: Argument Number Mismatch" title="Format String: Argument Number Mismatch"/>
+    </task>
+    <task id="20" title="Invalidate old session ID after authentication">
+        <cwe id="PHP Misconfiguration: session_use_trans_sid Enabled" title="PHP Misconfiguration: session_use_trans_sid Enabled"/>
+    </task>
+    <task id="41" title="Use Lightweight Directory Access Protocol (LDAP) encoding when interacting with LDAP data">
+        <cwe id="LDAP Injection" title="LDAP Injection"/>
+    </task>
+    <task id="204" title="Follow security best practices when dealing with pointers">
+        <cwe id="Null Dereference" title="Null Dereference"/>
+    </task>
+    <task id="205" title="Avoid inter-process race conditions">
+        <cwe id="Race Condition: Signal Handling" title="Race Condition: Signal Handling"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Axis 2 Service Provider Misconfiguration: Missing Outbound Encryption" title="Axis 2 Service Provider Misconfiguration: Missing Outbound Encryption"/>
+    </task>
+    <task id="56" title="Restrict access to WSDL">
+        <cwe id="Axis Misconfiguration: Service Enumeration" title="Axis Misconfiguration: Service Enumeration"/>
+    </task>
+    <task id="152" title="Avoid asking for and using excessive permissions">
+        <cwe id="Privilege Management: Overly Broad Grant" title="Privilege Management: Overly Broad Grant"/>
+    </task>
+    <task id="152" title="Avoid asking for and using excessive permissions">
+        <cwe id="Privilege Management: Default Package Rights" title="Privilege Management: Default Package Rights"/>
+    </task>
+    <task id="30" title="Protect forms authentication submissions">
+        <cwe id="Axis 2 Service Requester Misconfiguration: Plain Text Password" title="Axis 2 Service Requester Misconfiguration: Plain Text Password"/>
+    </task>
+    <task id="191" title="Follow best practices when handling primitive data types">
+        <cwe id="Out-of-Bounds Read: Signed Comparison" title="Out-of-Bounds Read: Signed Comparison"/>
+    </task>
+    <task id="64" title="No-cache for confidential pages">
+        <cwe id="Privacy Violation: Autocomplete" title="Privacy Violation: Autocomplete"/>
+    </task>
+    <task id="204" title="Follow security best practices when dealing with pointers">
+        <cwe id="Out-of-Bounds Read" title="Out-of-Bounds Read"/>
+    </task>
+    <task id="202" title="Prevent buffer overflow/underflow">
+        <cwe id="Out-of-Bounds Read" title="Out-of-Bounds Read"/>
+    </task>
+    <task id="165" title="Do not rely on Unique Device ID values in security controls">
+        <cwe id="ASP.NET Misconfiguration: Persistent Authentication" title="ASP.NET Misconfiguration: Persistent Authentication"/>
+    </task>
+    <task id="31" title="Perform input validation on all forms of input">
+        <cwe id="Code Correctness: Erroneous Zero Value" title="Code Correctness: Erroneous Zero Value"/>
+    </task>
+    <task id="39" title="Disallow carriage returns and line feeds when adding data to HTTP response headers">
+        <cwe id="HTTP Response Splitting" title="HTTP Response Splitting"/>
+    </task>
+    <task id="21" title="Ensure password and session ID are sent over SSL">
+        <cwe id="J2EE Misconfiguration: Missing Data Transport Constraint" title="J2EE Misconfiguration: Missing Data Transport Constraint"/>
+    </task>
+    <task id="196" title="Avoid dangerous functions">
+        <cwe id="Dangerous Function: xp_cmdshell" title="Dangerous Function: xp_cmdshell"/>
+    </task>
+    <task id="156" title="Validate certificate and its chain of trust properly">
+        <cwe id="ASP.NET Misconfiguration: Certificate Validation Disabled" title="ASP.NET Misconfiguration: Certificate Validation Disabled"/>
+    </task>
+    <task id="30" title="Protect forms authentication submissions">
+        <cwe id="Credential Management" title="Credential Management"/>
+    </task>
+    <task id="4" title="Configurable password policies">
+        <cwe id="Password Management: Weak Redundancy" title="Password Management: Weak Redundancy"/>
+    </task>
+    <task id="35" title="Specify maximum HTTP message size in web server">
+        <cwe id="Weak XML Schema: Unbounded Occurrences" title="Weak XML Schema: Unbounded Occurrences"/>
+    </task>
+    <task id="135" title="Provide unique user IDs for each user">
+        <cwe id="Struts Misconfiguration: Duplicate Form Bean" title="Struts Misconfiguration: Duplicate Form Bean"/>
+    </task>
+    <task id="204" title="Follow security best practices when dealing with pointers">
+        <cwe id="Memory Leak: Reallocation" title="Memory Leak: Reallocation"/>
+    </task>
+    <task id="156" title="Validate certificate and its chain of trust properly">
+        <cwe id="WCF Misconfiguration: Certificate Validation Not Enabled" title="WCF Misconfiguration: Certificate Validation Not Enabled"/>
+    </task>
+    <task id="191" title="Follow best practices when handling primitive data types">
+        <cwe id="Type Mismatch: Integer to Character" title="Type Mismatch: Integer to Character"/>
+    </task>
+    <task id="161" title="Treat Unique Device IDs as Personally Identifiable Information">
+        <cwe id="Password Management: Insecure Submission" title="Password Management: Insecure Submission"/>
+    </task>
+    <task id="76" title="Do not hard code passwords">
+        <cwe id="Password Management: Password in Comment" title="Password Management: Password in Comment"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="WebSphere Service Requester Misconfiguration: Missing Outbound Encryption" title="WebSphere Service Requester Misconfiguration: Missing Outbound Encryption"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Axis Service Provider Misconfiguration: Weak Token" title="Axis Service Provider Misconfiguration: Weak Token"/>
+    </task>
+    <task id="161" title="Treat Unique Device IDs as Personally Identifiable Information">
+        <cwe id="PCI Privacy Violation" title="PCI Privacy Violation"/>
+    </task>
+    <task id="189" title="Avoid using unmanaged (native) code">
+        <cwe id="Unsafe JNI" title="Unsafe JNI"/>
+    </task>
+    <task id="76" title="Do not hard code passwords">
+        <cwe id="Password Management: Password in HTML Form" title="Password Management: Password in HTML Form"/>
+    </task>
+    <task id="21" title="Ensure password and session ID are sent over SSL">
+        <cwe id="J2EE Misconfiguration: Insecure Transport" title="J2EE Misconfiguration: Insecure Transport"/>
+    </task>
+    <task id="191" title="Follow best practices when handling primitive data types">
+        <cwe id="Type Mismatch: Signed to Unsigned" title="Type Mismatch: Signed to Unsigned"/>
+    </task>
+    <task id="152" title="Avoid asking for and using excessive permissions">
+        <cwe id="Privilege Management: Android Connectivity" title="Privilege Management: Android Connectivity"/>
+    </task>
+    <task id="24" title="Enforce idle session timeouts">
+        <cwe id="ASP.NET Misconfiguration: Excessive Session Timeout" title="ASP.NET Misconfiguration: Excessive Session Timeout"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Axis 2 Service Requester Misconfiguration: Outbound WS-Security Not Enabled" title="Axis 2 Service Requester Misconfiguration: Outbound WS-Security Not Enabled"/>
+    </task>
+    <task id="50" title="Use indirect object reference maps if accessing files">
+        <cwe id="Access Control: DLI" title="Access Control: DLI"/>
+    </task>
+    <task id="31" title="Perform input validation on all forms of input">
+        <cwe id="Weak XML Schema: Lax Processing" title="Weak XML Schema: Lax Processing"/>
+    </task>
+    <task id="14" title="Principles of least privilege">
+        <cwe id="WCF Misconfiguration: Transport Security Enabled" title="WCF Misconfiguration: Transport Security Enabled"/>
+    </task>
+    <task id="162" title="Validate workspace before retrieving local resources">
+        <cwe id="Path Manipulation" title="Path Manipulation"/>
+    </task>
+    <task id="50" title="Use indirect object reference maps if accessing files">
+        <cwe id="Path Manipulation" title="Path Manipulation"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Axis 2 Service Requester Misconfiguration: Inbound WS-Security Not Enabled" title="Axis 2 Service Requester Misconfiguration: Inbound WS-Security Not Enabled"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Axis 2 Service Requester Misconfiguration: Missing Inbound Encryption" title="Axis 2 Service Requester Misconfiguration: Missing Inbound Encryption"/>
+    </task>
+    <task id="152" title="Avoid asking for and using excessive permissions">
+        <cwe id="Privilege Management: Android Disable" title="Privilege Management: Android Disable"/>
+    </task>
+    <task id="31" title="Perform input validation on all forms of input">
+        <cwe id="Code Correctness: Erroneous Negative Value" title="Code Correctness: Erroneous Negative Value"/>
+    </task>
+    <task id="55" title="Validate all untrusted XML input">
+        <cwe id="Missing XML Validation: Untyped Response" title="Missing XML Validation: Untyped Response"/>
+    </task>
+    <task id="152" title="Avoid asking for and using excessive permissions">
+        <cwe id="Privilege Management: Android Location" title="Privilege Management: Android Location"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="WebSphere Service Provider Misconfiguration: Missing Outbound Encryption" title="WebSphere Service Provider Misconfiguration: Missing Outbound Encryption"/>
+    </task>
+    <task id="204" title="Follow security best practices when dealing with pointers">
+        <cwe id="Double Free" title="Double Free"/>
+    </task>
+    <task id="72" title="Use safe arithmetic to avoid integer overflow">
+        <cwe id="Integer Overflow" title="Integer Overflow"/>
+    </task>
+    <task id="181" title="Validate model explicitly for fields the user is allowed to update">
+        <cwe id="Spring MVC Bad Practices: Request Parameters Bound into Persisted Objects" title="Spring MVC Bad Practices: Request Parameters Bound into Persisted Objects"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Axis 2 Service Provider Misconfiguration: WS-Security Not Enabled" title="Axis 2 Service Provider Misconfiguration: WS-Security Not Enabled"/>
+    </task>
+    <task id="62" title="Lockdown passwords in property and configuration files (e.g. database connection strings)">
+        <cwe id="Password Management: Password in Configuration File" title="Password Management: Password in Configuration File"/>
+    </task>
+    <task id="42" title="Avoid relying on untrusted data for server side page, view, or template selection">
+        <cwe id="Dangerous File Inclusion" title="Dangerous File Inclusion"/>
+    </task>
+    <task id="151" title="Use cryptographically secure random numbers">
+        <cwe id="HTML5: Easy-to-Guess Database Name" title="HTML5: Easy-to-Guess Database Name"/>
+    </task>
+    <task id="152" title="Avoid asking for and using excessive permissions">
+        <cwe id="Privilege Management: Unnecessary Permission" title="Privilege Management: Unnecessary Permission"/>
+    </task>
+    <task id="40" title="Use XML encoding when interacting with XML data">
+        <cwe id="XML Injection" title="XML Injection"/>
+    </task>
+    <task id="146" title="Use encryption for network communications in mobile environment">
+        <cwe id="Axis 2 Service Provider Misconfiguration: Weak Token" title="Axis 2 Service Provider Misconfiguration: Weak Token"/>
+    </task>
+    <task id="152" title="Avoid asking for and using excessive permissions">
+        <cwe id="J2EE Misconfiguration: Debug Information" title="J2EE Misconfiguration: Debug Information"/>
+    </task>
+    <task id="30" title="Protect forms authentication submissions">
+        <cwe id="Axis Service Requester Misconfiguration: Plain Text Password" title="Axis Service Requester Misconfiguration: Plain Text Password"/>
+    </task>
+</mapping>

@@ -2,7 +2,7 @@ import os
 from xml.dom import minidom
 
 from sdetools.sdelib import commons
-from base_integrator import BaseIntegrator, IntegrationError
+from sdetools.analysis_integration.base_integrator import BaseIntegrator, IntegrationError
 
 __all__ = ['VeracodeIntegrator']
 
