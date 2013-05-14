@@ -27,8 +27,8 @@ class FortifyIntegrator(BaseIntegrator):
         Extract finding information from an XML node.
         """
         entry = {}
-        entry['cweid'] = node.getElementsByTagName("Category")[0].firstChild.data
-        entry['description'] = node.getElementsByTagName("Kingdom")[0].firstChild.data
+        entry['cweid'] = node.getElementsByTagName("groupTitle")[0].firstChild.data
+        entry['description'] = node.getElementsByTagName("groupTitle")[0].firstChild.data
         return entry
 
     def parse(self):
@@ -45,8 +45,15 @@ class FortifyIntegrator(BaseIntegrator):
                 
         self.report_id = "WebGoat"
 
-        self.raw_findings[:] = [self._make_raw_finding(node)
-                                for node in base.getElementsByTagName('Issue')]
+        report_sections = base.getElementsByTagName('ReportSection')
+        for report_section in report_sections:
+            title = report_section.getElementsByTagName('Title')[0]
+            if (title.firstChild.data == 'Issue Count by Category'):
+                issue_listing = report_section.getElementsByTagName('IssueListing')[0]
+                grouping_sections = issue_listing.getElementsByTagName('GroupingSection')
+                for grouping_section in grouping_sections:
+                    for i in range(0,int(grouping_section.attributes['count'].value)):
+                        self.raw_findings.append( self._make_raw_finding(grouping_section) )
 
     def _make_finding(self, item):
         finding = {'cweid': item['cweid'], 'description': item['description']}
