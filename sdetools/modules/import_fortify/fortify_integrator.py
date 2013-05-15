@@ -15,7 +15,7 @@ class FortifyIntegrationError(IntegrationError):
     pass
 
 class FortifyIntegrator(BaseIntegrator):
-    TOOL_NAME = "veracode"
+    TOOL_NAME = "fortify"
 
     def __init__(self, config):
         config.add_custom_option("report_xml", "Fortify Report XML", "x", None)
