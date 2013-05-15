@@ -34,7 +34,6 @@ class BaseIntegrator(object):
         self.report_id = ""
         self.config = config
         self.emit = self.config.emit
-        self.plugin = None
         self.cwe_title = {}
         self.confidence = {}
         self.plugin = PlugInExperience(self.config)
