@@ -17,9 +17,14 @@ from sdetools.sdelib import commons
 
 ssl_warned = False
 
-CERT_PATH_NAME = os.path.join(commons.media_path, 'ssl')
-CA_CERTS_FILE = os.path.join(CERT_PATH_NAME, 'ca_bundle.crt')
+DEFAULT_ROOT_BUNDLE = 'ca_bundle.crt'
+CUSTOM_ROOT_BUNDLE = 'my_root_certs.crt'
 
+CERT_PATH_NAME = os.path.join(commons.media_path, 'ssl')
+CA_CERTS_FILE = os.path.join(CERT_PATH_NAME, DEFAULT_ROOT_BUNDLE)
+
+# Here we just check that the data directory is okey by checking to see
+# if we can access the default bundle.
 try:
     open(CA_CERTS_FILE).close()
 except:
