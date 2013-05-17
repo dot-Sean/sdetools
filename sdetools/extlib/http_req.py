@@ -4,6 +4,8 @@ import os
 import socket
 import urllib2
 import base64
+import tempfile
+import atexit
 
 try:
     import ssl
@@ -23,12 +25,42 @@ CUSTOM_ROOT_BUNDLE = 'my_root_certs.crt'
 CERT_PATH_NAME = os.path.join(commons.media_path, 'ssl')
 CA_CERTS_FILE = os.path.join(CERT_PATH_NAME, DEFAULT_ROOT_BUNDLE)
 
-# Here we just check that the data directory is okey by checking to see
-# if we can access the default bundle.
-try:
-    open(CA_CERTS_FILE).close()
-except:
-    logging.warning('Unable to access SSL root certificate: %s' % (CA_CERTS_FILE))
+def compile_certs():
+    global CA_CERTS_FILE
+
+    # Here we just check that the data directory is okey by checking to see
+    # if we can access the default bundle.
+    try:
+        open(CA_CERTS_FILE).close()
+    except:
+        logging.warning('Unable to access SSL root certificate: %s' % (CA_CERTS_FILE))
+
+    def remove_file(dest_path):
+        try:
+            os.remove(dest_path)
+        except:
+            logging.warning('Unable to cleanup temporary file: %s' % dest_path)
+
+    crtfd, crtfname = tempfile.mkstemp()
+    crtf = os.fdopen(crtfd, 'w')
+
+    for fname in os.listdir(CERT_PATH_NAME):
+        if not fname.endswith('.crt'):
+            continue
+        fpath = os.path.join(CERT_PATH_NAME, fname)
+        if not os.path.isfile(fpath):
+            continue
+        lfd = open(fpath)
+        buf = lfd.read()
+        while buf:
+            crtf.write(buf)
+            buf = lfd.read()
+        lfd.close()
+        crtf.write('\n')
+    crtf.close()
+
+    atexit.register(remove_file, crtfname)
+    CA_CERTS_FILE = crtfname
 
 class ExtendedMethodRequest(urllib2.Request):
     GET = 'GET'
@@ -182,4 +214,6 @@ def get_opener(method, server, proxy=None, debuglevel=0):
     opener = urllib2.build_opener(*handler)
     opener.server = server
     return opener
+
+compile_certs()
 
