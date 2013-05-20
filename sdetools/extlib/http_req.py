@@ -19,8 +19,18 @@ from sdetools.sdelib import commons
 
 ssl_warned = False
 
+# These are under media path
 DEFAULT_ROOT_BUNDLE = 'ca_bundle.crt'
 CUSTOM_ROOT_BUNDLE = 'my_root_certs.crt'
+
+OS_ROOT_BUNDLES = [
+    # Debian/Ubuntu/Gentoo/Arch Linux
+    '/etc/ssl/certs/ca-certificates.crt',
+    # Fedora/RHEL
+    '/etc/pki/tls/certs/ca-bundle.crt',
+    # openSUSE/SLE
+    '/etc/ssl/ca-bundle.pem',
+    ]
 
 CERT_PATH_NAME = os.path.join(commons.media_path, 'ssl')
 CA_CERTS_FILE = os.path.join(CERT_PATH_NAME, DEFAULT_ROOT_BUNDLE)
@@ -44,10 +54,15 @@ def compile_certs():
     crtfd, crtfname = tempfile.mkstemp()
     crtf = os.fdopen(crtfd, 'w')
 
+    candidates = OS_ROOT_BUNDLES[:]
+
     for fname in os.listdir(CERT_PATH_NAME):
         if not fname.endswith('.crt'):
             continue
         fpath = os.path.join(CERT_PATH_NAME, fname)
+        candidates.append(fpath)
+
+    for fpath in candidates:
         if not os.path.isfile(fpath):
             continue
         lfd = open(fpath)
