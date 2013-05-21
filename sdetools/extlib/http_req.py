@@ -65,7 +65,11 @@ def compile_certs():
     for fpath in candidates:
         if not os.path.isfile(fpath):
             continue
-        lfd = open(fpath)
+        try:
+            lfd = open(fpath)
+        except:
+            logging.warning('Unable to access SSL Certificates file %s (skipping ...)' % fpath)
+            continue
         buf = lfd.read()
         while buf:
             crtf.write(buf)
