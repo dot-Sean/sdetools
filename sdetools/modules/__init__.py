@@ -10,4 +10,5 @@ __all__ = [
     'list_projects',
     'sync_trac',
     'connect',
+    'add_ssl_cert',
 ]
