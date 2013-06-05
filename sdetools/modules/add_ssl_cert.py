@@ -1,6 +1,7 @@
 # Copyright SDElements Inc
 
 import ssl
+import socket
 from sdetools.sdelib.commons import UsageError, Error
 from sdetools.sdelib.cmd import BaseCommand
 from sdetools.extlib import http_req
@@ -19,12 +20,16 @@ class Command(BaseCommand):
     def handle(self):
         try:
             self.config['port'] = int(self.config['port'])
-        except:
+        except ValueError:
             raise UsageError('Port number invalid')
         try:
             cert = ssl.get_server_certificate((self.config['server'], self.config['port']))
-        except:
-            raise Error('Unable to reach the specified server, or no SSL can be found')
+        except ssl.SSLError, err:
+            raise Error('Can not establish SSL connection with the specified server/port.'
+                ' Reason: %s' % (err))
+        except socket.error, err:
+            raise Error('Unable to reach the specified server.'
+                ' Reason: %s' % (err))
 
         if SSL_END_MARKER not in cert:
             raise Error('No certificate found')
