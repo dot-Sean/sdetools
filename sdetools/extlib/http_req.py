@@ -39,17 +39,20 @@ CUSTOM_CA_FILE = os.path.join(CERT_PATH_NAME, CUSTOM_ROOT_BUNDLE)
 def compile_certs():
     global CA_CERTS_FILE
 
-    # Here we just check that the data directory is okey by checking to see
+    # Here we just check that the data directory is okay by checking to see
     # if we can access the default bundle.
     try:
         open(CA_CERTS_FILE).close()
     except:
+        # If can't open for any reason including file not existing, file not readable, 
+        # file locked by another process, we need to just continue
         logging.warning('Unable to access SSL root certificate: %s' % (CA_CERTS_FILE))
 
     def remove_file(dest_path):
         try:
             os.remove(dest_path)
         except:
+            # It is a failsafe file removal
             logging.warning('Unable to cleanup temporary file: %s' % dest_path)
 
     crtfd, crtfname = tempfile.mkstemp()
@@ -58,10 +61,8 @@ def compile_certs():
     candidates = OS_ROOT_BUNDLES[:]
 
     for fname in os.listdir(CERT_PATH_NAME):
-        if not fname.endswith('.crt'):
-            continue
-        fpath = os.path.join(CERT_PATH_NAME, fname)
-        candidates.append(fpath)
+        if fname.endswith('.crt'):
+            candidates.append(os.path.join(CERT_PATH_NAME, fname))
 
     for fpath in candidates:
         if not os.path.isfile(fpath):
