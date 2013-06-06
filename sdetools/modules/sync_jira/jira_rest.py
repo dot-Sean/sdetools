@@ -115,7 +115,7 @@ class JIRARestAPI(RESTBase):
                'labels':['SD-Elements']
            }
         }
-        if len(affected_versions) > 0:
+        if affected_versions:
             args['fields']['versions'] = affected_versions
 
         if self.config['alm_parent_issue']:
