@@ -71,7 +71,7 @@ class JIRARestAPI(RESTBase):
             task_resolution = jtask['fields']['resolution']['name']
 
         task_versions = []
-        if jtask['fields']['versions']:
+        if 'versions' in jtask['fields'] and jtask['fields']['versions']:
             for version in jtask['fields']['versions']:
                 task_versions.append(version['name'])
 
@@ -112,10 +112,12 @@ class JIRARestAPI(RESTBase):
                'issuetype': {
                    'id': issue_type_id
                },
-               'versions': affected_versions,
                'labels':['SD-Elements']
            }
         }
+        if len(affected_versions) > 0:
+            args['fields']['versions'] = affected_versions
+
         if self.config['alm_parent_issue']:
             args['fields']['parent'] = {'key':self.config['alm_parent_issue']}
 

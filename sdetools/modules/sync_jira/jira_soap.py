@@ -129,7 +129,7 @@ class JIRASoapAPI:
                 if priority['id'] == jtask['priority']:
                     task_priority = priority['name']
                     break
-        if jtask['affectsVersions']:
+        if 'affectsVersions' in jtask and jtask['affectsVersions']:
             for version in jtask['affectsVersions']:
                 task_versions.append(version['name'])
 
