@@ -97,12 +97,13 @@ class AlmConnector(object):
                 '(comma seperated, e.g. T12,T13). Note: Overrides other selections.',
                 default='')
         self.config.add_custom_option('alm_project', 'Project in ALM Tool',
-                default=None)
+                default='')
         self.config.add_custom_option('conflict_policy', 'Conflict policy to use',
                 default='alm')
         self.config.add_custom_option('show_progress', 'Show progress',
                 default='False')
-        self.config.add_custom_option('test_alm_connection', 'Test Alm Connection Only',
+        self.config.add_custom_option('test_alm_connection', 'Test Alm Connection Only '
+                '(Also checks existence of project if alm_project is specified)',
                 default='False')
         self.config.add_custom_option('alm_standard_workflow', 'Standard workflow in ALM?',
                 default='True')

@@ -44,7 +44,7 @@ class JIRASoapAPI:
         self.auth = None
         self.versions = None
 
-    def connect(self):
+    def connect_server(self):
         config = SOAPpy.Config
         if __name__ in self.config['debug_mods']:
             config.debug = 1
@@ -73,6 +73,11 @@ class JIRASoapAPI:
         except SOAPpy.Types.faultType:
             raise AlmException('Unable to login to JIRA. Please check ID, password')
 
+        # For JIRA 4 we need the ID-Name mapping for status and priority
+        self.statuses = self.proxy.getStatuses(self.auth)
+        self.priorities = self.proxy.getPriorities(self.auth)
+
+    def connect_project(self):
         # Test for project existence
         try:
             result = self.proxy.getProjectByKey(self.auth, self.config['alm_project'])
@@ -80,9 +85,6 @@ class JIRASoapAPI:
             raise AlmException('Unable to connect to project %s. Please check project'
                                ' settings' % (self.config['alm_project']))
         
-        # For JIRA 4 we need the ID-Name mapping for status and priority
-        self.statuses = self.proxy.getStatuses(self.auth)
-        self.priorities = self.proxy.getPriorities(self.auth)
         self.versions = self.proxy.getVersions(self.auth, self.config['alm_project'])
 
     def get_issue_types(self):
