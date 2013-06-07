@@ -15,16 +15,17 @@ class JIRARestAPI(RESTBase):
         else:
             return super(JIRARestAPI, self).parse_response(result)
 
-    def connect(self):
+    def connect_server(self):
         """ Verifies that JIRA connection works """
-        #verify that we can connect to JIRA
+        # Verify that we can connect to JIRA
         try:
             result = self.call_api('project')
         except APIError, err:
             raise AlmException('Unable to connect to JIRA service (Check server URL, '
                     'user, pass). Reason: %s' % str(err))
 
-        #verify that we can access project by retrieving its versions
+    def connect_project(self):
+        # Verify that we can access project by retrieving its versions
         try:
             self.versions = self.call_api('project/%s/versions' % (self.urlencode_str(self.config['alm_project'])))
         except APIError:

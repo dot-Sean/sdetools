@@ -79,8 +79,8 @@ class JIRAConnector(AlmConnector):
             'close': None,
             'reopen': None}
 
-    def alm_connect(self):
-        self.alm_plugin.connect()
+    def alm_connect_server(self):
+        self.alm_plugin.connect_server()
 
         #get Issue ID for given type name
         if self.config['alm_parent_issue']:
@@ -95,6 +95,9 @@ class JIRAConnector(AlmConnector):
                 break
         if self.jira_issue_type_id is None:
             raise AlmException('Issue type %s not available' % self.config['jira_issue_type'])
+
+    def alm_connect_project(self):
+        self.alm_plugin.connect_project()
 
         self.project_version = self.alm_get_version(self.config['alm_project_version'])
         if self.config['alm_project_version'] and not self.project_version:
