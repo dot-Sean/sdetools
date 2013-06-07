@@ -79,7 +79,7 @@ class JIRAConnector(AlmConnector):
             'close': None,
             'reopen': None}
 
-    def alm_connect(self):
+    def alm_connect_server(self):
         self.alm_plugin.connect_server()
 
         #get Issue ID for given type name
@@ -96,10 +96,7 @@ class JIRAConnector(AlmConnector):
         if self.jira_issue_type_id is None:
             raise AlmException('Issue type %s not available' % self.config['jira_issue_type'])
 
-        # In case we just wanted to verify the server rather than the project
-        if self.config['test_alm_connection'] and not self.config['alm_project']:
-            return
-
+    def alm_connect_project():
         self.alm_plugin.connect_project()
 
         self.project_version = self.alm_get_version(self.config['alm_project_version'])

@@ -170,8 +170,25 @@ class AlmConnector(object):
 
         logger.info('*** AlmConnector initialized ***')
 
-    @abstractmethod
     def alm_connect(self):
+        self.alm_connect_server()
+
+        # In case we just wanted to verify the server rather than the project
+        if self.config['test_alm_connection'] and not self.config['alm_project']:
+            return
+
+        self.alm_connect_project()
+
+    @abstractmethod
+    def alm_connect_server(self):
+        """ Sets up a connection to the ALM tool.
+
+        Raises an AlmException on encountering an error
+        """
+        pass
+
+    @abstractmethod
+    def alm_connect_project(self):
         """ Sets up a connection to the ALM tool.
 
         Raises an AlmException on encountering an error
