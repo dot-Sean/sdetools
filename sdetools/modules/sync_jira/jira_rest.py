@@ -39,10 +39,21 @@ class JIRARestAPI(RESTBase):
                 if item['name'] == self.config['jira_issue_type']:
                     for key in item['fields']:
                         fields.append({'id':key,'name':item['fields'][key]['name']})
+            self.fields = fields
             return fields
         except APIError:
             raise AlmException('Could not retrieve custom fields for JIRA project: %s' % self.config['alm_project'])
-       
+
+    def has_field(self, field_name):
+        if not self.fields:
+             return False
+             
+        for field in self.fields:
+            if (field_name == field['name']):
+                return True
+                
+        return False
+        
     def get_issue_types(self):
         try:
             return self.call_api('issuetype')
@@ -76,9 +87,13 @@ class JIRARestAPI(RESTBase):
             for version in jtask['fields']['versions']:
                 task_versions.append(version['name'])
 
+        task_priority = None
+        if 'priority' in jtask['fields'] and jtask['fields']['priority']:
+            task_priority = jtask['fields']['priority']['name']
+
         return JIRATask(task['id'],
                         jtask['key'],
-                        jtask['fields']['priority']['name'],
+                        task_priority,
                         jtask['fields']['status']['name'],
                         task_resolution,
                         jtask['fields']['updated'],
@@ -107,15 +122,15 @@ class JIRARestAPI(RESTBase):
                },
                'summary': task['title'],
                'description': task['formatted_content'],
-               'priority': {
-                   'name': task['alm_priority']
-               },
                'issuetype': {
                    'id': issue_type_id
                },
                'labels':['SD-Elements']
            }
         }
+        if self.has_field('priority'):
+            args['fields']['priority'] = {'name':task['alm_priority']}
+
         if affected_versions:
             args['fields']['versions'] = affected_versions
 

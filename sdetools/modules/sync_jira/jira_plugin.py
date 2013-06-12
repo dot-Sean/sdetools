@@ -104,8 +104,9 @@ class JIRAConnector(AlmConnector):
             raise AlmException('Version %s not found in the project' % (self.config['alm_project_version']))
 
         self.custom_fields = []
+        fields = self.alm_plugin.get_fields()
+
         if self.config['alm_custom_fields']:
-            fields = self.alm_plugin.get_fields()
             for key in self.config['alm_custom_fields']:
                 for field in fields:
                     if (key == field['name']):
