@@ -3,20 +3,14 @@
 
 [global]
 ; Specify the server to connect to
-server = newcastle.sdelements.com
+sde_server = newcastle.sdelements.com
 
 ; Specify the email (username) to be used
-email = ehsan@sdelements.com
+sde_user = ehsan@sdelements.com
 
 ; Password associated with the specified email
 ; WARNING: DO NOT STORE PASSWORDS in files that are publicly accessible
-password = PASSWORD_PLACEHOLDER
-
-; Target files for scanning. 
-; Each terget can be a path (all files in the directory) or a single file
-; Format:
-;      target1 [[target2] target3]
-targets = .
+sde_pass = PASSWORD_PLACEHOLDER
 
 ; Set the global log level here. The lever from most
 ;     debug   -> Output all debug information 
