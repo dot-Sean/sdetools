@@ -27,7 +27,7 @@ class FortifyIntegrator(BaseIntegrator):
         Extract finding information from an XML node.
         """
         entry = {}
-        entry['cweid'] = node.getElementsByTagName("groupTitle")[0].firstChild.data
+        entry['id'] = node.getElementsByTagName("groupTitle")[0].firstChild.data
         entry['description'] = node.getElementsByTagName("groupTitle")[0].firstChild.data
         return entry
 
@@ -56,7 +56,7 @@ class FortifyIntegrator(BaseIntegrator):
                         self.raw_findings.append( self._make_raw_finding(grouping_section) )
 
     def _make_finding(self, item):
-        finding = {'cweid': item['cweid'], 'description': item['description']}
+        finding = {'weakness_id': item['id'], 'description': item['description']}
         if item.has_key('sourcefilepath'):
             finding['source'] = item['sourcefilepath']
         if item.has_key('line'):
