@@ -1,4 +1,5 @@
 import os
+import re
 from xml.dom import minidom
 
 from sdetools.sdelib import commons
@@ -43,7 +44,7 @@ class FortifyIntegrator(BaseIntegrator):
         #for report_section in report_sections:
         #    if report_section.getElementsByTagName('Title')[0] == "Project Summary":
                 
-        self.report_id = "WebGoat"
+        self.report_id = "Not defined"
 
         report_sections = base.getElementsByTagName('ReportSection')
         for report_section in report_sections:
@@ -54,6 +55,12 @@ class FortifyIntegrator(BaseIntegrator):
                 for grouping_section in grouping_sections:
                     for i in range(0,int(grouping_section.attributes['count'].value)):
                         self.raw_findings.append( self._make_raw_finding(grouping_section) )
+            elif (title.firstChild.data == 'Project Summary'):
+                subsection = report_section.getElementsByTagName('SubSection')[0]
+                subsection_text = subsection.getElementsByTagName('Text')[0]
+                m = re.search('Build Label:\s*(.+)', subsection_text.firstChild.data)
+                if m:
+                    self.report_id = m.group(1)
 
     def _make_finding(self, item):
         finding = {'weakness_id': item['id'], 'description': item['description']}

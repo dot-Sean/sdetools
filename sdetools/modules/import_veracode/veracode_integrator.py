@@ -62,7 +62,7 @@ class VeracodeIntegrator(BaseIntegrator):
                 self.raw_findings.remove(flaw)
 
     def _make_finding(self, item):
-        finding = {'cweid': item['cweid'], 'description': item['description']}
+        finding = {'weakness_id': item['cweid'], 'description': item['description']}
         if item.has_key('sourcefilepath'):
             finding['source'] = item['sourcefilepath']
         if item.has_key('line'):

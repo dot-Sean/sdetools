@@ -181,8 +181,8 @@ class BaseIntegrator(object):
                         weakness_finding = {}
                     weakness_finding['count'] = 0
                     if self.weakness_type.has_key(weakness) and self.weakness_type[weakness] == 'cwe':
-                        weakness_finding['id'] = weakness
-                        if self.weakness_title.has_key(last_weakness):
+                        weakness_finding['cwe'] = weakness
+                        if self.weakness_title.has_key(weakness):
                             weakness_finding['desc'] = self.weakness_title[weakness]
                     else:
                         weakness_finding['desc'] = weakness
@@ -198,6 +198,7 @@ class BaseIntegrator(object):
                     finding_confidence = "none"
                     if self.confidence.has_key(task_id):
                         finding_confidence = self.confidence[task_id]
+
                     ret = self.plugin.add_analysis_note(task_name, project_analysis_note_ref, finding_confidence, analysis_findings)
                 logger.debug("Marked %s as FAILURE with %s confidence" % (task_name, finding_confidence))
                 stats_failures_added += 1
