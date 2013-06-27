@@ -39,7 +39,7 @@ class JIRARestAPI(RESTBase):
         try:
             meta_info = self.call_api('issue/createmeta', method=self.URLRequest.GET, args={'projectKeys':self.config['alm_project'], 'expand':'projects.issuetypes.fields'})
         except APIError:
-            raise AlmException('Could not retrieve custom fields for JIRA project: %s' % self.config['alm_project'])
+            raise AlmException('Could not retrieve fields for JIRA project: %s' % self.config['alm_project'])
 
         if meta_info:        
             for item in meta_info['projects'][0]['issuetypes']:
