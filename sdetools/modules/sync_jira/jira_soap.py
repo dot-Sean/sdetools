@@ -151,18 +151,45 @@ class JIRASoapAPI:
                 return v
         return None
          
-    def get_fields(self):
-        try:
-            issue_fields = self.proxy.getFieldsForEdit(self.auth, self.config['jira_existing_issue'])
-        except SOAPpy.Types.faultType, fault:
-            raise AlmException('Could not retrieve custom fields for JIRA project %s: %s' % (self.config['alm_project'], fault))
+    def setup_fields(self, jira_issue_type_id):
 
-        fields = []
-        if issue_fields:
-            for f in issue_fields:
-                fields.append({'name':f['name'], 'id':f['id']})
-        return fields
-        
+        self.custom_fields = []
+        self.fields = []
+
+        try:
+            create_fields = self.proxy.getFieldsForCreate(self.auth, self.config['alm_project'], SOAPpy.Types.longType(long(jira_issue_type_id)))
+        except SOAPpy.Types.faultType, fault:
+            raise AlmException('Could not retrieve fields for JIRA project %s: %s' % (self.config['alm_project'], fault))
+
+        if create_fields:
+            for f in create_fields:
+                self.fields.append({'name':f['name'], 'id':f['id']})
+
+        if self.config['alm_custom_fields'] and self.config['jira_existing_issue']:
+            try:
+                issue_fields = self.proxy.getFieldsForEdit(self.auth, self.config['jira_existing_issue'])
+            except SOAPpy.Types.faultType, fault:
+                raise AlmException('Could not retrieve custom fields for JIRA issue %s: %s' % (self.config['jira_existing_issue'], fault))
+
+            for key in self.config['alm_custom_fields']:
+                for field in issue_fields:
+                    if (key == field['name']):
+                        self.custom_fields.append({'field': field['id'],'value':self.config['alm_custom_fields'][key]})
+
+            if len(self.custom_fields) != len(self.config['alm_custom_fields']):
+                raise AlmException('At least one custom field could not be found')            
+
+    def has_field(self, field_name):
+
+        if not self.fields:
+             return False
+             
+        for field in self.fields:
+            if (field_name == field['id']):
+                return True
+                
+        return False
+                
     def get_affected_versions(self, task):
         affected_versions = []
         for version_name in task.versions:
@@ -183,7 +210,7 @@ class JIRASoapAPI:
     
         return True
 
-    def add_task(self, task, issue_type_id, project_version, custom_fields):
+    def add_task(self, task, issue_type_id, project_version):
         #Add task
         selected_priority = None
         for priority in self.priorities:
@@ -202,13 +229,15 @@ class JIRASoapAPI:
             'project': self.config['alm_project'],
             'summary': task['title'],
             'description': task['formatted_content'],
-            'priority': selected_priority,
             'type': issue_type_id
         }
 
-        if custom_fields:
+        if self.has_field('priority'):
+            args['priority'] = selected_priority
+
+        if self.custom_fields:
             arg_custom_fields = []
-            for custom_field in custom_fields:
+            for custom_field in self.custom_fields:
                 arg_custom_fields.append({'customfieldId':custom_field['field'],'values':[custom_field['value']]})
             args['customFieldValues'] = arg_custom_fields
         try:
