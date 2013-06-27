@@ -49,7 +49,7 @@ class JIRARestAPI(RESTBase):
 
         if self.config['alm_custom_fields']:
             for key in self.config['alm_custom_fields']:
-                for field in issue_fields:
+                for field in self.fields:
                     if (key == field['name']):
                         self.custom_fields.append({'field': field['id'],'value':self.config['alm_custom_fields'][key]})
 
@@ -61,7 +61,7 @@ class JIRARestAPI(RESTBase):
              return False
              
         for field in self.fields:
-            if (field_name == field['name']):
+            if (field_name == field['id']):
                 return True
                 
         return False
@@ -151,7 +151,7 @@ class JIRARestAPI(RESTBase):
 
         for field in self.custom_fields:
             args['fields'][field['field']] = {'value':field['value']}
-
+                
         try:
             issue = self.call_api('issue', method=self.URLRequest.POST, args=args)
             
