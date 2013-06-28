@@ -103,16 +103,7 @@ class JIRAConnector(AlmConnector):
         if self.config['alm_project_version'] and not self.project_version:
             raise AlmException('Version %s not found in the project' % (self.config['alm_project_version']))
 
-        self.custom_fields = []
-        if self.config['alm_custom_fields']:
-            fields = self.alm_plugin.get_fields()
-            for key in self.config['alm_custom_fields']:
-                for field in fields:
-                    if (key == field['name']):
-                        self.custom_fields.append({'field': field['id'],'value':self.config['alm_custom_fields'][key]})
-
-            if len(self.custom_fields) != len(self.config['alm_custom_fields']):
-                raise AlmException('At least one custom fields could not be found')
+        self.alm_plugin.setup_fields(self.jira_issue_type_id)
 
     def alm_get_task(self, task):
         task_id = task['title'].partition(':')[0]
@@ -131,7 +122,7 @@ class JIRAConnector(AlmConnector):
         task['formatted_content'] = self.sde_get_task_content(task)
         task['alm_priority'] = self.translate_priority(task['priority'])
 
-        new_issue = self.alm_plugin.add_task(task, self.jira_issue_type_id, self.project_version, self.custom_fields)
+        new_issue = self.alm_plugin.add_task(task, self.jira_issue_type_id, self.project_version)
         logger.info('Create new task in JIRA: %s' % new_issue['key'])
 
         if (self.config['alm_standard_workflow'] and
