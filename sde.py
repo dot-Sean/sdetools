@@ -29,6 +29,7 @@ def main(argv):
         commons.show_error(str(e), usage_hint=True)
         return False
     except commons.Error, e:
+        logger.exception(str(e))
         commons.show_error(str(e))
         return False
 
