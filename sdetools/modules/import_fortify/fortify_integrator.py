@@ -7,9 +7,6 @@ from sdetools.analysis_integration.base_integrator import BaseIntegrator, Integr
 
 __all__ = ['FortifyIntegrator']
 
-REQUIRED_NODES = ['Category', 'cweid', 'categoryid', 'categoryname', 'description', 'severity', 'module','remediation_status']
-LOCATION_ATTRIBS = ['sourcefilepath', 'sourcefile', 'line', 'location']
-
 DEFAULT_MAPPING_FILE = os.path.join(commons.media_path, 'fortify', 'sde_fortify_map.xml')
 
 class FortifyIntegrationError(IntegrationError):
@@ -24,9 +21,6 @@ class FortifyIntegrator(BaseIntegrator):
         self.raw_findings = []
 
     def _make_raw_finding(self, node):
-        """
-        Extract finding information from an XML node.
-        """
         entry = {}
         entry['id'] = node.getElementsByTagName("groupTitle")[0].firstChild.data
         entry['description'] = node.getElementsByTagName("groupTitle")[0].firstChild.data
@@ -39,11 +33,7 @@ class FortifyIntegrator(BaseIntegrator):
             raise FortifyIntegrationError("Missing configuration option 'report_xml'")
         except Exception, e:
             raise FortifyIntegrationError("Error opening report xml (%s)" % self.config['report_xml'])
-
-        report_sections = base.getElementsByTagName('ReportSection')
-        #for report_section in report_sections:
-        #    if report_section.getElementsByTagName('Title')[0] == "Project Summary":
-                
+              
         self.report_id = "Not defined"
 
         report_sections = base.getElementsByTagName('ReportSection')
@@ -63,15 +53,7 @@ class FortifyIntegrator(BaseIntegrator):
                     self.report_id = m.group(1)
 
     def _make_finding(self, item):
-        finding = {'weakness_id': item['id'], 'description': item['description']}
-        if item.has_key('sourcefilepath'):
-            finding['source'] = item['sourcefilepath']
-        if item.has_key('line'):
-            finding['line'] = item['line']
-        if item.has_key('inputvector'):
-            finding['source'] = item['inputvector']
-        return finding
+        return {'weakness_id': item['id'], 'description': item['description']}
 
     def generate_findings(self):
         return [self._make_finding(item) for item in self.raw_findings]
-        

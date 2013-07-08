@@ -40,7 +40,7 @@ class BaseIntegrator(object):
         self.config.add_custom_option("mapping_file",
                 "Task ID -> Tool Weakness mapping in XML format", "m", default_mapping_file)
         self.config.add_custom_option("flaws_only",
-                "Only update tasks identified having flaws. (True | False)", "z", "True")
+                "Only update tasks identified having flaws. (True | False)", "z", "False")
         self.config.add_custom_option("trial_run",
                 "Trial run only: 'True' or 'False'", "t", "False")
 
