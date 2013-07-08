@@ -158,7 +158,17 @@ class BaseIntegrator(object):
                     new_task_id = mapped_tasks[0] # use the first one
                     if task_id != new_task_id:
                         logger.warn("Task %s was not found in the project, mapping it to the default task %s." % (task_id, new_task_id))
-                        task_id = new_task_id
+                        if not unique_findings.has_key(new_task_id):
+                            unique_findings[new_task_id] = finding
+                        else:
+                            for weakness in finding['weaknesses']:
+                                unique_findings[new_task_id]['weaknesses'].append(weakness)
+                        del unique_findings[task_id]
+
+        task_ids = sorted(unique_findings.iterkeys())
+
+        for task_id in task_ids:
+            finding = unique_findings[task_id]
 
             stats_total_flaws_found += len(finding['weaknesses'])
 
@@ -251,7 +261,7 @@ class BaseIntegrator(object):
             self.emit.info("All flaws successfully mapped to tasks.")
 
         results = {}
-        results['total_flaws_found'] = (stats_total_flaws_found, 'Total Flaws Found')
+        results['total_flaws_found'] = (stats_total_flaws_found, 'Total Flaw Types Found')
         results['tasks_marked_fail'] = (stats_failures_added, 'Number of Tasks marked as FAILED')
         results['tasks_without_findings'] = (noflaw_tasks, 'Number of Tasks in the project without any flaws')
         if stats_total_skips:
