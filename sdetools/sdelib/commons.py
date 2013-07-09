@@ -26,17 +26,19 @@ media_path = None
 
 class Error(Exception):
     """
-    Base Error for the Lint Library.
+    Base Error for sdetools.
     All Exceptions in the tool must be inherited from this.
     """
-    pass
+    def __str__(self):
+        return "FATAL ERROR: %s\n" % (self.args)
 
 class UsageError(Error):
     """
     Wrong usage of library functions.
     E.g. invalid choices for arguments.
     """
-    pass
+    def __str__(self):
+        return "UsageError: %s\n" % (self.args)
 
 def setup_base_path(base_path_val):
     global base_path
@@ -46,7 +48,7 @@ def setup_base_path(base_path_val):
     media_path = os.path.join(base_path, 'docs')
 
 def show_error(err_msg, usage_hint=False):
-    sys.stderr.write("FATAL ERROR: %s\n" % (err_msg))
+    sys.stderr.write(err_msg)
     if usage_hint:
         sys.stderr.write("  Try specifying 'help' as arguments to see the usage\n")
 
