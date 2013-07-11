@@ -4,6 +4,7 @@ __all__ = [
     'report',
     'import_fortify',
     'import_veracode',
+    'import_webinspect',
     'sync_jira',
     'sync_mingle',
     'sync_rally',
