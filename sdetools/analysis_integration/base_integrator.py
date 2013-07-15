@@ -192,11 +192,12 @@ class BaseIntegrator(object):
                     weakness_finding['count'] = 0
                     if self.weakness_type.has_key(weakness) and self.weakness_type[weakness] == 'cwe':
                         weakness_finding['cwe'] = weakness
+
+                    if self.weakness_title.has_key(weakness):
+                        weakness_finding['desc'] = self.weakness_title[weakness]
                     else:
-                        if self.weakness_title.has_key(weakness):
-                            weakness_finding['desc'] = self.weakness_title[weakness]
-                        else:
-                            weakness_finding['desc'] = weakness
+                        weakness_finding['desc'] = weakness
+
                     last_weakness = weakness
 
                 weakness_finding['count'] = weakness_finding['count'] + 1
