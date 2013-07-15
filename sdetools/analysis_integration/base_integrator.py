@@ -193,7 +193,7 @@ class BaseIntegrator(object):
                     if self.weakness_type.has_key(weakness) and self.weakness_type[weakness] == 'cwe':
                         weakness_finding['cwe'] = weakness
 
-                    if self.weakness_title.has_key(weakness):
+                    if self.weakness_title.has_key(weakness) and self.weakness_title[weakness] != '':
                         weakness_finding['desc'] = self.weakness_title[weakness]
                     else:
                         weakness_finding['desc'] = weakness
