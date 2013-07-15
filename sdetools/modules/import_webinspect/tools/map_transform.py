@@ -38,12 +38,24 @@ class Mapping:
             raise MappingError("An error occured opening mapping file '%s': %s" % (weakness_file, e))
 
         cwe_weaknesses = {}
-        for weakness in base.getElementsByTagName('weakness'):
-             weaknesses = []
-             if (cwe_weaknesses.has_key(weakness.attributes['cwe'].value)):
-                 weaknesses = cwe_weaknesses[weakness.attributes['cwe'].value]
-             weaknesses.append(weakness)
-             cwe_weaknesses[weakness.attributes['cwe'].value] = weaknesses
+        for weakness_row in base.getElementsByTagName('Table1'):
+            weakness = {}
+            weakness['check_id'] = weakness_row.getElementsByTagName('CheckID')[0].firstChild.data
+            weakness['check_name'] = weakness_row.getElementsByTagName('CheckName')[0].firstChild.data
+            weakness['check_name'] = weakness['check_name'].replace('"','&quot;')
+            weakness['check_name'] = weakness['check_name'].replace('&','&amp;')
+            
+            cwe = weakness_row.getElementsByTagName('CWE')[0].firstChild.data
+            weakness['cwe_desc'] = weakness_row.getElementsByTagName('CWE_Desc')[0].firstChild.data
+            weakness['cwe_desc'] = weakness['cwe_desc'].replace('"','&quot;')
+            weakness['cwe_desc'] = weakness['cwe_desc'].replace('&','&amp;')
+            weakness['cwe_id'] = cwe[4:]
+            
+            weaknesses = []
+            if (cwe_weaknesses.has_key(weakness['cwe_id'])):
+                weaknesses = cwe_weaknesses[weakness['cwe_id']]
+            weaknesses.append(weakness)
+            cwe_weaknesses[weakness['cwe_id']] = weaknesses
 
         self.cwe_weaknesses = cwe_weaknesses
         
@@ -80,7 +92,7 @@ class Mapping:
             print '\t<task id="%s" title="%s">'%(task_id, self.base_tasks[task_id].attributes['title'].value)
             weaknesses = sorted(weaknesses)
             for weakness in weaknesses:
-                print '\t\t<weakness type="check" id="%s" name="%s" cwe="%s" title="%s"/>'% (weakness.attributes['id'].value, weakness.attributes['name'].value, weakness.attributes['cwe'].value, weakness.attributes['title'].value)
+                print '\t\t<weakness type="check" id="%s" name="%s" cwe="%s" title="%s"/>'% (weakness['check_id'], weakness['check_name'], weakness['cwe_id'], weakness['cwe_desc'])
             print '\t</task>'
         print '</mapping>'            
 def main(argv):
