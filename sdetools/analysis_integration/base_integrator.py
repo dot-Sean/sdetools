@@ -50,7 +50,7 @@ class BaseIntegrator(object):
         except KeyError, ke:
             raise IntegrationError("Missing configuration option 'mapping_file'")
         except Exception, e:
-            raise IntegrationError("An error occurred opening mapping file '%s'" % self.config['mapping_file'])
+            raise IntegrationError("An error occurred opening mapping file '%s': %s" % (self.config['mapping_file'], e))
 
         weakness_mapping = collections.defaultdict(list)
         self.weakness_title = {}
@@ -192,10 +192,11 @@ class BaseIntegrator(object):
                     weakness_finding['count'] = 0
                     if self.weakness_type.has_key(weakness) and self.weakness_type[weakness] == 'cwe':
                         weakness_finding['cwe'] = weakness
+                    else:
                         if self.weakness_title.has_key(weakness):
                             weakness_finding['desc'] = self.weakness_title[weakness]
-                    else:
-                        weakness_finding['desc'] = weakness
+                        else:
+                            weakness_finding['desc'] = weakness
                     last_weakness = weakness
 
                 weakness_finding['count'] = weakness_finding['count'] + 1

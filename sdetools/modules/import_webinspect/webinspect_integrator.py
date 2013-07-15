@@ -7,7 +7,7 @@ from sdetools.analysis_integration.base_integrator import BaseIntegrator, Integr
 
 __all__ = ['WebInspectIntegrator']
 
-DEFAULT_MAPPING_FILE = os.path.join(commons.media_path, 'fortify', 'sde_fortify_map.xml')
+DEFAULT_MAPPING_FILE = os.path.join(commons.media_path, 'webinspect', 'sde_webinspect_map.xml')
 
 class WebInspectIntegrationError(IntegrationError):
     pass
@@ -22,11 +22,9 @@ class WebInspectIntegrator(BaseIntegrator):
 
     def _make_raw_finding(self, node):
         entry = {}
-        for classification in node.getElementsByTagName("Classification"):
-            if classification.attributes['kind'].value == 'CWE':
-                entry['type'] = 'cwe'
-                entry['id'] = classification.attributes['identifier'].value
-                return entry
+        entry['type'] = 'check'
+        entry['id'] = node.getElementsByTagName("VulnerabilityID")[0].firstChild.data
+        entry['description'] = node.getElementsByTagName("Name")[0].firstChild.data
         return entry
 
     def parse(self):
@@ -47,7 +45,7 @@ class WebInspectIntegrator(BaseIntegrator):
             self.report_id = urls[0].firstChild.data
 
     def _make_finding(self, item):
-        return {'weakness_id': item['id'], 'description': item['description'], 'type': entry['type']}
+        return {'weakness_id': item['id'], 'description': item['description'], 'type': item['type']}
 
     def generate_findings(self):
         return [self._make_finding(item) for item in self.raw_findings]
