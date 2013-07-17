@@ -24,6 +24,7 @@ class FortifyIntegrator(BaseIntegrator):
         entry = {}
         entry['id'] = node.getElementsByTagName("groupTitle")[0].firstChild.data
         entry['description'] = node.getElementsByTagName("groupTitle")[0].firstChild.data
+        entry['count'] = int(node.attributes['count'].value)
         return entry
 
     def parse(self):
@@ -43,8 +44,7 @@ class FortifyIntegrator(BaseIntegrator):
                 issue_listing = report_section.getElementsByTagName('IssueListing')[0]
                 grouping_sections = issue_listing.getElementsByTagName('GroupingSection')
                 for grouping_section in grouping_sections:
-                    for i in range(0,int(grouping_section.attributes['count'].value)):
-                        self.raw_findings.append( self._make_raw_finding(grouping_section) )
+                    self.raw_findings.append( self._make_raw_finding(grouping_section) )
             elif (title.firstChild.data == 'Project Summary'):
                 subsection = report_section.getElementsByTagName('SubSection')[0]
                 subsection_text = subsection.getElementsByTagName('Text')[0]
@@ -53,7 +53,7 @@ class FortifyIntegrator(BaseIntegrator):
                     self.report_id = m.group(1)
 
     def _make_finding(self, item):
-        return {'weakness_id': item['id'], 'description': item['description']}
+        return {'weakness_id': item['id'], 'description': item['description'], 'count':item['count']}
 
     def generate_findings(self):
         return [self._make_finding(item) for item in self.raw_findings]

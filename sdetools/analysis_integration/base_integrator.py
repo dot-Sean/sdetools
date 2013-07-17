@@ -93,7 +93,7 @@ class BaseIntegrator(object):
                     flaws = unique_findings[mapped_task_id]
                 else:
                     flaws = {'weaknesses': []}
-                flaws['weaknesses'].append(weakness_id)
+                flaws['weaknesses'].append(finding)
                 flaws['related_tasks'] = mapped_tasks
                 unique_findings[mapped_task_id] = flaws
         return unique_findings
@@ -185,20 +185,23 @@ class BaseIntegrator(object):
             weakness_finding = {}
 
             for weakness in sorted(finding['weaknesses']):
-                if last_weakness != weakness:
+                if last_weakness != weakness['weakness_id']:
                     if len(weakness_finding.items()) > 0:
                         analysis_findings.append(weakness_finding)
                         weakness_finding = {}
                     weakness_finding['count'] = 0
-                    if self.weakness_type.has_key(weakness) and self.weakness_type[weakness] == 'cwe':
-                        weakness_finding['cwe'] = weakness
-                        if self.weakness_title.has_key(weakness):
-                            weakness_finding['desc'] = self.weakness_title[weakness]
+                    if self.weakness_type.has_key(weakness['weakness_id']) and self.weakness_type[weakness['weakness_id']] == 'cwe':
+                        weakness_finding['cwe'] = weakness['weakness_id']
+                        if self.weakness_title.has_key(weakness['weakness_id']):
+                            weakness_finding['desc'] = self.weakness_title[weakness['weakness_id']]
                     else:
-                        weakness_finding['desc'] = weakness
-                    last_weakness = weakness
+                        weakness_finding['desc'] = weakness['weakness_id']
+                    last_weakness = weakness['weakness_id']
 
-                weakness_finding['count'] = weakness_finding['count'] + 1
+                if 'count' in weakness:
+                    weakness_finding['count'] = weakness_finding['count'] + weakness['count']
+                else:
+                    weakness_finding['count'] = weakness_finding['count'] + 1
 
             if len(finding.items()) > 0:
                 analysis_findings.append(weakness_finding)
