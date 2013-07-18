@@ -152,7 +152,7 @@ class BaseIntegrator(object):
         for task_id in task_ids:
             finding = unique_findings[task_id]
 
-            if not self.task_exists( task_id, task_list):
+            if not self.task_exists(task_id, task_list):
                 mapped_tasks = self.lookup_task("*")
                 if mapped_tasks:
                     new_task_id = mapped_tasks[0] # use the first one
