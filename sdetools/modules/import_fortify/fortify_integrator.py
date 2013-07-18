@@ -22,9 +22,18 @@ class FortifyIntegrator(BaseIntegrator):
 
     def _make_raw_finding(self, node):
         entry = {}
-        entry['id'] = node.getElementsByTagName("groupTitle")[0].firstChild.data
-        entry['description'] = node.getElementsByTagName("groupTitle")[0].firstChild.data
-        entry['count'] = int(node.attributes['count'].value)
+        group_title = None
+        weakness_count = 0
+ 
+        try:
+            group_title = node.getElementsByTagName("groupTitle")[0].firstChild.data
+            weakness_count = int(node.attributes['count'].value)
+        except Exception, e:       
+            raise FortifyIntegrationError("Malformed GroupingSection detected in SubSection 'Issues By Category'")
+
+        entry['id'] = group_title
+        entry['description'] = group_title
+        entry['count'] = weakness_count
         return entry
 
     def parse(self):
@@ -35,9 +44,12 @@ class FortifyIntegrator(BaseIntegrator):
         except Exception, e:
             raise FortifyIntegrationError("Error opening report xml (%s)" % self.config['report_xml'])
               
-        self.report_id = "Not defined"
+        self.report_id = ""
 
         report_sections = base.getElementsByTagName('ReportSection')
+        if not report_sections:
+            raise FortifyIntegrationError("Malformed report detected: ReportSection not found")
+
         for report_section in report_sections:
             title = report_section.getElementsByTagName('Title')[0]
             if (title.firstChild.data == 'Issue Count by Category'):
@@ -51,6 +63,9 @@ class FortifyIntegrator(BaseIntegrator):
                 m = re.search('Build Label:\s*(.+)', subsection_text.firstChild.data)
                 if m:
                     self.report_id = m.group(1)
+                    
+        if self.report_id == "":
+            raise FortifyIntegrationError("Build Label not found" % self.config['report_xml'])
 
     def _make_finding(self, item):
         return {'weakness_id': item['id'], 'description': item['description'], 'count':item['count']}
