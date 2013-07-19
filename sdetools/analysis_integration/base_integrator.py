@@ -105,11 +105,19 @@ class BaseIntegrator(object):
             return self.mapping['*']
         return None
 
-    def task_exists(self, needle_task_id, haystack_tasks):
-        for task in haystack_tasks:
-            task_id = re.search('(\d+)-[^\d]+(\d+)', task['id']).group(2)
-            if task_id == needle_task_id:
-                return True
+    def task_exists_in_project_tasks(self, task_id, project_tasks):
+        """
+        Return True if task_id is present in the array of project_tasks, False otherwise
+        
+        task_id is an integer
+        project_tasks is an array of maps. Each map contains a key 'id' with a corresponding integer value
+        """
+        for task in project_tasks:
+            task_search = re.search('^(\d+)-[^\d]+(\d+)$', task['id'])
+            if task_search:
+                project_task_id = task_search.group(2)
+                if project_task_id == task_id:
+                    return True
         return False
 
     def mapping_contains_task(self, needle_task_id):
@@ -152,7 +160,7 @@ class BaseIntegrator(object):
         for task_id in task_ids:
             finding = unique_findings[task_id]
 
-            if not self.task_exists( task_id, task_list):
+            if not self.task_exists_in_project_tasks( task_id, task_list):
                 mapped_tasks = self.lookup_task("*")
                 if mapped_tasks:
                     new_task_id = mapped_tasks[0] # use the first one
@@ -172,7 +180,7 @@ class BaseIntegrator(object):
 
             stats_total_flaws_found += len(finding['weaknesses'])
 
-            if not self.task_exists(task_id, task_list):
+            if not self.task_exists_in_project_tasks(task_id, task_list):
                 logger.error("Task %s was not found in the project, skipping %d findings." % (task_id, len(finding['weaknesses'])))
                 stats_total_skips += 1
                 stats_total_skips_findings += len(finding['weaknesses'])
@@ -229,10 +237,12 @@ class BaseIntegrator(object):
             if(task['phase'] in self.phase_exceptions):
                 stats_test_tasks+=1
                 continue
-            task_id = re.search('(\d+)-[^\d]+(\d+)', task['id']).group(2)
-            if(unique_findings.has_key(task_id)):
-                affected_tasks.append(task_id)
-                continue
+            task_search = re.search('^(\d+)-[^\d]+(\d+)$', task['id'])
+            if task_search:
+                task_id = task_search.group(2)
+                if(unique_findings.has_key(task_id)):
+                    affected_tasks.append(task_id)
+                    continue
             noflaw_tasks.append(task_id)
 
         if self.config['flaws_only'] == 'False':
