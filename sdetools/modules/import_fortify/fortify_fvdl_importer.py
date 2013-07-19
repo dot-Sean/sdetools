@@ -42,15 +42,15 @@ class FVDLXMLContent(xml.sax.handler.ContentHandler):
             self.report_id = data
 
     def endElement(self, name):
-        if name == 'Vulnerability':
-            self.in_vulnerability_node = False
+        if self.in_vuln_node and name == 'Vulnerability':
+            self.in_vuln_node = False
+        if self.in_vuln_class_info_node and name == 'ClassInfo':
             self.in_vuln_class_info_node = False
+        if self.in_vuln_class_info_type_node and name == 'Type':
             self.in_vuln_class_info_type_node = False
-            self.in_build_node = False
+        elif self.in_build_build_id_node and name == 'BuildID':
             self.in_build_build_id_node = False
-        elif name == 'BuildID':
-            self.in_build_build_id_node = False
-        elif name == 'Build':
+        elif self.in_build_node and name == 'Build':
             self.in_build_node = False
     
 class FortifyFVDLImporter(FortifyBaseImporter):
