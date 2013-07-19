@@ -19,11 +19,11 @@ class FortifyFPRImporter(FortifyBaseImporter):
         importer = FortifyFVDLImporter()
         fvdl_xml = None
         try:
-            fvdl_xml = fpr_file.read('audit.fvdl')
+            fvdl_file = fpr_file.open('audit.fvdl')
         except Exception, e:
             raise e
 
-        importer.parse_string(fvdl_xml)
+        importer.parse_file(fvdl_file)
 
         self.report_id = importer.report_id
         self.raw_findings = importer.raw_findings

@@ -70,6 +70,18 @@ class FortifyFVDLImporter(FortifyBaseImporter):
         self.raw_findings = FVDLReader.raw_findings
         self.report_id = FVDLReader.report_id
 
+    def parse_file(self, fvdl_file):
+        FVDLReader = FVDLXMLContent()
+        try:    
+            parser = xml.sax.make_parser()
+            parser.setContentHandler(FVDLReader)
+            parser.parse(fvdl_file)
+        except Exception, e:
+            raise Exception("Error opening FVDL file (%s): %s" % (fvdl_file, e))
+        
+        self.raw_findings = FVDLReader.raw_findings
+        self.report_id = FVDLReader.report_id
+
     def parse_string(self, fvdl_xml):
         FVDLReader = FVDLXMLContent()
         try:    
