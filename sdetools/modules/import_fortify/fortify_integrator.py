@@ -5,6 +5,11 @@ from xml.dom import minidom
 from sdetools.sdelib import commons
 from sdetools.analysis_integration.base_integrator import BaseIntegrator, IntegrationError
 
+from sdetools.modules.import_fortify.fortify_report_importer import FortifyReportImporter
+from sdetools.modules.import_fortify.fortify_fpr_importer import FortifyFPRImporter
+from sdetools.modules.import_fortify.fortify_fvdl_importer import FortifyFVDLImporter
+
+
 __all__ = ['FortifyIntegrator']
 
 DEFAULT_MAPPING_FILE = os.path.join(commons.media_path, 'fortify', 'sde_fortify_map.xml')
@@ -19,53 +24,30 @@ class FortifyIntegrator(BaseIntegrator):
         config.add_custom_option("report_xml", "Fortify Report XML", "x", None)
         super(FortifyIntegrator, self).__init__(config, DEFAULT_MAPPING_FILE)
         self.raw_findings = []
-
-    def _make_raw_finding(self, node):
-        entry = {}
-        group_title = None
-        weakness_count = 0
- 
-        try:
-            group_title = node.getElementsByTagName("groupTitle")[0].firstChild.data
-            weakness_count = int(node.attributes['count'].value)
-        except Exception, e:       
-            raise FortifyIntegrationError("Malformed GroupingSection detected in SubSection 'Issues By Category'")
-
-        entry['id'] = group_title
-        entry['description'] = group_title
-        entry['count'] = weakness_count
-        return entry
+        self.importer = None
 
     def parse(self):
+    
         try:
-            base = minidom.parse(self.config['report_xml'])
+            fileName, file_extension = os.path.splitext(self.config['report_xml'])
         except KeyError, ke:
             raise FortifyIntegrationError("Missing configuration option 'report_xml'")
-        except Exception, e:
-            raise FortifyIntegrationError("Error opening report xml (%s)" % self.config['report_xml'])
-              
-        self.report_id = ""
+        
+        if file_extension == '.xml':
+            self.importer = FortifyReportImporter()
+        elif file_extension == '.fpr':
+            self.importer = FortifyFPRImporter()
+        elif file_extension == '.fvdl':
+            self.importer = FortifyFVDLImporter()
+        else:
+            raise FortifyIntegrationError("Unsupported file type (%s)" % file_extension)
 
-        report_sections = base.getElementsByTagName('ReportSection')
-        if not report_sections:
-            raise FortifyIntegrationError("Malformed report detected: ReportSection not found")
+        self.importer.parse(self.config['report_xml'])
+        self.raw_findings = self.importer.raw_findings
+        self.report_id = self.importer.report_id
 
-        for report_section in report_sections:
-            title = report_section.getElementsByTagName('Title')[0]
-            if (title.firstChild.data == 'Issue Count by Category'):
-                issue_listing = report_section.getElementsByTagName('IssueListing')[0]
-                grouping_sections = issue_listing.getElementsByTagName('GroupingSection')
-                for grouping_section in grouping_sections:
-                    self.raw_findings.append( self._make_raw_finding(grouping_section) )
-            elif (title.firstChild.data == 'Project Summary'):
-                subsection = report_section.getElementsByTagName('SubSection')[0]
-                subsection_text = subsection.getElementsByTagName('Text')[0]
-                m = re.search('Build Label:\s*(.+)', subsection_text.firstChild.data)
-                if m:
-                    self.report_id = m.group(1)
-                    
-        if self.report_id == "":
-            raise FortifyIntegrationError("Build Label not found" % self.config['report_xml'])
+        if self.report_id is None or self.report_id == "":
+            raise FortifyIntegrationError("Report ID not found in report file (%s)" % self.config['report_xml'])
 
     def _make_finding(self, item):
         return {'weakness_id': item['id'], 'description': item['description'], 'count':item['count']}
