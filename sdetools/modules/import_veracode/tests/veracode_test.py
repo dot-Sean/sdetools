@@ -21,7 +21,7 @@ class TestVeracode(unittest.TestCase):
          api_result = self.integrator.plugin.get_task_ide_notes("T%d" % task_id)
          notes = api_result['notes']
          last_note = notes[len(notes)-1]
-         note_time = datetime.datetime.fromtimestamp(last_note['updated'])
+         #note_time = datetime.datetime.fromtimestamp(last_note['updated'])
          #Timezone issue - datetime is 1 hour off. Neutering this assertion until this is worked out
          #self.assertTrue(note_time >= result.import_start_datetime and note_time <= result.import_finish_datetime)
          self.assertTrue(last_note['status'] == status)
