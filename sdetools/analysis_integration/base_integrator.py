@@ -16,13 +16,13 @@ class IntegrationError(Error):
 
 class IntegrationResult(object):
     def __init__(self, import_start_datetime, import_finish_datetime, affected_tasks, noflaw_tasks,
-            error_count, error_cwes_unmapped):
+            error_count, error_weaknesses_unmapped):
         self.import_start_datetime = import_start_datetime
         self.import_finish_datetime = import_finish_datetime
         self.affected_tasks = affected_tasks
         self.noflaw_tasks = noflaw_tasks
         self.error_count = error_count
-        self.error_cwes_unmapped = error_cwes_unmapped
+        self.error_weaknesses_unmapped = error_weaknesses_unmapped
 
 class BaseIntegrator(object):
     TOOL_NAME = 'External tool'
@@ -34,14 +34,13 @@ class BaseIntegrator(object):
         self.report_id = ""
         self.config = config
         self.emit = self.config.emit
-        self.plugin = None
-        self.cwe_title = {}
+        self.weakness_title = {}
         self.confidence = {}
         self.plugin = PlugInExperience(self.config)
         self.config.add_custom_option("mapping_file",
-                "Task ID -> CWE mapping in XML format", "m", default_mapping_file)
+                "Task ID -> Tool Weakness mapping in XML format", "m", default_mapping_file)
         self.config.add_custom_option("flaws_only",
-                "Only update tasks identified having flaws. (True | False)", "z", "True")
+                "Only update tasks identified having flaws. (True | False)", "z", "False")
         self.config.add_custom_option("trial_run",
                 "Trial run only: 'True' or 'False'", "t", "False")
 
@@ -53,17 +52,21 @@ class BaseIntegrator(object):
         except Exception, e:
             raise IntegrationError("An error occurred opening mapping file '%s'" % self.config['mapping_file'])
 
-        cwe_mapping = collections.defaultdict(list)
-        self.cwe_title = {}
+        weakness_mapping = collections.defaultdict(list)
+        self.weakness_title = {}
         self.confidence = {}
+        self.weakness_type = {}
         for task in base.getElementsByTagName('task'):
-            self.confidence[task.attributes['id'].value] = task.attributes['confidence'].value
-            for cwe in task.getElementsByTagName('cwe'):
-                cwe_id = cwe.attributes['id'].value
-                cwe_mapping[cwe_id].append(task.attributes['id'].value)
-                self.cwe_title[cwe_id] = cwe.attributes['title'].value
+            if task.attributes.has_key('confidence'):
+                self.confidence[task.attributes['id'].value] = task.attributes['confidence'].value
 
-        self.mapping = cwe_mapping
+            for weakness in task.getElementsByTagName('weakness'):
+                weakness_id = weakness.attributes['id'].value
+                weakness_mapping[weakness_id].append(task.attributes['id'].value)
+                self.weakness_type[weakness_id] = weakness.attributes['type'].value
+                self.weakness_title[weakness_id] = weakness.attributes['title'].value
+
+        self.mapping = weakness_mapping
         if not self.mapping:
             raise IntegrationError("No mapping was found in file '%s'" % self.config['mapping_file'])
 
@@ -72,41 +75,49 @@ class BaseIntegrator(object):
 
     def unique_findings(self):
         """
-        Return a map (task_id=> *flaw) based on list of findings (cwe)
+        Return a map (task_id=> *flaw) based on list of findings (weakness)
 
         Where flaw is defined as:
-            flaw[cwes]
+            flaw[weaknesses]
             flaw[related_tasks]
         """
         unique_findings = {'nomap': []}
         for finding in self.generate_findings():
-            cwe_id = finding['cweid']
-            mapped_tasks = self.lookup_task(cwe_id)
+            weakness_id = finding['weakness_id']
+            mapped_tasks = self.lookup_task(weakness_id)
             if not mapped_tasks:
-                unique_findings['nomap'].append(cwe_id)
+                unique_findings['nomap'].append(weakness_id)
                 continue
             for mapped_task_id in mapped_tasks:
                 if unique_findings.has_key(mapped_task_id):
                     flaws = unique_findings[mapped_task_id]
                 else:
-                    flaws = {'cwes': []}
-                flaws['cwes'].append(cwe_id)
+                    flaws = {'weaknesses': []}
+                flaws['weaknesses'].append(finding)
                 flaws['related_tasks'] = mapped_tasks
                 unique_findings[mapped_task_id] = flaws
         return unique_findings
 
-    def lookup_task(self, cwe_id):
-        if self.mapping.has_key(cwe_id):
-            return self.mapping[cwe_id]
+    def lookup_task(self, weakness_id):
+        if self.mapping.has_key(weakness_id):
+            return self.mapping[weakness_id]
         if self.mapping.has_key('*'):
             return self.mapping['*']
         return None
 
-    def task_exists(self, needle_task_id, haystack_tasks):
-        for task in haystack_tasks:
-            task_id = re.search('(\d+)-[^\d]+(\d+)', task['id']).group(2)
-            if task_id == needle_task_id:
-                return True
+    def task_exists_in_project_tasks(self, task_id, project_tasks):
+        """
+        Return True if task_id is present in the array of project_tasks, False otherwise
+        
+        task_id is an integer
+        project_tasks is an array of maps. Each map contains a key 'id' with a corresponding integer value
+        """
+        for task in project_tasks:
+            task_search = re.search('^(\d+)-[^\d]+(\d+)$', task['id'])
+            if task_search:
+                project_task_id = task_search.group(2)
+                if project_task_id == task_id:
+                    return True
         return False
 
     def mapping_contains_task(self, needle_task_id):
@@ -141,7 +152,7 @@ class BaseIntegrator(object):
             (self.config['sde_application'], self.config['sde_project']))
 
         unique_findings = self.unique_findings()
-        missing_cwe_map = unique_findings['nomap']
+        missing_weakness_map = unique_findings['nomap']
         del unique_findings['nomap']
 
         task_ids = sorted(unique_findings.iterkeys())
@@ -149,43 +160,61 @@ class BaseIntegrator(object):
         for task_id in task_ids:
             finding = unique_findings[task_id]
 
-            if not self.task_exists( task_id, task_list):
+            if not self.task_exists_in_project_tasks( task_id, task_list):
                 mapped_tasks = self.lookup_task("*")
                 if mapped_tasks:
                     new_task_id = mapped_tasks[0] # use the first one
                     if task_id != new_task_id:
-                        logger.warn("Task %s was not found in the project, mapping it to the default task %s." % (task_id, new_task_id))
-                        task_id = new_task_id
+                        logger.warn("Task %s was not found in the project, mapping it to the default task %s." % 
+                                (task_id, new_task_id))
+                        if not unique_findings.has_key(new_task_id):
+                            unique_findings[new_task_id] = finding
+                        else:
+                            for weakness in finding['weaknesses']:
+                                unique_findings[new_task_id]['weaknesses'].append(weakness)
+                        del unique_findings[task_id]
 
-            stats_total_flaws_found += len(finding['cwes'])
+        task_ids = sorted(unique_findings.iterkeys())
 
-            if not self.task_exists(task_id, task_list):
-                logger.error("Task %s was not found in the project, skipping %d findings." % (task_id, len(finding['cwes'])))
+        for task_id in task_ids:
+            finding = unique_findings[task_id]
+
+            stats_total_flaws_found += len(finding['weaknesses'])
+
+            if not self.task_exists_in_project_tasks(task_id, task_list):
+                logger.error("Task %s was not found in the project, skipping %d findings." % (task_id, len(finding['weaknesses'])))
                 stats_total_skips += 1
-                stats_total_skips_findings += len(finding['cwes'])
+                stats_total_skips_findings += len(finding['weaknesses'])
                 continue
 
             task_name = "T%s" % (task_id)
 
             analysis_findings = []
-            last_cwe = None
-            cwe_finding = {}
+            last_weakness = None
+            weakness_finding = {}
 
-            for cwe in sorted(finding['cwes']):
-                if last_cwe != cwe:
-                    if len(cwe_finding.items()) > 0:
-                        analysis_findings.append(cwe_finding)
-                        cwe_finding = {}
-                    cwe_finding['count'] = 0
-                    cwe_finding['cwe'] = cwe
-                    last_cwe = cwe
-                    if self.cwe_title.has_key(last_cwe):
-                        cwe_finding['desc'] = self.cwe_title[last_cwe]
+            for weakness in sorted(finding['weaknesses']):
+                if last_weakness != weakness['weakness_id']:
+                    if len(weakness_finding.items()) > 0:
+                        analysis_findings.append(weakness_finding)
+                        weakness_finding = {}
+                    weakness_finding['count'] = 0
+                    if (self.weakness_type.has_key(weakness['weakness_id']) and 
+                            self.weakness_type[weakness['weakness_id']] == 'cwe'):
+                        weakness_finding['cwe'] = weakness['weakness_id']
+                        if self.weakness_title.has_key(weakness['weakness_id']):
+                            weakness_finding['desc'] = self.weakness_title[weakness['weakness_id']]
+                    else:
+                        weakness_finding['desc'] = weakness['weakness_id']
+                    last_weakness = weakness['weakness_id']
 
-                cwe_finding['count'] = cwe_finding['count'] + 1
+                if 'count' in weakness:
+                    weakness_finding['count'] += weakness['count']
+                else:
+                    weakness_finding['count'] += 1
 
             if len(finding.items()) > 0:
-                analysis_findings.append(cwe_finding)
+                analysis_findings.append(weakness_finding)
 
             try:
                 if commit:
@@ -193,7 +222,8 @@ class BaseIntegrator(object):
                     if self.confidence.has_key(task_id):
                         finding_confidence = self.confidence[task_id]
 
-                    ret = self.plugin.add_analysis_note(task_name, project_analysis_note_ref, finding_confidence, analysis_findings)
+                    ret = self.plugin.add_analysis_note(task_name, project_analysis_note_ref, 
+                            finding_confidence, analysis_findings)
                 logger.debug("Marked %s as FAILURE with %s confidence" % (task_name, finding_confidence))
                 stats_failures_added += 1
             except APIError, e:
@@ -210,10 +240,12 @@ class BaseIntegrator(object):
             if(task['phase'] in self.phase_exceptions):
                 stats_test_tasks+=1
                 continue
-            task_id = re.search('(\d+)-[^\d]+(\d+)', task['id']).group(2)
-            if(unique_findings.has_key(task_id)):
-                affected_tasks.append(task_id)
-                continue
+            task_search = re.search('^(\d+)-[^\d]+(\d+)$', task['id'])
+            if task_search:
+                task_id = task_search.group(2)
+                if(unique_findings.has_key(task_id)):
+                    affected_tasks.append(task_id)
+                    continue
             noflaw_tasks.append(task_id)
 
         if self.config['flaws_only'] == 'False':
@@ -231,7 +263,8 @@ class BaseIntegrator(object):
                     if commit:
                         analysis_findings = []
 
-                        self.plugin.add_analysis_note(task_name, project_analysis_note_ref, finding_confidence, analysis_findings)
+                        self.plugin.add_analysis_note(task_name, project_analysis_note_ref, 
+                                finding_confidence, analysis_findings)
                     logger.info("Marked %s as PASS with %s confidence" % (task_name, finding_confidence))
                     stats_passes_added += 1
                 except APIError, e:
@@ -239,13 +272,15 @@ class BaseIntegrator(object):
                     self.emit.error("API Error: Unable to mark %s as PASS. Skipping ..." % (task_name))
                     stats_api_errors += 1
 
-        if missing_cwe_map:
-            self.emit.error("Could not map %s flaws" % (len(missing_cwe_map)), err_type='unmapped_cwe', cwe_list=missing_cwe_map)
+        if missing_weakness_map:
+            self.emit.error("Could not map %s flaws" % (len(missing_weakness_map)), 
+                err_type='unmapped_weakness', 
+                weakness_list=missing_weakness_map)
         else:
             self.emit.info("All flaws successfully mapped to tasks.")
 
         results = {}
-        results['total_flaws_found'] = (stats_total_flaws_found, 'Total Flaws Found')
+        results['total_flaws_found'] = (stats_total_flaws_found, 'Total Flaw Types Found')
         results['tasks_marked_fail'] = (stats_failures_added, 'Number of Tasks marked as FAILED')
         results['tasks_without_findings'] = (noflaw_tasks, 'Number of Tasks in the project without any flaws')
         if stats_total_skips:
@@ -262,4 +297,4 @@ class BaseIntegrator(object):
                                  affected_tasks=affected_tasks,
                                  noflaw_tasks=noflaw_tasks,
                                  error_count=stats_api_errors,
-                                 error_cwes_unmapped=len(missing_cwe_map))
+                                 error_weaknesses_unmapped=len(missing_weakness_map))

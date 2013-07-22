@@ -3,6 +3,7 @@ __all__ = [
     'sdelib', 
     'modules', 
     'alm_integration', 
+    'analysis_integration', 
     'extlib',
 ]
 

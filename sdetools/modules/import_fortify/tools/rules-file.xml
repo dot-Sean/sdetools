@@ -1,0 +1,1952 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ExternalMetadataPack xmlns="xmlns://www.fortifysoftware.com/schema/externalMetadata" schemaVersion="1.0">
+	<PackInfo>
+		<Name>SD Elements Mappings</Name>
+		<PackID>sdelements-external-mappings</PackID>
+		<Version>2013-05-01</Version>
+	</PackInfo>
+	<ExternalList>
+		<ExternalListID>950DB15C-F170-488F-9546-256C25C3FC5E</ExternalListID>
+		<Name>SDE Task</Name>
+		<Shortcut>sde_t</Shortcut>
+		<Description>SD Elements Task Mappings</Description>
+		<Group>SDE</Group>
+		<ExternalCategoryDefinition>
+			<Name>T1: Use multi-factor authentication for high risk financial systems</Name>
+			<Description></Description>
+			<OrderingInfo>1</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T2: Secure forgotten password</Name>
+			<Description></Description>
+			<OrderingInfo>2</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T3: Require old passwords when users change password</Name>
+			<Description></Description>
+			<OrderingInfo>3</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T4: Configurable password policies</Name>
+			<Description></Description>
+			<OrderingInfo>4</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T5: Minimum password standards</Name>
+			<Description></Description>
+			<OrderingInfo>5</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T6: Implement account lockout or authentication throttling</Name>
+			<Description></Description>
+			<OrderingInfo>6</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T7: Salt and hash stored password</Name>
+			<Description></Description>
+			<OrderingInfo>7</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T8: Consistent error handling for all authentication failures</Name>
+			<Description></Description>
+			<OrderingInfo>8</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T9: Implement transactional authentication for high-value transactions</Name>
+			<Description></Description>
+			<OrderingInfo>9</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T10: Use server-to-server authentication</Name>
+			<Description></Description>
+			<OrderingInfo>10</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T11: Disallow external redirects</Name>
+			<Description></Description>
+			<OrderingInfo>11</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T12: Mask user passwords by default</Name>
+			<Description></Description>
+			<OrderingInfo>12</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T13: Reassign new password if password is automatically generated</Name>
+			<Description></Description>
+			<OrderingInfo>13</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T14: Principles of least privilege</Name>
+			<Description></Description>
+			<OrderingInfo>14</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T15: Centralize authorization</Name>
+			<Description></Description>
+			<OrderingInfo>15</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T16: Authorize every page</Name>
+			<Description></Description>
+			<OrderingInfo>16</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T17: Avoid client-side authorization</Name>
+			<Description></Description>
+			<OrderingInfo>17</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T18: Apply domain specific authorization checks in business logic</Name>
+			<Description></Description>
+			<OrderingInfo>18</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T19: Restrict application's access to database</Name>
+			<Description></Description>
+			<OrderingInfo>19</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T20: Invalidate old session ID after authentication</Name>
+			<Description></Description>
+			<OrderingInfo>20</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T21: Ensure password and session ID are sent over SSL</Name>
+			<Description></Description>
+			<OrderingInfo>21</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T22: Set secure flag on session cookies</Name>
+			<Description></Description>
+			<OrderingInfo>22</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T23: Set HttpOnly flag on session cookies</Name>
+			<Description></Description>
+			<OrderingInfo>23</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T24: Enforce idle session timeouts</Name>
+			<Description></Description>
+			<OrderingInfo>24</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T20: Invalidate old session ID after authentication</Name>
+			<Description></Description>
+			<OrderingInfo>25</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T25: Enforce absolute session timeouts</Name>
+			<Description></Description>
+			<OrderingInfo>26</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T26: Destroy sessions on logout</Name>
+			<Description></Description>
+			<OrderingInfo>27</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T28: Avoid remember-me functionality</Name>
+			<Description></Description>
+			<OrderingInfo>28</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T29: Use anti cross site request forgery (CSRF) tokens</Name>
+			<Description></Description>
+			<OrderingInfo>29</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T30: Protect forms authentication submissions</Name>
+			<Description></Description>
+			<OrderingInfo>30</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T31: Perform input validation on all forms of input</Name>
+			<Description></Description>
+			<OrderingInfo>31</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T32: Always perform input validation on the server</Name>
+			<Description></Description>
+			<OrderingInfo>32</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T33: Verify integrity of client-supplied read-only data</Name>
+			<Description></Description>
+			<OrderingInfo>33</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T34: Disallow overly-long</Name>
+			<Description></Description>
+			<OrderingInfo>34</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T35: Specify maximum HTTP message size in web server</Name>
+			<Description></Description>
+			<OrderingInfo>35</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T36: Escape untrusted data in HTML</Name>
+			<Description></Description>
+			<OrderingInfo>36</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T37: Avoid DOM-based cross site scripting (XSS)</Name>
+			<Description></Description>
+			<OrderingInfo>37</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T38: Bind variables in SQL statements</Name>
+			<Description></Description>
+			<OrderingInfo>38</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T39: Disallow carriage returns and line feeds when adding data to HTTP response headers</Name>
+			<Description></Description>
+			<OrderingInfo>39</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T40: Use XML encoding when interacting with XML data</Name>
+			<Description></Description>
+			<OrderingInfo>40</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T41: Use Lightweight Directory Access Protocol (LDAP) encoding when interacting with LDAP data</Name>
+			<Description></Description>
+			<OrderingInfo>41</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T42: Avoid relying on untrusted data for server side page, view, or template selection</Name>
+			<Description></Description>
+			<OrderingInfo>42</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T43: Avoid unsafe operating system interaction</Name>
+			<Description></Description>
+			<OrderingInfo>43</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T44: Specify standard encoding format for all HTML content</Name>
+			<Description></Description>
+			<OrderingInfo>44</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T45: Log potential application security events</Name>
+			<Description></Description>
+			<OrderingInfo>45</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T46: Do not log confidential data</Name>
+			<Description></Description>
+			<OrderingInfo>46</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T47: Implement a global error handler and generic default error page for end users</Name>
+			<Description></Description>
+			<OrderingInfo>47</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T48: HTML entity encode validation error messages</Name>
+			<Description></Description>
+			<OrderingInfo>48</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T49: Remove/disable unused, test or debug code and data</Name>
+			<Description></Description>
+			<OrderingInfo>49</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T50: Use indirect object reference maps if accessing files</Name>
+			<Description></Description>
+			<OrderingInfo>50</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T51: Throw an error page for unknown extensions on the web server</Name>
+			<Description></Description>
+			<OrderingInfo>51</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T52: Do not store confidential data in temporary files</Name>
+			<Description></Description>
+			<OrderingInfo>52</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T53: Virus scan all uploaded files using an inline virus scanner</Name>
+			<Description></Description>
+			<OrderingInfo>53</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T54: Validate file contents</Name>
+			<Description></Description>
+			<OrderingInfo>54</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T55: Validate all untrusted XML input</Name>
+			<Description></Description>
+			<OrderingInfo>55</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T56: Restrict access to WSDL</Name>
+			<Description></Description>
+			<OrderingInfo>56</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T57: Do not accept user-supplied XSLTs</Name>
+			<Description></Description>
+			<OrderingInfo>57</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T58: Do not process user-supplied XSLTs in XML digital signatures</Name>
+			<Description></Description>
+			<OrderingInfo>58</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T59: Use standard libraries for encryption</Name>
+			<Description></Description>
+			<OrderingInfo>59</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T60: Only use approved cryptographic algorithms and key lengths</Name>
+			<Description></Description>
+			<OrderingInfo>60</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T61: Change all default passwords in third party libraries</Name>
+			<Description></Description>
+			<OrderingInfo>61</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T62: Lockdown passwords in property and configuration files (e.g. database connection strings)</Name>
+			<Description></Description>
+			<OrderingInfo>62</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T63: Disable auto-complete on confidential fields</Name>
+			<Description></Description>
+			<OrderingInfo>63</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T64: No-cache for confidential pages</Name>
+			<Description></Description>
+			<OrderingInfo>64</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T65: Restrict accepted HTTP verbs</Name>
+			<Description></Description>
+			<OrderingInfo>65</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T66: Prevent web pages from being loaded inside iframe (Frame Busting)</Name>
+			<Description></Description>
+			<OrderingInfo>66</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T67: Enforce page navigation</Name>
+			<Description></Description>
+			<OrderingInfo>67</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T68: Encrypt credit card PANs in storage</Name>
+			<Description></Description>
+			<OrderingInfo>68</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T69: Ensure that system accounts for server to server authentication meet at least the same minimum password requirements as end users</Name>
+			<Description></Description>
+			<OrderingInfo>69</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T70: Implement account lockout or authentication throttling for system accounts</Name>
+			<Description></Description>
+			<OrderingInfo>70</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T71: Capture sufficient information for transactional audit logging</Name>
+			<Description></Description>
+			<OrderingInfo>71</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T72: Use safe arithmetic to avoid integer overflow</Name>
+			<Description></Description>
+			<OrderingInfo>72</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T73: Use random delays in authentication failures</Name>
+			<Description></Description>
+			<OrderingInfo>73</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T74: Avoid HTTP Parameter Pollution</Name>
+			<Description></Description>
+			<OrderingInfo>74</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T75: Use regular expressions that are not vulnerable to Denial of Service</Name>
+			<Description></Description>
+			<OrderingInfo>75</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T76: Do not hard code passwords</Name>
+			<Description></Description>
+			<OrderingInfo>76</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T133: Mask credit card PAN numbers when displayed</Name>
+			<Description></Description>
+			<OrderingInfo>77</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T134: Do not email PAN numbers</Name>
+			<Description></Description>
+			<OrderingInfo>78</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T135: Provide unique user IDs for each user</Name>
+			<Description></Description>
+			<OrderingInfo>79</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T136: Do not store credit card CVV or PIN numbers</Name>
+			<Description></Description>
+			<OrderingInfo>80</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T137: Encrypt protected health information in storage</Name>
+			<Description></Description>
+			<OrderingInfo>81</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T139: Use SSL to encrypt protected health information on the Internet</Name>
+			<Description></Description>
+			<OrderingInfo>82</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T143: Apply minimum password standards for mobile environments</Name>
+			<Description></Description>
+			<OrderingInfo>83</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T144: Do not rely on client for account lockout or authentication throttling</Name>
+			<Description></Description>
+			<OrderingInfo>84</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T145: Avoid client-side authorization</Name>
+			<Description></Description>
+			<OrderingInfo>85</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T146: Use encryption for network communications in mobile environment</Name>
+			<Description></Description>
+			<OrderingInfo>86</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T148: Avoid caching confidential data on client</Name>
+			<Description></Description>
+			<OrderingInfo>87</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T149: Avoid hard-coded secret keys or passwords on client</Name>
+			<Description></Description>
+			<OrderingInfo>88</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T150: Validate data received from server before handling</Name>
+			<Description></Description>
+			<OrderingInfo>89</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T151: Use cryptographically secure random numbers</Name>
+			<Description></Description>
+			<OrderingInfo>90</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T152: Avoid asking for and using excessive permissions</Name>
+			<Description></Description>
+			<OrderingInfo>91</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T153: Scrub buffers holding sensitive information when releasing/deleting</Name>
+			<Description></Description>
+			<OrderingInfo>92</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T154: Do not store or cache credit card information on client</Name>
+			<Description></Description>
+			<OrderingInfo>93</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T155: Avoid storing logs on the client</Name>
+			<Description></Description>
+			<OrderingInfo>94</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T156: Validate certificate and its chain of trust properly</Name>
+			<Description></Description>
+			<OrderingInfo>95</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T157: Temporary files must be cleaned up after the resource is used</Name>
+			<Description></Description>
+			<OrderingInfo>96</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T158: Verify integrity of client-supplied read-only data from rich clients</Name>
+			<Description></Description>
+			<OrderingInfo>97</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T159: Avoid sending detailed error messages to remote systems</Name>
+			<Description></Description>
+			<OrderingInfo>98</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T160: Avoid relying on Jailbreak detection as a security measure</Name>
+			<Description></Description>
+			<OrderingInfo>99</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T161: Treat Unique Device IDs as Personally Identifiable Information</Name>
+			<Description></Description>
+			<OrderingInfo>100</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T162: Validate workspace before retrieving local resources</Name>
+			<Description></Description>
+			<OrderingInfo>101</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T163: Handle health data securely</Name>
+			<Description></Description>
+			<OrderingInfo>102</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T164: Clear session information from client upon logout</Name>
+			<Description></Description>
+			<OrderingInfo>103</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T165: Do not rely on Unique Device ID values in security controls</Name>
+			<Description></Description>
+			<OrderingInfo>104</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T166: Use secure JSON format for AJAX end points</Name>
+			<Description></Description>
+			<OrderingInfo>105</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T168: Prevent auto-snapshot feature of iOS from saving sensitive data</Name>
+			<Description></Description>
+			<OrderingInfo>106</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T170: Secure IPC endpoints used in clients</Name>
+			<Description></Description>
+			<OrderingInfo>107</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T171: Follow spam free guidelines for sending solicitation emails</Name>
+			<Description></Description>
+			<OrderingInfo>108</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T176: Apply principles of privacy when handling personal information</Name>
+			<Description></Description>
+			<OrderingInfo>109</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T177: Provide a mean for the users to review and update their personal data</Name>
+			<Description></Description>
+			<OrderingInfo>110</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T178: Ask for consent from user when collecting personal information</Name>
+			<Description></Description>
+			<OrderingInfo>111</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T179: Allow access for users to remove their data from the system</Name>
+			<Description></Description>
+			<OrderingInfo>112</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T180: Provide privacy preferences to the browser via P3P</Name>
+			<Description></Description>
+			<OrderingInfo>113</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T181: Validate model explicitly for fields the user is allowed to update</Name>
+			<Description></Description>
+			<OrderingInfo>114</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T182: Turn off nested expression language evaluation</Name>
+			<Description></Description>
+			<OrderingInfo>115</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T184: Perform authorization checks on RESTful web services</Name>
+			<Description></Description>
+			<OrderingInfo>116</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T185: Follow best practices to secure SAML implementations</Name>
+			<Description></Description>
+			<OrderingInfo>117</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T186: Maintain the latest security patch level for third party libraries and software</Name>
+			<Description></Description>
+			<OrderingInfo>118</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T188: Avoid storing cached confidential data on mobile devices</Name>
+			<Description></Description>
+			<OrderingInfo>119</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T189: Avoid using unmanaged (native) code</Name>
+			<Description></Description>
+			<OrderingInfo>120</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T191: Follow best practices when handling primitive data types</Name>
+			<Description></Description>
+			<OrderingInfo>121</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T194: Obtain user consent for tracking cookies</Name>
+			<Description></Description>
+			<OrderingInfo>122</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T195: Special provisions for sensitive personal information</Name>
+			<Description></Description>
+			<OrderingInfo>123</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T196: Avoid dangerous functions</Name>
+			<Description></Description>
+			<OrderingInfo>124</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T202: Prevent buffer overflow/underflow</Name>
+			<Description></Description>
+			<OrderingInfo>125</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T203: Avoid uncontrolled format string</Name>
+			<Description></Description>
+			<OrderingInfo>126</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T204: Follow security best practices when dealing with pointers</Name>
+			<Description></Description>
+			<OrderingInfo>127</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T205: Avoid inter-process race conditions</Name>
+			<Description></Description>
+			<OrderingInfo>128</OrderingInfo>
+		</ExternalCategoryDefinition>
+		<ExternalCategoryDefinition>
+			<Name>T206: Avoid time of check time of use race condition against external resources</Name>
+			<Description></Description>
+			<OrderingInfo>129</OrderingInfo>
+		</ExternalCategoryDefinition>
+
+		<!-- ########## -->
+		<Mapping>
+			<InternalCategory>ASP.NET Misconfiguration: Weak Password Protection</InternalCategory>
+			<ExternalCategory>T62: Lockdown passwords in property and configuration files (e.g. database connection strings)</ExternalCategory>
+		</Mapping>
+
+
+
+
+		<Mapping>
+			<InternalCategory>Password Management: Heap Inspection</InternalCategory>
+			<ExternalCategory>T153: Scrub buffers holding sensitive information when releasing/deleting</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>PHP Misconfiguration: magic_quotes_runtime Enabled</InternalCategory>
+			<ExternalCategory>T31: Perform input validation on all forms of input</ExternalCategory>
+		</Mapping>
+
+
+
+
+		<Mapping>
+			<InternalCategory>Cross-Site Scripting: Persistent</InternalCategory>
+			<ExternalCategory>T36: Escape untrusted data in HTML</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>WCF Misconfiguration: Service Enumeration</InternalCategory>
+			<ExternalCategory>T56: Restrict access to WSDL</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>SQL Injection: Persistence</InternalCategory>
+			<ExternalCategory>T38: Bind variables in SQL statements</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>WCF Misconfiguration: Anonymous Transport Client</InternalCategory>
+			<ExternalCategory>T14: Principles of least privilege</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Cross-Site Scripting: External Links</InternalCategory>
+			<ExternalCategory>T36: Escape untrusted data in HTML</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Heap Inspection</InternalCategory>
+			<ExternalCategory>T153: Scrub buffers holding sensitive information when releasing/deleting</ExternalCategory>
+		</Mapping>
+
+
+
+		<Mapping>
+			<InternalCategory>Buffer Overflow: Format String (%f/%F)</InternalCategory>
+			<ExternalCategory>T203: Avoid uncontrolled format string</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Access Control: MQ</InternalCategory>
+			<ExternalCategory>T50: Use indirect object reference maps if accessing files</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>HTTP Verb Tampering</InternalCategory>
+			<ExternalCategory>T65: Restrict accepted HTTP verbs</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>WebSphere Service Provider Misconfiguration: Weak Token</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Null Dereference: Check before Dereference</InternalCategory>
+			<ExternalCategory>T204: Follow security best practices when dealing with pointers</ExternalCategory>
+		</Mapping>
+
+
+
+
+		<Mapping>
+			<InternalCategory>Privilege Management: Android Network</InternalCategory>
+			<ExternalCategory>T152: Avoid asking for and using excessive permissions</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Weak WS-SecurityPolicy: Missing Recipient Encryption Token</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Session Fixation</InternalCategory>
+			<ExternalCategory>T20: Invalidate old session ID after authentication</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Axis 2 Service Provider Misconfiguration: Missing Inbound Encryption</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Weak Encryption: Inadequate RSA Padding</InternalCategory>
+			<ExternalCategory>T60: Only use approved cryptographic algorithms and key lengths</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Cookie Security: Cookie not Sent Over SSL</InternalCategory>
+			<ExternalCategory>T22: Set secure flag on session cookies</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Privacy Violation: Password</InternalCategory>
+			<ExternalCategory>T161: Treat Unique Device IDs as Personally Identifiable Information</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>SQL Injection: Hibernate</InternalCategory>
+			<ExternalCategory>T38: Bind variables in SQL statements</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Weak Cryptographic Hash</InternalCategory>
+			<ExternalCategory>T60: Only use approved cryptographic algorithms and key lengths</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Dead Code</InternalCategory>
+			<ExternalCategory>T49: Remove/disable unused, test or debug code and data</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Resource Injection</InternalCategory>
+			<ExternalCategory>T50: Use indirect object reference maps if accessing files</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>SQL Injection: SubSonic</InternalCategory>
+			<ExternalCategory>T38: Bind variables in SQL statements</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Cookie Security: Persistent Session Cookie</InternalCategory>
+			<ExternalCategory>T26: Destroy sessions on logout</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Tomcat Configuration: Insecure Transport</InternalCategory>
+			<ExternalCategory>T21: Ensure password and session ID are sent over SSL</ExternalCategory>
+		</Mapping>
+
+
+
+		<Mapping>
+			<InternalCategory>Buffer Overflow</InternalCategory>
+			<ExternalCategory>T202: Prevent buffer overflow/underflow</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Hidden Field</InternalCategory>
+			<ExternalCategory>T33: Verify integrity of client-supplied read-only data</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>System Information Leak</InternalCategory>
+			<ExternalCategory>T47: Implement a global error handler and generic default error page for end users</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Axis 2 Service Provider Misconfiguration: Outbound WS-Security Not Enabled</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Privacy Violation: Image</InternalCategory>
+			<ExternalCategory>T161: Treat Unique Device IDs as Personally Identifiable Information</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>Acegi Misconfiguration: Insecure Channel Mixing</InternalCategory>
+			<ExternalCategory>T21: Ensure password and session ID are sent over SSL</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Privilege Management: Android Telephony</InternalCategory>
+			<ExternalCategory>T152: Avoid asking for and using excessive permissions</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Axis 2 Misconfiguration: Insecure Message Security</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Axis 2 Service Provider Misconfiguration: Inbound WS-Security Not Enabled</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>System Information Leak: PHP Errors</InternalCategory>
+			<ExternalCategory>T159: Avoid sending detailed error messages to remote systems</ExternalCategory>
+		</Mapping>
+
+
+
+
+
+
+
+
+
+		<Mapping>
+			<InternalCategory>Null Dereference: Dereference before Check</InternalCategory>
+			<ExternalCategory>T204: Follow security best practices when dealing with pointers</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Buffer Overflow: Signed Comparison</InternalCategory>
+			<ExternalCategory>T191: Follow best practices when handling primitive data types</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Often Misused: File Upload</InternalCategory>
+			<ExternalCategory>T53: Virus scan all uploaded files using an inline virus scanner</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Race Condition: Singleton Member Field</InternalCategory>
+			<ExternalCategory>T205: Avoid inter-process race conditions</ExternalCategory>
+		</Mapping>
+
+
+
+		<Mapping>
+			<InternalCategory>System Information Leak: Incomplete Servlet Error Handling</InternalCategory>
+			<ExternalCategory>T159: Avoid sending detailed error messages to remote systems</ExternalCategory>
+		</Mapping>
+		
+		<Mapping>
+			<InternalCategory>Out-of-Bounds Read: Off-by-One</InternalCategory>
+			<ExternalCategory>T204: Follow security best practices when dealing with pointers</ExternalCategory>
+		</Mapping>
+		
+		<Mapping>
+			<InternalCategory>Axis Service Provider Misconfiguration: Plain Text Password</InternalCategory>
+			<ExternalCategory>T30: Protect forms authentication submissions</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Privacy Violation: Screen Caching</InternalCategory>
+			<ExternalCategory>T161: Treat Unique Device IDs as Personally Identifiable Information</ExternalCategory>
+		</Mapping>
+
+
+
+
+
+		<Mapping>
+			<InternalCategory>Privilege Management: Android Data Storage</InternalCategory>
+			<ExternalCategory>T152: Avoid asking for and using excessive permissions</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Privacy Violation: Keyboard Caching</InternalCategory>
+			<ExternalCategory>T161: Treat Unique Device IDs as Personally Identifiable Information</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Insecure Randomness</InternalCategory>
+			<ExternalCategory>T151: Use cryptographically secure random numbers</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Buffer Overflow: Format String</InternalCategory>
+			<ExternalCategory>T203: Avoid uncontrolled format string</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>String Termination Error</InternalCategory>
+			<ExternalCategory>T202: Prevent buffer overflow/underflow</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Dynamic Code Evaluation: Script Injection</InternalCategory>
+			<ExternalCategory>T182: Turn off nested expression language evaluation</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Insecure Temporary File</InternalCategory>
+			<ExternalCategory>T52: Do not store confidential data in temporary files</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>Encoded Data Validation</InternalCategory>
+			<ExternalCategory>T31: Perform input validation on all forms of input</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Often Misused: Privilege Management</InternalCategory>
+			<ExternalCategory>T19: Restrict application's access to database</ExternalCategory>
+		</Mapping>
+
+
+
+
+
+
+		<Mapping>
+			<InternalCategory>WebSphere Service Requester Misconfiguration: Weak Token</InternalCategory>
+			<ExternalCategory>T21: Ensure password and session ID are sent over SSL</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>WebSphere Service Requester Misconfiguration: Missing Inbound Encryption</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Weak XML Schema: Type Any</InternalCategory>
+			<ExternalCategory>T31: Perform input validation on all forms of input</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Use After Free</InternalCategory>
+			<ExternalCategory>T204: Follow security best practices when dealing with pointers</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Command Injection</InternalCategory>
+			<ExternalCategory>T43: Avoid unsafe operating system interaction</ExternalCategory>
+		</Mapping>
+		
+		<Mapping>
+			<InternalCategory>Axis Misconfiguration: Debug Information</InternalCategory>
+			<ExternalCategory>T159: Avoid sending detailed error messages to remote systems</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Memory Leak</InternalCategory>
+			<ExternalCategory>T204: Follow security best practices when dealing with pointers</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>SQL Injection: NHibernate</InternalCategory>
+			<ExternalCategory>T38: Bind variables in SQL statements</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Race Condition: Static Database Connection</InternalCategory>
+			<ExternalCategory>T205: Avoid inter-process race conditions</ExternalCategory>
+		</Mapping>
+
+
+
+		<Mapping>
+			<InternalCategory>Weak WS-SecurityPolicy: Missing Encryption on Message Headers</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Dead Code: Unused Field</InternalCategory>
+			<ExternalCategory>T49: Remove/disable unused, test or debug code and data</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Race Condition: PHP Design Flaw</InternalCategory>
+			<ExternalCategory>T205: Avoid inter-process race conditions</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Race Condition: PHP Design Flaw</InternalCategory>
+			<ExternalCategory>T206: Avoid time of check time of use race condition against external resources</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Often Misused: Strings</InternalCategory>
+			<ExternalCategory>T196: Avoid dangerous functions</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>WCF Misconfiguration: Weak Token</InternalCategory>
+			<ExternalCategory>T21: Ensure password and session ID are sent over SSL</ExternalCategory>
+		</Mapping>
+
+
+
+		<Mapping>
+			<InternalCategory>Insecure Storage: Missing Encryption on Stored Private Media</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>WebSphere Service Requester Misconfiguration: Inbound WS-Security Not Enabled</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>Password Management: Password in Redirect</InternalCategory>
+			<ExternalCategory>T161: Treat Unique Device IDs as Personally Identifiable Information</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Often Misused: File Uploads</InternalCategory>
+			<ExternalCategory>T53: Virus scan all uploaded files using an inline virus scanner</ExternalCategory>
+		</Mapping>
+
+
+
+
+		<Mapping>
+			<InternalCategory>Axis 2 Service Requester Misconfiguration: Weak Token</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>System Information Leak: Overly Broad SQL Logging</InternalCategory>
+			<ExternalCategory>T46: Do not log confidential data</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>Dead Code: Empty Try Block</InternalCategory>
+			<ExternalCategory>T49: Remove/disable unused, test or debug code and data</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>ASP.NET Misconfiguration: Role Protection Disabled</InternalCategory>
+			<ExternalCategory>T165: Do not rely on Unique Device ID values in security controls</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Redundant Null Check</InternalCategory>
+			<ExternalCategory>T204: Follow security best practices when dealing with pointers</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>WCF Misconfiguration: Unsafe Revocation Mode</InternalCategory>
+			<ExternalCategory>T156: Validate certificate and its chain of trust properly</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>SQL Injection: Lateral SQL Injection</InternalCategory>
+			<ExternalCategory>T38: Bind variables in SQL statements</ExternalCategory>
+		</Mapping>
+
+
+
+		<Mapping>
+			<InternalCategory>Password Management: Hardcoded Password</InternalCategory>
+			<ExternalCategory>T76: Do not hard code passwords</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>WCF Misconfiguration: Throttling Not Enabled</InternalCategory>
+			<ExternalCategory>T35: Specify maximum HTTP message size in web server</ExternalCategory>
+		</Mapping>
+
+
+
+
+
+
+		<Mapping>
+			<InternalCategory>Dangerous Function</InternalCategory>
+			<ExternalCategory>T196: Avoid dangerous functions</ExternalCategory>
+		</Mapping>
+
+
+
+
+		<Mapping>
+			<InternalCategory>Access Control: Weak Security Constraint</InternalCategory>
+			<ExternalCategory>T14: Principles of least privilege</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Spring MVC Bad Practices: Flow Bypass</InternalCategory>
+			<ExternalCategory>T31: Perform input validation on all forms of input</ExternalCategory>
+		</Mapping>
+
+
+
+		<Mapping>
+			<InternalCategory>Cross-Site Request Forgery</InternalCategory>
+			<ExternalCategory>T29: Use anti cross site request forgery (CSRF) tokens</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Race Condition: File System Access</InternalCategory>
+			<ExternalCategory>T205: Avoid inter-process race conditions</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Race Condition: File System Access</InternalCategory>
+			<ExternalCategory>T206: Avoid time of check time of use race condition against external resources</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Format String</InternalCategory>
+			<ExternalCategory>T203: Avoid uncontrolled format string</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>Password Management: Null Password</InternalCategory>
+			<ExternalCategory>T76: Do not hard code passwords</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Cross-Site Scripting: Poor Validation</InternalCategory>
+			<ExternalCategory>T36: Escape untrusted data in HTML</ExternalCategory>
+		</Mapping>
+
+
+
+
+		<Mapping>
+			<InternalCategory>Illegal Pointer Value</InternalCategory>
+			<ExternalCategory>T204: Follow security best practices when dealing with pointers</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Axis Service Requester Misconfiguration: Weak Token</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Spring Webflow Bad Practices: Flow Bypass</InternalCategory>
+			<ExternalCategory>T31: Perform input validation on all forms of input</ExternalCategory>
+		</Mapping>
+
+
+
+		<Mapping>
+			<InternalCategory>ColdFusion Bad Practices: Leftover Debug Code</InternalCategory>
+			<ExternalCategory>T49: Remove/disable unused, test or debug code and data</ExternalCategory>
+		</Mapping>
+
+
+
+
+
+
+
+
+		<Mapping>
+			<InternalCategory>Weak Cryptographic Hash: Hardcoded Salt</InternalCategory>
+			<ExternalCategory>T7: Salt and hash stored password</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>Access Control: LDAP</InternalCategory>
+			<ExternalCategory>T50: Use indirect object reference maps if accessing files</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Axis 2 Misconfiguration: Debug Information</InternalCategory>
+			<ExternalCategory>T49: Remove/disable unused, test or debug code and data</ExternalCategory>
+		</Mapping>
+		Maps to proposed "T218" J2EE Misconfiguration: Weak Access Permissions
+
+
+		<Mapping>
+			<InternalCategory>SQL Injection: JDO</InternalCategory>
+			<ExternalCategory>T38: Bind variables in SQL statements</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Weak Encryption: Insufficient Key Size</InternalCategory>
+			<ExternalCategory>T60: Only use approved cryptographic algorithms and key lengths</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>CakePHP Misconfiguration: Excessive Session Timeout</InternalCategory>
+			<ExternalCategory>T24: Enforce idle session timeouts</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Dead Code: Unused Method</InternalCategory>
+			<ExternalCategory>T49: Remove/disable unused, test or debug code and data</ExternalCategory>
+		</Mapping>
+
+
+
+
+		<Mapping>
+			<InternalCategory>ASP.NET Bad Practices: Leftover Debug Code</InternalCategory>
+			<ExternalCategory>T49: Remove/disable unused, test or debug code and data</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Password Management: Empty Password</InternalCategory>
+			<ExternalCategory>T76: Do not hard code passwords</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Race Condition: Format Flaw</InternalCategory>
+			<ExternalCategory>T205: Avoid inter-process race conditions</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Unsafe Mobile Code: Insecure Transport</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>SQL Injection: LINQ</InternalCategory>
+			<ExternalCategory>T38: Bind variables in SQL statements</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>Dynamic Code Evaluation: Code Injection</InternalCategory>
+			<ExternalCategory>T182: Turn off nested expression language evaluation</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>ASP.NET Misconfiguration: Incomplete Certificate Validation</InternalCategory>
+			<ExternalCategory>T156: Validate certificate and its chain of trust properly</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Weak WS-SecurityPolicy: Missing Encryption on Message Attachments</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>WCF Misconfiguration: Anonymous Message Client</InternalCategory>
+			<ExternalCategory>T14: Principles of least privilege</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>ASP.NET Misconfiguration: HttpOnly Unset</InternalCategory>
+			<ExternalCategory>T23: Set HttpOnly flag on session cookies</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>JSON Injection</InternalCategory>
+			<ExternalCategory>T40: Use XML encoding when interacting with XML data</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>LDAP Manipulation</InternalCategory>
+			<ExternalCategory>T41: Use Lightweight Directory Access Protocol (LDAP) encoding when interacting with LDAP data</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Axis 2 Misconfiguration: Insecure Transport Sender</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Password Management: Weak Cryptography</InternalCategory>
+			<ExternalCategory>T7: Salt and hash stored password</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>ASP.NET Misconfiguration: Password Protection Disabled</InternalCategory>
+			<ExternalCategory>T62: Lockdown passwords in property and configuration files (e.g. database connection strings)</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>WebSphere Service Provider Misconfiguration: Outbound WS-Security Not Enabled</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>PHP Misconfiguration: magic_quotes_gpc Enabled</InternalCategory>
+			<ExternalCategory>T31: Perform input validation on all forms of input</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Open Redirect</InternalCategory>
+			<ExternalCategory>T11: Disallow external redirects</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>J2EE Misconfiguration: Excessive Session Timeout</InternalCategory>
+			<ExternalCategory>T24: Enforce idle session timeouts</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Insecure Compiler Optimization: Pointer Arithmetic</InternalCategory>
+			<ExternalCategory>T204: Follow security best practices when dealing with pointers</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Axis 2 Service Requester Misconfiguration: WS-Security Not Enabled</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>WCF Misconfiguration: MSMQ Anonymous Transport Client</InternalCategory>
+			<ExternalCategory>T14: Principles of least privilege</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>Weak XML Schema: Undefined Namespace</InternalCategory>
+			<ExternalCategory>T31: Perform input validation on all forms of input</ExternalCategory>
+		</Mapping>
+
+
+
+		<Mapping>
+			<InternalCategory>Dangerous Function: strcpy()</InternalCategory>
+			<ExternalCategory>T196: Avoid dangerous functions</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Missing XML Validation</InternalCategory>
+			<ExternalCategory>T55: Validate all untrusted XML input</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Format String: Argument Type Mismatch</InternalCategory>
+			<ExternalCategory>T203: Avoid uncontrolled format string</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Format String: Argument Type Mismatch</InternalCategory>
+			<ExternalCategory>T204: Follow security best practices when dealing with pointers</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>ASP.NET Misconfiguration: Debug Information</InternalCategory>
+			<ExternalCategory>T159: Avoid sending detailed error messages to remote systems</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>WCF Misconfiguration: Insecure Transport</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>SQL Injection: iBatis Data Map</InternalCategory>
+			<ExternalCategory>T38: Bind variables in SQL statements</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>Privilege Management: Android Messaging</InternalCategory>
+			<ExternalCategory>T152: Avoid asking for and using excessive permissions</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>WSE Misconfiguration: Missing Authorization</InternalCategory>
+			<ExternalCategory>T14: Principles of least privilege</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Weak Encryption</InternalCategory>
+			<ExternalCategory>T59: Use standard libraries for encryption</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Cookie Security: Session Cookies Disabled</InternalCategory>
+			<ExternalCategory>T20: Invalidate old session ID after authentication</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>J2EE Misconfiguration: Missing Error Handling</InternalCategory>
+			<ExternalCategory>T47: Implement a global error handler and generic default error page for end users</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>Cross-Site Scripting: Reflected</InternalCategory>
+			<ExternalCategory>T36: Escape untrusted data in HTML</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>PHP Misconfiguration: file_uploads Enabled</InternalCategory>
+			<ExternalCategory>T53: Virus scan all uploaded files using an inline virus scanner</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>CakePHP Misconfiguration: Debug Information</InternalCategory>
+			<ExternalCategory>T159: Avoid sending detailed error messages to remote systems</ExternalCategory>
+		</Mapping>
+
+
+
+
+		<Mapping>
+			<InternalCategory>Privacy Violation</InternalCategory>
+			<ExternalCategory>T161: Treat Unique Device IDs as Personally Identifiable Information</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>SQL Injection</InternalCategory>
+			<ExternalCategory>T38: Bind variables in SQL statements</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Flex Misconfiguration: Debug Information</InternalCategory>
+			<ExternalCategory>T159: Avoid sending detailed error messages to remote systems</ExternalCategory>
+		</Mapping>
+
+
+
+
+
+
+
+
+
+		<Mapping>
+			<InternalCategory>WSE Misconfiguration: Insufficient Encryption</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+
+
+
+		<Mapping>
+			<InternalCategory>J2EE Misconfiguration: Cookies Disabled</InternalCategory>
+			<ExternalCategory>T20: Invalidate old session ID after authentication</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>ASP.NET Misconfiguration: Sensitive File Persistence</InternalCategory>
+			<ExternalCategory>T20: Invalidate old session ID after authentication</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Query String Injection: Amazon Web Services</InternalCategory>
+			<ExternalCategory>T38: Bind variables in SQL statements</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Axis 2 Service Requester Misconfiguration: Missing Outbound Encryption</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Least Privilege Violation</InternalCategory>
+			<ExternalCategory>T14: Principles of least privilege</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Header Manipulation: Cookies</InternalCategory>
+			<ExternalCategory>T39: Disallow carriage returns and line feeds when adding data to HTTP response headers</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Weak WS-SecurityPolicy: Missing Encryption on Message Body</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>Weak WS-SecurityPolicy: Missing Encryption Token</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>Access Control: Missing Authorization Check</InternalCategory>
+			<ExternalCategory>T14: Principles of least privilege</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>System Information Leak: Apache Axis 2</InternalCategory>
+			<ExternalCategory>T159: Avoid sending detailed error messages to remote systems</ExternalCategory>
+		</Mapping>
+
+
+
+
+		<Mapping>
+			<InternalCategory>Password Management</InternalCategory>
+			<ExternalCategory>T7: Salt and hash stored password</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>SQL Injection: Castle ActiveRecord</InternalCategory>
+			<ExternalCategory>T38: Bind variables in SQL statements</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>HTML5: Form Validation Turned Off</InternalCategory>
+			<ExternalCategory>T31: Perform input validation on all forms of input</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>ASP.NET Misconfiguration: Incomplete Role Protection</InternalCategory>
+			<ExternalCategory>T165: Do not rely on Unique Device ID values in security controls</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>ASP.NET Misconfiguration: Missing Error Handling</InternalCategory>
+			<ExternalCategory>T47: Implement a global error handler and generic default error page for end users</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Header Manipulation</InternalCategory>
+			<ExternalCategory>T39: Disallow carriage returns and line feeds when adding data to HTTP response headers</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>WebSphere Service Requester Misconfiguration: Outbound WS-Security Not Enabled</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Often Misused: Weak SSL Certificate</InternalCategory>
+			<ExternalCategory>T156: Validate certificate and its chain of trust properly</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>WebSphere Service Provider Misconfiguration: Missing Inbound Encryption</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Weak WS-SecurityPolicy: Missing Initiator Encryption Token</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Query String Injection: Android Provider</InternalCategory>
+			<ExternalCategory>T38: Bind variables in SQL statements</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Cross-Site Scripting: DOM</InternalCategory>
+			<ExternalCategory>T36: Escape untrusted data in HTML</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Cross-Site Scripting: DOM</InternalCategory>
+			<ExternalCategory>T37: Avoid DOM-based cross site scripting (XSS)</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>J2EE Bad Practices: Leftover Debug Code</InternalCategory>
+			<ExternalCategory>T49: Remove/disable unused, test or debug code and data</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Array Bounds Error</InternalCategory>
+			<ExternalCategory>T191: Follow best practices when handling primitive data types</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Array Bounds Error</InternalCategory>
+			<ExternalCategory>T202: Prevent buffer overflow/underflow</ExternalCategory>
+		</Mapping>
+
+
+
+
+
+
+		<Mapping>
+			<InternalCategory>XML External Entity Injection</InternalCategory>
+			<ExternalCategory>T40: Use XML encoding when interacting with XML data</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>WCF Misconfiguration: Insufficient Logging</InternalCategory>
+			<ExternalCategory>T45: Log potential application security events</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Weak XML Schema: Unbounded Occurences</InternalCategory>
+			<ExternalCategory>T35: Specify maximum HTTP message size in web server</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>ADF Bad Practices: Missing URL Parameter Converter</InternalCategory>
+			<ExternalCategory>T31: Perform input validation on all forms of input</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Cross-Site Scripting</InternalCategory>
+			<ExternalCategory>T36: Escape untrusted data in HTML</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Cookie Security: Session Cookie not Sent Over SSL</InternalCategory>
+			<ExternalCategory>T22: Set secure flag on session cookies</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Axis 2 Misconfiguration: Insecure Transport Receiver</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Key Management: Hardcoded Encryption Key</InternalCategory>
+			<ExternalCategory>T76: Do not hard code passwords</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Key Management: Hardcoded Encryption Key</InternalCategory>
+			<ExternalCategory>T149: Avoid hard-coded secret keys or passwords on client</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>ASP.NET Misconfiguration: Session Cookies Disabled</InternalCategory>
+			<ExternalCategory>T20: Invalidate old session ID after authentication</ExternalCategory>
+		</Mapping>
+
+
+
+
+		<Mapping>
+			<InternalCategory>Access Control: Anonymous LDAP Bind</InternalCategory>
+			<ExternalCategory>T14: Principles of least privilege</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Dangerous Function: Strcpy</InternalCategory>
+			<ExternalCategory>T196: Avoid dangerous functions</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>WCF Misconfiguration: Debug Information</InternalCategory>
+			<ExternalCategory>T49: Remove/disable unused, test or debug code and data</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>XPath Injection</InternalCategory>
+			<ExternalCategory>T40: Use XML encoding when interacting with XML data</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Format String: Argument Number Mismatch</InternalCategory>
+			<ExternalCategory>T203: Avoid uncontrolled format string</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>PHP Misconfiguration: session_use_trans_sid Enabled</InternalCategory>
+			<ExternalCategory>T20: Invalidate old session ID after authentication</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>LDAP Injection</InternalCategory>
+			<ExternalCategory>T41: Use Lightweight Directory Access Protocol (LDAP) encoding when interacting with LDAP data</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Null Dereference</InternalCategory>
+			<ExternalCategory>T204: Follow security best practices when dealing with pointers</ExternalCategory>
+		</Mapping>
+
+
+
+		<Mapping>
+			<InternalCategory>Race Condition: Signal Handling</InternalCategory>
+			<ExternalCategory>T205: Avoid inter-process race conditions</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>Axis 2 Service Provider Misconfiguration: Missing Outbound Encryption</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Axis Misconfiguration: Service Enumeration</InternalCategory>
+			<ExternalCategory>T56: Restrict access to WSDL</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Privilege Management: Overly Broad Grant</InternalCategory>
+			<ExternalCategory>T152: Avoid asking for and using excessive permissions</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Privilege Management: Default Package Rights</InternalCategory>
+			<ExternalCategory>T152: Avoid asking for and using excessive permissions</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Axis 2 Service Requester Misconfiguration: Plain Text Password</InternalCategory>
+			<ExternalCategory>T30: Protect forms authentication submissions</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Out-of-Bounds Read: Signed Comparison</InternalCategory>
+			<ExternalCategory>T191: Follow best practices when handling primitive data types</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Privacy Violation: Autocomplete</InternalCategory>
+			<ExternalCategory>T64: No-cache for confidential pages</ExternalCategory>
+		</Mapping>
+
+
+
+
+
+		<Mapping>
+			<InternalCategory>Out-of-Bounds Read</InternalCategory>
+			<ExternalCategory>T204: Follow security best practices when dealing with pointers</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Out-of-Bounds Read</InternalCategory>
+			<ExternalCategory>T202: Prevent buffer overflow/underflow</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>ASP.NET Misconfiguration: Persistent Authentication</InternalCategory>
+			<ExternalCategory>T165: Do not rely on Unique Device ID values in security controls</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Code Correctness: Erroneous Zero Value</InternalCategory>
+			<ExternalCategory>T31: Perform input validation on all forms of input</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>HTTP Response Splitting</InternalCategory>
+			<ExternalCategory>T39: Disallow carriage returns and line feeds when adding data to HTTP response headers</ExternalCategory>
+		</Mapping>
+
+
+
+		<Mapping>
+			<InternalCategory>J2EE Misconfiguration: Missing Data Transport Constraint</InternalCategory>
+			<ExternalCategory>T21: Ensure password and session ID are sent over SSL</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Dangerous Function: xp_cmdshell</InternalCategory>
+			<ExternalCategory>T196: Avoid dangerous functions</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>ASP.NET Misconfiguration: Certificate Validation Disabled</InternalCategory>
+			<ExternalCategory>T156: Validate certificate and its chain of trust properly</ExternalCategory>
+		</Mapping>
+
+
+
+		<Mapping>
+			<InternalCategory>Credential Management</InternalCategory>
+			<ExternalCategory>T30: Protect forms authentication submissions</ExternalCategory>
+		</Mapping>
+
+
+
+		<Mapping>
+			<InternalCategory>Password Management: Weak Redundancy</InternalCategory>
+			<ExternalCategory>T4: Configurable password policies</ExternalCategory>
+		</Mapping>
+
+
+
+		<Mapping>
+			<InternalCategory>Weak XML Schema: Unbounded Occurrences</InternalCategory>
+			<ExternalCategory>T35: Specify maximum HTTP message size in web server</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Struts Misconfiguration: Duplicate Form Bean</InternalCategory>
+			<ExternalCategory>T135: Provide unique user IDs for each user</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Memory Leak: Reallocation</InternalCategory>
+			<ExternalCategory>T204: Follow security best practices when dealing with pointers</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>WCF Misconfiguration: Certificate Validation Not Enabled</InternalCategory>
+			<ExternalCategory>T156: Validate certificate and its chain of trust properly</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Type Mismatch: Integer to Character</InternalCategory>
+			<ExternalCategory>T191: Follow best practices when handling primitive data types</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Password Management: Insecure Submission</InternalCategory>
+			<ExternalCategory>T161: Treat Unique Device IDs as Personally Identifiable Information</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Password Management: Password in Comment</InternalCategory>
+			<ExternalCategory>T76: Do not hard code passwords</ExternalCategory>
+		</Mapping>
+
+
+
+
+
+
+		<Mapping>
+			<InternalCategory>WebSphere Service Requester Misconfiguration: Missing Outbound Encryption</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		<Mapping>
+			<InternalCategory>Axis Service Provider Misconfiguration: Weak Token</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>PCI Privacy Violation</InternalCategory>
+			<ExternalCategory>T161: Treat Unique Device IDs as Personally Identifiable Information</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Unsafe JNI</InternalCategory>
+			<ExternalCategory>T189: Avoid using unmanaged (native) code</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Password Management: Password in HTML Form</InternalCategory>
+			<ExternalCategory>T76: Do not hard code passwords</ExternalCategory>
+		</Mapping>
+
+
+
+		<Mapping>
+			<InternalCategory>J2EE Misconfiguration: Insecure Transport</InternalCategory>
+			<ExternalCategory>T21: Ensure password and session ID are sent over SSL</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Type Mismatch: Signed to Unsigned</InternalCategory>
+			<ExternalCategory>T191: Follow best practices when handling primitive data types</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Privilege Management: Android Connectivity</InternalCategory>
+			<ExternalCategory>T152: Avoid asking for and using excessive permissions</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>ASP.NET Misconfiguration: Excessive Session Timeout</InternalCategory>
+			<ExternalCategory>T24: Enforce idle session timeouts</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Axis 2 Service Requester Misconfiguration: Outbound WS-Security Not Enabled</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Access Control: DLI</InternalCategory>
+			<ExternalCategory>T50: Use indirect object reference maps if accessing files</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Weak XML Schema: Lax Processing</InternalCategory>
+			<ExternalCategory>T31: Perform input validation on all forms of input</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>WCF Misconfiguration: Transport Security Enabled</InternalCategory>
+			<ExternalCategory>T14: Principles of least privilege</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Path Manipulation</InternalCategory>
+			<ExternalCategory>T162: Validate workspace before retrieving local resources</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Path Manipulation</InternalCategory>
+			<ExternalCategory>T50: Use indirect object reference maps if accessing files</ExternalCategory>
+		</Mapping>
+
+
+
+		<Mapping>
+			<InternalCategory>Axis 2 Service Requester Misconfiguration: Inbound WS-Security Not Enabled</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Axis 2 Service Requester Misconfiguration: Missing Inbound Encryption</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>Privilege Management: Android Disable</InternalCategory>
+			<ExternalCategory>T152: Avoid asking for and using excessive permissions</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Code Correctness: Erroneous Negative Value</InternalCategory>
+			<ExternalCategory>T31: Perform input validation on all forms of input</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Missing XML Validation: Untyped Response</InternalCategory>
+			<ExternalCategory>T55: Validate all untrusted XML input</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Privilege Management: Android Location</InternalCategory>
+			<ExternalCategory>T152: Avoid asking for and using excessive permissions</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>WebSphere Service Provider Misconfiguration: Missing Outbound Encryption</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Double Free</InternalCategory>
+			<ExternalCategory>T204: Follow security best practices when dealing with pointers</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Integer Overflow</InternalCategory>
+			<ExternalCategory>T72: Use safe arithmetic to avoid integer overflow</ExternalCategory>
+		</Mapping>
+
+		<Mapping>
+			<InternalCategory>Spring MVC Bad Practices: Request Parameters Bound into Persisted Objects</InternalCategory>
+			<ExternalCategory>T181: Validate model explicitly for fields the user is allowed to update</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Axis 2 Service Provider Misconfiguration: WS-Security Not Enabled</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Password Management: Password in Configuration File</InternalCategory>
+			<ExternalCategory>T62: Lockdown passwords in property and configuration files (e.g. database connection strings)</ExternalCategory>
+		</Mapping>
+		
+		<Mapping>
+			<InternalCategory>Dangerous File Inclusion</InternalCategory>
+			<ExternalCategory>T42: Avoid relying on untrusted data for server side page, view, or template selection</ExternalCategory>
+		</Mapping>
+		
+		<Mapping>
+			<InternalCategory>HTML5: Easy-to-Guess Database Name</InternalCategory>
+			<ExternalCategory>T151: Use cryptographically secure random numbers</ExternalCategory>
+		</Mapping>
+
+
+		<Mapping>
+			<InternalCategory>Privilege Management: Unnecessary Permission</InternalCategory>
+			<ExternalCategory>T152: Avoid asking for and using excessive permissions</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>XML Injection</InternalCategory>
+			<ExternalCategory>T40: Use XML encoding when interacting with XML data</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>Axis 2 Service Provider Misconfiguration: Weak Token</InternalCategory>
+			<ExternalCategory>T146: Use encryption for network communications in mobile environment</ExternalCategory>
+		</Mapping>
+		<Mapping>
+			<InternalCategory>J2EE Misconfiguration: Debug Information</InternalCategory>
+			<ExternalCategory>T152: Avoid asking for and using excessive permissions</ExternalCategory>
+		</Mapping>
+
+
+
+		<Mapping>
+			<InternalCategory>Axis Service Requester Misconfiguration: Plain Text Password</InternalCategory>
+			<ExternalCategory>T30: Protect forms authentication submissions</ExternalCategory>
+		</Mapping>
+		<OrderingInfo>30</OrderingInfo>
+	</ExternalList>
+</ExternalMetadataPack>
+
