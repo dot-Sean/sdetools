@@ -2,7 +2,7 @@
 import collections
 import re
 from datetime import datetime
-from xml.dom import minidom
+from sdetools.extlib.defusedxml import minidom
 
 from sdetools.sdelib.commons import Error
 from sdetools.sdelib.restclient import APIError
