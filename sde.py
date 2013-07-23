@@ -8,6 +8,9 @@ from sdetools.sdelib import log_mgr
 
 log_mgr.setup_root_logger()
 
+import logging
+logger = logging.getLogger(__name__)
+
 def main(argv):
     if len(argv) < 2:
         commons.show_error("Missing command", usage_hint=True)
