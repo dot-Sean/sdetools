@@ -4,6 +4,8 @@ import os
 import socket
 import urllib2
 import base64
+import tempfile
+import atexit
 
 try:
     import ssl
@@ -17,13 +19,69 @@ from sdetools.sdelib import commons
 
 ssl_warned = False
 
-CERT_PATH_NAME = os.path.join(commons.media_path, 'ssl')
-CA_CERTS_FILE = os.path.join(CERT_PATH_NAME, 'ca_bundle.crt')
+# These are under media path
+DEFAULT_ROOT_BUNDLE = 'ca_bundle.crt'
+CUSTOM_ROOT_BUNDLE = 'my_root_certs.crt'
 
-try:
-    open(CA_CERTS_FILE).close()
-except:
-    logging.warning('Unable to access SSL root certificate: %s' % (CA_CERTS_FILE))
+OS_ROOT_BUNDLES = [
+    # Debian/Ubuntu/Gentoo/Arch Linux
+    '/etc/ssl/certs/ca-certificates.crt',
+    # Fedora/RHEL
+    '/etc/pki/tls/certs/ca-bundle.crt',
+    # openSUSE/SLE
+    '/etc/ssl/ca-bundle.pem',
+    ]
+
+CERT_PATH_NAME = os.path.join(commons.media_path, 'ssl')
+CA_CERTS_FILE = os.path.join(CERT_PATH_NAME, DEFAULT_ROOT_BUNDLE)
+CUSTOM_CA_FILE = os.path.join(CERT_PATH_NAME, CUSTOM_ROOT_BUNDLE)
+
+def compile_certs():
+    global CA_CERTS_FILE
+
+    # Here we just check that the data directory is okay by checking to see
+    # if we can access the default bundle.
+    try:
+        open(CA_CERTS_FILE).close()
+    except:
+        # If can't open for any reason including file not existing, file not readable, 
+        # file locked by another process, we need to just continue
+        logging.warning('Unable to access SSL root certificate: %s' % (CA_CERTS_FILE))
+
+    def remove_file(dest_path):
+        try:
+            os.remove(dest_path)
+        except:
+            # It is a failsafe file removal
+            logging.warning('Unable to cleanup temporary file: %s' % dest_path)
+
+    crtfd, crtfname = tempfile.mkstemp()
+    crtf = os.fdopen(crtfd, 'w')
+
+    candidates = OS_ROOT_BUNDLES[:]
+
+    for fname in os.listdir(CERT_PATH_NAME):
+        if fname.endswith('.crt'):
+            candidates.append(os.path.join(CERT_PATH_NAME, fname))
+
+    for fpath in candidates:
+        if not os.path.isfile(fpath):
+            continue
+        try:
+            lfd = open(fpath)
+        except:
+            logging.warning('Unable to access SSL Certificates file %s (skipping ...)' % fpath)
+            continue
+        buf = lfd.read()
+        while buf:
+            crtf.write(buf)
+            buf = lfd.read()
+        lfd.close()
+        crtf.write('\n')
+    crtf.close()
+
+    atexit.register(remove_file, crtfname)
+    CA_CERTS_FILE = crtfname
 
 class ExtendedMethodRequest(urllib2.Request):
     GET = 'GET'
@@ -177,4 +235,6 @@ def get_opener(method, server, proxy=None, debuglevel=0):
     opener = urllib2.build_opener(*handler)
     opener.server = server
     return opener
+
+compile_certs()
 

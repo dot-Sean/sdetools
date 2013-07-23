@@ -1,5 +1,6 @@
 import urllib
 import urllib2
+import httplib
 import base64
 
 from commons import json, Error, UsageError
@@ -184,6 +185,8 @@ class RESTBase(object):
         except urllib2.URLError, err:
             handle = err
             call_success = False
+        except httplib.InvalidURL, err:
+            raise UsageError('Invalid URL. Reason %s' % (err))
 
         if not call_success:
             if not hasattr(handle, 'code'):

@@ -137,9 +137,10 @@ def run_command(cmd_name, args, call_src, call_options={},
 
         ret_status = cmd_inst.handle()
     except commons.Error, e:
-        logger.exception(str(e))
         if call_src == 'shell':
             raise
+        else:
+            logger.exception(str(e))
         config.ret_chn.close(status=False, msg=str(e))
         return False
 

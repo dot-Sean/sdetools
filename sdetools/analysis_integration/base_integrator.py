@@ -217,11 +217,11 @@ class BaseIntegrator(object):
                 analysis_findings.append(weakness_finding)
 
             try:
-                if commit:
-                    finding_confidence = "none"
-                    if self.confidence.has_key(task_id):
-                        finding_confidence = self.confidence[task_id]
+                finding_confidence = "none"
+                if self.confidence.has_key(task_id):
+                    finding_confidence = self.confidence[task_id]
 
+                if commit:
                     ret = self.plugin.add_analysis_note(task_name, project_analysis_note_ref, 
                             finding_confidence, analysis_findings)
                 logger.debug("Marked %s as FAILURE with %s confidence" % (task_name, finding_confidence))

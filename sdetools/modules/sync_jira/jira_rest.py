@@ -15,33 +15,57 @@ class JIRARestAPI(RESTBase):
         else:
             return super(JIRARestAPI, self).parse_response(result)
 
-    def connect(self):
+    def connect_server(self):
         """ Verifies that JIRA connection works """
-        #verify that we can connect to JIRA
+        # Verify that we can connect to JIRA
         try:
             result = self.call_api('project')
         except APIError, err:
             raise AlmException('Unable to connect to JIRA service (Check server URL, '
                     'user, pass). Reason: %s' % str(err))
 
-        #verify that we can access project by retrieving its versions
+    def connect_project(self):
+        # Verify that we can access project by retrieving its versions
         try:
             self.versions = self.call_api('project/%s/versions' % (self.urlencode_str(self.config['alm_project'])))
         except APIError:
             raise AlmException('JIRA project not found: %s' % self.config['alm_project'])
 
-    def get_fields(self):
+    def setup_fields(self, issue_type_id):
+
+        self.custom_fields = []
+        self.fields = []
+
         try:
             meta_info = self.call_api('issue/createmeta', method=self.URLRequest.GET, args={'projectKeys':self.config['alm_project'], 'expand':'projects.issuetypes.fields'})
-            fields = []
+        except APIError:
+            raise AlmException('Could not retrieve fields for JIRA project: %s' % self.config['alm_project'])
+
+        if meta_info:        
             for item in meta_info['projects'][0]['issuetypes']:
                 if item['name'] == self.config['jira_issue_type']:
                     for key in item['fields']:
-                        fields.append({'id':key,'name':item['fields'][key]['name']})
-            return fields
-        except APIError:
-            raise AlmException('Could not retrieve custom fields for JIRA project: %s' % self.config['alm_project'])
-       
+                        self.fields.append({'id':key,'name':item['fields'][key]['name']})
+
+        if self.config['alm_custom_fields']:
+            for key in self.config['alm_custom_fields']:
+                for field in self.fields:
+                    if (key == field['name']):
+                        self.custom_fields.append({'field': field['id'],'value':self.config['alm_custom_fields'][key]})
+
+            if len(self.custom_fields) != len(self.config['alm_custom_fields']):
+                raise AlmException('At least one custom field could not be found')            
+        
+    def has_field(self, field_name):
+        if not self.fields:
+             return False
+             
+        for field in self.fields:
+            if (field_name == field['id']):
+                return True
+                
+        return False
+        
     def get_issue_types(self):
         try:
             return self.call_api('issuetype')
@@ -71,13 +95,17 @@ class JIRARestAPI(RESTBase):
             task_resolution = jtask['fields']['resolution']['name']
 
         task_versions = []
-        if jtask['fields']['versions']:
+        if 'versions' in jtask['fields'] and jtask['fields']['versions']:
             for version in jtask['fields']['versions']:
                 task_versions.append(version['name'])
 
+        task_priority = None
+        if 'priority' in jtask['fields'] and jtask['fields']['priority']:
+            task_priority = jtask['fields']['priority']['name']
+
         return JIRATask(task['id'],
                         jtask['key'],
-                        jtask['fields']['priority']['name'],
+                        task_priority,
                         jtask['fields']['status']['name'],
                         task_resolution,
                         jtask['fields']['updated'],
@@ -93,7 +121,7 @@ class JIRARestAPI(RESTBase):
         except APIError:
             raise AlmException('Unable to update issue %s with new version %s' % (task.get_alm_id(), project_version))
 
-    def add_task(self, task, issue_type_id, project_version, custom_fields):
+    def add_task(self, task, issue_type_id, project_version):
         affected_versions = []
         if self.config['alm_project_version']:
             affected_versions.append({'name':self.config['alm_project_version']})
@@ -106,22 +134,24 @@ class JIRARestAPI(RESTBase):
                },
                'summary': task['title'],
                'description': task['formatted_content'],
-               'priority': {
-                   'name': task['alm_priority']
-               },
                'issuetype': {
                    'id': issue_type_id
                },
-               'versions': affected_versions,
                'labels':['SD-Elements']
            }
         }
+        if self.has_field('priority'):
+            args['fields']['priority'] = {'name':task['alm_priority']}
+
+        if affected_versions:
+            args['fields']['versions'] = affected_versions
+
         if self.config['alm_parent_issue']:
             args['fields']['parent'] = {'key':self.config['alm_parent_issue']}
 
-        for field in custom_fields:
+        for field in self.custom_fields:
             args['fields'][field['field']] = {'value':field['value']}
-
+                
         try:
             issue = self.call_api('issue', method=self.URLRequest.POST, args=args)
             
