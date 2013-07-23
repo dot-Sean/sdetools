@@ -3,7 +3,7 @@
 
 import urllib
 from datetime import datetime
-from xml.dom import minidom
+from sdetools.extlib.defusedxml import minidom
 
 from sdetools.sdelib.restclient import RESTBase
 from sdetools.sdelib.restclient import URLRequest, APIError
