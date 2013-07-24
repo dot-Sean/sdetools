@@ -56,7 +56,11 @@ class Command(BaseCommand):
             if self.config['show_progress']:
                 print "Progress: %2d %% - App: %s" % (int(float(app_ind+1)*100/len(app_list)), app['name'])
             logger.info('Going through App: %s' % (app['name']))
-            proj_list = plugin.api.get_projects(app['id'])
+            args = {}
+            #TODO: Once the server side bug is fixed, use this instead of listing all
+            #if not self.config['list_archived']:
+            #    args['archived'] = 'false'
+            proj_list = plugin.api.get_projects(app['id'], **args)
 
             for proj_ind in xrange(len(proj_list)):
                 proj = proj_list[proj_ind]
