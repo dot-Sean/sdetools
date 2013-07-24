@@ -45,7 +45,7 @@ class Command(BaseCommand):
         app_list = plugin.api.get_applications()
 
         csv_file = csv.writer(open(self.config['write_file'], 'wb'))
-        header = ['Application', 'Project']
+        header = ['Application', 'Project', 'Created', 'Creator']
         if self.config['list_tasks']:
             header += ['Task', 'Weakness', 'Status']
 
@@ -70,8 +70,9 @@ class Command(BaseCommand):
                     continue
                 logger.info('Going through Project: %s' % (proj['name']))
 
+                row = [app['name'], proj['name'], create_date, proj['creator']]
                 if not self.config['list_tasks']:
-                    csv_file.writerow([app['name'], proj['name']])
+                    csv_file.writerow(row)
                     continue
                 if self.config['show_progress']:
                     print "    Prj (%d / %d): %s" % (proj_ind+1, len(proj_list), proj['name'])
@@ -80,8 +81,7 @@ class Command(BaseCommand):
 
                 for task_ind in xrange(len(task_list)):
                     task = task_list[task_ind]
-                    csv_file.writerow([app['name'], proj['name'],
-                            task['title'], task['weakness']['title'], task['status']])
+                    csv_file.writerow(row + [task['title'], task['weakness']['title'], task['status']])
 
     def handle(self):
         self.test_report(self.plugin)
