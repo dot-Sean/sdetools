@@ -119,20 +119,20 @@ class JIRASoapAPI:
         task_priority = None
         task_versions = []
 
-        if 'resolution' in jtask._keys() and jtask['resolution']:
-            task_resolution = jtask['resolution']
-        if jtask['status']:
+        if hasattr(jtask, 'resolution') and jtask.resolution:
+            task_resolution = jtask.resolution
+        if jtask.status:
             for status in self.statuses:
-                if status['id'] == jtask['status']:
+                if status['id'] == jtask.status:
                     task_status = status['name']
                     break
-        if jtask['priority']:
+        if hasattr(jtask, 'priority'):
             for priority in self.priorities:
-                if priority['id'] == jtask['priority']:
+                if priority['id'] == jtask.priority:
                     task_priority = priority['name']
                     break
-        if 'affectsVersions' in jtask._keys() and jtask['affectsVersions']:
-            for version in jtask['affectsVersions']:
+        if hasattr(jtask, 'affectsVersions') and jtask.affectsVersions:
+            for version in jtask.affectsVersions:
                 task_versions.append(version['name'])
 
         return JIRATask(task['id'],
