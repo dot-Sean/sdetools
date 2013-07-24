@@ -4,6 +4,7 @@ import optparse
 import ConfigParser
 import shlex
 import logging
+import datetime
 
 import log_mgr
 
@@ -324,3 +325,10 @@ class Config(object):
         except Exception, err:
             raise UsageError('Unable to process %s (not a JSON dictionary). Reason: %s' % (key, str(err)))
 
+    def process_date_config(self, key):
+        if not isinstance(self[key], basestring):
+            return
+        try:
+            self[key] = datetime.datetime.strptime(self[key], '%Y-%m-%d').date()
+        except ValueError, err:
+            raise UsageError('Unable to read date field %s. Reason: %s' % (key, str(err)))
