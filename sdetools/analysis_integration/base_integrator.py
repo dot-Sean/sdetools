@@ -164,8 +164,8 @@ class BaseIntegrator(object):
 
 
         task_list = self.plugin.get_task_list()
-        logger.debug("Retrieved task list for %s/%s" % 
-            (self.config['sde_application'], self.config['sde_project']))
+        logger.debug("Retrieved %d tasks from %s/%s" % 
+            (len(task_list), self.config['sde_application'], self.config['sde_project']))
 
         unique_findings = self.unique_findings()
         missing_weakness_map = unique_findings['nomap']
