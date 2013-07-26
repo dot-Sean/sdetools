@@ -1,0 +1,100 @@
+<mapping>
+	<task id="151" title="Use cryptographically secure random numbers" confidence="high">
+        <weakness type="category" id="catCredentialSessionPrediction" title="Credential and Session Prediction"/>
+	</task>
+    <task id="21" title="Ensure confidential data is sent over secure channel">
+        <weakness type="category" id="catInsufficientTransLayerProtection" title="Insufficient Transport Layer Protection"/>
+    </task>
+	<task id="138" title="Authenticate end users" confidence="low">
+        <weakness type="category" id="catInsufficientAuthentication" title="Insufficient Authentication"/>        
+	</task>
+	<task id="55" title="Validate all untrusted XML input" confidence="low">
+        <weakness type="category" id="catXMLExternalEntities" title="XML External Entities"/>
+        <weakness type="category" id="catXMLEntityExpansion" title="XML Entity Expansion"/>
+        <weakness type="category" id="catXMLAttributeBlowup" title="XML Attribute Blowup"/>
+        <weakness type="category" id="catSOAPArrayAbuse" title="SOAP Array Abuse"/>
+	</task>
+    <task id="203" title="Avoid uncontrolled format string" confidence="high">
+        <weakness type="category" id="catFormatStringAttack" title="Format String Attack"/>
+    </task>
+    <task id="15" title="Centralize authorization">
+        <weakness type="category" id="catCrossSiteRequestForgery" title="Cross Site Request Forgery"/>
+    </task>
+	<task id="193" title="Review non-categorized/miscellaneous findings from static code analysis" confidence="low">
+        <weakness type="category" id="catInformationLeakage" title="Information Leakage"/>
+	    <weakness type="category" id="*" title="Unmapped CWE"/>
+        <weakness type="category" id="catPathTraversal" title="Path-Traversal"/>
+        <weakness type="category" id="catDenialOfService" title="Denial of Service"/>
+        <weakness type="category" id="catContentSpoofing" title="Content Spoofing"/>
+        <weakness type="category" id="catAbuseOfFunctionality" title="Abuse Of Functionality"/>
+        <weakness type="category" id="catImproperOutputHandling" title="Improper Output Handling"/>
+        <weakness type="category" id="catImproperFilesystemPermissions" title="Improper Filesystem Permissions"/>
+        <weakness type="category" id="catServerMisconfiguration" title="Server Misconfiguration"/>
+        <weakness type="category" id="catQuality" title="Quality Issue"/>
+        <weakness type="category" id="catUserDefined" title="User Defined Weakness"/>
+        <weakness type="category" id="catMaliciousContent" title="Malicious Content"/>
+    </task>
+    <task id="202" title="Prevent buffer overflow/underflow" confidence="high">
+         <weakness type="category" id="catBufferOverflow" title="Buffer Overflow"/>
+    </task>
+	<task id="176" title="Apply principles of privacy when handling personal information" confidence="low">
+        <weakness type="category" id="catPrivacy" title="Privacy Weakness"/>
+	</task>
+	<task id="20" title="Invalidate old session ID after authentication" confidence="low">
+        <weakness type="category" id="catSessionFixation" title="Session Fixation"/>
+	</task>
+    <task id="25" title="Enforce absolute session timeouts">
+        <weakness type="category" id="catInsufficientSessionExpiration" title="Insufficient Session Expiration"/>
+    </task>
+	<task id="49" title="Remove/disable unused, test or debug code and data" confidence="low">
+        <weakness type="category" id="catApplicationMisconfiguration" title="Application Misconfiguration"/>
+	</task>
+	<task id="42" title="Avoid relying on untrusted data for server side page, view, or template selection" confidence="high">
+        <weakness type="category" id="catRemoteFileInclusion" title="Remote File Inclusion"/>
+        <weakness type="category" id="catSSIInjection" title="SSI Injection"/>
+	</task>
+	<task id="43" title="Avoid unsafe operating system interaction" confidence="low">
+		<weakness type="category" id="catOSCommanding" title="OS Commanding"/>
+	</task>
+    <task id="40" title="Use XML encoding when interacting with XML data" confidence="low">
+        <weakness type="category" id="catXPathInjection" title="XPath Injection"/>
+        <waekness type="category" id="catXMLInjection" title="XML Injection"/>
+    </task>
+	<task id="41" title="Use Lightweight Directory Access Protocol (LDAP) encoding when interacting with LDAP data" confidence="low">
+        <weakness type="category" id="catLDAPInjection" title="LDAP Injection"/>
+	</task>
+	<task id="72" title="Use safe arithmetic to avoid integer overflow" confidence="low">
+         <weakness type="category" id="catIntegerOverflow" title="Integer Overflow"/>
+	</task>
+	<task id="11" title="Disallow external redirects" confidence="high">
+        <weakness type="category" id="catURLRedirectoryAbuse" title="URL Redirect Abuse"/>
+	</task>
+	<task id="39" title="Disallow carriage returns and line feeds when adding data to HTTP response headers" confidence="high">
+        <weakness type="category" id="catHTTPResponseSplitting" title="HTTP Response Splitting"/>
+	</task>
+	<task id="38" title="Bind variables in SQL statements" confidence="high">
+		<weakness type="category" id="catSQLInjection" title="SQL Injection"/>
+	</task>
+	<task id="67" title="Enforce page navigation" confidence="low">
+        <weakness type="category" id="catInsufficientProcessValidation" title="Insufficient Process Validation"/>
+	</task>
+    <task id="6" title="Implement account lockout or authentication throttling" confidence="low">
+        <weakness type="category" id="catBruteForce" title="Brute Force"/>    
+    </task>
+	<task id="16" title="Authorize every page" confidence="low">
+        <weakness type="category" id="catPredictableResourceLocation" title="Predictable Resource Location"/>
+        <weakness type="category" id="catInsufficientAuthorization" title="Insufficient Authorization"/>
+        <weakness type="category" id="catInsecureIndexing" title="Insecure Indexing"/>
+	</task>
+	<task id="31" title="Perform input validation on all forms of input" confidence="low">
+        <weakness type="category" id="catNullByteInjection" title="Null Byte Injection"/>
+        <weakness type="category" id="catImproperInputHandling" title="Improper Input Handling"/>
+        <weakness type="category" id="catMailCommandInjection" title="Mail Command Injection"/>
+	</task>
+	<task id="36" title="Escape untrusted data in HTML, HTML attributes, Cascading Style Sheets and JavaScript" confidence="low">
+		<weakness type="category" id="catCrossSiteScripting" title="Cross-Site Scripting"/>
+	</task>
+	<task id="50" title="Use indirect object reference maps if accessing files" confidence="low">
+        <weakness type="category" id="catDirectoryIndexing" title="Directory Indexing"/>
+	</task>
+</mapping>

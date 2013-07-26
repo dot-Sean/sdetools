@@ -4,12 +4,14 @@ import re
 from datetime import datetime
 from sdetools.extlib.defusedxml import minidom
 
-from sdetools.sdelib.commons import Error
+from sdetools.sdelib.commons import Error, abc
 from sdetools.sdelib.restclient import APIError
 from sdetools.sdelib.interactive_plugin import PlugInExperience
 
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
+
+abstractmethod = abc.abstractmethod
 
 class IntegrationError(Error):
     pass
@@ -23,6 +25,20 @@ class IntegrationResult(object):
         self.noflaw_tasks = noflaw_tasks
         self.error_count = error_count
         self.error_weaknesses_unmapped = error_weaknesses_unmapped
+
+class BaseImporter(object):
+
+    def __init__(self):
+        self.report_id = ""
+        self.raw_findings = []
+
+    @abstractmethod
+    def _make_raw_finding(self, node):
+        pass
+
+    @abstractmethod
+    def parse(self):
+        pass
 
 class BaseIntegrator(object):
     TOOL_NAME = 'External tool'
