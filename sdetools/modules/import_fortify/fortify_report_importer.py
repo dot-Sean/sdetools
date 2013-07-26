@@ -3,9 +3,9 @@ import re
 from xml.dom import minidom
 
 from sdetools.sdelib import commons
-from sdetools.modules.import_fortify.fortify_base_importer import FortifyBaseImporter
+from sdetools.analysis_integration.base_integrator import BaseImporter
 
-class FortifyReportImporter(FortifyBaseImporter):
+class FortifyReportImporter(BaseImporter):
 
     def __init__(self):
         super(FortifyReportImporter, self).__init__()

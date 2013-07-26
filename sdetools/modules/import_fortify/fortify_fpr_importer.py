@@ -2,10 +2,10 @@ import os
 
 import zipfile
 from sdetools.sdelib import commons
-from sdetools.modules.import_fortify.fortify_base_importer import FortifyBaseImporter
+from sdetools.analysis_integration.base_integrator import BaseImporter
 from sdetools.modules.import_fortify.fortify_fvdl_importer import FortifyFVDLImporter
 
-class FortifyFPRImporter(FortifyBaseImporter):
+class FortifyFPRImporter(BaseImporter):
 
     def __init__(self):
         super(FortifyFPRImporter, self).__init__()

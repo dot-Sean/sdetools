@@ -3,8 +3,7 @@ import re
 import xml.sax
 
 from sdetools.sdelib import commons
-from sdetools.modules.import_fortify.fortify_base_importer import FortifyBaseImporter
-#from sdetools.modules.import_fortify.fortify_integrator import FortifyIntegrationError
+from sdetools.analysis_integration.base_integrator import BaseImporter
 
 class FVDLXMLContent(xml.sax.handler.ContentHandler):
     def __init__(self):
@@ -53,7 +52,7 @@ class FVDLXMLContent(xml.sax.handler.ContentHandler):
         elif self.in_build_node and name == 'Build':
             self.in_build_node = False
     
-class FortifyFVDLImporter(FortifyBaseImporter):
+class FortifyFVDLImporter(BaseImporter):
 
     def __init__(self):
         super(FortifyFVDLImporter, self).__init__()
