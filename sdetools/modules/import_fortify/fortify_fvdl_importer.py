@@ -1,6 +1,7 @@
 import os
 import re
-import xml.sax
+import xml.sax.handler
+from sdetools.extlib.defusedxml import sax
 
 from sdetools.sdelib import commons
 from sdetools.analysis_integration.base_integrator import BaseImporter
@@ -66,7 +67,7 @@ class FortifyFVDLImporter(BaseImporter):
     def parse_file(self, fvdl_file):
         FVDLReader = FVDLXMLContent()
         try:    
-            parser = xml.sax.make_parser()
+            parser = sax.make_parser()
             parser.setContentHandler(FVDLReader)
             parser.parse(fvdl_file)
         except Exception, e:
@@ -78,7 +79,7 @@ class FortifyFVDLImporter(BaseImporter):
     def parse_string(self, fvdl_xml):
         FVDLReader = FVDLXMLContent()
         try:    
-            xml.sax.parseString(fvdl_xml, FVDLReader)
+            sax.parseString(fvdl_xml, FVDLReader)
         except Exception, e:
             raise e
         
