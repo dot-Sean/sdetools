@@ -1,5 +1,6 @@
 import urllib
 import urllib2
+import httplib
 import base64
 
 from commons import json, Error, UsageError
@@ -122,7 +123,7 @@ class RESTBase(object):
         """
         return []
 
-    def call_api(self, target, method=URLRequest.GET, args=None):
+    def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}):
         """
         Internal method used to call a RESTFul API
 
@@ -173,6 +174,8 @@ class RESTBase(object):
             req.add_header('Cookie', cookie_str)
         else:
             raise UsageError('Unknown Authentication mode "%s".' % (auth_mode))
+        for item in call_headers:
+            req.add_header(item, call_headers[item])
         for item, val in self.get_custom_headers(target, method):
             req.add_header(item, val)
 
@@ -184,6 +187,8 @@ class RESTBase(object):
         except urllib2.URLError, err:
             handle = err
             call_success = False
+        except httplib.InvalidURL, err:
+            raise UsageError('Invalid URL. Reason %s' % (err))
 
         if not call_success:
             if not hasattr(handle, 'code'):

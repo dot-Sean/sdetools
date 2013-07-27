@@ -114,7 +114,7 @@ class TracConnector(AlmConnector):
             self.config[action_type] = (action_to_take, action_args)
             
 
-    def alm_connect(self):
+    def alm_connect_server(self):
         """ Perform initial connect and verify that Trac connection works """
         try:
             self.alm_plugin.connect()
@@ -136,6 +136,10 @@ class TracConnector(AlmConnector):
             trac_ver = '0.11 or higher'
         
         logger.debug('Connected to Trac API %s v%s.%s' % (trac_ver, api_version[1], api_version[2]))
+
+    def alm_connect_project(self):
+        #TODO: Check milestone if present
+        pass
 
     def _vet_alm_tasks(self, tasks):
         if len(tasks) > 1:

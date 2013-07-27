@@ -3,7 +3,7 @@
 
 import urllib
 from datetime import datetime
-from xml.dom import minidom
+from sdetools.extlib.defusedxml import minidom
 
 from sdetools.sdelib.restclient import RESTBase
 from sdetools.sdelib.restclient import URLRequest, APIError
@@ -17,11 +17,7 @@ logger = log_mgr.mods.add_mod(__name__)
 
 class MingleAPIBase(RESTBase):
     def __init__(self, config):
-        super(MingleAPIBase, self).__init__('alm', 'Mingle', config, None)
-
-    def post_conf_init(self):
-        self.base_path = 'api/v2/projects/%s' % self.urlencode_str(self.config['alm_project'])
-        super(MingleAPIBase, self).post_conf_init()
+        super(MingleAPIBase, self).__init__('alm', 'Mingle', config, 'api/v2')
 
     def encode_post_args(self, args):
         encoded_args = dict((key.encode('utf-8'), val.encode('utf-8')) for key, val in args.items())
@@ -102,15 +98,23 @@ class MingleConnector(AlmConnector):
 
         self.mark_down_converter = markdown.Markdown(safe_mode="escape")
 
-    def alm_connect(self):
+    def alm_connect_server(self):
+        try:
+            self.alm_plugin.call_api('projects.xml')
+        except APIError, err:
+            raise AlmException('Unable to connect to Mingle. Please '
+                               'check server URL, ID, password. Reason: %s' % err)
+
+    def alm_connect_project(self):
         """ Verifies that Mingle connection works """
+        self.project_uri = 'projects/%s/cards' % (
+                self.alm_plugin.urlencode_str(self.config['alm_project']))
+
         #Check to make sure that we can do a simple API call
         try:
-            self.alm_plugin.call_api('cards.xml')
-        except APIError:
-            raise AlmException('Unable to connect to Mingle. Please '
-                               'check server URL, ID, password and '
-                               'project')
+            self.alm_plugin.call_api('%s.xml' % self.project_uri)
+        except APIError, err:
+            raise AlmException('Unable to find Mingle project. Reason: %s' % err)
 
     def alm_get_task(self, task):
         task_id = task['title']
@@ -118,7 +122,7 @@ class MingleConnector(AlmConnector):
 
         try:
             task_args =  {'filters[]': ('[Name][is][%s]' % task_id)}
-            result = self.alm_plugin.call_api('cards.xml', args=task_args)
+            result = self.alm_plugin.call_api('%s.xml' % self.project_uri, args=task_args)
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get task %s from Mingle' % task_id)
@@ -165,7 +169,7 @@ class MingleConnector(AlmConnector):
                 'card[properties][][name]': 'status',
                 'card[properties][][value]': self.sde_plugin.config['mingle_new_status']
             }
-            self.alm_plugin.call_api('cards.xml', args=status_args,
+            self.alm_plugin.call_api('%s.xml' % self.project_uri, args=status_args,
                     method=URLRequest.POST)
             logger.debug('Task %s added to Mingle Project' % task['id'])
         except APIError, err:
@@ -197,7 +201,7 @@ class MingleConnector(AlmConnector):
                     'card[properties][][name]':'status',
                     'card[properties][][value]': self.sde_plugin.config['mingle_done_statuses'][0]
                 }
-                self.alm_plugin.call_api('cards/%s.xml' % task.get_alm_id(),
+                self.alm_plugin.call_api('%s/%s.xml' % (self.project_uri, task.get_alm_id()),
                         args=status_args, method=URLRequest.PUT)
             except APIError, err:
                 raise AlmException('Unable to update task status to DONE '
@@ -209,7 +213,7 @@ class MingleConnector(AlmConnector):
                     'card[properties][][name]':'status',
                     'card[properties][][value]': self.sde_plugin.config['mingle_new_status']
                 }
-                self.alm_plugin.call_api('cards/%s.xml' % task.get_alm_id(),
+                self.alm_plugin.call_api('%s/%s.xml' % (self.project_uri, task.get_alm_id()),
                         args=status_args, method=URLRequest.PUT)
             except APIError, err:
                 raise AlmException('Unable to update task status to TODO for '
