@@ -1,9 +1,15 @@
-from commons import UsageError
+from commons import UsageError, json
 import restclient
 from restclient import APIError, APIHTTPError, APICallError, APIAuthError, ServerError, APIFormatError
 
 import logging
 logger = logging.getLogger(__name__)
+
+def _encode_options(options):
+    headers = {'Accept': 'application/json;'}
+    for item in options:
+        headers['Accept'] += '; %s=%s' % (item, json.dumps(json.dumps(options[item])))
+    return headers
 
 class ExtAPI(restclient.RESTBase):
     """
@@ -41,22 +47,22 @@ class ExtAPI(restclient.RESTBase):
         self.connected = True
         return not not result
 
-    def get_applications(self, **filters):
+    def get_applications(self, options={}, **filters):
         """
         Gets all applications accessible to user
 
         Available Filters:
             name -> application name to be searched for
         """
-        result = self.call_api('applications', args=filters)
+        result = self.call_api('applications', args=filters, 
+                call_headers=_encode_options(options))
         return result['applications']
 
     def create_application(self, name):
         args = {'name': name}
-        result = self.call_api('applications', self.URLRequest.POST, args=args)
-        return result
+        return self.call_api('applications', self.URLRequest.POST, args=args)
 
-    def get_projects(self, application, **filters):
+    def get_projects(self, application, options={}, **filters):
         """
         Gets all projects for parameter application
 
@@ -65,30 +71,32 @@ class ExtAPI(restclient.RESTBase):
         """
         args = {'application': application}
         args.update(filters)
-        result = self.call_api('projects', args=args)
+        result = self.call_api('projects', args=args, 
+                call_headers=_encode_options(options))
         return result['projects']
 
-    def get_tasks(self, project):
+    def get_tasks(self, project, options={}, **filters):
         """ 
         Get all tasks for a project indicated by the ID of the project
         """
-        result = self.call_api('tasks', args={'project': project})
+        args = {'project': project}
+        args.update(filters)
+        result = self.call_api('tasks', args=args, call_headers=_encode_options(options))
         return result['tasks']
 
-    def get_task(self, task):
+    def get_task(self, task, options={}, **filters):
         """ 
         Get an individual task with parameter task id
         <task> = <project_id>-<task_id> (e.g. 127-T21)
         """
-        result = self.call_api('tasks/%s' % task)
-        return result
+        end_point = 'tasks/%s' % task
+        return self.call_api(end_point, args=filters, call_headers=_encode_options(options))
 
     def add_task_text_note(self, task, text):
         note = {
             'text': text, 
             'task': task}
-        result = self.call_api('tasknotes/text', self.URLRequest.POST, args=note)
-        return result
+        return self.call_api('tasknotes/text', self.URLRequest.POST, args=note)
 
     def add_task_ide_note(self, task, text, filename, status):
         note = {
@@ -96,16 +104,17 @@ class ExtAPI(restclient.RESTBase):
             'filename': filename, 
             'status': status, 
             'task': task}
-        result = self.call_api('tasknotes/ide', self.URLRequest.POST, args=note)
-        return result
+        return self.call_api('tasknotes/ide', self.URLRequest.POST, args=note)
 
-    def get_task_notes(self, task, note_type):
+    def get_task_notes(self, task, note_type, options={}, **filters):
         end_point = 'tasknotes'
         if note_type not in ['', 'ide', 'text']:
             return
         if note_type:
             end_point += '/%s' % (note_type)
-        return self.call_api(end_point, args={'task':task})
+        args = {'task': task}
+        args.update(filters)
+        return self.call_api(end_point, args=args, call_headers=_encode_options(options))
 
     def add_analysis_note(self, task, analysis_ref, confidence, findings):
         note = {
