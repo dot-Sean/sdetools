@@ -4,6 +4,7 @@ from xml.dom import minidom
 
 from sdetools.sdelib import commons
 from sdetools.analysis_integration.base_integrator import BaseIntegrator, IntegrationError
+from sdetools.modules.import_webinspect.webinspect_xml_importer import WebInspectXMLImporter
 
 __all__ = ['WebInspectIntegrator']
 
@@ -20,29 +21,24 @@ class WebInspectIntegrator(BaseIntegrator):
         super(WebInspectIntegrator, self).__init__(config, DEFAULT_MAPPING_FILE)
         self.raw_findings = []
 
-    def _make_raw_finding(self, node):
-        entry = {}
-        entry['type'] = 'check'
-        entry['id'] = node.getElementsByTagName("VulnerabilityID")[0].firstChild.data
-        entry['description'] = node.getElementsByTagName("Name")[0].firstChild.data
-        return entry
-
     def parse(self):
-        try:
-            base = minidom.parse(self.config['report_xml'])
-        except KeyError, ke:
-            raise WebInspectIntegrationError("Missing configuration option 'report_xml'")
-        except Exception, e:
-            raise WebInspectIntegrationError("Error opening report xml (%s)" % self.config['report_xml'])
-              
-        self.report_id = "Not defined"
 
-        issues = base.getElementsByTagName('Issue')
-        for issue in issues:
-            self.raw_findings.append( self._make_raw_finding(issue) )
-        urls = base.getElementsByTagName('URL')
-        if urls:
-            self.report_id = urls[0].firstChild.data
+        try:
+            fileName, file_extension = os.path.splitext(self.config['report_xml'])
+        except KeyError, ke:
+            raise FortifyIntegrationError("Missing configuration option 'report_xml'")
+        
+        if file_extension == '.xml':
+            self.importer = WebInspectXMLImporter()
+        else:
+            raise FortifyIntegrationError("Unsupported file type (%s)" % file_extension)
+
+        self.importer.parse(self.config['report_xml'])
+        self.raw_findings = self.importer.raw_findings
+        self.report_id = self.importer.report_id
+
+        if self.report_id is None or self.report_id == "":
+            raise FortifyIntegrationError("Report ID not found in report file (%s)" % self.config['report_xml'])
 
     def _make_finding(self, item):
         return {'weakness_id': item['id'], 'description': item['description'], 'type': item['type']}

@@ -4,12 +4,14 @@ import re
 from datetime import datetime
 from sdetools.extlib.defusedxml import minidom
 
-from sdetools.sdelib.commons import Error
+from sdetools.sdelib.commons import Error, abc
 from sdetools.sdelib.restclient import APIError
 from sdetools.sdelib.interactive_plugin import PlugInExperience
 
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
+
+abstractmethod = abc.abstractmethod
 
 class IntegrationError(Error):
     pass
@@ -23,6 +25,20 @@ class IntegrationResult(object):
         self.noflaw_tasks = noflaw_tasks
         self.error_count = error_count
         self.error_weaknesses_unmapped = error_weaknesses_unmapped
+
+class BaseImporter(object):
+
+    def __init__(self):
+        self.report_id = ""
+        self.raw_findings = []
+
+    @abstractmethod
+    def _make_raw_finding(self, node):
+        pass
+
+    @abstractmethod
+    def parse(self):
+        pass
 
 class BaseIntegrator(object):
     TOOL_NAME = 'External tool'
@@ -148,8 +164,8 @@ class BaseIntegrator(object):
 
 
         task_list = self.plugin.get_task_list()
-        logger.debug("Retrieved task list for %s/%s" % 
-            (self.config['sde_application'], self.config['sde_project']))
+        logger.debug("Retrieved %d tasks from %s/%s" % 
+            (len(task_list), self.config['sde_application'], self.config['sde_project']))
 
         unique_findings = self.unique_findings()
         missing_weakness_map = unique_findings['nomap']
@@ -161,6 +177,7 @@ class BaseIntegrator(object):
             finding = unique_findings[task_id]
 
             if not self.task_exists_in_project_tasks( task_id, task_list):
+                logger.debug("Task %s not found in project tasks" % task_id)
                 mapped_tasks = self.lookup_task("*")
                 if mapped_tasks:
                     new_task_id = mapped_tasks[0] # use the first one
