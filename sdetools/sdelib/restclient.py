@@ -107,7 +107,7 @@ class RESTBase(object):
         try:
             result = json.loads(result)
         except:
-            raise APIFormatError('Unable to process JSON data: %s' % result)
+            raise APIFormatError('Unable to process JSON data: %s' % str(result)[:200])
         return result
 
     def parse_error(self, result):
@@ -123,7 +123,7 @@ class RESTBase(object):
         """
         return []
 
-    def call_api(self, target, method=URLRequest.GET, args=None):
+    def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}):
         """
         Internal method used to call a RESTFul API
 
@@ -174,6 +174,8 @@ class RESTBase(object):
             req.add_header('Cookie', cookie_str)
         else:
             raise UsageError('Unknown Authentication mode "%s".' % (auth_mode))
+        for item in call_headers:
+            req.add_header(item, call_headers[item])
         for item, val in self.get_custom_headers(target, method):
             req.add_header(item, val)
 

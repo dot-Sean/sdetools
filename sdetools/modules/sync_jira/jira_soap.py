@@ -119,22 +119,21 @@ class JIRASoapAPI:
         task_priority = None
         task_versions = []
 
-        if 'resolution' in jtask and jtask['resolution']:
-            task_resolution = jtask['resolution']
-        if jtask['status']:
+        if hasattr(jtask, 'resolution') and jtask.resolution:
+            task_resolution = jtask.resolution
+        if jtask.status:
             for status in self.statuses:
-                if status['id'] == jtask['status']:
+                if status['id'] == jtask.status:
                     task_status = status['name']
                     break
-        if jtask['priority']:
+        if hasattr(jtask, 'priority'):
             for priority in self.priorities:
-                if priority['id'] == jtask['priority']:
+                if priority['id'] == jtask.priority:
                     task_priority = priority['name']
                     break
-        if 'affectsVersions' in jtask and jtask['affectsVersions']:
-            for version in jtask['affectsVersions']:
+        if hasattr(jtask, 'affectsVersions') and jtask.affectsVersions:
+            for version in jtask.affectsVersions:
                 task_versions.append(version['name'])
-
 
         return JIRATask(task['id'],
                         jtask['key'],
@@ -156,10 +155,18 @@ class JIRASoapAPI:
         self.custom_fields = []
         self.fields = []
 
-        try:
-            create_fields = self.proxy.getFieldsForCreate(self.auth, self.config['alm_project'], SOAPpy.Types.longType(long(jira_issue_type_id)))
-        except SOAPpy.Types.faultType, fault:
-            raise AlmException('Could not retrieve fields for JIRA project %s: %s' % (self.config['alm_project'], fault))
+        create_fields = []
+
+        # We use self.proxy.getFieldsForCreate to determine which fields are applicable to issues to avoid
+        # sending fields which have been removed from a project, for instance 'priority'. Unfortunately, this method 
+        # was only exposed in Jira 4.4. We assuming all fields are fair game for versions prior to 4.4
+        if hasattr(self.proxy, 'getFieldsForCreate'):
+            try:
+                create_fields = self.proxy.getFieldsForCreate(self.auth, self.config['alm_project'], 
+                                                              SOAPpy.Types.longType(long(jira_issue_type_id)))
+            except SOAPpy.Types.faultType, fault:
+                raise AlmException('Could not retrieve fields for JIRA project %s: %s' % (self.config['alm_project'], 
+                                   fault))
 
         if create_fields:
             for f in create_fields:
@@ -169,7 +176,8 @@ class JIRASoapAPI:
             try:
                 issue_fields = self.proxy.getFieldsForEdit(self.auth, self.config['jira_existing_issue'])
             except SOAPpy.Types.faultType, fault:
-                raise AlmException('Could not retrieve custom fields for JIRA issue %s: %s' % (self.config['jira_existing_issue'], fault))
+                raise AlmException('Could not retrieve custom fields for JIRA issue %s: %s' % 
+                                   (self.config['jira_existing_issue'], fault))
 
             for key in self.config['alm_custom_fields']:
                 for field in issue_fields:
@@ -180,9 +188,9 @@ class JIRASoapAPI:
                 raise AlmException('At least one custom field could not be found')            
 
     def has_field(self, field_name):
-
+        # We assume all fields are fair game for Jira versions prior to 4.4 (see comment in 'setup_fields' above)
         if not self.fields:
-             return False
+             return True
              
         for field in self.fields:
             if (field_name == field['id']):
