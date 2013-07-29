@@ -2,11 +2,13 @@
 import collections
 import re
 from datetime import datetime
-from sdetools.extlib.defusedxml import minidom
+from sdetools.extlib.defusedxml import minidom, sax
 
 from sdetools.sdelib.commons import Error, abc
 from sdetools.sdelib.restclient import APIError
 from sdetools.sdelib.interactive_plugin import PlugInExperience
+
+abstractmethod = abc.abstractmethod
 
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
@@ -32,14 +34,47 @@ class BaseImporter(object):
         self.report_id = ""
         self.raw_findings = []
 
-    @abstractmethod
-    def _make_raw_finding(self, node):
-        pass
+class BaseXMLImporter(BaseImporter):
+
+    def __init__(self):
+        super(BaseXMLImporter, self).__init__()
 
     @abstractmethod
-    def parse(self):
+    def _get_content_handler(self):
         pass
 
+    def parse(self, file_name):        
+        try:    
+            self.parse_file(open(file_name, 'r'))
+        except IOError, ioe:
+            raise IntegrationError("Could not open file '%s': %s" % (file_name, ioe))
+
+    def parse_file(self, xml_file):
+        XMLReader = self._get_content_handler()
+        try:    
+            parser = sax.make_parser()
+            parser.setContentHandler(XMLReader)
+            parser.parse(xml_file)
+        except (xml.sax.SAXException, xml.sax.SAXParseException), se:
+            raise IntegrationError("Could not parse file '%s': %s" % (xml_file, se))
+        except (xml.sax.SAXNotSupportedException, xml.sax.SAXNotRecognizedException), sse:
+            raise IntegrationError("Could not parse file '%s': %s" % (xml_file, sse))
+        
+        self.raw_findings = XMLReader.raw_findings
+        self.report_id = XMLReader.report_id   
+        
+    def parse_string(self, xml):
+        XMLReader = self._get_content_handler()
+        try:    
+            sax.parseString(xml, XMLReader)
+        except (xml.sax.SAXException, xml.sax.SAXParseException), se:
+            raise IntegrationError("Could not parse file '%s': %s" % (xml_file, se))
+        except (xml.sax.SAXNotSupportedException, xml.sax.SAXNotRecognizedException), sse:
+            raise IntegrationError("Could not parse file '%s': %s" % (xml_file, sse))
+        
+        self.raw_findings = XMLReader.raw_findings
+        self.report_id = XMLReader.report_id
+        
 class BaseIntegrator(object):
     TOOL_NAME = 'External tool'
 
@@ -66,7 +101,7 @@ class BaseIntegrator(object):
         except KeyError, ke:
             raise IntegrationError("Missing configuration option 'mapping_file'")
         except Exception, e:
-            raise IntegrationError("An error occurred opening mapping file '%s'" % self.config['mapping_file'])
+            raise IntegrationError("An error occurred opening mapping file '%s': %s" % (self.config['mapping_file'], e))
 
         weakness_mapping = collections.defaultdict(list)
         self.weakness_title = {}
@@ -177,6 +212,7 @@ class BaseIntegrator(object):
             finding = unique_findings[task_id]
 
             if not self.task_exists_in_project_tasks( task_id, task_list):
+                logger.debug("Task %s not found in project tasks" % task_id)
                 mapped_tasks = self.lookup_task("*")
                 if mapped_tasks:
                     new_task_id = mapped_tasks[0] # use the first one
@@ -215,14 +251,16 @@ class BaseIntegrator(object):
                         analysis_findings.append(weakness_finding)
                         weakness_finding = {}
                     weakness_finding['count'] = 0
-                    if (self.weakness_type.has_key(weakness['weakness_id']) and 
-                            self.weakness_type[weakness['weakness_id']] == 'cwe'):
-                        weakness_finding['cwe'] = weakness['weakness_id']
-                        if self.weakness_title.has_key(weakness['weakness_id']):
-                            weakness_finding['desc'] = self.weakness_title[weakness['weakness_id']]
+
+                    if self.weakness_type.has_key(weakness['weakness_id']) and self.weakness_type[weakness['weakness_id']] == 'cwe':
+                        weakness_finding['cwe'] = weakness
+
+                    if self.weakness_title.has_key(weakness['weakness_id']) and self.weakness_title[weakness['weakness_id']] != '':
+                        weakness_finding['desc'] = self.weakness_title[weakness['weakness_id']]
                     else:
                         weakness_finding['desc'] = weakness['weakness_id']
-                    last_weakness = weakness['weakness_id']
+
+                    last_weakness = weakness
 
                 if 'count' in weakness:
                     weakness_finding['count'] += weakness['count']

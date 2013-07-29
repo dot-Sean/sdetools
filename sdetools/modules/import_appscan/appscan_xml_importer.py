@@ -1,10 +1,7 @@
-import os
-import re
 from xml.sax.handler import ContentHandler
-from sdetools.extlib.defusedxml import sax
 
 from sdetools.sdelib import commons
-from sdetools.analysis_integration.base_integrator import BaseImporter
+from sdetools.analysis_integration.base_integrator import BaseXMLImporter
 
 class AppScanXMLContent(ContentHandler):
     def __init__(self):
@@ -64,37 +61,11 @@ class AppScanXMLContent(ContentHandler):
         elif self.in_hosts_node and name == 'Hosts':
             self.in_hosts_node = False
     
-# TODO: Use defusedxml interface
-class AppScanXMLImporter(BaseImporter):
+class AppScanXMLImporter(BaseXMLImporter):
 
     def __init__(self):
         super(AppScanXMLImporter, self).__init__()
 
-    def parse(self, xml_file):
-        try:    
-            self.parse_file(open(xml_file, 'rb'))
-        except Exception, e:
-            raise Exception("Error opening AppScan XML file (%s): %s" % (xml_file, e))
-
-    def parse_file(self, xml_file):
-        AppScanReader = AppScanXMLContent()
-        try:    
-            parser = sax.make_parser()
-            parser.setContentHandler(AppScanReader)
-            parser.parse(xml_file)
-        except Exception, e:
-            raise Exception("Error opening AppScan XML file (%s): %s" % (xml_file, e))
-        
-        self.raw_findings = AppScanReader.raw_findings
-        self.report_id = AppScanReader.report_id
-
-    def parse_string(self, appscan_xml):
-        AppScanReader = AppScanXMLContent()
-        try:    
-            xml.sax.parseString(appscan_xml, AppScanReader)
-        except Exception, e:
-            raise e
-        
-        self.raw_findings = AppScanReader.raw_findings
-        self.report_id = AppScanReader.report_id
+    def _get_content_handler(self):
+        return AppScanXMLContent()
     

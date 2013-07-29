@@ -5,6 +5,7 @@ __all__ = [
     'import_appscan',
     'import_fortify',
     'import_veracode',
+    'import_webinspect',
     'sync_jira',
     'sync_mingle',
     'sync_rally',
