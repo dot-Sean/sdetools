@@ -107,7 +107,7 @@ class RESTBase(object):
         try:
             result = json.loads(result)
         except:
-            raise APIFormatError('Unable to process JSON data: %s' % result[:200])
+            raise APIFormatError('Unable to process JSON data: %s' % str(result)[:200])
         return result
 
     def parse_error(self, result):
