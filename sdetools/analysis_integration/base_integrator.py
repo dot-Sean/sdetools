@@ -2,11 +2,13 @@
 import collections
 import re
 from datetime import datetime
-from sdetools.extlib.defusedxml import minidom
+from sdetools.extlib.defusedxml import minidom, sax
 
 from sdetools.sdelib.commons import Error, abc
 from sdetools.sdelib.restclient import APIError
 from sdetools.sdelib.interactive_plugin import PlugInExperience
+
+abstractmethod = abc.abstractmethod
 
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
@@ -32,14 +34,47 @@ class BaseImporter(object):
         self.report_id = ""
         self.raw_findings = []
 
-    @abstractmethod
-    def _make_raw_finding(self, node):
-        pass
+class BaseXMLImporter(BaseImporter):
+
+    def __init__(self):
+        super(BaseXMLImporter, self).__init__()
 
     @abstractmethod
-    def parse(self):
+    def _get_content_handler(self):
         pass
 
+    def parse(self, file_name):        
+        try:    
+            self.parse_file(open(file_name, 'r'))
+        except IOError, ioe:
+            raise IntegrationError("Could not open file '%s': %s" % (file_name, ioe))
+
+    def parse_file(self, xml_file):
+        XMLReader = self._get_content_handler()
+        try:    
+            parser = sax.make_parser()
+            parser.setContentHandler(XMLReader)
+            parser.parse(xml_file)
+        except (xml.sax.SAXException, xml.sax.SAXParseException), se:
+            raise IntegrationError("Could not parse file '%s': %s" % (xml_file, se))
+        except (xml.sax.SAXNotSupportedException, xml.sax.SAXNotRecognizedException), sse:
+            raise IntegrationError("Could not parse file '%s': %s" % (xml_file, sse))
+        
+        self.raw_findings = XMLReader.raw_findings
+        self.report_id = XMLReader.report_id   
+        
+    def parse_string(self, xml):
+        XMLReader = self._get_content_handler()
+        try:    
+            sax.parseString(xml, XMLReader)
+        except (xml.sax.SAXException, xml.sax.SAXParseException), se:
+            raise IntegrationError("Could not parse file '%s': %s" % (xml_file, se))
+        except (xml.sax.SAXNotSupportedException, xml.sax.SAXNotRecognizedException), sse:
+            raise IntegrationError("Could not parse file '%s': %s" % (xml_file, sse))
+        
+        self.raw_findings = XMLReader.raw_findings
+        self.report_id = XMLReader.report_id
+        
 class BaseIntegrator(object):
     TOOL_NAME = 'External tool'
 

@@ -1,10 +1,8 @@
 import os
-import re
 import xml.sax.handler
-from sdetools.extlib.defusedxml import sax
 
 from sdetools.sdelib import commons
-from sdetools.analysis_integration.base_integrator import BaseImporter
+from sdetools.analysis_integration.base_integrator import BaseXMLImporter
 
 class WebInspectXMLContent(xml.sax.handler.ContentHandler):
     def __init__(self):
@@ -61,35 +59,10 @@ class WebInspectXMLContent(xml.sax.handler.ContentHandler):
         elif self.in_session_node and self.in_url_node and name == 'Host':
             self.in_url_node = False
     
-class WebInspectXMLImporter(BaseImporter):
+class WebInspectXMLImporter(BaseXMLImporter):
 
     def __init__(self):
         super(WebInspectXMLImporter, self).__init__()
 
-    def parse(self, xml_file):
-        try:    
-            self.parse_file(open(xml_file, 'rb'))
-        except Exception, e:
-            raise Exception("Error opening XML file (%s): %s" % (xml_file, e))
-
-    def parse_file(self, xml_file):
-        XMLReader = WebInspectXMLContent()
-        try:    
-            parser = sax.make_parser()
-            parser.setContentHandler(XMLReader)
-            parser.parse(xml_file)
-        except Exception, e:
-            raise Exception("Error opening XML file (%s): %s" % (xml_file, e))
-        
-        self.raw_findings = XMLReader.raw_findings
-        self.report_id = XMLReader.report_id
-
-    def parse_string(self, xml):
-        XMLReader = WebInspectXMLContent()
-        try:    
-            sax.parseString(fvdl_xml, XMLReader)
-        except Exception, e:
-            raise e
-        
-        self.raw_findings = XMLReader.raw_findings
-        self.report_id = XMLReader.report_id
+    def _get_content_handler(self):
+        return WebInspectXMLContent()
