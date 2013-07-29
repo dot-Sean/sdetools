@@ -1,20 +1,16 @@
 import os
-import re
 
 from sdetools.sdelib import commons
-from sdetools.analysis_integration.base_integrator import BaseIntegrator, IntegrationError
+from sdetools.analysis_integration.base_integrator import BaseIntegrator
 
+from sdetools.modules.import_fortify.fortify_integration_error import FortifyIntegrationError
 from sdetools.modules.import_fortify.fortify_report_importer import FortifyReportImporter
 from sdetools.modules.import_fortify.fortify_fpr_importer import FortifyFPRImporter
 from sdetools.modules.import_fortify.fortify_fvdl_importer import FortifyFVDLImporter
 
-
 __all__ = ['FortifyIntegrator']
 
 DEFAULT_MAPPING_FILE = os.path.join(commons.media_path, 'fortify', 'sde_fortify_map.xml')
-
-class FortifyIntegrationError(IntegrationError):
-    pass
 
 class FortifyIntegrator(BaseIntegrator):
     TOOL_NAME = "fortify"

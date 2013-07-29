@@ -1,12 +1,11 @@
 import os
-import re
 import xml.sax.handler
-from sdetools.extlib.defusedxml import sax
 
 from sdetools.sdelib import commons
-from sdetools.analysis_integration.base_integrator import BaseImporter
+from sdetools.analysis_integration.base_integrator import BaseXMLImporter
 
 class FVDLXMLContent(xml.sax.handler.ContentHandler):
+
     def __init__(self):
         self.in_build_node = False
         self.in_build_build_id_node = False
@@ -53,36 +52,10 @@ class FVDLXMLContent(xml.sax.handler.ContentHandler):
         elif self.in_build_node and name == 'Build':
             self.in_build_node = False
     
-class FortifyFVDLImporter(BaseImporter):
+class FortifyFVDLImporter(BaseXMLImporter):
 
     def __init__(self):
         super(FortifyFVDLImporter, self).__init__()
 
-    def parse(self, fvdl_file):
-        try:    
-            self.parse_file(open(fvdl_file, 'rb'))
-        except Exception, e:
-            raise Exception("Error opening FVDL file (%s): %s" % (fvdl_file, e))
-
-    def parse_file(self, fvdl_file):
-        FVDLReader = FVDLXMLContent()
-        try:    
-            parser = sax.make_parser()
-            parser.setContentHandler(FVDLReader)
-            parser.parse(fvdl_file)
-        except Exception, e:
-            raise Exception("Error opening FVDL file (%s): %s" % (fvdl_file, e))
-        
-        self.raw_findings = FVDLReader.raw_findings
-        self.report_id = FVDLReader.report_id
-
-    def parse_string(self, fvdl_xml):
-        FVDLReader = FVDLXMLContent()
-        try:    
-            sax.parseString(fvdl_xml, FVDLReader)
-        except Exception, e:
-            raise e
-        
-        self.raw_findings = FVDLReader.raw_findings
-        self.report_id = FVDLReader.report_id
-    
+    def _get_content_handler(self):
+        return FVDLXMLContent()
