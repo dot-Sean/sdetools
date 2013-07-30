@@ -4,6 +4,7 @@ import xml.sax.handler
 from sdetools.sdelib import commons
 from sdetools.analysis_integration.base_integrator import BaseXMLImporter
 
+
 class FVDLXMLContent(xml.sax.handler.ContentHandler):
 
     def __init__(self):
@@ -51,11 +52,9 @@ class FVDLXMLContent(xml.sax.handler.ContentHandler):
             self.in_build_build_id_node = False
         elif self.in_build_node and name == 'Build':
             self.in_build_node = False
-    
-class FortifyFVDLImporter(BaseXMLImporter):
 
-    def __init__(self):
-        super(FortifyFVDLImporter, self).__init__()
+
+class FortifyFVDLImporter(BaseXMLImporter):
 
     def _get_content_handler(self):
         return FVDLXMLContent()

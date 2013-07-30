@@ -12,6 +12,7 @@ __all__ = ['FortifyIntegrator']
 
 DEFAULT_MAPPING_FILE = os.path.join(commons.media_path, 'fortify', 'sde_fortify_map.xml')
 
+
 class FortifyIntegrator(BaseIntegrator):
     TOOL_NAME = "fortify"
 
@@ -22,12 +23,12 @@ class FortifyIntegrator(BaseIntegrator):
         self.importer = None
 
     def parse(self):
-    
+
         try:
             fileName, file_extension = os.path.splitext(self.config['report_xml'])
         except KeyError, ke:
             raise FortifyIntegrationError("Missing configuration option 'report_xml'")
-        
+
         if file_extension == '.xml':
             self.importer = FortifyReportImporter()
         elif file_extension == '.fpr':
@@ -41,11 +42,11 @@ class FortifyIntegrator(BaseIntegrator):
         self.raw_findings = self.importer.raw_findings
         self.report_id = self.importer.report_id
 
-        if self.report_id is None or self.report_id == "":
+        if not self.report_id:
             raise FortifyIntegrationError("Report ID not found in report file (%s)" % self.config['report_xml'])
 
     def _make_finding(self, item):
-        return {'weakness_id': item['id'], 'description': item['description'], 'count':item['count']}
+        return {'weakness_id': item['id'], 'description': item['description'], 'count': item['count']}
 
     def generate_findings(self):
         return [self._make_finding(item) for item in self.raw_findings]
