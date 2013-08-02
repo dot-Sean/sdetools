@@ -13,6 +13,8 @@ abstractmethod = abc.abstractmethod
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
+abstractmethod = abc.abstractmethod
+
 class IntegrationError(Error):
     pass
 
@@ -99,7 +101,7 @@ class BaseIntegrator(object):
         except KeyError, ke:
             raise IntegrationError("Missing configuration option 'mapping_file'")
         except Exception, e:
-            raise IntegrationError("An error occurred opening mapping file '%s'" % self.config['mapping_file'])
+            raise IntegrationError("An error occurred opening mapping file '%s': %s" % (self.config['mapping_file'], e))
 
         weakness_mapping = collections.defaultdict(list)
         self.weakness_title = {}
@@ -210,6 +212,7 @@ class BaseIntegrator(object):
             finding = unique_findings[task_id]
 
             if not self.task_exists_in_project_tasks( task_id, task_list):
+                logger.debug("Task %s not found in project tasks" % task_id)
                 mapped_tasks = self.lookup_task("*")
                 if mapped_tasks:
                     new_task_id = mapped_tasks[0] # use the first one
@@ -231,7 +234,8 @@ class BaseIntegrator(object):
             stats_total_flaws_found += len(finding['weaknesses'])
 
             if not self.task_exists_in_project_tasks(task_id, task_list):
-                logger.error("Task %s was not found in the project, skipping %d findings." % (task_id, len(finding['weaknesses'])))
+                logger.error("Task %s was not found in the project, skipping %d findings." % 
+                             (task_id, len(finding['weaknesses'])))
                 stats_total_skips += 1
                 stats_total_skips_findings += len(finding['weaknesses'])
                 continue
@@ -248,13 +252,17 @@ class BaseIntegrator(object):
                         analysis_findings.append(weakness_finding)
                         weakness_finding = {}
                     weakness_finding['count'] = 0
-                    if (self.weakness_type.has_key(weakness['weakness_id']) and 
+
+                    if (self.weakness_type.has_key(weakness['weakness_id']) and
                             self.weakness_type[weakness['weakness_id']] == 'cwe'):
                         weakness_finding['cwe'] = weakness['weakness_id']
-                        if self.weakness_title.has_key(weakness['weakness_id']):
-                            weakness_finding['desc'] = self.weakness_title[weakness['weakness_id']]
+
+                    if (self.weakness_title.has_key(weakness['weakness_id']) and
+                            self.weakness_title[weakness['weakness_id']] != ''):
+                        weakness_finding['desc'] = self.weakness_title[weakness['weakness_id']]
                     else:
                         weakness_finding['desc'] = weakness['weakness_id']
+
                     last_weakness = weakness['weakness_id']
 
                 if 'count' in weakness:
@@ -266,7 +274,7 @@ class BaseIntegrator(object):
                 analysis_findings.append(weakness_finding)
 
             try:
-                finding_confidence = "none"
+                finding_confidence = "low"
                 if self.confidence.has_key(task_id):
                     finding_confidence = self.confidence[task_id]
 
