@@ -13,8 +13,6 @@ abstractmethod = abc.abstractmethod
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
-abstractmethod = abc.abstractmethod
-
 class IntegrationError(Error):
     pass
 
@@ -55,10 +53,9 @@ class BaseXMLImporter(BaseImporter):
             parser = sax.make_parser()
             parser.setContentHandler(XMLReader)
             parser.parse(xml_file)
-        except (xml.sax.SAXException, xml.sax.SAXParseException), se:
+        except (xml.sax.SAXException, xml.sax.SAXParseException, xml.sax.SAXNotSupportedException, 
+                xml.sax.SAXNotRecognizedException), se:
             raise IntegrationError("Could not parse file '%s': %s" % (xml_file, se))
-        except (xml.sax.SAXNotSupportedException, xml.sax.SAXNotRecognizedException), sse:
-            raise IntegrationError("Could not parse file '%s': %s" % (xml_file, sse))
         
         self.raw_findings = XMLReader.raw_findings
         self.report_id = XMLReader.report_id   
@@ -67,10 +64,9 @@ class BaseXMLImporter(BaseImporter):
         XMLReader = self._get_content_handler()
         try:    
             sax.parseString(xml, XMLReader)
-        except (xml.sax.SAXException, xml.sax.SAXParseException), se:
+        except (xml.sax.SAXException, xml.sax.SAXParseException, xml.sax.SAXNotSupportedException, 
+                xml.sax.SAXNotRecognizedException), se:
             raise IntegrationError("Could not parse file '%s': %s" % (xml_file, se))
-        except (xml.sax.SAXNotSupportedException, xml.sax.SAXNotRecognizedException), sse:
-            raise IntegrationError("Could not parse file '%s': %s" % (xml_file, sse))
         
         self.raw_findings = XMLReader.raw_findings
         self.report_id = XMLReader.report_id
@@ -234,7 +230,8 @@ class BaseIntegrator(object):
             stats_total_flaws_found += len(finding['weaknesses'])
 
             if not self.task_exists_in_project_tasks(task_id, task_list):
-                logger.error("Task %s was not found in the project, skipping %d findings." % (task_id, len(finding['weaknesses'])))
+                logger.error("Task %s was not found in the project, skipping %d findings." % 
+                             (task_id, len(finding['weaknesses'])))
                 stats_total_skips += 1
                 stats_total_skips_findings += len(finding['weaknesses'])
                 continue
@@ -252,10 +249,12 @@ class BaseIntegrator(object):
                         weakness_finding = {}
                     weakness_finding['count'] = 0
 
-                    if self.weakness_type.has_key(weakness['weakness_id']) and self.weakness_type[weakness['weakness_id']] == 'cwe':
-                        weakness_finding['cwe'] = weakness
+                    if (self.weakness_type.has_key(weakness['weakness_id']) and
+                            self.weakness_type[weakness['weakness_id']] == 'cwe'):
+                        weakness_finding['cwe'] = weakness['weakness_id']
 
-                    if self.weakness_title.has_key(weakness['weakness_id']) and self.weakness_title[weakness['weakness_id']] != '':
+                    if (self.weakness_title.has_key(weakness['weakness_id']) and
+                            self.weakness_title[weakness['weakness_id']] != ''):
                         weakness_finding['desc'] = self.weakness_title[weakness['weakness_id']]
                     else:
                         weakness_finding['desc'] = weakness['weakness_id']
