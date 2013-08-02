@@ -13,8 +13,6 @@ abstractmethod = abc.abstractmethod
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
-abstractmethod = abc.abstractmethod
-
 class IntegrationError(Error):
     pass
 
@@ -55,10 +53,9 @@ class BaseXMLImporter(BaseImporter):
             parser = sax.make_parser()
             parser.setContentHandler(XMLReader)
             parser.parse(xml_file)
-        except (xml.sax.SAXException, xml.sax.SAXParseException), se:
+        except (xml.sax.SAXException, xml.sax.SAXParseException, xml.sax.SAXNotSupportedException, 
+                xml.sax.SAXNotRecognizedException), se:
             raise IntegrationError("Could not parse file '%s': %s" % (xml_file, se))
-        except (xml.sax.SAXNotSupportedException, xml.sax.SAXNotRecognizedException), sse:
-            raise IntegrationError("Could not parse file '%s': %s" % (xml_file, sse))
         
         self.raw_findings = XMLReader.raw_findings
         self.report_id = XMLReader.report_id   
@@ -67,10 +64,9 @@ class BaseXMLImporter(BaseImporter):
         XMLReader = self._get_content_handler()
         try:    
             sax.parseString(xml, XMLReader)
-        except (xml.sax.SAXException, xml.sax.SAXParseException), se:
+        except (xml.sax.SAXException, xml.sax.SAXParseException, xml.sax.SAXNotSupportedException, 
+                xml.sax.SAXNotRecognizedException), se:
             raise IntegrationError("Could not parse file '%s': %s" % (xml_file, se))
-        except (xml.sax.SAXNotSupportedException, xml.sax.SAXNotRecognizedException), sse:
-            raise IntegrationError("Could not parse file '%s': %s" % (xml_file, sse))
         
         self.raw_findings = XMLReader.raw_findings
         self.report_id = XMLReader.report_id
