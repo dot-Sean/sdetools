@@ -10,8 +10,9 @@ class MappingError(Exception):
 class Mapping:
     def __init__(self):
         self.mapping = {}
-        self.cwe_weaknesses = {}
+        self.cwe_checks = {}
         self.base_tasks = {}
+        self.checks = []
 
     def load_base_mapping_from_xml(self, mapping_file):
         try:
@@ -37,64 +38,91 @@ class Mapping:
         except Exception, e:
             raise MappingError("An error occured opening mapping file '%s': %s" % (weakness_file, e))
 
-        cwe_weaknesses = {}
+        cwe_checks = {}
         for weakness_row in base.getElementsByTagName('Table1'):
-            weakness = {}
-            weakness['check_id'] = weakness_row.getElementsByTagName('CheckID')[0].firstChild.data
-            weakness['check_name'] = weakness_row.getElementsByTagName('CheckName')[0].firstChild.data
-            weakness['check_name'] = weakness['check_name'].replace('"','&quot;')
-            weakness['check_name'] = weakness['check_name'].replace('&','&amp;')
+            check = {}
+            check['check_id'] = weakness_row.getElementsByTagName('CheckID')[0].firstChild.data
+            check['check_name'] = weakness_row.getElementsByTagName('CheckName')[0].firstChild.data
+            check['check_name'] = check['check_name'].replace('"','&quot;')
+            check['check_name'] = check['check_name'].replace('&','&amp;')
             
             cwe = weakness_row.getElementsByTagName('CWE')[0].firstChild.data
-            weakness['cwe_desc'] = weakness_row.getElementsByTagName('CWE_Desc')[0].firstChild.data
-            weakness['cwe_desc'] = weakness['cwe_desc'].replace('"','&quot;')
-            weakness['cwe_desc'] = weakness['cwe_desc'].replace('&','&amp;')
-            weakness['cwe_id'] = cwe[4:]
+            check['cwe_desc'] = weakness_row.getElementsByTagName('CWE_Desc')[0].firstChild.data
+            check['cwe_desc'] = check['cwe_desc'].replace('"','&quot;')
+            check['cwe_desc'] = check['cwe_desc'].replace('&','&amp;')
+            check['cwe_id'] = cwe[4:]
             
             weaknesses = []
-            if (cwe_weaknesses.has_key(weakness['cwe_id'])):
-                weaknesses = cwe_weaknesses[weakness['cwe_id']]
-            weaknesses.append(weakness)
-            cwe_weaknesses[weakness['cwe_id']] = weaknesses
+            if (cwe_checks.has_key(check['cwe_id'])):
+                weaknesses = cwe_checks[check['cwe_id']]
+            weaknesses.append(check)
+            cwe_checks[check['cwe_id']] = weaknesses
 
-        self.cwe_weaknesses = cwe_weaknesses
+            if not check['check_id'] in self.checks:
+                self.checks.append(check['check_id'])
+            
+        self.cwe_checks = cwe_checks
         
     def remap(self):
         task_map = {}
         nomap = {}
 
-        keys = sorted(self.cwe_weaknesses.iterkeys())
+        keys = sorted(self.cwe_checks.iterkeys())
         for cwe in keys:
             if self.mapping.has_key(cwe):
                 tasks = self.mapping[cwe]
                 for task in tasks:
-                    weaknesses = []
+                    task_checks = []
                     if task_map.has_key(task):
-                        weaknesses = task_map[task]
-                    for wk in self.cwe_weaknesses[cwe]:
-                        weaknesses.append(wk)
-                    task_map[task] = weaknesses
+                        task_checks = task_map[task]
+                    for check in self.cwe_checks[cwe]:
+                        task_mapping_found = False
+                        for task_check in task_checks:
+                            if task_check['check_id'] == check['check_id']:
+                                task_mapping_found = True
+                        if not task_mapping_found:
+                            task_checks.append(check)
+                    task_map[task] = task_checks
             else: #map to 193
-                    weaknesses = []
+                    task_mapping_found = False
+                    task_checks = []
                     task = '193'
                     if task_map.has_key(task):
-                        weaknesses = task_map[task]
-                    for wk in self.cwe_weaknesses[cwe]:
-                        weaknesses.append(wk)
-                    task_map[task] = weaknesses
+                        task_checks = task_map[task]
+                    for check in self.cwe_checks[cwe]:
+                        for chk in task_checks:
+                            if chk['check_id'] == check['check_id']:
+                                task_mapping_found = True
+                        if not task_mapping_found:
+                            task_checks.append(check)
+                    task_map[task] = task_checks
         self.task_map = task_map
 
     def output_mapping(self):
         keys = sorted(self.task_map.iterkeys())
-        print '<mapping>'
+        print '<mapping weaknesses="%d">' % len(self.checks)
         for task_id in keys:
-            weaknesses = self.task_map[task_id]
-            print '\t<task id="%s" title="%s">'%(task_id, self.base_tasks[task_id].attributes['title'].value)
-            weaknesses = sorted(weaknesses)
-            for weakness in weaknesses:
-                print '\t\t<weakness type="check" id="%s" name="%s" cwe="%s" title="%s"/>'% (weakness['check_id'], weakness['check_name'], weakness['cwe_id'], weakness['cwe_desc'])
+            task_checks = self.task_map[task_id]
+            print '\t<task id="%s" title="%s" >'%(task_id, self.base_tasks[task_id].attributes['title'].value)
+            task_checks = sorted(task_checks)
+            for weakness in task_checks:
+                print '\t\t<weakness type="check" id="%s" title="%s" />'% (weakness['check_id'], weakness['check_name'])
             print '\t</task>'
-        print '</mapping>'            
+        print '</mapping>'
+    def output_missing_checks(self):
+        keys = sorted(self.task_map.iterkeys())
+        #print self.cwe_checks['79']
+        #print self.task_map['36']
+        for check in self.checks:
+            check_found = False
+            for task_id in keys:
+                task_checks = self.task_map[task_id]
+                for task_check in task_checks:
+                    if int(check) == int(task_check['check_id']):
+                         check_found = True
+            if not check_found:
+                print "Check %s missing" % check
+
 def main(argv):
     base = Mapping()
     base.load_base_mapping_from_xml(argv[1])

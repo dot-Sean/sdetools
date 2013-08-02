@@ -260,7 +260,7 @@ class BaseIntegrator(object):
                     else:
                         weakness_finding['desc'] = weakness['weakness_id']
 
-                    last_weakness = weakness
+                    last_weakness = weakness['weakness_id']
 
                 if 'count' in weakness:
                     weakness_finding['count'] += weakness['count']
@@ -271,7 +271,7 @@ class BaseIntegrator(object):
                 analysis_findings.append(weakness_finding)
 
             try:
-                finding_confidence = "none"
+                finding_confidence = "low"
                 if self.confidence.has_key(task_id):
                     finding_confidence = self.confidence[task_id]
 

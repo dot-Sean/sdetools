@@ -41,7 +41,7 @@
         <task id="203" title="Avoid uncontrolled format string" confidence="high">
  		<weakness type="cwe" id="134" title="Uncontrolled Format String"/>
         </task>
-	<task id="193" title="Review non-categorized/miscellaneous findings from static code analysis" confidence="none">
+	<task id="193" title="Review non-categorized/miscellaneous findings from static code analysis" confidence="low">
 		<weakness type="cwe" id="597" title="Use of Wrong Operator in String Comparison"/>
 		<weakness type="cwe" id="668" title="Exposure of Resource to Wrong Sphere"/>
 		<weakness type="cwe" id="391" title="Unchecked Error Condition"/>
@@ -76,7 +76,7 @@
         <task id="206" title="Avoid time of check time of use race condition against external resources" confidence="low">
                 <weakness type="cwe" id="367" title="Time-of-check Time-of-use (TOCTOU) Race Condition"/>
         </task>
-        <task id="205" title="Avoid inter-process race conditions" confidence="none">
+        <task id="205" title="Avoid inter-process race conditions" confidence="low">
                 <weakness type="cwe" id="557" title="Concurrency Issues"/>
         </task>
         <task id="202" title="Prevent buffer overflow/underflow" confidence="high">
@@ -94,10 +94,10 @@
 		<weakness type="cwe" id="327" title="Use of a Broken or Risky Cryptographic Algorithm"/>
 		<weakness type="cwe" id="329" title="Not Using a Random IV with CBC Mode"/>
 	</task>
-	<task id="62" title="Lockdown passwords in property and configuration files (e.g. database connection strings)" confidence="none">
+	<task id="62" title="Lockdown passwords in property and configuration files (e.g. database connection strings)" confidence="low">
 		<weakness type="cwe" id="522" title="Insufficiently Protected Credentials"/>
 	</task>
-	<task id="176" title="Apply principles of privacy when handling personal information" confidence="none">
+	<task id="176" title="Apply principles of privacy when handling personal information" confidence="low">
 		<weakness type="cwe" id="359" title="Privacy Violation"/>
 	</task>
 	<task id="20" title="Invalidate old session ID after authentication" confidence="low">
@@ -170,7 +170,7 @@
 		<weakness type="cwe" id="354" title="Improper Validation of Integrity Check Value"/>
 		<weakness type="cwe" id="472" title="External Control of Assumed-Immutable Web Parameter"/>
 	</task>
-	<task id="54" title="Validate file contents" confidence="none">
+	<task id="54" title="Validate file contents" confidence="low">
 		<weakness type="cwe" id="434" title="Unrestricted Upload of File with Dangerous Type"/>
 	</task>
 	<task id="31" title="Perform input validation on all forms of input" confidence="low">

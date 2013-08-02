@@ -54,6 +54,7 @@
 		<weakness type="cwe" id="498" title="Cloneable Class Containing Sensitive Information"/>
 		<weakness type="cwe" id="234" title="Failure to Handle Missing Parameter"/>
 		<weakness type="cwe" id="398" title="Indicator of Poor Code Quality"/>
+        <weakness type="cwe" id="730" title="OWASP Top Ten 2004 Category A9 - Denial of Service"/>
 		<weakness type="cwe" id="830" title="Inclusion of Web Functionality from an Untrusted Source"/>
 		<weakness type="cwe" id="656" title="Reliance on Security Through Obscurity"/>
 		<weakness type="cwe" id="404" title="Improper Resource Shutdown or Release"/>
@@ -75,7 +76,6 @@
 		<weakness type="cwe" id="313" title="Plaintext Storage in a File or on Disk"/>
 		<weakness type="cwe" id="193" title="Off-by-One Error"/>
 		<weakness type="cwe" id="135" title="Incorrect Calculation of Multi-Byte String Length"/>
-		<weakness type="cwe" id="129" title="Improper Validation of Array Index"/>
 		<weakness type="cwe" id="170" title="Improper Null Termination"/>
 	    <weakness type="cwe" id="*" title="Unmapped CWE"/>
     </task>
@@ -91,6 +91,9 @@
     <task id="202" title="Prevent buffer overflow/underflow" >
         <weakness type="cwe" id="121" title="Stack-Based Buffer Overflow"/>
         <weakness type="cwe" id="120" title="Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')"/>
+		<weakness type="cwe" id="119" title="Failure to Constrain Operations within the Bounds of a Memory Buffer"/>
+		<weakness type="cwe" id="131" title="Incorrect Calculation of Buffer Size"/>
+        <weakness type="cwe" id="787" title="Out-of-bounds Write"/>
     </task>
     <task id="35" title="Specify HTTP protocol limits in the server settings">
         <weakness type="cwe" id="400" title="Uncontrolled Resource Consumption ('Resource Exhaustion')"/>
@@ -99,6 +102,7 @@
         <weakness type="cwe" id="125" title="Out-of-Bounds Read"/>
         <weakness type="cwe" id="415" title="Double Free"/>
         <weakness type="cwe" id="416" title="Use After Free"/>
+		<weakness type="cwe" id="129" title="Improper Validation of Array Index"/>        
     </task>
 	<task id="60" title="Only use approved cryptographic algorithms and key lengths" >
 		<weakness type="cwe" id="757" title="Selection of Less-Secure Algorithm During Negotiation (Algorithm Downgrade)"/>
@@ -190,14 +194,17 @@
 		<weakness type="cwe" id="93" title="Improper Neutralization of CRLF Sequences (CRLF Injection)"/>
 		<weakness type="cwe" id="94" title="Improper Control of Generation of code (Code Injection)"/>
 		<weakness type="cwe" id="501" title="Trust Boundary Violation"/>
-        <weakness type="cwe" id="713" title="OWASP Top Ten 2007 Category A2 - Injection Flaws"/>        
-        <weakness type="cwe" id="116" title="Improper Encoding or Escaping of Output"/>        
+        <weakness type="cwe" id="713" title="OWASP Top Ten 2007 Category A2 - Injection Flaws"/>            
 	</task>
 	<task id="36" title="Escape untrusted data in HTML, HTML attributes, Cascading Style Sheets and JavaScript" >
 		<weakness type="cwe" id="83" title="Improper Neutralization of Script in Attributes in a Web Page"/>
 		<weakness type="cwe" id="80" title="Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)"/>
 		<weakness type="cwe" id="79" title="Improper Neutralization of Input During Web Page Generation (Cross-site Scripting)"/>
         <weakness type="cwe" id="811" title="OWASP Top Ten 2010 Category A2 - Cross-Site Scripting (XSS)"/>
+		<weakness type="cwe" id="692" title="Incomplete Blacklist to Cross-Site Scripting"/>
+		<weakness type="cwe" id="82" title="Improper Neutralization of Script in Attributes of IMG Tags in a Web Page"/>
+		<weakness type="cwe" id="87" title="Improper Neutralization of Alternate XSS Syntax"/>
+        <weakness type="cwe" id="116" title="Improper Encoding or Escaping of Output"/>
 	</task>
 	<task id="55" title="Validate all untrusted XML input" >
 		<weakness type="cwe" id="611" title="Information Exposure Through XML External Entity Reference"/>
