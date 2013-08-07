@@ -2,11 +2,13 @@
 import collections
 import re
 from datetime import datetime
-from sdetools.extlib.defusedxml import minidom
+from sdetools.extlib.defusedxml import minidom, sax
 
-from sdetools.sdelib.commons import Error
+from sdetools.sdelib.commons import Error, abc
 from sdetools.sdelib.restclient import APIError
 from sdetools.sdelib.interactive_plugin import PlugInExperience
+
+abstractmethod = abc.abstractmethod
 
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
@@ -24,6 +26,56 @@ class IntegrationResult(object):
         self.error_count = error_count
         self.error_weaknesses_unmapped = error_weaknesses_unmapped
 
+class BaseImporter(object):
+
+    def __init__(self):
+        self.report_id = ""
+        self.raw_findings = []
+
+class BaseXMLImporter(BaseImporter):
+
+    def __init__(self):
+        super(BaseXMLImporter, self).__init__()
+
+    @abstractmethod
+    def _get_content_handler(self):
+        """
+        Returns a customizable XML Reader that can extract information as
+        the parse goes through the file
+        """
+        pass
+
+    def parse(self, file_name):        
+        try:    
+            fp = open(file_name, 'r')
+        except IOError, ioe:
+            raise IntegrationError("Could not open file '%s': %s" % (file_name, ioe))
+        self.parse_file(fp)
+
+    def parse_file(self, xml_file):
+        XMLReader = self._get_content_handler()
+        try:    
+            parser = sax.make_parser()
+            parser.setContentHandler(XMLReader)
+            parser.parse(xml_file)
+        except (xml.sax.SAXException, xml.sax.SAXParseException, xml.sax.SAXNotSupportedException, 
+                xml.sax.SAXNotRecognizedException), se:
+            raise IntegrationError("Could not parse file '%s': %s" % (xml_file, se))
+        
+        self.raw_findings = XMLReader.raw_findings
+        self.report_id = XMLReader.report_id   
+        
+    def parse_string(self, xml):
+        XMLReader = self._get_content_handler()
+        try:    
+            sax.parseString(xml, XMLReader)
+        except (xml.sax.SAXException, xml.sax.SAXParseException, xml.sax.SAXNotSupportedException, 
+                xml.sax.SAXNotRecognizedException), se:
+            raise IntegrationError("Could not parse file '%s': %s" % (xml_file, se))
+        
+        self.raw_findings = XMLReader.raw_findings
+        self.report_id = XMLReader.report_id
+        
 class BaseIntegrator(object):
     TOOL_NAME = 'External tool'
 
@@ -44,13 +96,22 @@ class BaseIntegrator(object):
         self.config.add_custom_option("trial_run",
                 "Trial run only: 'True' or 'False'", "t", "False")
 
+    def initialize(self):
+        """
+        This is a post init initialization. It needs to be called as the first
+        function after configuration is processed (usually first call inside handler of
+        the module)
+        """
+        self.config.process_boolean_config('flaws_only')
+        self.config.process_boolean_config('trial_run')
+
     def load_mapping_from_xml(self):
         try:
             base = minidom.parse(self.config['mapping_file'])
         except KeyError, ke:
             raise IntegrationError("Missing configuration option 'mapping_file'")
         except Exception, e:
-            raise IntegrationError("An error occurred opening mapping file '%s'" % self.config['mapping_file'])
+            raise IntegrationError("An error occurred opening mapping file '%s': %s" % (self.config['mapping_file'], e))
 
         weakness_mapping = collections.defaultdict(list)
         self.weakness_title = {}
@@ -127,8 +188,6 @@ class BaseIntegrator(object):
         return False
 
     def import_findings(self):
-        commit = (self.config['trial_run'] != 'True')
-
         stats_failures_added = 0
         stats_api_errors = 0
         stats_total_skips = 0
@@ -140,7 +199,7 @@ class BaseIntegrator(object):
         logger.info("Mapped SD application/project: %s/%s" % 
             (self.config['sde_application'], self.config['sde_project']))
 
-        if not commit:
+        if self.config['trial_run']:
             logger.info("Trial run only. No changes will be made")
         else:
             ret = self.plugin.add_project_analysis_note(self.report_id, self.TOOL_NAME)
@@ -148,8 +207,8 @@ class BaseIntegrator(object):
 
 
         task_list = self.plugin.get_task_list()
-        logger.debug("Retrieved task list for %s/%s" % 
-            (self.config['sde_application'], self.config['sde_project']))
+        logger.debug("Retrieved %d tasks from %s/%s" % 
+            (len(task_list), self.config['sde_application'], self.config['sde_project']))
 
         unique_findings = self.unique_findings()
         missing_weakness_map = unique_findings['nomap']
@@ -161,6 +220,7 @@ class BaseIntegrator(object):
             finding = unique_findings[task_id]
 
             if not self.task_exists_in_project_tasks( task_id, task_list):
+                logger.debug("Task %s not found in project tasks" % task_id)
                 mapped_tasks = self.lookup_task("*")
                 if mapped_tasks:
                     new_task_id = mapped_tasks[0] # use the first one
@@ -182,7 +242,8 @@ class BaseIntegrator(object):
             stats_total_flaws_found += len(finding['weaknesses'])
 
             if not self.task_exists_in_project_tasks(task_id, task_list):
-                logger.error("Task %s was not found in the project, skipping %d findings." % (task_id, len(finding['weaknesses'])))
+                logger.error("Task %s was not found in the project, skipping %d findings." % 
+                             (task_id, len(finding['weaknesses'])))
                 stats_total_skips += 1
                 stats_total_skips_findings += len(finding['weaknesses'])
                 continue
@@ -199,13 +260,17 @@ class BaseIntegrator(object):
                         analysis_findings.append(weakness_finding)
                         weakness_finding = {}
                     weakness_finding['count'] = 0
-                    if (self.weakness_type.has_key(weakness['weakness_id']) and 
+
+                    if (self.weakness_type.has_key(weakness['weakness_id']) and
                             self.weakness_type[weakness['weakness_id']] == 'cwe'):
                         weakness_finding['cwe'] = weakness['weakness_id']
-                        if self.weakness_title.has_key(weakness['weakness_id']):
-                            weakness_finding['desc'] = self.weakness_title[weakness['weakness_id']]
+
+                    if (self.weakness_title.has_key(weakness['weakness_id']) and
+                            self.weakness_title[weakness['weakness_id']] != ''):
+                        weakness_finding['desc'] = self.weakness_title[weakness['weakness_id']]
                     else:
                         weakness_finding['desc'] = weakness['weakness_id']
+
                     last_weakness = weakness['weakness_id']
 
                 if 'count' in weakness:
@@ -217,11 +282,11 @@ class BaseIntegrator(object):
                 analysis_findings.append(weakness_finding)
 
             try:
-                finding_confidence = "none"
+                finding_confidence = "low"
                 if self.confidence.has_key(task_id):
                     finding_confidence = self.confidence[task_id]
 
-                if commit:
+                if not self.config['trial_run']:
                     ret = self.plugin.add_analysis_note(task_name, project_analysis_note_ref, 
                             finding_confidence, analysis_findings)
                 logger.debug("Marked %s as FAILURE with %s confidence" % (task_name, finding_confidence))
@@ -231,14 +296,14 @@ class BaseIntegrator(object):
                 self.emit.error("API Error: Unable to mark %s as FAILURE. Skipping ..." % (task_name))
                 stats_api_errors += 1
 
-        stats_passes_added=0
-        stats_test_tasks=0
+        stats_passes_added = 0
+        stats_test_tasks = 0
 
         affected_tasks = []
         noflaw_tasks = []
         for task in task_list:
             if(task['phase'] in self.phase_exceptions):
-                stats_test_tasks+=1
+                stats_test_tasks += 1
                 continue
             task_search = re.search('^(\d+)-[^\d]+(\d+)$', task['id'])
             if task_search:
@@ -248,7 +313,7 @@ class BaseIntegrator(object):
                     continue
             noflaw_tasks.append(task_id)
 
-        if self.config['flaws_only'] == 'False':
+        if not self.config['flaws_only']:
             for task_id in noflaw_tasks:
 
                 task_name = "T%s" % task_id
@@ -260,7 +325,7 @@ class BaseIntegrator(object):
                     continue
 
                 try:
-                    if commit:
+                    if not self.config['trial_run']:
                         analysis_findings = []
 
                         self.plugin.add_analysis_note(task_name, project_analysis_note_ref, 
