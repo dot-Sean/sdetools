@@ -44,9 +44,9 @@ class FVDLXMLContent(xml.sax.handler.ContentHandler):
     def endElement(self, name):
         if self.in_vuln_node and name == 'Vulnerability':
             self.in_vuln_node = False
-        if self.in_vuln_class_info_node and name == 'ClassInfo':
+        elif self.in_vuln_class_info_node and name == 'ClassInfo':
             self.in_vuln_class_info_node = False
-        if self.in_vuln_class_info_type_node and name == 'Type':
+        elif self.in_vuln_class_info_type_node and name == 'Type':
             self.in_vuln_class_info_type_node = False
         elif self.in_build_build_id_node and name == 'BuildID':
             self.in_build_build_id_node = False
