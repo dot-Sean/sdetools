@@ -87,16 +87,17 @@ class FortifyIntegrator(BaseIntegrator):
 
         stream = opener.open(req)
         print stream
-        with open('C:/Users/Geoffrey/Downloads/test.fpr', 'wb') as fp:
-          while True:
+        fp = open('test.fpr', 'wb')
+        while True:
             try:
                 chunk = stream.read()
             except httplib.IncompleteRead as e:
                 chunk = e.partial
             if not chunk: break
             fp.write(chunk)
+        fp.close()
 
-        self.config['report_xml'] = 'C:/Users/Geoffrey/Downloads/test.fpr'
+        self.config['report_xml'] = 'test.fpr'
         self.parse()
 
     def parse(self):
