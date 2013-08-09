@@ -3,10 +3,11 @@ __all__ = [
     'sdelib', 
     'modules', 
     'alm_integration', 
+    'analysis_integration', 
     'extlib',
 ]
 
-VERSION = '3.4.0'
+VERSION = '3.7.0'
 
 from sdetools.sdelib import mod_mgr
 

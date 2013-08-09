@@ -123,10 +123,7 @@ class RallyConnector(AlmConnector):
     def carriage_return(self):
         return '<br//>'
 
-    def alm_connect(self):
-
-        workspace_ref = None
-
+    def alm_connect_server(self):
         """ Verifies that Rally connection works """
         #Check to make sure that we can do a simple API call
         try:
@@ -134,6 +131,9 @@ class RallyConnector(AlmConnector):
         except APIError, err:
             raise AlmException('Unable to connect to Rally service (Check server URL, '
                     'user, pass). Reason: %s' % str(err))
+
+    def alm_connect_project(self):
+        workspace_ref = None
 
         #Now try to get workspace ID
         subscription_ref = self.alm_plugin.call_api('subscription.js')
@@ -146,7 +146,6 @@ class RallyConnector(AlmConnector):
             raise AlmException('Workspace is not valid, please check config value: '
                     '%s' % self.config['rally_workspace'])
         self.workspace_ref = workspace_ref
-
 
         #Now get project ID
         query_args = {

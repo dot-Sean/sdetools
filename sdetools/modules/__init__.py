@@ -2,6 +2,7 @@ __all__ = [
     'help',
     'lint',
     'report',
+    'import_fortify',
     'import_veracode',
     'sync_jira',
     'sync_mingle',
@@ -10,4 +11,5 @@ __all__ = [
     'list_projects',
     'sync_trac',
     'connect',
+    'add_ssl_cert',
 ]
