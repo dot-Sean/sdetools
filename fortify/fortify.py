@@ -16,18 +16,5 @@ client = suds.client.Client("http://127.0.0.1:8180/ssc/fm-ws/services/fws.wsdl",
     autoblend=True,
     location="http://127.0.0.1:8180/ssc/fm-ws/services/",
     wsse=security)
-ret = client.service.CreateAuditSession()
-import pdb; pdb.set_trace()
-
-spec = []
-for method in client.wsdl.services[0].ports[0].methods.values(): 
-    if not method.soap.input.body.parts:
-        args = ''
-    else:
-        args = str(client.factory.create(method.soap.input.body.parts[0].element[0]))
-    spec.append((method.name, args))
-spec.sort()
-for item in spec:
-    print item[0]
-    print '\n    '.join(item[1].split('\n'))
-    print
+client.service.GetSingleUseFPRDownloadToken()
+print client.last_received()
