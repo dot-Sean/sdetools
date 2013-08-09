@@ -23,7 +23,7 @@ class FortifyIntegrator(BaseIntegrator):
 
     def __init__(self, config):
         config.add_custom_option('integration_mode',"Integration mode ('api' or 'file')", default='file')
-        config.add_custom_option("result_file", "Verification results file", "x", None)
+        config.add_custom_option("result_file", "Verification results file", "x", default='')
         config.add_custom_option('ssc_method','ss', default='')
         config.add_custom_option('ssc_server','sx', default='')
         config.add_custom_option('ssc_user','sy',default='')
