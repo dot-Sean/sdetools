@@ -22,26 +22,46 @@ class FortifyIntegrator(BaseIntegrator):
     TOOL_NAME = "fortify"
 
     def __init__(self, config):
-        config.add_custom_option('integration_mode',"Integration mode ('api' or 'file')", default='file')
-        config.add_custom_option("result_file", "Verification results file", "x", default='')
-        config.add_custom_option('ssc_method','ss', default='')
-        config.add_custom_option('ssc_server','sx', default='')
-        config.add_custom_option('ssc_user','sy',default='')
-        config.add_custom_option('ssc_pass','sz',default='')
-        config.add_custom_option('ssc_project_name','Project name',default='')
-        config.add_custom_option('ssc_project_version','Project version',default='')
-        
         super(FortifyIntegrator, self).__init__(config, DEFAULT_MAPPING_FILE)
+
+        config.add_custom_option('integration_mode',"Integration mode: (ssc or file)", default='file')
+        config.add_custom_option("file_results", "Verification results file", "x", default='')
+        config.add_custom_option('ssc_test_connection','Test Fortify SSC Connection Only '
+                '(Also checks existence of project and version)', default='False')
+        config.add_custom_option('ssc_method','http vs https for Fortify SSC server', default='https')
+        config.add_custom_option('ssc_server','Fortify SSC server name or IP', default='')
+        config.add_custom_option('ssc_user','Fortify SSC user',default='')
+        config.add_custom_option('ssc_pass','Fortify SSC password',default='')
+        config.add_custom_option('ssc_project_name','Fortify Project name',default='')
+        config.add_custom_option('ssc_project_version','Fortify Project version',default='')
+        
         self.raw_findings = []
         self.importer = None
 
+    def initialize(self):
+        super(FortifyIntegrator, self).initialize()
+        
+        if self.config['integration_mode'] == 'ssc':
+            self.config.process_boolean_config('ssc_test_connection')
+
+            config_keys = ['ssc_method','ssc_server','ssc_user','ssc_pass','ssc_project_name','ssc_project_version']
+            for config_key in config_keys:
+                if not self.config[config_key]:
+                    raise FortifyIntegrationError("Missing value for option %s" % config_key)
+
+        elif self.config['integration_mode'] == 'file':        
+            if not self.config['file_results']:
+                raise FortifyIntegrationError("Missing value for option file_results")
+        else:
+            raise FortifyIntegrationError("Invalid value for integration_mode. Valid values are: ssc or file")
+            
     def start(self):
 
         if self.config['integration_mode'] == 'file':
             try:
-                fileName, file_extension = os.path.splitext(self.config['result_file'])
+                fileName, file_extension = os.path.splitext(self.config['file_results'])
             except KeyError, ke:
-                raise FortifyIntegrationError("Missing configuration option 'result_file'")
+                raise FortifyIntegrationError("Missing configuration option 'file_results'")
 
             if file_extension == '.xml':
                 self.importer = FortifyReportImporter()
@@ -52,9 +72,9 @@ class FortifyIntegrator(BaseIntegrator):
             else:
                 raise FortifyIntegrationError("Unsupported file type (%s)" % file_extension)
 
-            self.importer.parse(self.config['result_file'])
+            self.importer.parse(self.config['file_results'])
             
-        elif self.config['integration_mode'] == 'api':
+        elif self.config['integration_mode'] == 'ssc':
             self.importer = FortifySSCImporter(self.config)
             self.importer.run()
         
@@ -62,7 +82,7 @@ class FortifyIntegrator(BaseIntegrator):
         self.report_id = self.importer.report_id
 
         if not self.report_id:
-            raise FortifyIntegrationError("Report ID not found in report file (%s)" % self.config['result_file'])
+            raise FortifyIntegrationError("Report ID not found in report file (%s)" % self.config['file_results'])
 
     def _make_finding(self, item):
         return {'weakness_id': item['id'], 'description': item['description'], 'count': item['count']}
