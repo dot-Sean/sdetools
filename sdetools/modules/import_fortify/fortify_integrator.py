@@ -47,13 +47,13 @@ class FortifyIntegrator(BaseIntegrator):
             config_keys = ['ssc_method','ssc_server','ssc_user','ssc_pass','ssc_project_name','ssc_project_version']
             for config_key in config_keys:
                 if not self.config[config_key]:
-                    raise FortifyIntegrationError("Missing value for option %s" % config_key)
+                    raise commons.UsageError("Missing value for option %s" % config_key)
 
         elif self.config['integration_mode'] == 'file':        
             if not self.config['file_results']:
-                raise FortifyIntegrationError("Missing value for option file_results")
+                raise commons.UsageError("Missing value for option file_results")
         else:
-            raise FortifyIntegrationError("Invalid value for integration_mode. Valid values are: ssc or file")
+            raise commons.UsageError("Invalid value for integration_mode. Valid values are: ssc or file")
             
     def start(self):
 
