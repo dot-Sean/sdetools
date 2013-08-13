@@ -1,6 +1,6 @@
 import os
 
-from sdetools.sdelib import commons
+from sdetools.sdelib.commons import media_path, UsageError
 from sdetools.analysis_integration.base_integrator import BaseIntegrator
 
 from sdetools.modules.import_fortify.fortify_integration_error import FortifyIntegrationError
@@ -10,40 +10,44 @@ from sdetools.modules.import_fortify.fortify_fvdl_importer import FortifyFVDLImp
 
 __all__ = ['FortifyIntegrator']
 
-DEFAULT_MAPPING_FILE = os.path.join(commons.media_path, 'fortify', 'sde_fortify_map.xml')
+DEFAULT_MAPPING_FILE = os.path.join(media_path, 'fortify', 'sde_fortify_map.xml')
 
 
 class FortifyIntegrator(BaseIntegrator):
     TOOL_NAME = "fortify"
 
     def __init__(self, config):
-        config.add_custom_option("report_xml", "Fortify Report XML", "x", None)
+        config.add_custom_option("report_file", "Fortify Report File", "x", None)
+        config.add_custom_option("report_type", "Fortify Report Type: xml|fpr|fvdl|auto", "auto")
         super(FortifyIntegrator, self).__init__(config, DEFAULT_MAPPING_FILE)
         self.raw_findings = []
         self.importer = None
 
     def parse(self):
+        if not self.config['report_file']:
+            raise UsageError("Missing configuration option 'report_file'")
 
-        try:
-            fileName, file_extension = os.path.splitext(self.config['report_xml'])
-        except KeyError, ke:
-            raise FortifyIntegrationError("Missing configuration option 'report_xml'")
+        if self.config['report_type'] == 'auto': 
+            if not isinstance(self.config['report_file'], basestring):
+                raise UsageError("On auto-detect mode, the file name needs to be specified.")
+            fileName, file_extension = os.path.splitext(self.config['report_file'])
+            self.config['report_type'] = file_extension[1:]
 
-        if file_extension == '.xml':
+        if self.config['report_type'] == 'xml':
             self.importer = FortifyReportImporter()
-        elif file_extension == '.fpr':
+        elif self.config['report_type'] == 'fpr':
             self.importer = FortifyFPRImporter()
-        elif file_extension == '.fvdl':
+        elif self.config['report_type'] == 'fvdl':
             self.importer = FortifyFVDLImporter()
         else:
-            raise FortifyIntegrationError("Unsupported file type (%s)" % file_extension)
+            raise FortifyIntegrationError("Unsupported file type (%s)" % self.config['report_type'])
 
-        self.importer.parse(self.config['report_xml'])
+        self.importer.parse(self.config['report_file'])
         self.raw_findings = self.importer.raw_findings
         self.report_id = self.importer.report_id
 
         if not self.report_id:
-            raise FortifyIntegrationError("Report ID not found in report file (%s)" % self.config['report_xml'])
+            raise FortifyIntegrationError("Report ID not found in report file")
 
     def _make_finding(self, item):
         return {'weakness_id': item['id'], 'description': item['description'], 'count': item['count']}
