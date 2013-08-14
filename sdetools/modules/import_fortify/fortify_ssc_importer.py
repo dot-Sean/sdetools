@@ -8,6 +8,7 @@ import logging
 import tempfile
 import xml.parsers.expat
 import socket
+from suds.plugin import MessagePlugin
 
 logging.getLogger('suds').setLevel(logging.WARNING)
 
@@ -19,6 +20,15 @@ from sdetools.modules.import_fortify.fortify_fpr_importer import FortifyFPRImpor
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
+class TokenPlugin(MessagePlugin):
+
+    def __init__(self, token_value):
+        self.auth_token=token_value
+
+    def marshalled(self, context):
+        header = context.envelope.getChild('Header')
+        header.set('xmlns:axis2ns1', 'www.fortify.com/schema')
+        header.set('axis2ns1:token', self.auth_token)
 
 class FortifySSCImporter(BaseImporter):
 
@@ -30,14 +40,21 @@ class FortifySSCImporter(BaseImporter):
     def _get_ssc_client(self):
 
         security = suds.wsse.Security()
-        token = suds.wsse.UsernameToken(self.config['ssc_user'], self.config['ssc_pass'])
+        
+        suds_plugins = []
+
+        if self.config['ssc_authtoken']:
+            token = suds.wsse.UsernameToken('', '')
+            suds_plugins.append(TokenPlugin(self.config['ssc_authtoken']))
+        else:
+            token = suds.wsse.UsernameToken(self.config['ssc_user'], self.config['ssc_pass'])
         security.tokens.append(token)
         
         try:
             client = suds.client.Client("%s/fws.wsdl" % self.soap_endpoint, 
                 autoblend=True,
                 location=self.soap_endpoint,
-                wsse=security)
+                wsse=security,plugins=suds_plugins)
         except (xml.parsers.expat.ExpatError, socket.error, urllib2.URLError), err:
             raise FortifyIntegrationError('Error talking to Fortify SSC service. Please check server URL. Reason: %s' % err)
 

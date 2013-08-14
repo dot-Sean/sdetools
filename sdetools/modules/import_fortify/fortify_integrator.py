@@ -32,6 +32,7 @@ class FortifyIntegrator(BaseIntegrator):
         config.add_custom_option('ssc_server','Fortify SSC server name or IP', default='')
         config.add_custom_option('ssc_user','Fortify SSC user',default='')
         config.add_custom_option('ssc_pass','Fortify SSC password',default='')
+        config.add_custom_option('ssc_authtoken','Fortify SSC authtoken (AnalysisDownloadToken permission)',default='')
         config.add_custom_option('ssc_project_name','Fortify Project name',default='')
         config.add_custom_option('ssc_project_version','Fortify Project version',default='')
         
@@ -44,11 +45,15 @@ class FortifyIntegrator(BaseIntegrator):
         if self.config['integration_mode'] == 'ssc':
             self.config.process_boolean_config('ssc_test_connection')
 
-            config_keys = ['ssc_method','ssc_server','ssc_user','ssc_pass','ssc_project_name','ssc_project_version']
-            for config_key in config_keys:
+            for config_key in ['ssc_method','ssc_server','ssc_project_name','ssc_project_version']:
                 if not self.config[config_key]:
                     raise commons.UsageError("Missing value for option %s" % config_key)
 
+            if not self.config['ssc_authtoken']:
+                for config_key in ['ssc_user','ssc_pass']:
+                    if not self.config[config_key]:
+                        raise commons.UsageError("Missing value for option %s" % config_key)
+            
         elif self.config['integration_mode'] == 'file':        
             if not self.config['file_results']:
                 raise commons.UsageError("Missing value for option file_results")
