@@ -45,11 +45,14 @@ class BaseXMLImporter(BaseImporter):
         """
         pass
 
-    def parse(self, file_name):        
-        try:    
-            fp = open(file_name, 'r')
-        except IOError, ioe:
-            raise IntegrationError("Could not open file '%s': %s" % (file_name, ioe))
+    def parse(self, file_name):
+        if isinstance(file_name, basestring):
+            try:
+                fp = open(file_name, 'r')
+            except IOError, ioe:
+                raise IntegrationError("Could not open file '%s': %s" % (file_name, ioe))
+        else:
+            fp = file_name
         self.parse_file(fp)
 
     def parse_file(self, xml_file):
