@@ -39,13 +39,21 @@ class BaseXMLImporter(BaseImporter):
 
     @abstractmethod
     def _get_content_handler(self):
+        """
+        Returns a customizable XML Reader that can extract information as
+        the parse goes through the file
+        """
         pass
 
-    def parse(self, file_name):        
-        try:    
-            self.parse_file(open(file_name, 'r'))
-        except IOError, ioe:
-            raise IntegrationError("Could not open file '%s': %s" % (file_name, ioe))
+    def parse(self, file_name):
+        if isinstance(file_name, basestring):
+            try:
+                fp = open(file_name, 'r')
+            except IOError, ioe:
+                raise IntegrationError("Could not open file '%s': %s" % (file_name, ioe))
+        else:
+            fp = file_name
+        self.parse_file(fp)
 
     def parse_file(self, xml_file):
         XMLReader = self._get_content_handler()
@@ -90,6 +98,15 @@ class BaseIntegrator(object):
                 "Only update tasks identified having flaws. (True | False)", "z", "False")
         self.config.add_custom_option("trial_run",
                 "Trial run only: 'True' or 'False'", "t", "False")
+
+    def initialize(self):
+        """
+        This is a post init initialization. It needs to be called as the first
+        function after configuration is processed (usually first call inside handler of
+        the module)
+        """
+        self.config.process_boolean_config('flaws_only')
+        self.config.process_boolean_config('trial_run')
 
     def load_mapping_from_xml(self):
         try:
@@ -174,8 +191,6 @@ class BaseIntegrator(object):
         return False
 
     def import_findings(self):
-        commit = (self.config['trial_run'] != 'True')
-
         stats_failures_added = 0
         stats_api_errors = 0
         stats_total_skips = 0
@@ -187,7 +202,7 @@ class BaseIntegrator(object):
         logger.info("Mapped SD application/project: %s/%s" % 
             (self.config['sde_application'], self.config['sde_project']))
 
-        if not commit:
+        if self.config['trial_run']:
             logger.info("Trial run only. No changes will be made")
         else:
             ret = self.plugin.add_project_analysis_note(self.report_id, self.TOOL_NAME)
@@ -274,7 +289,7 @@ class BaseIntegrator(object):
                 if self.confidence.has_key(task_id):
                     finding_confidence = self.confidence[task_id]
 
-                if commit:
+                if not self.config['trial_run']:
                     ret = self.plugin.add_analysis_note(task_name, project_analysis_note_ref, 
                             finding_confidence, analysis_findings)
                 logger.debug("Marked %s as FAILURE with %s confidence" % (task_name, finding_confidence))
@@ -284,14 +299,14 @@ class BaseIntegrator(object):
                 self.emit.error("API Error: Unable to mark %s as FAILURE. Skipping ..." % (task_name))
                 stats_api_errors += 1
 
-        stats_passes_added=0
-        stats_test_tasks=0
+        stats_passes_added = 0
+        stats_test_tasks = 0
 
         affected_tasks = []
         noflaw_tasks = []
         for task in task_list:
             if(task['phase'] in self.phase_exceptions):
-                stats_test_tasks+=1
+                stats_test_tasks += 1
                 continue
             task_search = re.search('^(\d+)-[^\d]+(\d+)$', task['id'])
             if task_search:
@@ -301,7 +316,7 @@ class BaseIntegrator(object):
                     continue
             noflaw_tasks.append(task_id)
 
-        if self.config['flaws_only'] == 'False':
+        if not self.config['flaws_only']:
             for task_id in noflaw_tasks:
 
                 task_name = "T%s" % task_id
@@ -313,7 +328,7 @@ class BaseIntegrator(object):
                     continue
 
                 try:
-                    if commit:
+                    if not self.config['trial_run']:
                         analysis_findings = []
 
                         self.plugin.add_analysis_note(task_name, project_analysis_note_ref, 

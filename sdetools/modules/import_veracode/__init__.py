@@ -8,6 +8,7 @@ class Command(BaseCommand):
         self.vc_integrator = veracode_integrator.VeracodeIntegrator(self.config)
 
     def handle(self):
+        self.vc_integrator.initialize()
         self.vc_integrator.load_mapping_from_xml()
         self.vc_integrator.parse()
         self.emit.info('Finding file parsed successfully. Starting the import')
