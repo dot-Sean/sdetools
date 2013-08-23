@@ -31,7 +31,7 @@ class FortifyFPRImporter(BaseImporter):
 
         if file_info.file_size > self.MAX_SIZE_IN_MB * 1024 * 1024:
             raise FortifyIntegrationError("File %s is larger than %s MB: %d bytes" %
-                    (self.MAX_SIZE_IN_MB, self.AUDIT_FILE, file_info.file_size))
+                    (self.AUDIT_FILE, self.MAX_SIZE_IN_MB, file_info.file_size))
 
         # Python 2.6+ can open a ZIP file entry as a stream
         if hasattr(fpr_file, 'open'):
