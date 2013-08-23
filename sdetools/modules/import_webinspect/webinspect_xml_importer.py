@@ -50,7 +50,7 @@ class WebInspectXMLContent(xml.sax.handler.ContentHandler):
         if self.in_issue_node and name == 'Issue':
             self.in_issue_node = False
             self.check_name_found = False
-        if self.in_issue_node and self.in_vuln_node and name == 'VulnerabilityID':
+        elif self.in_issue_node and self.in_vuln_node and name == 'VulnerabilityID':
             self.in_vuln_node = False
         elif self.in_issue_node and self.in_issue_name_node and name == 'Name':
             self.in_issue_name_node = False

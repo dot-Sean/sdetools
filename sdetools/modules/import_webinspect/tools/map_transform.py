@@ -67,6 +67,8 @@ class Mapping:
         task_map = {}
         nomap = {}
 
+        task_map['193'] = [ {'check_id':'*', 'check_name': 'Unmapped Check'} ]
+
         keys = sorted(self.cwe_checks.iterkeys())
         for cwe in keys:
             if self.mapping.has_key(cwe):
@@ -98,37 +100,69 @@ class Mapping:
                     task_map[task] = task_checks
         self.task_map = task_map
 
-    def output_mapping(self):
+    def output_mapping(self, file_name):
+        fp = open(file_name, "w")
         keys = sorted(self.task_map.iterkeys())
-        print '<mapping weaknesses="%d">' % len(self.checks)
+        fp.write('<mapping weaknesses="%d">\n' % len(self.checks))
         for task_id in keys:
             task_checks = self.task_map[task_id]
-            print '\t<task id="%s" title="%s" >'%(task_id, self.base_tasks[task_id].attributes['title'].value)
+            fp.write('\t<task id="%s" title="%s" >\n'%(task_id, self.base_tasks[task_id].attributes['title'].value))
             task_checks = sorted(task_checks)
             for weakness in task_checks:
-                print '\t\t<weakness type="check" id="%s" title="%s" />'% (weakness['check_id'], weakness['check_name'])
-            print '\t</task>'
-        print '</mapping>'
-    def output_missing_checks(self):
+                fp.write('\t\t<weakness type="check" id="%s" title="%s" />\n'% (weakness['check_id'], weakness['check_name']))
+            fp.write('\t</task>\n')
+        fp.write('</mapping>\n')
+        fp.close()
+
+    def find_missing_checks(self):
         keys = sorted(self.task_map.iterkeys())
-        #print self.cwe_checks['79']
-        #print self.task_map['36']
+        missing_checks = False
         for check in self.checks:
             check_found = False
             for task_id in keys:
                 task_checks = self.task_map[task_id]
                 for task_check in task_checks:
-                    if int(check) == int(task_check['check_id']):
+                    if check == task_check['check_id']:
                          check_found = True
             if not check_found:
-                print "Check %s missing" % check
+                print "*** Check %s is not mapped" % check
+                missing_checks = True
+        return missing_checks
 
 def main(argv):
+
+    usage = "Usage: %s <base mapping> <webinspect checks> <webinspect map>\n" % (argv[0])
+
+    if len(argv) == 2 and argv[1] == 'help':
+        print usage
+        print "base mapping: (input) docs/base_cwe/sde_cwe_map.xml"
+        print "webinspect checks: (input) WebInspect checks in xml format [i.e. webinspect_checks.xml]"
+        print "webinspect map: (output) WebInspect map file"
+        sys.exit(0)
+    elif len(argv) < 4:
+        print usage
+        sys.exit(1)
+
     base = Mapping()
+
+    print "Loading CWE map..."
     base.load_base_mapping_from_xml(argv[1])
+    
+    print "Loading WebInspect Checks..."    
     base.load_weaknesses_from_xml(argv[2])
+    
+    print "Re-mapping Checks..."
     base.remap()
-    base.output_mapping()
+    
+    print "Validating..."
+    if base.find_missing_checks():
+        print "Aborted"
+        sys.exit(1)
+        
+    print "Outputting WebInspect map to %s..." % argv[3]
+    base.output_mapping(argv[3])
+
+    print "Done."        
 
 if __name__ == "__main__":
     main(sys.argv)
