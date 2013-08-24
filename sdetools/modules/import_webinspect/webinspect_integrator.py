@@ -12,7 +12,7 @@ class WebInspectIntegrationError(IntegrationError):
     pass
 
 class WebInspectIntegrator(BaseIntegrator):
-    TOOL_NAME = "fortify"
+    TOOL_NAME = "webinspect"
 
     def __init__(self, config):
         config.add_custom_option("report_file", "WebInspect Report File", "x", None)
