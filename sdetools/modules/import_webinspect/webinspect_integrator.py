@@ -40,8 +40,8 @@ class WebInspectIntegrator(BaseIntegrator):
         self.raw_findings = self.importer.raw_findings
         self.report_id = self.importer.report_id
 
-        if self.report_id is None or self.report_id == "":
-            raise WebInspectIntegrationError("Report ID not found in report file (%s)" % self.config['report_file'])
+        if not self.report_id:
+            raise WebInspectIntegrationError("Report ID not found in report file")
 
     def _make_finding(self, item):
         return {'weakness_id': item['id'], 'description': item['description'], 'type': item['type']}
