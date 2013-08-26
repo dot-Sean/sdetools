@@ -66,7 +66,8 @@ class BaseXMLImporter(BaseImporter):
             raise IntegrationError("Could not parse file '%s': %s" % (xml_file, se))
         
         self.raw_findings = XMLReader.raw_findings
-        self.report_id = XMLReader.report_id   
+        if XMLReader.report_id:
+            self.report_id = XMLReader.report_id   
         
     def parse_string(self, xml):
         XMLReader = self._get_content_handler()
@@ -77,7 +78,8 @@ class BaseXMLImporter(BaseImporter):
             raise IntegrationError("Could not parse file '%s': %s" % (xml_file, se))
         
         self.raw_findings = XMLReader.raw_findings
-        self.report_id = XMLReader.report_id
+        if XMLReader.report_id:
+            self.report_id = XMLReader.report_id   
         
 class BaseIntegrator(object):
     TOOL_NAME = 'External tool'
@@ -86,7 +88,7 @@ class BaseIntegrator(object):
         self.findings = []
         self.phase_exceptions = ['testing']
         self.mapping = {}
-        self.report_id = ""
+        self.report_id = "Not specified"
         self.config = config
         self.emit = self.config.emit
         self.weakness_title = {}
