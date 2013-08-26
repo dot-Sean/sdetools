@@ -13,7 +13,8 @@ class Command(BaseCommand):
     help = 'JIRA <-> SDE sync utility.'
 
     def configure(self):
-        self.config.add_custom_option('jira_version', 'Version of JIRA [4 or 5]', default='5')
+        self.config.add_custom_option('jira_version', 'Version of JIRA [e.g. 4.3.3, 5, or 6.0]', 
+                default='6')
 
         # We start with REST to get configuration and other stuff right
         # Then we switch to SOAP for JIRA 4 if we need to
@@ -22,8 +23,8 @@ class Command(BaseCommand):
 
     def handle(self):
         api_ver = self.config['jira_version'][:1]
-        if api_ver not in ['4', '5']:
-            raise AlmException('Only JIRA versions 4.4 and 5 are supported')
+        if api_ver not in ['4', '5', '6']:
+            raise AlmException('Only JIRA versions 4.3.3 and up are supported')
         self.config.jira_api_ver = int(api_ver)
 
         if self.config.jira_api_ver == 4:
