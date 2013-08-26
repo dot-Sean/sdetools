@@ -8,6 +8,7 @@ class Command(BaseCommand):
         self.wi_integrator = webinspect_integrator.WebInspectIntegrator(self.config)
 
     def handle(self):
+        self.wi_integrator.initialize()
         self.wi_integrator.load_mapping_from_xml()
         self.wi_integrator.parse()
         self.emit.info('Finding file parsed successfully. Starting the import')

@@ -8,6 +8,7 @@ class Command(BaseCommand):
         self.as_integrator = appscan_integrator.AppScanIntegrator(self.config)
 
     def handle(self):
+        self.as_integrator.initialize()
         self.as_integrator.load_mapping_from_xml()
         self.as_integrator.parse()
         self.emit.info('Finding file parsed successfully. Starting the import')
