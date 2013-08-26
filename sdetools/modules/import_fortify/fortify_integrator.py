@@ -47,6 +47,8 @@ class FortifyIntegrator(BaseIntegrator):
 
         if self.importer.report_id:
             self.report_id = self.importer.report_id
+        else:
+            logger.info("Report ID not found in report")
 
     def _make_finding(self, item):
         return {'weakness_id': item['id'], 'description': item['description'], 'count': item['count']}
