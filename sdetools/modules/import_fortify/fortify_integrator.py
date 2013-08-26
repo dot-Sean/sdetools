@@ -44,10 +44,9 @@ class FortifyIntegrator(BaseIntegrator):
 
         self.importer.parse(self.config['report_file'])
         self.raw_findings = self.importer.raw_findings
-        self.report_id = self.importer.report_id
 
-        if not self.report_id:
-            raise FortifyIntegrationError("Report ID not found in report file")
+        if self.importer.report_id:
+            self.report_id = self.importer.report_id
 
     def _make_finding(self, item):
         return {'weakness_id': item['id'], 'description': item['description'], 'count': item['count']}
