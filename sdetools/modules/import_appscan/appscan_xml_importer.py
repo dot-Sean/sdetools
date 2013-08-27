@@ -14,16 +14,16 @@ class AppScanXMLContent(ContentHandler):
         self.raw_findings = []
         self.count = 0
         self.report_id = ""
+        self.check_id = ""
 
     def processingInstruction(self, target, data):
         pass
 
     def startElement(self, name, attrs):
         if name == 'IssueType':
-            # <IssueType ID="attCrossSiteScripting" Count="10">
             self.in_issuetype_node = True
             self.count = int(attrs['Count'])
-            # collect Count attribute value
+            self.check_id = attrs['ID']
         elif self.in_issuetype_node and name == 'advisory':
             self.in_issuetype_advisory_node = True
         elif self.in_issuetype_advisory_node and name == 'threatClassification':
@@ -39,20 +39,22 @@ class AppScanXMLContent(ContentHandler):
     def characters(self, data):
         if self.in_issuetype_advisory_threatclass_name_node:
             entry = {}
-            entry['id'] = data
+            entry['id'] = self.check_id
             entry['count'] = self.count
             entry['description'] = data
+
             self.raw_findings.append(entry)
             
-            # reset count
+            # reset
             self.count = 0
+            self.check_id = ""
 
     def endElement(self, name):
         if self.in_issuetype_node and name == 'IssueType':
             self.in_issuetype_node = False
-        if self.in_issuetype_advisory_node and name == 'advisory':
+        elif self.in_issuetype_advisory_node and name == 'advisory':
             self.in_issuetype_advisory_node = False
-        if self.in_issuetype_advisory_threatclass_node and name == 'threatClassification':
+        elif self.in_issuetype_advisory_threatclass_node and name == 'threatClassification':
             self.in_issuetype_advisory_threatclass_node = False
         elif self.in_issuetype_advisory_threatclass_node and name == 'name':
             self.in_issuetype_advisory_threatclass_name_node = False
