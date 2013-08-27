@@ -4,6 +4,9 @@ from sdetools.sdelib import commons
 from sdetools.analysis_integration.base_integrator import BaseIntegrator, IntegrationError
 from sdetools.modules.import_appscan.appscan_xml_importer import AppScanXMLContent, AppScanXMLImporter
 
+from sdetools.sdelib import log_mgr
+logger = log_mgr.mods.add_mod(__name__)
+
 __all__ = ['AppScanIntegrator']
 
 DEFAULT_MAPPING_FILE = os.path.join(commons.media_path, 'appscan', 'sde_appscan_map.xml')
