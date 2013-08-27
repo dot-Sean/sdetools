@@ -8,6 +8,9 @@ from sdetools.modules.import_fortify.fortify_report_importer import FortifyRepor
 from sdetools.modules.import_fortify.fortify_fpr_importer import FortifyFPRImporter
 from sdetools.modules.import_fortify.fortify_fvdl_importer import FortifyFVDLImporter
 
+from sdetools.sdelib import log_mgr
+logger = log_mgr.mods.add_mod(__name__)
+
 __all__ = ['FortifyIntegrator']
 
 DEFAULT_MAPPING_FILE = os.path.join(media_path, 'fortify', 'sde_fortify_map.xml')

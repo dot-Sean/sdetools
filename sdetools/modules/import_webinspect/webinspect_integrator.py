@@ -3,6 +3,7 @@ import os
 from sdetools.sdelib.commons import media_path, UsageError
 from sdetools.analysis_integration.base_integrator import BaseIntegrator, IntegrationError
 from sdetools.modules.import_webinspect.webinspect_xml_importer import WebInspectXMLImporter
+
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
