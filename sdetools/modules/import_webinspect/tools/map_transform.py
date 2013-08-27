@@ -78,6 +78,11 @@ class Mapping:
                     if task_map.has_key(task):
                         task_checks = task_map[task]
                     for check in self.cwe_checks[cwe]:
+                    
+                        # If the check is assigned elsewhere do not put it in the catch-all task
+                        if task == '193' and self.check_mapped(task_map, check['check_id']):
+                            continue
+
                         task_mapping_found = False
                         for task_check in task_checks:
                             if task_check['check_id'] == check['check_id']:
@@ -92,6 +97,11 @@ class Mapping:
                     if task_map.has_key(task):
                         task_checks = task_map[task]
                     for check in self.cwe_checks[cwe]:
+
+                        # If the check is assigned elsewhere do not put it in the catch-all task
+                        if self.check_mapped(task_map, check['check_id']):
+                            continue
+                    
                         for chk in task_checks:
                             if chk['check_id'] == check['check_id']:
                                 task_mapping_found = True
@@ -114,18 +124,22 @@ class Mapping:
         fp.write('</mapping>\n')
         fp.close()
 
+    def check_mapped(self, task_map, check_id):
+        check_found = False
+        keys = task_map.iterkeys()
+
+        for task_id in keys:
+            task_checks = task_map[task_id]
+            for task_check in task_checks:
+                if check_id == task_check['check_id']:
+                     return True
+        return check_found
+    
     def find_missing_checks(self):
-        keys = sorted(self.task_map.iterkeys())
         missing_checks = False
-        for check in self.checks:
-            check_found = False
-            for task_id in keys:
-                task_checks = self.task_map[task_id]
-                for task_check in task_checks:
-                    if check == task_check['check_id']:
-                         check_found = True
-            if not check_found:
-                print "*** Check %s is not mapped" % check
+        for check_id in self.checks:
+            if not self.check_mapped(self.task_map, check_id):
+                print "*** Check %s is not mapped" % check_id
                 missing_checks = True
         return missing_checks
 

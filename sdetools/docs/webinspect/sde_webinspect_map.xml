@@ -484,28 +484,14 @@
 	</task>
 	<task id="193" title="Review non-categorized/miscellaneous findings from static code analysis" >
 		<weakness type="check" id="*" title="Unmapped Check" />
-		<weakness type="check" id="10044" title="HTML Tag Injection" />
 		<weakness type="check" id="10051" title="Directory (assets)" />
 		<weakness type="check" id="10052" title="Directory (srcview)" />
 		<weakness type="check" id="10056" title="Netscape Enterprise Server Directory Contents Disclosure" />
-		<weakness type="check" id="10093" title="Caudium Web Server Denial of Service" />
-		<weakness type="check" id="10096" title="Macallan Mail Solution Denial of Service" />
-		<weakness type="check" id="10098" title="WhatsUp Gold Web Interface Denial of Service" />
-		<weakness type="check" id="10101" title="Jeuce Personal Web Server Denial of Service" />
-		<weakness type="check" id="10167" title="Password in Query or Cookie Data" />
 		<weakness type="check" id="10172" title="Directory (plesk-stat)" />
 		<weakness type="check" id="10173" title="Directory (plesk-stat/webstat)" />
 		<weakness type="check" id="10177" title="Test Application (wm.cgi)" />
 		<weakness type="check" id="10185" title="Directory (tst)" />
-		<weakness type="check" id="10189" title="PHP Nested Array Denial Of Service" />
 		<weakness type="check" id="10194" title="Directory (jsp-examples)" />
-		<weakness type="check" id="10199" title="Universal Arbitrary Command Execution (Backticks)" />
-		<weakness type="check" id="10200" title="Universal Arbitrary Command Execution (NULL)" />
-		<weakness type="check" id="10201" title="Universal Arbitrary Command Execution (Newline)" />
-		<weakness type="check" id="10202" title="Universal Arbitrary Command Execution (Pipe/Ampersand)" />
-		<weakness type="check" id="10203" title="Universal Arbitrary Command Execution (Pipe/Ampersand/Single Quote)" />
-		<weakness type="check" id="10204" title="Universal Arbitrary Command Execution (Pipe/Ampersand/Double Quote)" />
-		<weakness type="check" id="10205" title="Universal Arbitrary Command Execution (Ampersand/Pipe)" />
 		<weakness type="check" id="10209" title="FrontPage-Related Directories" />
 		<weakness type="check" id="10210" title="Administrative Directories" />
 		<weakness type="check" id="10211" title="Backup-Related Directories" />
@@ -534,33 +520,18 @@
 		<weakness type="check" id="10234" title="Unix-Related Directories" />
 		<weakness type="check" id="10235" title="Web Application Common Directories" />
 		<weakness type="check" id="10236" title="Websphere Directories" />
-		<weakness type="check" id="10253" title="Possible Parameter Based Buffer Overflow (70 bytes)" />
-		<weakness type="check" id="10254" title="Possible Parameter Based Buffer Overflow (270 bytes)" />
 		<weakness type="check" id="10255" title="Minb User Database Disclosure" />
-		<weakness type="check" id="10273" title="Warning: IIS Server Overloaded" />
 		<weakness type="check" id="10274" title="Proxy CONNECT Access" />
 		<weakness type="check" id="10275" title="Proxy GET Access" />
-		<weakness type="check" id="10287" title="Local File Include" />
-		<weakness type="check" id="10295" title="BadBlue PassThru Denial of Service" />
-		<weakness type="check" id="10321" title="ColdFusion Default Web Application (cfm)" />
-		<weakness type="check" id="10322" title="ColdFusion Default Web Application (mdb)" />
-		<weakness type="check" id="10335" title="WordPress Footnotes Plugin Administration Page Authentication Bypass" />
-		<weakness type="check" id="10342" title="Common Documentation Text Files" />
-		<weakness type="check" id="10343" title="Additional Common Documentation Text Files" />
-		<weakness type="check" id="10347" title="Common Documentation HTML Files" />
 		<weakness type="check" id="10375" title="Snitz Forums Database Disclosure" />
 		<weakness type="check" id="10423" title="Common Application Test Files" />
 		<weakness type="check" id="10463" title="PHP Login Application" />
 		<weakness type="check" id="10493" title="Mole Settings Pages Authentication Bypass" />
-		<weakness type="check" id="10506" title="Apache Header Line Abort Denial of Service" />
 		<weakness type="check" id="10512" title="HTTP Basic Logins Sent Over Unencrypted Connection" />
-		<weakness type="check" id="10541" title="WSDL File Discovered (asmx)" />
 		<weakness type="check" id="10542" title="WSDL File Discovered " />
-		<weakness type="check" id="10551" title="Possible Username or Password Disclosure" />
 		<weakness type="check" id="10562" title="eLineStudio Site Composer folderdel_.asp File Deletion Vulnerability" />
 		<weakness type="check" id="10564" title="eLineStudio Site Composer foldernew.asp Folder Creation Vulnerability" />
 		<weakness type="check" id="10595" title="Unencrypted Login Form" />
-		<weakness type="check" id="10666" title="Oracle Application Server Portal Authentication Bypass" />
 		<weakness type="check" id="10675" title="Questionable Material Directories" />
 		<weakness type="check" id="10687" title="Application Probing: General PHP" />
 		<weakness type="check" id="107" title="Directory (bdatos)" />
@@ -571,8 +542,6 @@
 		<weakness type="check" id="10830" title="&amp;quot;Adm&amp;quot; Directory" />
 		<weakness type="check" id="10831" title="&amp;quot;phpMyAdmin&amp;quot; Directory" />
 		<weakness type="check" id="10832" title="&amp;quot;phpPgAdmin&amp;quot; Directory" />
-		<weakness type="check" id="10845" title="Possible XPath Query" />
-		<weakness type="check" id="10854" title="IIS General Authentication Bypass" />
 		<weakness type="check" id="10876" title="Directory Probing: /tmp" />
 		<weakness type="check" id="10877" title="Directory Probing: Index File Names" />
 		<weakness type="check" id="10879" title="Directory Probing: /temp" />
@@ -584,24 +553,18 @@
 		<weakness type="check" id="10889" title="Directory Probing: Statistics Directories" />
 		<weakness type="check" id="109" title="Directory (bin)" />
 		<weakness type="check" id="10930" title="Application Probing: /WEB-INF/" />
-		<weakness type="check" id="10932" title="Server Error Response" />
 		<weakness type="check" id="10942" title="SSLv3/TLS Renegotiation Stream Injection" />
 		<weakness type="check" id="10944" title="ASP.NET Proxy Script Debug Version Detected" />
-		<weakness type="check" id="10958" title="FCKeditor 'CurrentFolder' Parameter Directory Traversal" />
-		<weakness type="check" id="10965" title="User Data in Query or Cookie" />
 		<weakness type="check" id="10972" title="DotNetNuke Arbitrary File Upload" />
 		<weakness type="check" id="10974" title="File Probing: WebResource.axd" />
 		<weakness type="check" id="10978" title="Joomla's Contact Component Spam Vulnerability" />
-		<weakness type="check" id="10988" title="Java Double-precision Parsing Denial of Service" />
 		<weakness type="check" id="110" title="Directory (boot)" />
 		<weakness type="check" id="111" title="Directory (bug)" />
 		<weakness type="check" id="112" title="Directory (bugs)" />
-		<weakness type="check" id="11200" title="PHP Double-precision Parsing Denial of Service" />
 		<weakness type="check" id="11273" title="Apache HTTPD Range Header Denial of Service" />
 		<weakness type="check" id="11293" title="Cross-Frame Scripting" />
 		<weakness type="check" id="11294" title="Weak Cross-Frame Scripting Protection" />
 		<weakness type="check" id="11296" title="Form Validation Disabled " />
-		<weakness type="check" id="113" title="Directory (buy)" />
 		<weakness type="check" id="11331" title="Ruby XML YAML Remote Code Execution " />
 		<weakness type="check" id="114" title="Directory (buynow)" />
 		<weakness type="check" id="115" title="Directory (c)" />
@@ -623,7 +586,6 @@
 		<weakness type="check" id="131" title="Directory (cfide)" />
 		<weakness type="check" id="132" title="Directory (cgi)" />
 		<weakness type="check" id="133" title="Directory (cgi-bin)" />
-		<weakness type="check" id="1385" title="ColdFusion Error Message" />
 		<weakness type="check" id="1387" title="Directory (stats)" />
 		<weakness type="check" id="140" title="Directory (cgi-weddico)" />
 		<weakness type="check" id="141" title="Directory (class)" />
@@ -635,15 +597,6 @@
 		<weakness type="check" id="1431" title="Directory (~webstats)" />
 		<weakness type="check" id="1433" title="Directory (webdb)" />
 		<weakness type="check" id="1434" title="Directory (datafiles)" />
-		<weakness type="check" id="1435" title="Shell Error Message" />
-		<weakness type="check" id="1436" title="Shell Error Message" />
-		<weakness type="check" id="144" title="IIS ism.dll Multiple Possible Vulnerabilities" />
-		<weakness type="check" id="1442" title="SMTP Web Application Multiple Possible Vulnerabilities (clemail.exe)" />
-		<weakness type="check" id="1443" title="SMTP Web Application Multiple Possible Vulnerabilities (comments.exe)" />
-		<weakness type="check" id="1444" title="SMTP Web Application Multiple Possible Vulnerabilities (Formvar.exe)" />
-		<weakness type="check" id="1445" title="SMTP Web Application Multiple Possible Vulnerabilities (gbmail.exe)" />
-		<weakness type="check" id="1446" title="SMTP Web Application Multiple Possible Vulnerabilities (mailform.exe)" />
-		<weakness type="check" id="1451" title="Shell Error Message" />
 		<weakness type="check" id="1479" title="Directory (activex)" />
 		<weakness type="check" id="1480" title="Directory (global)" />
 		<weakness type="check" id="1481" title="Directory (save)" />
@@ -661,7 +614,6 @@
 		<weakness type="check" id="1493" title="Directory (priv)" />
 		<weakness type="check" id="1494" title="Directory (includes)" />
 		<weakness type="check" id="1495" title="Directory (internal)" />
-		<weakness type="check" id="1498" title="Exception Error Message" />
 		<weakness type="check" id="15" title="Directory (bkup)" />
 		<weakness type="check" id="1501" title="Directory (_errors)" />
 		<weakness type="check" id="1502" title="Directory (_tests)" />
@@ -670,7 +622,6 @@
 		<weakness type="check" id="1505" title="Directory (objects)" />
 		<weakness type="check" id="1506" title="Directory (csr)" />
 		<weakness type="check" id="1507" title="Directory (xml)" />
-		<weakness type="check" id="1508" title="Directory (_passwords)" />
 		<weakness type="check" id="1521" title="Directory (durep)" />
 		<weakness type="check" id="1522" title="Directory (mysql)" />
 		<weakness type="check" id="1523" title="Directory (administration)" />
@@ -796,11 +747,8 @@
 		<weakness type="check" id="1643" title="Directory (/W3SVC99/)" />
 		<weakness type="check" id="1644" title="Directory (/W3SVC100/)" />
 		<weakness type="check" id="165" title="Directory (conecta)" />
-		<weakness type="check" id="166" title="Directory (conf)" />
-		<weakness type="check" id="167" title="Directory (config)" />
 		<weakness type="check" id="168" title="Directory (connect)" />
 		<weakness type="check" id="169" title="Directory (correo)" />
-		<weakness type="check" id="17" title="Netscape Enterprise Server Directory Contents Disclosure" />
 		<weakness type="check" id="170" title="Directory (counter)" />
 		<weakness type="check" id="171" title="Directory (credit)" />
 		<weakness type="check" id="172" title="Directory (crypto)" />
@@ -813,120 +761,67 @@
 		<weakness type="check" id="1810" title="Directory (mysql_admin)" />
 		<weakness type="check" id="183" title="Directory (dat)" />
 		<weakness type="check" id="184" title="Directory (data)" />
-		<weakness type="check" id="1847" title="News Desk Arbitrary Command Execution" />
 		<weakness type="check" id="1848" title="Directory (jslib)" />
 		<weakness type="check" id="185" title="Directory (database)" />
-		<weakness type="check" id="1874" title="OmniHTTPD Temp File Creation Potential DOS Attack" />
-		<weakness type="check" id="1875" title="Af.cgi Application" />
 		<weakness type="check" id="188" title="Directory (dato)" />
-		<weakness type="check" id="1885" title="Unlg1.1 Application" />
-		<weakness type="check" id="1886" title="Unlg1.2 Application" />
 		<weakness type="check" id="1887" title="Directory (mp3s)" />
 		<weakness type="check" id="1889" title="Cobalt RaQ siteUserMod.cgi Privilege Escalation " />
 		<weakness type="check" id="189" title="Directory (datos)" />
-		<weakness type="check" id="1893" title="Allmanage Administrative Password Reveal" />
-		<weakness type="check" id="1895" title="SSI Directory Traversal File Access" />
 		<weakness type="check" id="19" title="Directory (_vti_bin)" />
 		<weakness type="check" id="190" title="Directory (db)" />
 		<weakness type="check" id="1903" title="Directory (~root)" />
 		<weakness type="check" id="1908" title="Directory (sysadmin)" />
 		<weakness type="check" id="1909" title="Directory (webcart)" />
 		<weakness type="check" id="191" title="Directory (dbase)" />
-		<weakness type="check" id="1912" title="Submit.cgi Application" />
 		<weakness type="check" id="192" title="Directory (ddreport)" />
 		<weakness type="check" id="1928" title="Sambar Administrative Interface" />
 		<weakness type="check" id="1929" title="Trend Micro OfficeScan Administration" />
 		<weakness type="check" id="193" title="Directory (demo)" />
 		<weakness type="check" id="1930" title="Frontpage Server Extensions Exploit" />
-		<weakness type="check" id="1933" title="Import.txt" />
-		<weakness type="check" id="1936" title="Check.txt Issue" />
-		<weakness type="check" id="1937" title="Checks.txt Issue" />
 		<weakness type="check" id="1938" title="FrontPage Server Extensions Administration Interface (fpadmin.htm)" />
-		<weakness type="check" id="1939" title="Contents.htm Issue" />
 		<weakness type="check" id="194" title="Directory (demos)" />
-		<weakness type="check" id="1940" title="WebSTART%20LOG Issue" />
-		<weakness type="check" id="1941" title="SimpleServer tpgnrock Issue" />
-		<weakness type="check" id="1942" title="Tablebuild.pl Issue" />
-		<weakness type="check" id="1943" title="displayTC.pl Issue" />
-		<weakness type="check" id="1944" title="c_download.cgi Issue" />
-		<weakness type="check" id="1945" title="ntitar.pl Issue" />
-		<weakness type="check" id="1946" title="Enter.cgi Issue" />
 		<weakness type="check" id="195" title="Directory (dir)" />
-		<weakness type="check" id="1951" title="Sambar Arbitrary File Creation/Deletion/Disclosure (echo.bat)" />
-		<weakness type="check" id="1952" title="Sambar Arbitrary File Creation/Deletion/Disclosure (hello.bat)" />
-		<weakness type="check" id="1954" title="fm_shell.asp Issue" />
-		<weakness type="check" id="1955" title="cgiback.cgi Issue" />
-		<weakness type="check" id="1956" title="ColdFusion Server Shutdown" />
 		<weakness type="check" id="196" title="Directory (directory)" />
-		<weakness type="check" id="1964" title="Java Web Server Arbitrary Command Execution" />
 		<weakness type="check" id="197" title="Directory (DMR)" />
-		<weakness type="check" id="1973" title="nlog-smb.cgi Issue" />
 		<weakness type="check" id="1978" title="Cache Manager Administrative Interface" />
-		<weakness type="check" id="1979" title="Admnlogin Issue" />
 		<weakness type="check" id="198" title="Directory (doc)" />
-		<weakness type="check" id="1982" title="Run.exe Issue" />
-		<weakness type="check" id="1983" title="Srchadm Issue" />
-		<weakness type="check" id="1984" title="htmldocs Issue" />
-		<weakness type="check" id="1985" title="Visitor.exe Issue" />
-		<weakness type="check" id="1986" title="Redir.exe Issue" />
-		<weakness type="check" id="1988" title="Stats.prg Issue" />
-		<weakness type="check" id="1989" title="Minimal.exe Issue" />
 		<weakness type="check" id="199" title="Directory (doc-html)" />
-		<weakness type="check" id="1990" title="cgi-lib.pl Exploit" />
 		<weakness type="check" id="200" title="Directory (doc1)" />
 		<weakness type="check" id="201" title="Directory (docs)" />
 		<weakness type="check" id="202" title="Directory (docs1)" />
-		<weakness type="check" id="2026" title="OmniHTTPD Statsconfig Arbitrary Command Execution" />
 		<weakness type="check" id="203" title="Directory (down)" />
 		<weakness type="check" id="204" title="Directory (download)" />
 		<weakness type="check" id="205" title="Directory (downloads)" />
 		<weakness type="check" id="2060" title="Directory (~admin)" />
-		<weakness type="check" id="2061" title="Directory (cgi-bin/.cobalt)" />
-		<weakness type="check" id="2063" title="Formvar.top Multiple Possible Vulnerabilities" />
-		<weakness type="check" id="2064" title="Formvar.ini Multiple Possible Vulnerabilities" />
-		<weakness type="check" id="2065" title="Formvarconfiguration.exe Multiple Possible Vulnerabilities" />
-		<weakness type="check" id="2066" title="Formvar.bot Multiple Possible Vulnerabilities" />
-		<weakness type="check" id="2067" title="comments.txt Multiple Possible Vulnerabilities" />
 		<weakness type="check" id="207" title="Directory (etc)" />
 		<weakness type="check" id="209" title="Directory (example)" />
 		<weakness type="check" id="21" title="Directory (_vti_pvt)" />
 		<weakness type="check" id="210" title="Directory (examples)" />
-		<weakness type="check" id="2100" title="Backup File (Appended .BKUP)" />
 		<weakness type="check" id="211" title="Directory (excel)" />
-		<weakness type="check" id="2111" title="Apache Access Log Information Disclosure (access.log)" />
-		<weakness type="check" id="2113" title="Apache Access Log Information Disclosure (access_log)" />
-		<weakness type="check" id="2117" title="Apache Frontpage Server Extensions author.exe DOS Attack" />
 		<weakness type="check" id="2119" title="Directory (stats-bin-p/reports)" />
 		<weakness type="check" id="212" title="Directory (exe)" />
 		<weakness type="check" id="2127" title="Directory (secure)" />
 		<weakness type="check" id="2128" title="Directory (secured)" />
-		<weakness type="check" id="2129" title="BEA WebLogic Console Administrative Interface Discovery" />
 		<weakness type="check" id="213" title="Directory (fbsd)" />
 		<weakness type="check" id="214" title="Directory (file)" />
 		<weakness type="check" id="215" title="Directory (files)" />
-		<weakness type="check" id="2152" title="Parameter Manipulation Directory Traversal Command Execution (/../../../../../../../../bin/id%00|)" />
 		<weakness type="check" id="216" title="Directory (form)" />
 		<weakness type="check" id="217" title="Directory (forms)" />
 		<weakness type="check" id="2176" title="Directory (~etc)" />
-		<weakness type="check" id="2181" title="calendar_admin.pl Arbitrary Command Execution" />
 		<weakness type="check" id="2183" title="Directory (~var)" />
 		<weakness type="check" id="2184" title="Directory (~bin)" />
 		<weakness type="check" id="2185" title="Directory (~sbin)" />
 		<weakness type="check" id="2186" title="Directory (~usr)" />
 		<weakness type="check" id="2187" title="Directory (~home)" />
 		<weakness type="check" id="2188" title="Directory (~guest)" />
-		<weakness type="check" id="2189" title="Directory (~nobody)" />
 		<weakness type="check" id="219" title="Directory (Forte Examples)" />
-		<weakness type="check" id="2195" title="Pi3Web Buffer Overflow DOS/Path Disclosure" />
 		<weakness type="check" id="2209" title="Directory (userdb)" />
 		<weakness type="check" id="221" title="Directory (forum)" />
 		<weakness type="check" id="2211" title="Directory (.admin)" />
 		<weakness type="check" id="2212" title="Directory (.adm)" />
-		<weakness type="check" id="2214" title="BadBlue Configuration Information Disclosure/DOS Attack" />
 		<weakness type="check" id="222" title="Directory (forums)" />
 		<weakness type="check" id="2223" title="Directory (btauxdir)" />
 		<weakness type="check" id="223" title="Directory (foto)" />
-		<weakness type="check" id="2237" title="AdCycle build.cgi Reconfiguration" />
 		<weakness type="check" id="2239" title="Directory (test)" />
 		<weakness type="check" id="224" title="Directory (fotos)" />
 		<weakness type="check" id="2240" title="Directory (external)" />
@@ -959,11 +854,9 @@
 		<weakness type="check" id="2271" title="Directory (_sharedtemplates)" />
 		<weakness type="check" id="228" title="Directory (guestbook)" />
 		<weakness type="check" id="229" title="Directory (guests)" />
-		<weakness type="check" id="2303" title="Cobalt RaQ networker.cgi Log Information Disclosure " />
 		<weakness type="check" id="2309" title="Arbitrary Server Side Include Execution" />
 		<weakness type="check" id="231" title="Directory (GXApp)" />
 		<weakness type="check" id="232" title="Directory (help)" />
-		<weakness type="check" id="2320" title="Frontpage Server Frontpage Server Extensions htimage.exe Multiple Vulnerabilities" />
 		<weakness type="check" id="233" title="Directory (helpdesk)" />
 		<weakness type="check" id="234" title="Directory (hit_tracker)" />
 		<weakness type="check" id="235" title="Directory (hit_matic)" />
@@ -987,8 +880,6 @@
 		<weakness type="check" id="255" title="Directory (impreso)" />
 		<weakness type="check" id="256" title="Directory (include)" />
 		<weakness type="check" id="257" title="Directory (incoming)" />
-		<weakness type="check" id="258" title="Directory (info)" />
-		<weakness type="check" id="259" title="Directory (information)" />
 		<weakness type="check" id="260" title="Directory (ingresa)" />
 		<weakness type="check" id="261" title="Directory (ingreso)" />
 		<weakness type="check" id="263" title="Directory (install)" />
@@ -1004,7 +895,6 @@
 		<weakness type="check" id="273" title="Directory (lib)" />
 		<weakness type="check" id="274" title="Directory (library)" />
 		<weakness type="check" id="275" title="Directory (libro)" />
-		<weakness type="check" id="2754" title="Apache Access Control List Disclosure (.access)" />
 		<weakness type="check" id="2756" title="Directory (~log)" />
 		<weakness type="check" id="276" title="Directory (linux)" />
 		<weakness type="check" id="277" title="Directory (log)" />
@@ -1024,7 +914,6 @@
 		<weakness type="check" id="2790" title="Directory (cgi-sys)" />
 		<weakness type="check" id="282" title="Directory (logfile)" />
 		<weakness type="check" id="2839" title="phpMyAdmin Arbitrary Command Execution" />
-		<weakness type="check" id="2855" title="Homebet Multiple Possible Vulnerabilities" />
 		<weakness type="check" id="287" title="Directory (logger)" />
 		<weakness type="check" id="289" title="Directory (logging)" />
 		<weakness type="check" id="290" title="Directory (login)" />
@@ -1051,30 +940,21 @@
 		<weakness type="check" id="298" title="Directory (mail)" />
 		<weakness type="check" id="299" title="Directory (mail_log_files)" />
 		<weakness type="check" id="300" title="Directory (manual)" />
-		<weakness type="check" id="3008" title="Forte Examples SQLDemo" />
 		<weakness type="check" id="301" title="Directory (marketing)" />
 		<weakness type="check" id="302" title="Directory (mc-icons)" />
 		<weakness type="check" id="3021" title="Oracle Application Server DAD Administration" />
 		<weakness type="check" id="303" title="Directory (members)" />
 		<weakness type="check" id="3034" title="Directory (soap)" />
-		<weakness type="check" id="3036" title="Oracle Application Server SOAP Administration" />
 		<weakness type="check" id="3037" title="Directory (soapdocs)" />
-		<weakness type="check" id="3038" title="Oracle Application Server SOAP Configuration" />
 		<weakness type="check" id="304" title="Directory (message)" />
 		<weakness type="check" id="305" title="Directory (messaging)" />
-		<weakness type="check" id="3072" title="JSP Processor DOS Device Denial of Service" />
 		<weakness type="check" id="308" title="Directory (misc)" />
 		<weakness type="check" id="3087" title="Directory (tmplogs)" />
 		<weakness type="check" id="309" title="Directory (movimientos)" />
-		<weakness type="check" id="3099" title="JRun %3F.jsp Directory Contents Disclosure" />
 		<weakness type="check" id="310" title="Directory (mqseries)" />
 		<weakness type="check" id="311" title="Directory (msql)" />
 		<weakness type="check" id="3118" title="WebSphere Help" />
-		<weakness type="check" id="3119" title="WebSphere Configuration Information Disclosure (ncommerce.ini)" />
 		<weakness type="check" id="312" title="Directory (Msword)" />
-		<weakness type="check" id="3120" title="WebSphere Configuration Information Disclosure (svrctrl.ini)" />
-		<weakness type="check" id="3121" title="WebSphere Configuration Information Disclosure (db2www.ini)" />
-		<weakness type="check" id="3123" title="WebSphere Configuration Information Disclosure (srvrctrl.conf)" />
 		<weakness type="check" id="3126" title="WebSphere Commerce Admin Login" />
 		<weakness type="check" id="3128" title="Directory (ca_icons)" />
 		<weakness type="check" id="3129" title="WebSphere Template Directory" />
@@ -1084,23 +964,17 @@
 		<weakness type="check" id="3135" title="Directory (dm_jsp)" />
 		<weakness type="check" id="3136" title="Directory (demoauct)" />
 		<weakness type="check" id="314" title="Directory (NetDynamics)" />
-		<weakness type="check" id="3149" title="WebSphere Configuration Information Disclosure (ncommerce.conf)" />
 		<weakness type="check" id="315" title="Directory (netmagstats)" />
-		<weakness type="check" id="3150" title="StepWeb Search Administrative Access" />
 		<weakness type="check" id="316" title="Directory (netscape)" />
-		<weakness type="check" id="3169" title="Directory (boadmin)" />
 		<weakness type="check" id="317" title="Directory (netshare)" />
 		<weakness type="check" id="318" title="Directory (new)" />
 		<weakness type="check" id="3182" title="Sympoll Voting System Application Administration" />
 		<weakness type="check" id="319" title="Directory (news)" />
 		<weakness type="check" id="3199" title="ASPJar Application Administration" />
 		<weakness type="check" id="320" title="Directory (nl)" />
-		<weakness type="check" id="3205" title="mwForum Possible Web Application Administration" />
 		<weakness type="check" id="321" title="Directory (noticias)" />
-		<weakness type="check" id="3216" title="WebSphere Payment Manager Login" />
 		<weakness type="check" id="322" title="Directory (ns-icons)" />
 		<weakness type="check" id="323" title="Directory (odbc)" />
-		<weakness type="check" id="3240" title="Easynews Arbitrary File Modification" />
 		<weakness type="check" id="325" title="Directory (oracle)" />
 		<weakness type="check" id="3252" title="PGP Keyserver Possible Web Application Administration" />
 		<weakness type="check" id="326" title="Directory (oradata)" />
@@ -1111,29 +985,19 @@
 		<weakness type="check" id="329" title="Directory (outgoing)" />
 		<weakness type="check" id="330" title="Directory (pages)" />
 		<weakness type="check" id="3309" title="Directory (bugzilla)" />
-		<weakness type="check" id="331" title="Directory (passwords)" />
 		<weakness type="check" id="3314" title="BSCW Arbitrary User Registration" />
-		<weakness type="check" id="3316" title="BEA Weblogic JSP Processor Denial of Service" />
 		<weakness type="check" id="333" title="Directory (perl)" />
-		<weakness type="check" id="3331" title="Anthill Cross-Site Scripting" />
-		<weakness type="check" id="3340" title="Avotravis Static Administrative Cookie" />
-		<weakness type="check" id="3344" title="Xerver Arbitrary File Source Disclosure" />
 		<weakness type="check" id="3347" title="Novell Groupwise ServletManager Application Administration" />
 		<weakness type="check" id="336" title="Directory (php_classes)" />
-		<weakness type="check" id="3360" title="SEANOX Devwex Arbitrary File Source Disclosure" />
-		<weakness type="check" id="3372" title="Resin view_source.jsp Directory Traversal File Access" />
 		<weakness type="check" id="338" title="Directory (privado)" />
 		<weakness type="check" id="339" title="Directory (private)" />
 		<weakness type="check" id="3397" title="PHP Trouble Ticket Possible Application Administration" />
 		<weakness type="check" id="340" title="Directory (prod)" />
 		<weakness type="check" id="341" title="Directory (prueba)" />
-		<weakness type="check" id="3411" title="phpBB Possible Denial Of Service" />
-		<weakness type="check" id="3415" title="phpSquidPass User Denial of Service" />
 		<weakness type="check" id="342" title="Directory (pruebas)" />
 		<weakness type="check" id="343" title="Directory (pub)" />
 		<weakness type="check" id="3430" title="PHPAuction Application Adminstration" />
 		<weakness type="check" id="3433" title="KeyFocus Webserver Directory Listing" />
-		<weakness type="check" id="3436" title="Novell iManage Denial Of Service" />
 		<weakness type="check" id="344" title="Directory (public)" />
 		<weakness type="check" id="345" title="Directory (publica)" />
 		<weakness type="check" id="346" title="Directory (publicar)" />
@@ -1142,14 +1006,12 @@
 		<weakness type="check" id="349" title="Directory (purchase)" />
 		<weakness type="check" id="350" title="Directory (purchases)" />
 		<weakness type="check" id="3501" title="Easy Homepage Creator Possible Application Administration" />
-		<weakness type="check" id="3502" title="phpBB profile.php  Administration Access" />
 		<weakness type="check" id="351" title="Directory (pw)" />
 		<weakness type="check" id="353" title="Directory (register)" />
 		<weakness type="check" id="354" title="Directory (registered)" />
 		<weakness type="check" id="3543" title="Novell NetWare Filesystem Browsing" />
 		<weakness type="check" id="355" title="Directory (report)" />
 		<weakness type="check" id="3550" title="PHP Affiliate Authentication Bypass" />
-		<weakness type="check" id="3555" title="Abyss Webserver Multiple Vulnerabilities" />
 		<weakness type="check" id="356" title="Directory (reports)" />
 		<weakness type="check" id="3565" title="Directory (affiliates)" />
 		<weakness type="check" id="3566" title="Directory (_overlay)" />
@@ -1162,9 +1024,7 @@
 		<weakness type="check" id="3575" title="Directory (_vti_script)" />
 		<weakness type="check" id="3579" title="Directory (ttweb)" />
 		<weakness type="check" id="358" title="Directory (retail)" />
-		<weakness type="check" id="3583" title="WebSphere .jsp Handler Denial of Service" />
 		<weakness type="check" id="3597" title="Directory (testdir)" />
-		<weakness type="check" id="36" title="Counter.exe Web Hit Counter DOS Attack" />
 		<weakness type="check" id="360" title="Directory (root)" />
 		<weakness type="check" id="3602" title="Directory (appweb)" />
 		<weakness type="check" id="361" title="Directory (sales)" />
@@ -1184,7 +1044,6 @@
 		<weakness type="check" id="3643" title="Directory (mastergate)" />
 		<weakness type="check" id="3644" title="Directory (netbilling)" />
 		<weakness type="check" id="3645" title="Directory (webcash)" />
-		<weakness type="check" id="3646" title="Apache Access Control List Disclosure Backup" />
 		<weakness type="check" id="365" title="WebLog Administrative Access Bypass" />
 		<weakness type="check" id="3652" title="Directory (_vti_cnf)" />
 		<weakness type="check" id="3655" title="Directory (phpPgAdmin)" />
@@ -1200,18 +1059,13 @@
 		<weakness type="check" id="369" title="Directory (server_stats)" />
 		<weakness type="check" id="3698" title="Directory (dscgi)" />
 		<weakness type="check" id="370" title="Directory (serverstats)" />
-		<weakness type="check" id="3701" title="SurfControl SuperScout Multiple Vulnerabilities" />
-		<weakness type="check" id="3703" title="WASD /tree/ Directory Contents Disclosure" />
 		<weakness type="check" id="371" title="Directory (service)" />
-		<weakness type="check" id="3717" title="Mondosearch Directory Traversal File Access" />
 		<weakness type="check" id="372" title="Directory (services)" />
-		<weakness type="check" id="3723" title="Frontpage Server Extensions shtml.dll Denial of Service" />
 		<weakness type="check" id="3729" title="Directory (analyze)" />
 		<weakness type="check" id="373" title="Directory (servicio)" />
 		<weakness type="check" id="374" title="Directory (servicios)" />
 		<weakness type="check" id="375" title="Directory (servlet)" />
 		<weakness type="check" id="376" title="Directory (setup)" />
-		<weakness type="check" id="3760" title="phpBB admin_ug_auth.php Privilege Elevation" />
 		<weakness type="check" id="3761" title="Directory (Citrix)" />
 		<weakness type="check" id="3763" title="Directory (Citrix/NFuse17)" />
 		<weakness type="check" id="3764" title="Directory (Citrix/NFuseAdmin)" />
@@ -1220,19 +1074,15 @@
 		<weakness type="check" id="3767" title="Directory (Citrix/ICAWEB)" />
 		<weakness type="check" id="3769" title="Directory (wsdocs)" />
 		<weakness type="check" id="377" title="Directory (shop)" />
-		<weakness type="check" id="3777" title="SSL Policy Enforcement Issue" />
-		<weakness type="check" id="3778" title="ColdFusion ISAPI Arbitrary Command Execution" />
 		<weakness type="check" id="378" title="Directory (shopper)" />
 		<weakness type="check" id="3780" title="Directory (wsdl)" />
 		<weakness type="check" id="3784" title="Directory (zip)" />
 		<weakness type="check" id="3785" title="Directory (zips)" />
 		<weakness type="check" id="3786" title="Netscape Enterprise Server Web Publisher Access" />
-		<weakness type="check" id="38" title="Apache Access Control List Disclosure (.htaccess)" />
 		<weakness type="check" id="380" title="Directory (site)" />
 		<weakness type="check" id="3810" title="Versatile BulletinBoard Application Administration" />
 		<weakness type="check" id="382" title="Directory (siteminder)" />
 		<weakness type="check" id="3822" title="Directory (analog-5.1)" />
-		<weakness type="check" id="383" title="Siteminder Administration Interface" />
 		<weakness type="check" id="385" title="Directory (siteminderagent)" />
 		<weakness type="check" id="386" title="Directory (siteminderagent/pw)" />
 		<weakness type="check" id="387" title="Directory (sites)" />
@@ -1282,7 +1132,6 @@
 		<weakness type="check" id="435" title="Directory (trabajo)" />
 		<weakness type="check" id="436" title="Directory (trafficlog)" />
 		<weakness type="check" id="4365" title="Directory (network)" />
-		<weakness type="check" id="4366" title="Directory (documentation)" />
 		<weakness type="check" id="4367" title="Directory (glossary)" />
 		<weakness type="check" id="4368" title="Directory (policy)" />
 		<weakness type="check" id="4369" title="Directory (bios)" />
@@ -1324,7 +1173,6 @@
 		<weakness type="check" id="441" title="Directory (updates)" />
 		<weakness type="check" id="4419" title="Owl Intranet Authentication Failure" />
 		<weakness type="check" id="442" title="Directory (upload)" />
-		<weakness type="check" id="4425" title="IIS 5.0 Denial of Service" />
 		<weakness type="check" id="443" title="Directory (uploads)" />
 		<weakness type="check" id="4431" title="Directory (sounds)" />
 		<weakness type="check" id="4432" title="Directory (movies)" />
@@ -1476,14 +1324,12 @@
 		<weakness type="check" id="4621" title="Directory (solution)" />
 		<weakness type="check" id="4622" title="Directory (admission)" />
 		<weakness type="check" id="4623" title="Directory (strategy)" />
-		<weakness type="check" id="4629" title="Webalizer Usage Page Discovery" />
 		<weakness type="check" id="463" title="Directory (webadmin)" />
 		<weakness type="check" id="4631" title="Directory (add)" />
 		<weakness type="check" id="4632" title="Directory (join)" />
 		<weakness type="check" id="4636" title="Directory (department)" />
 		<weakness type="check" id="4637" title="Directory (departments)" />
 		<weakness type="check" id="4638" title="Directory (solutions)" />
-		<weakness type="check" id="464" title="Directory (webalizer)" />
 		<weakness type="check" id="4640" title="Directory (online)" />
 		<weakness type="check" id="4641" title="Directory (shell)" />
 		<weakness type="check" id="4642" title="Directory (girls)" />
@@ -1503,7 +1349,6 @@
 		<weakness type="check" id="4656" title="Directory (dropbox)" />
 		<weakness type="check" id="4658" title="Directory (dom)" />
 		<weakness type="check" id="4659" title="Directory (domain)" />
-		<weakness type="check" id="466" title="Directory (webdata)" />
 		<weakness type="check" id="4660" title="Directory (docroot)" />
 		<weakness type="check" id="4661" title="Directory (doc11)" />
 		<weakness type="check" id="4662" title="Directory (dlsym)" />
@@ -1547,16 +1392,9 @@
 		<weakness type="check" id="4714" title="Directory (zipped)" />
 		<weakness type="check" id="4716" title="Directory (zos)" />
 		<weakness type="check" id="472" title="Directory (webreps)" />
-		<weakness type="check" id="4720" title="SSL Cookie Not Used" />
-		<weakness type="check" id="4721" title="Admin Section Must Require Authentication" />
 		<weakness type="check" id="4722" title="Logins Sent Over Unencrypted Connection" />
 		<weakness type="check" id="4723" title="Logins Sent Over Query" />
-		<weakness type="check" id="4724" title="Password Field Masked" />
-		<weakness type="check" id="4725" title="Certificate Hostname Discrepency" />
-		<weakness type="check" id="4726" title="Secure Section Must Require SSL Access" />
-		<weakness type="check" id="4727" title="Hidden Form Value" />
 		<weakness type="check" id="4728" title="Persistent Cookies" />
-		<weakness type="check" id="4729" title="User supplied data without POST" />
 		<weakness type="check" id="473" title="Directory (WebShop)" />
 		<weakness type="check" id="4733" title="Directory (detail)" />
 		<weakness type="check" id="4734" title="Directory (/W3SVC101/)" />
@@ -1564,7 +1402,6 @@
 		<weakness type="check" id="4736" title="Directory (updated)" />
 		<weakness type="check" id="4737" title="Directory (netpierce)" />
 		<weakness type="check" id="4738" title="Directory (repository)" />
-		<weakness type="check" id="4739" title="Directory (xss)" />
 		<weakness type="check" id="474" title="Directory (website)" />
 		<weakness type="check" id="4740" title="Directory (mozilla)" />
 		<weakness type="check" id="4741" title="Directory (explorer)" />
@@ -1632,11 +1469,9 @@
 		<weakness type="check" id="4839" title="Directory (webnews)" />
 		<weakness type="check" id="484" title="Directory (www)" />
 		<weakness type="check" id="485" title="Directory (www-sql)" />
-		<weakness type="check" id="4852" title="ChiliSoft ASP Documentation" />
 		<weakness type="check" id="4859" title="Directory (webmail)" />
 		<weakness type="check" id="486" title="Directory (wwwjoin)" />
 		<weakness type="check" id="4863" title="Web Connection API EditConfig" />
-		<weakness type="check" id="4864" title="Web Connection API ShowStatus" />
 		<weakness type="check" id="4865" title="Web Connection API ShowLog" />
 		<weakness type="check" id="4866" title="Web Connection API Maint ShowStatus" />
 		<weakness type="check" id="4867" title="Web Connection API DLL Error Log" />
@@ -1662,25 +1497,15 @@
 		<weakness type="check" id="50" title="Directory (Agent)" />
 		<weakness type="check" id="5000" title="Directory (_mmServerScripts)" />
 		<weakness type="check" id="5001" title="Directory (_mmDBScripts)" />
-		<weakness type="check" id="5057" title="Possible Parameter Based Buffer Overflow (2100 bytes)" />
-		<weakness type="check" id="5063" title="Multiple vulnerabilities in JAWS" />
-		<weakness type="check" id="5064" title="VP-ASP Shopping Cart Multiple Vulnerabilities" />
-		<weakness type="check" id="5069" title="PHP-Nuke SQL Injection in Reviews module" />
 		<weakness type="check" id="5079" title="WpQuiz Gain Admin Rights Exploit" />
 		<weakness type="check" id="5083" title="Litecommerce Installation Script May Let Remote Users Gain Administrative Access" />
-		<weakness type="check" id="509" title="IIS 4.0 advsearch.asp DOS Attack" />
 		<weakness type="check" id="5095" title="Directory (Exadmin)" />
 		<weakness type="check" id="5096" title="Directory (ExchWeb)" />
 		<weakness type="check" id="5097" title="Directory (Exchange)" />
 		<weakness type="check" id="5099" title="Directory (Microsoft-Server-ActiveSync)" />
 		<weakness type="check" id="51" title="Directory (agentes)" />
-		<weakness type="check" id="510" title="IIS 4.0 search.asp DOS Attack" />
 		<weakness type="check" id="5100" title="Directory (spool)" />
-		<weakness type="check" id="5104" title="Whatsup Gold 8.0 Version Check" />
-		<weakness type="check" id="511" title="IIS 4.0 query.asp DOS Attack" />
 		<weakness type="check" id="5110" title="Directory (top_list)" />
-		<weakness type="check" id="5119" title="Whatsup Gold Denial Of Service" />
-		<weakness type="check" id="5128" title="Microsoft ASP.NET URI Canonicalization Remote Information Disclosure Vulnerability" />
 		<weakness type="check" id="5130" title="Directory (alias)" />
 		<weakness type="check" id="5133" title="Directory (asp.net)" />
 		<weakness type="check" id="5134" title="Directory (assemblies)" />
@@ -1695,14 +1520,10 @@
 		<weakness type="check" id="5146" title="Directory (Application_Themes)" />
 		<weakness type="check" id="5147" title="Directory (Application_LocalResources)" />
 		<weakness type="check" id="5151" title="Arbitrary Remote File Include" />
-		<weakness type="check" id="5153" title="ASP.NET Unhashed Viewstate Agent" />
-		<weakness type="check" id="5189" title="ASP Calendar Administrative Access Vulnerability" />
 		<weakness type="check" id="52" title="Directory (Agents)" />
-		<weakness type="check" id="5208" title="Novell GroupWise WebAccess Error Modules Loading Vulnerability" />
 		<weakness type="check" id="521" title="Directory (ejemplo)" />
 		<weakness type="check" id="522" title="Directory (ejemplos)" />
 		<weakness type="check" id="523" title="Directory (employees)" />
-		<weakness type="check" id="5235" title="xGB Grants Administrative Access to Remote Users" />
 		<weakness type="check" id="525" title="Directory (envia)" />
 		<weakness type="check" id="526" title="Directory (enviamail)" />
 		<weakness type="check" id="527" title="Directory (errors)" />
@@ -1720,18 +1541,12 @@
 		<weakness type="check" id="537" title="IIS Web Server Account Manipulation (anot.htr)" />
 		<weakness type="check" id="5374" title="KorWebLog Directory Listing Vulnerability" />
 		<weakness type="check" id="538" title="IIS Web Server Account Manipulation (anot3.htr)" />
-		<weakness type="check" id="5383" title="OneWorldStore Remote Denial of Service" />
 		<weakness type="check" id="5388" title="phpAuction SQL Injection and Authentication Bypass" />
-		<weakness type="check" id="5399" title="Jeuce Personal Web Server Denial of Service" />
 		<weakness type="check" id="54" title="Directory (apache)" />
 		<weakness type="check" id="5401" title="GForge Directory Listing Vulnerability" />
-		<weakness type="check" id="5403" title="04WebServer Denial of Service and Log Manipulation" />
 		<weakness type="check" id="544" title="MultiHTML Remote Shell Access" />
 		<weakness type="check" id="5447" title="Gravity Board X Arbitrary Code Execution and SQL Injection" />
 		<weakness type="check" id="545" title="Directory (_themes)" />
-		<weakness type="check" id="5470" title="WhatsUp Gold Web Interface Denial of Service" />
-		<weakness type="check" id="5472" title="Macallan Mail Solution Denial of Service" />
-		<weakness type="check" id="5485" title="Caudium Web Server Denial of Service" />
 		<weakness type="check" id="549" title="Directory (_fpclass)" />
 		<weakness type="check" id="55" title="Directory (app)" />
 		<weakness type="check" id="550" title="Directory (doc/packages)" />
@@ -1742,9 +1557,6 @@
 		<weakness type="check" id="554" title="Directory (junk)" />
 		<weakness type="check" id="5541" title="XPath Error Message" />
 		<weakness type="check" id="555" title="Directory (share)" />
-		<weakness type="check" id="5550" title="Oracle9i AS XML SOAP Processing DoS" />
-		<weakness type="check" id="5552" title="BEA WebLogic SSL Denial of Service" />
-		<weakness type="check" id="5554" title="Apache Header Line Abort Denial of Service" />
 		<weakness type="check" id="5573" title="Directory (usage)" />
 		<weakness type="check" id="5586" title="Directory (signup)" />
 		<weakness type="check" id="56" title="Directory (application)" />
@@ -1756,33 +1568,23 @@
 		<weakness type="check" id="57" title="Directory (applications)" />
 		<weakness type="check" id="570" title="Directory (manage)" />
 		<weakness type="check" id="571" title="Contivity Server Administrative Interface" />
-		<weakness type="check" id="572" title="Calendar.pl Arbitrary Command Execution" />
-		<weakness type="check" id="573" title="Calendar_admin.pl Arbitrary Command Execution" />
 		<weakness type="check" id="58" title="Directory (apps)" />
 		<weakness type="check" id="589" title="PHPNuke Administrative Access" />
 		<weakness type="check" id="59" title="Directory (ar)" />
-		<weakness type="check" id="591" title="WebSite Pro Arbitrary File Upload" />
 		<weakness type="check" id="597" title="Directory (siteman000510)" />
 		<weakness type="check" id="60" title="Directory (archive)" />
 		<weakness type="check" id="605" title="PlusMail Adminstrative Access" />
-		<weakness type="check" id="607" title="Lotus Domino /cgi-bin/ Path Disclosure/DOS Attack" />
 		<weakness type="check" id="61" title="Directory (archives)" />
-		<weakness type="check" id="610" title="CyberOffice Shopping Cart Database Download" />
 		<weakness type="check" id="616" title="Guestbook.pl Server-Side Include Command Execution" />
 		<weakness type="check" id="62" title="Directory (asp)" />
 		<weakness type="check" id="620" title="Directory (cgi-bin/w3-msql)" />
 		<weakness type="check" id="621" title="Directory (PowerPlay Data files)" />
-		<weakness type="check" id="624" title="EWS Password file exposure2" />
 		<weakness type="check" id="63" title="Directory (atc)" />
-		<weakness type="check" id="632" title="ColdFusion Expression Evaluator" />
-		<weakness type="check" id="633" title="ColdFusion Expression Evaluator (sendmail)" />
-		<weakness type="check" id="635" title="ColdFusion Expression Evaluator(openfile)" />
 		<weakness type="check" id="64" title="Directory (auth)" />
 		<weakness type="check" id="640" title="Directory (cfappman)" />
 		<weakness type="check" id="641" title="Directory (cfide/administrator)" />
 		<weakness type="check" id="643" title="Directory (framesets)" />
 		<weakness type="check" id="644" title="Directory (adminuser)" />
-		<weakness type="check" id="646" title="Directory (.cobalt)" />
 		<weakness type="check" id="647" title="Directory (cobalt-images)" />
 		<weakness type="check" id="648" title="Directory (siteadmin)" />
 		<weakness type="check" id="649" title="Directory (personal)" />
@@ -1792,18 +1594,10 @@
 		<weakness type="check" id="653" title="Directory (.web)" />
 		<weakness type="check" id="654" title="Directory (javascript)" />
 		<weakness type="check" id="658" title="Directory (admentor)" />
-		<weakness type="check" id="659" title="AdMentor Configuration Database Disclosure" />
 		<weakness type="check" id="66" title="Directory (aw)" />
 		<weakness type="check" id="660" title="Directory (admentor/admin)" />
-		<weakness type="check" id="671" title="Lilikoi Ceilidh Path Disclosure/DOS Attack" />
-		<weakness type="check" id="674" title="Directory (banner01)" />
-		<weakness type="check" id="686" title="WebView Buffer Overflow DOS Attack" />
-		<weakness type="check" id="687" title="ICQ Web Front Guestbook DOS Attack" />
 		<weakness type="check" id="69" title="Directory (ayuda)" />
-		<weakness type="check" id="690" title="Progress WebSpeed Administration" />
 		<weakness type="check" id="692" title="Nortel Contivity Switch Remote Administration Vulnerability" />
-		<weakness type="check" id="693" title="CERN Image Map Dispatcher htimage.exe Vulnerability" />
-		<weakness type="check" id="694" title="CERN Image Map Dispatcher imagemap.exe Vulnerability" />
 		<weakness type="check" id="70" title="Directory (backup)" />
 		<weakness type="check" id="71" title="Directory (bak)" />
 		<weakness type="check" id="713" title="Directory (backups)" />
@@ -1818,24 +1612,11 @@
 		<weakness type="check" id="728" title="Directory (email)" />
 		<weakness type="check" id="73" title="Directory (banco)" />
 		<weakness type="check" id="74" title="Directory (bank)" />
-		<weakness type="check" id="742" title="Database Server Error Message" />
-		<weakness type="check" id="745" title="Runtime Error Message" />
 		<weakness type="check" id="746" title="Directory Listing" />
 		<weakness type="check" id="75" title="Directory (bbv)" />
 		<weakness type="check" id="76" title="Directory (bdata)" />
-		<weakness type="check" id="77" title="IIS Frontpage Server Extensions Author.dll Possible DOS" />
-		<weakness type="check" id="774" title="WebUtils Issue" />
-		<weakness type="check" id="775" title="Tigvote.cgi Command Execution" />
-		<weakness type="check" id="776" title="Form.cgi Issue" />
-		<weakness type="check" id="777" title="Message.cgi Issue" />
-		<weakness type="check" id="778" title=".fhp Issue" />
-		<weakness type="check" id="786" title="WebBBS Buffer Overflow DOS Attack" />
-		<weakness type="check" id="789" title="stats.prf Issue" />
-		<weakness type="check" id="790" title="architext_query.cgi Exploit" />
-		<weakness type="check" id="791" title="filemail.pl Issue" />
 		<weakness type="check" id="802" title="Possible Login Form" />
 		<weakness type="check" id="811" title="Directory (Album)" />
-		<weakness type="check" id="821" title="WebEvent Administrative Access" />
 		<weakness type="check" id="822" title="Directory (protected)" />
 		<weakness type="check" id="823" title="Directory (js)" />
 		<weakness type="check" id="824" title="Adobe JRun WEB-INF Directory Listing" />
@@ -1843,8 +1624,6 @@
 		<weakness type="check" id="828" title="Directory (jsp)" />
 		<weakness type="check" id="829" title="Directory (javatest)" />
 		<weakness type="check" id="833" title="News Update Administrative Access" />
-		<weakness type="check" id="840" title="Directory (formsmgr)" />
-		<weakness type="check" id="842" title="Directory (storage)" />
 		<weakness type="check" id="873" title="Unicode Folder (_vti_bin)" />
 		<weakness type="check" id="874" title="Unicode Folder (printers)" />
 		<weakness type="check" id="875" title="Unicode Folder (siteserver)" />
@@ -1855,11 +1634,8 @@
 		<weakness type="check" id="882" title="Directory (cmsample)" />
 		<weakness type="check" id="883" title="Directory (_mem_bin)" />
 		<weakness type="check" id="884" title="Directory (old)" />
-		<weakness type="check" id="887" title="Catalyst 3500 XL Arbitrary Command Execution" />
-		<weakness type="check" id="888" title="Unicode Folder (scripts)" />
 		<weakness type="check" id="902" title="Directory (SilverStream)" />
 		<weakness type="check" id="908" title="Unicode Folder (cgi-bin)" />
-		<weakness type="check" id="91" title="Frontpage Server Extensions Shtml.dll Multiple Possible Vulnerabilities" />
 		<weakness type="check" id="911" title="Directory (webpub)" />
 		<weakness type="check" id="912" title="Directory (nettracker)" />
 		<weakness type="check" id="913" title="Directory (document)" />
@@ -1868,10 +1644,6 @@
 		<weakness type="check" id="916" title="Directory (development)" />
 		<weakness type="check" id="917" title="Directory (xtemp)" />
 		<weakness type="check" id="918" title="Directory (cybercash)" />
-		<weakness type="check" id="922" title="Cart32 Multiple Possible Vulnerabilities" />
-		<weakness type="check" id="923" title="Cart32 Configuration Information Disclosure" />
-		<weakness type="check" id="924" title="Cart32 Multiple Possible Vulnerabilities" />
-		<weakness type="check" id="925" title="Cart32 Multiple Possible Vulnerabilities" />
 		<weakness type="check" id="926" title="Directory (~wsdocs)" />
 		<weakness type="check" id="931" title="Directory (~stats)" />
 		<weakness type="check" id="933" title="Directory (javasdk)" />

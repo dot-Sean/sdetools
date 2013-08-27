@@ -80,7 +80,7 @@ class BaseXMLImporter(BaseImporter):
         self.raw_findings = XMLReader.raw_findings
         if XMLReader.report_id:
             self.report_id = XMLReader.report_id   
-        
+
 class BaseIntegrator(object):
     TOOL_NAME = 'External tool'
 
@@ -260,7 +260,16 @@ class BaseIntegrator(object):
             weakness_finding = {}
 
             for weakness in sorted(finding['weaknesses']):
-                if last_weakness != weakness['weakness_id']:
+
+                if 'description' in weakness:
+                    weakness_description = weakness['description']
+                elif (self.weakness_title.has_key(weakness['weakness_id']) and
+                        self.weakness_title[weakness['weakness_id']] != ''):
+                    weakness_description = self.weakness_title[weakness['weakness_id']]
+                else:
+                    weakness_description = weakness['weakness_id']
+
+                if last_weakness != weakness_description:
                     if len(weakness_finding.items()) > 0:
                         analysis_findings.append(weakness_finding)
                         weakness_finding = {}
@@ -270,13 +279,9 @@ class BaseIntegrator(object):
                             self.weakness_type[weakness['weakness_id']] == 'cwe'):
                         weakness_finding['cwe'] = weakness['weakness_id']
 
-                    if (self.weakness_title.has_key(weakness['weakness_id']) and
-                            self.weakness_title[weakness['weakness_id']] != ''):
-                        weakness_finding['desc'] = self.weakness_title[weakness['weakness_id']]
-                    else:
-                        weakness_finding['desc'] = weakness['weakness_id']
+                    weakness_finding['desc'] = weakness_description
 
-                    last_weakness = weakness['weakness_id']
+                    last_weakness = weakness_description
 
                 if 'count' in weakness:
                     weakness_finding['count'] += weakness['count']
