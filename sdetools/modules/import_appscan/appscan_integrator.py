@@ -15,7 +15,7 @@ class AppScanIntegrationError(IntegrationError):
     pass
 
 class AppScanIntegrator(BaseIntegrator):
-    TOOL_NAME = "fortify"
+    TOOL_NAME = "appscan"
 
     def __init__(self, config):
         config.add_custom_option("report_file", "AppScan Report XML", "x", None)
@@ -46,7 +46,7 @@ class AppScanIntegrator(BaseIntegrator):
         if self.importer.report_id:
             self.report_id = self.importer.report_id
         else:
-            logger.info("Report ID not found in report")
+            self.emit.info("Report ID not found in report: Using default.")
 
     def _make_finding(self, item):
         return {'weakness_id': item['id'], 'description': item['description'], 'count':item['count']}
