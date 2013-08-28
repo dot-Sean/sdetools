@@ -1,0 +1,216 @@
+<mapping>
+	<task id="151" title="Use cryptographically secure random numbers" >
+		<weakness type="cwe" id="331" title="Insufficient Entropy"/>
+	</task>
+	<task id="199" title="Avoid relying on evironment variables for application settings" >
+		<weakness type="cwe" id="526" title="Information Exposure Through Environmental Variables"/>
+		<weakness type="cwe" id="15" title="External Control of System or Configuration Setting"/>
+	</task>
+	<task id="198" title="Encrypt sensitive information in memory" >
+		<weakness type="cwe" id="316" title="Plaintext Storage in Memory"/>
+	</task>
+	<task id="157" title="Securely create and cleanup of temporary files must be cleaned up after the resource is used" >
+		<weakness type="cwe" id="378" title="Creation of Temporary File With Insecure Permissions"/>
+		<weakness type="cwe" id="377" title="Insecure Temporary File"/>
+	</task>
+    <task id="244" title="Securely delete any unprotected sensitive data">
+        <weakness type="cwe" id="200" title="Information Exposure"/>
+    </task>
+    <task id="15" title="Centralize authorization">
+        <weakness type="cwe" id="284" title="Improper Access Control"/>
+    </task>    
+	<task id="156" title="Validate certificate and its chain of trust properly" >
+		<weakness type="cwe" id="296" title="Improper Following of Chain of Trust for Certificate Validation"/>
+		<weakness type="cwe" id="297" title="Improper Validation of Host-specific Certificate Data"/>
+		<weakness type="cwe" id="298" title="Improper Validation of Certificate Expiration"/>
+	</task>
+	<task id="159" title="Avoid sending detailed error messages to remote systems" >
+		<weakness type="cwe" id="201" title="Information Exposure Through Sent Data"/>
+		<weakness type="cwe" id="209" title="Information Exposure Through an Error Message"/>
+		<weakness type="cwe" id="497" title="Exposure of System Data to an Unauthorized Control Sphere"/>
+	</task>
+	<task id="197" title="Verify the integrity of dynamically-included third party code" >
+		<weakness type="cwe" id="494" title="Download of Code Without Integrity Check"/>
+	</task>
+	<task id="196" title="Avoid Dangerous Functions" >
+		<weakness type="cwe" id="242" title="Use of Inherently Dangerous Function"/>
+	</task>
+	<task id="191" title="Follow best practices when handling primitive data types" >
+		<weakness type="cwe" id="195" title="Signed to Unsigned Conversion Error"/>
+		<weakness type="cwe" id="197" title="Numeric Truncation Error"/>
+		<weakness type="cwe" id="196" title="Unsigned to Signed Conversion Error"/>
+		<weakness type="cwe" id="192" title="Integer Coercion Error"/>
+	</task>
+	<task id="55" title="Validate all untrusted XML input" >
+		<weakness type="cwe" id="112" title="Missing XML Validation"/>
+	</task>
+        <task id="203" title="Avoid uncontrolled format string" >
+ 		<weakness type="cwe" id="134" title="Uncontrolled Format String"/>
+        </task>
+	<task id="193" title="Review non-categorized/miscellaneous findings from static code analysis" >
+		<weakness type="cwe" id="597" title="Use of Wrong Operator in String Comparison"/>
+		<weakness type="cwe" id="668" title="Exposure of Resource to Wrong Sphere"/>
+		<weakness type="cwe" id="391" title="Unchecked Error Condition"/>
+		<weakness type="cwe" id="498" title="Cloneable Class Containing Sensitive Information"/>
+		<weakness type="cwe" id="234" title="Failure to Handle Missing Parameter"/>
+		<weakness type="cwe" id="398" title="Indicator of Poor Code Quality"/>
+        <weakness type="cwe" id="730" title="OWASP Top Ten 2004 Category A9 - Denial of Service"/>
+		<weakness type="cwe" id="830" title="Inclusion of Web Functionality from an Untrusted Source"/>
+		<weakness type="cwe" id="656" title="Reliance on Security Through Obscurity"/>
+		<weakness type="cwe" id="404" title="Improper Resource Shutdown or Release"/>
+		<weakness type="cwe" id="366" title="Race Condition within a Thread"/>
+		<weakness type="cwe" id="548" title="Information Exposure Through Directory Listing"/>
+		<weakness type="cwe" id="560" title="Use of Umask() with Chmod-Style Argument"/>
+		<weakness type="cwe" id="675" title="Duplicate Operations on Resource"/>
+		<weakness type="cwe" id="245" title="J2EE Bad Practices: Direct Management of Connections"/>
+		<weakness type="cwe" id="382" title="J2EE Bad Practices: Use of System.exit()"/>
+		<weakness type="cwe" id="243" title="Creation of Chroot Jail Without Changing Working Directory"/>
+		<weakness type="cwe" id="247" title="Reliance on DNS Lookups in a Security Decision"/>
+		<weakness type="cwe" id="117" title="Improper Output Neutralization for Logs"/>
+		<weakness type="cwe" id="470" title="Use of Externally-Controlled Input to Select Classes or Code (Unsafe Reflection)"/>
+		<weakness type="cwe" id="88" title="Argument Injection or Modification"/>
+		<weakness type="cwe" id="479" title="Signal Handler Use of a Non-Reentrant Function"/>
+		<weakness type="cwe" id="287" title="Improper Authentication"/>
+		<weakness type="cwe" id="311" title="Missing Encryption of Sensitive Data"/>	
+		<weakness type="cwe" id="312" title="Cleartext Storage of Sensitive Information"/>
+		<weakness type="cwe" id="313" title="Plaintext Storage in a File or on Disk"/>
+		<weakness type="cwe" id="193" title="Off-by-One Error"/>
+		<weakness type="cwe" id="135" title="Incorrect Calculation of Multi-Byte String Length"/>
+		<weakness type="cwe" id="170" title="Improper Null Termination"/>
+	    <weakness type="cwe" id="*" title="Unmapped CWE"/>
+    </task>
+    <task id="206" title="Avoid time of check time of use race condition against external resources" >
+        <weakness type="cwe" id="367" title="Time-of-check Time-of-use (TOCTOU) Race Condition"/>
+    </task>
+    <task id="205" title="Avoid inter-process race conditions" >
+        <weakness type="cwe" id="557" title="Concurrency Issues"/>
+    </task>
+    <task id="5" title="Minimum password standards">
+        <weakness type="cwe" id="521" title="Weak Password Requirements"/>
+    </task>
+    <task id="202" title="Prevent buffer overflow/underflow" >
+        <weakness type="cwe" id="121" title="Stack-Based Buffer Overflow"/>
+        <weakness type="cwe" id="120" title="Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')"/>
+		<weakness type="cwe" id="119" title="Failure to Constrain Operations within the Bounds of a Memory Buffer"/>
+		<weakness type="cwe" id="131" title="Incorrect Calculation of Buffer Size"/>
+        <weakness type="cwe" id="787" title="Out-of-bounds Write"/>
+    </task>
+    <task id="35" title="Specify HTTP protocol limits in the server settings">
+        <weakness type="cwe" id="400" title="Uncontrolled Resource Consumption ('Resource Exhaustion')"/>
+    </task>
+    <task id="204" title="Follow security best practices when dealing with pointers" >
+        <weakness type="cwe" id="125" title="Out-of-Bounds Read"/>
+        <weakness type="cwe" id="415" title="Double Free"/>
+        <weakness type="cwe" id="416" title="Use After Free"/>
+		<weakness type="cwe" id="129" title="Improper Validation of Array Index"/>        
+    </task>
+	<task id="60" title="Only use approved cryptographic algorithms and key lengths" >
+		<weakness type="cwe" id="757" title="Selection of Less-Secure Algorithm During Negotiation (Algorithm Downgrade)"/>
+		<weakness type="cwe" id="347" title="Improper Verification of Cryptographic Signature"/>
+		<weakness type="cwe" id="326" title="Inadequate Encryption Strength"/>
+		<weakness type="cwe" id="327" title="Use of a Broken or Risky Cryptographic Algorithm"/>
+		<weakness type="cwe" id="329" title="Not Using a Random IV with CBC Mode"/>
+	</task>
+	<task id="62" title="Lockdown passwords in property and configuration files (e.g. database connection strings)" >
+		<weakness type="cwe" id="522" title="Insufficiently Protected Credentials"/>
+	</task>
+	<task id="176" title="Apply principles of privacy when handling personal information" >
+		<weakness type="cwe" id="359" title="Privacy Violation"/>
+	</task>
+	<task id="20" title="Invalidate old session ID after authentication" >
+		<weakness type="cwe" id="384" title="Session Fixation"/>
+	</task>
+	<task id="22" title="Set secure flag on session cookies" >
+		<weakness type="cwe" id="614" title="Sensitive Cookie in HTTPS Session Without Secure Attribute"/>
+	</task>
+	<task id="49" title="Remove/disable unused, test or debug code and data" >
+		<weakness type="cwe" id="215" title="Information Exposure Through Debug Information"/>
+		<weakness type="cwe" id="511" title="Logic/Time Bomb"/>
+		<weakness type="cwe" id="489" title="Leftover Debug Code"/>
+		<weakness type="cwe" id="530" title="Exposure of Backup File to an Unauthorized Control Sphere"/>
+		<weakness type="cwe" id="506" title="Embedded Malicious Code"/>
+		<weakness type="cwe" id="514" title="Covert Channel"/>
+	</task>
+	<task id="47" title="Implement a global error handler and generic default error page for end users" >
+		<weakness type="cwe" id="201" title="Information Exposure Through Sent Data"/>
+		<weakness type="cwe" id="209" title="Information Exposure Through an Error Message"/>
+		<weakness type="cwe" id="497" title="Exposure of System Data to an Unauthorized Control Sphere"/>
+	</task>
+	<task id="42" title="Avoid relying on untrusted data for server side page, view, or template selection" >
+		<weakness type="cwe" id="98" title="Improper Control of Filename for Include/Require Statement in PHP Program (PHP File Inclusion)"/>
+	</task>
+	<task id="43" title="Avoid unsafe operating system interaction" >
+		<weakness type="cwe" id="114" title="Process Control"/>
+		<weakness type="cwe" id="426" title="Untrusted Search Path"/>
+		<weakness type="cwe" id="427" title="Uncontrolled Search Path Element"/>
+		<weakness type="cwe" id="78" title="Improper Neutralization of Special Elements used in an OS Command (OS Command Injection)"/>
+	</task>
+	<task id="41" title="Use Lightweight Directory Access Protocol (LDAP) encoding when interacting with LDAP data" >
+		<weakness type="cwe" id="90" title="Improper Neutralization of Special Elements Used in an LDAP Query (LDAP Injection)"/>
+	</task>
+	<task id="182" title="Avoid nested expressions based on unvalidated input" >
+		<weakness type="cwe" id="95" title="Improper Neutralization of Directives in Dynamically Evaluated Code (Eval Injection)"/>
+	</task>
+	<task id="181" title="Validate model explicitly for fields the user is allowed to update" >
+		<weakness type="cwe" id="103" title="Struts: Incomplete validate() Method Definition"/>
+		<weakness type="cwe" id="104" title="Struts: Form Bean Does Not Extend Validation Class"/>
+	</task>
+	<task id="7" title="Salt and hash stored password" >
+		<weakness type="cwe" id="256" title="Plaintext Storage of a Password"/>
+	</task>
+	<task id="189" title="Avoid usage of unmanaged code" >
+		<weakness type="cwe" id="111" title="Direct Use of Unsafe JNI"/>
+	</task>
+	<task id="76" title="Do not hard code passwords" >
+		<weakness type="cwe" id="259" title="Use of Hard-coded Password"/>
+		<weakness type="cwe" id="321" title="Use of Hard-coded Cryptographic Key"/>
+	</task>
+	<task id="72" title="Use safe arithmetic to avoid integer overflow" >
+		<weakness type="cwe" id="191" title="Integer Underflow (Wrap or Wraparound)"/>
+		<weakness type="cwe" id="190" title="Integer Overflow or Wraparound"/>
+	</task>
+	<task id="11" title="Disallow external redirects" >
+		<weakness type="cwe" id="601" title="URL Redirection to Untrusted Site (Open Redirect)"/>
+	</task>
+	<task id="39" title="Disallow carriage returns and line feeds when adding data to HTTP response headers" >
+		<weakness type="cwe" id="113" title="Improper Neutralization of CRLF Sequences in HTTP Headers (HTTP Response Splitting)"/>
+	</task>
+	<task id="38" title="Bind variables in SQL statements" >
+		<weakness type="cwe" id="89" title="Improper Neutralization of Special Elements used in an SQL Command (SQL Injection)"/>
+		<weakness type="cwe" id="564" title="SQL Injection: Hibernate"/>
+	</task>
+	<task id="14" title="Principles of least privilege" >
+		<weakness type="cwe" id="732" title="Incorrect Permission Assignment for Critical Resource"/>
+		<weakness type="cwe" id="708" title="Incorrect Ownership Assignment"/>
+	</task>
+	<task id="33" title="Verify integrity of client-supplied read-only data" >
+		<weakness type="cwe" id="354" title="Improper Validation of Integrity Check Value"/>
+		<weakness type="cwe" id="472" title="External Control of Assumed-Immutable Web Parameter"/>
+	</task>
+	<task id="54" title="Validate file contents" >
+		<weakness type="cwe" id="434" title="Unrestricted Upload of File with Dangerous Type"/>
+	</task>
+	<task id="31" title="Perform input validation on all forms of input" >
+		<weakness type="cwe" id="93" title="Improper Neutralization of CRLF Sequences (CRLF Injection)"/>
+		<weakness type="cwe" id="94" title="Improper Control of Generation of code (Code Injection)"/>
+		<weakness type="cwe" id="501" title="Trust Boundary Violation"/>
+        <weakness type="cwe" id="713" title="OWASP Top Ten 2007 Category A2 - Injection Flaws"/>            
+	</task>
+	<task id="36" title="Escape untrusted data in HTML, HTML attributes, Cascading Style Sheets and JavaScript" >
+		<weakness type="cwe" id="83" title="Improper Neutralization of Script in Attributes in a Web Page"/>
+		<weakness type="cwe" id="80" title="Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)"/>
+		<weakness type="cwe" id="79" title="Improper Neutralization of Input During Web Page Generation (Cross-site Scripting)"/>
+        <weakness type="cwe" id="811" title="OWASP Top Ten 2010 Category A2 - Cross-Site Scripting (XSS)"/>
+		<weakness type="cwe" id="692" title="Incomplete Blacklist to Cross-Site Scripting"/>
+		<weakness type="cwe" id="82" title="Improper Neutralization of Script in Attributes of IMG Tags in a Web Page"/>
+		<weakness type="cwe" id="87" title="Improper Neutralization of Alternate XSS Syntax"/>
+        <weakness type="cwe" id="116" title="Improper Encoding or Escaping of Output"/>
+	</task>
+	<task id="55" title="Validate all untrusted XML input" >
+		<weakness type="cwe" id="611" title="Information Exposure Through XML External Entity Reference"/>
+	</task>
+	<task id="50" title="Use indirect object reference maps if accessing files" >
+		<weakness type="cwe" id="73" title="External Control of File Name or Path"/>
+		<weakness type="cwe" id="22" title="Improper Limitation of a Pathname to a Restricted Directory (Path Traversal)"/>
+	</task>
+</mapping>

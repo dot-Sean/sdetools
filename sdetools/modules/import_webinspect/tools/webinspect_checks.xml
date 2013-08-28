@@ -1,0 +1,8 @@
+<NewDataSet>
+  <Table1>
+    <CheckID>1</CheckID>
+    <CheckName>Hidden Reference Found</CheckName>
+    <CWE>CWE-200</CWE>
+    <CWE_Desc>CWE-200: Information Exposure</CWE_Desc>
+  </Table1>
+</NewDataSet>
