@@ -5,9 +5,6 @@ from sdetools.analysis_integration.base_integrator import BaseIntegrator, Integr
 from sdetools.modules.import_webinspect.webinspect_xml_importer import WebInspectXMLImporter
 from sdetools.modules.import_webinspect.webinspect_fpr_importer import WebInspectFPRImporter
 
-from sdetools.sdelib import log_mgr
-logger = log_mgr.mods.add_mod(__name__)
-
 __all__ = ['WebInspectIntegrator']
 
 DEFAULT_MAPPING_FILE = os.path.join(media_path, 'webinspect', 'sde_webinspect_map.xml')
@@ -44,7 +41,6 @@ class WebInspectIntegrator(BaseIntegrator):
 
         self.importer.parse(self.config['report_file'])
         self.raw_findings = self.importer.raw_findings
-        self.report_id = self.importer.report_id
 
         if self.importer.report_id:
             self.report_id = self.importer.report_id
