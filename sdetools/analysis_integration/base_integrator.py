@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import collections
 import re
+import zipfile
 from datetime import datetime
 from sdetools.extlib.defusedxml import minidom, sax
 
@@ -31,7 +32,55 @@ class BaseImporter(object):
     def __init__(self):
         self.report_id = ""
         self.raw_findings = []
+        
+class BaseZIPImporter(BaseImporter):
+    ARCHIVED_FILE_NAME = None
+    MAX_SIZE_IN_MB = 300  # Maximum archived file size in MB
+    MAX_MEMORY_SIZE_IN_MB = 50  # Python 2.5 and prior must be much more conservative
 
+    def __init__(self):
+        super(BaseZIPImporter, self).__init__()
+
+    def process_archive(self, zip_archive, importer):
+        try:
+            results_archive = zipfile.ZipFile(zip_archive, "r")
+        except zipfile.BadZipfile, e:
+            raise BaseIntegrationError("Error opening file (Bad file) %s" % (zip_archive))
+        except zipfile.LargeZipFile, e:
+            raise BaseIntegrationError("Error opening file (File too large) %s" % (zip_archive))
+
+        try:
+            file_info = results_archive.getinfo(self.ARCHIVED_FILE_NAME)
+        except KeyError, ke:
+            raise BaseIntegrationError("File (%s) not found in archive %s" % (self.ARCHIVED_FILE_NAME, zip_archive))
+
+        # Python 2.6+ can open a ZIP file entry as a stream
+        if hasattr(results_archive, 'open'):
+        
+            # Restrict the size of the file we will open
+            if file_info.file_size > self.MAX_SIZE_IN_MB * 1024 * 1024:
+                raise BaseIntegrationError("File %s is larger than %s MB: %d bytes" %
+                        (self.ARCHIVED_FILE_NAME, self.MAX_SIZE_IN_MB, file_info.file_size))
+
+            try:
+                results_file = results_archive.open(self.ARCHIVED_FILE_NAME)
+            except KeyError, ke:
+                raise BaseIntegrationError("File (%s) not found in archive %s" % (self.ARCHIVED_FILE_NAME, zip_archive))
+
+            importer.parse_file(results_file)
+            self.report_id = importer.report_id
+            self.raw_findings = importer.raw_findings
+
+        # Python 2.5 and prior must open the file into memory
+        else:
+            # Restrict the size of the file we will open into RAM
+            if file_info.file_size > self.MAX_MEMORY_SIZE_IN_MB * 1024 * 1024:
+                raise BaseIntegrationError("File %s is larger than %s MB: %d bytes" %
+                        (archive_file_name, self.MAX_MEMORY_SIZE_IN_MB, file_info.file_size))
+
+            results_xml = scan_file.read(self.WEBINSPECT_FILE)
+            importer.parse_string(results_xml)
+        
 class BaseXMLImporter(BaseImporter):
 
     def __init__(self):
