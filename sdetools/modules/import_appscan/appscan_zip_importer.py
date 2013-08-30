@@ -8,5 +8,4 @@ class AppScanZIPImporter(BaseZIPImporter):
         super(AppScanZIPImporter, self).__init__()
 
     def parse(self, zip_file):
-
         self.process_archive(zip_file, AppScanXMLImporter())
