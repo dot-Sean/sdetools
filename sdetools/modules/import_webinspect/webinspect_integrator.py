@@ -3,9 +3,7 @@ import os
 from sdetools.sdelib.commons import media_path, UsageError
 from sdetools.analysis_integration.base_integrator import BaseIntegrator, IntegrationError
 from sdetools.modules.import_webinspect.webinspect_xml_importer import WebInspectXMLImporter
-
-from sdetools.sdelib import log_mgr
-logger = log_mgr.mods.add_mod(__name__)
+from sdetools.modules.import_webinspect.webinspect_fpr_importer import WebInspectFPRImporter
 
 __all__ = ['WebInspectIntegrator']
 
@@ -19,7 +17,7 @@ class WebInspectIntegrator(BaseIntegrator):
 
     def __init__(self, config):
         config.add_custom_option("report_file", "WebInspect Report File", "x", None)
-        config.add_custom_option("report_type", "WebInspect Report Type: xml|auto", default="auto")
+        config.add_custom_option("report_type", "WebInspect Report Type: xml|fpr|auto", default="auto")
         super(WebInspectIntegrator, self).__init__(config, DEFAULT_MAPPING_FILE)
         self.raw_findings = []
 
@@ -36,12 +34,13 @@ class WebInspectIntegrator(BaseIntegrator):
 
         if self.config['report_type'] == 'xml':
             self.importer = WebInspectXMLImporter()
+        elif self.config['report_type'] == 'fpr':
+            self.importer = WebInspectFPRImporter()
         else:
             raise UsageError("Unsupported file type (%s)" % self.config['report_type'])
 
         self.importer.parse(self.config['report_file'])
         self.raw_findings = self.importer.raw_findings
-        self.report_id = self.importer.report_id
 
         if self.importer.report_id:
             self.report_id = self.importer.report_id

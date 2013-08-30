@@ -1,15 +1,13 @@
 import os
 
-from sdetools.sdelib import commons
+from sdetools.sdelib.commons import media_path, UsageError
 from sdetools.analysis_integration.base_integrator import BaseIntegrator, IntegrationError
-from sdetools.modules.import_appscan.appscan_xml_importer import AppScanXMLContent, AppScanXMLImporter
-
-from sdetools.sdelib import log_mgr
-logger = log_mgr.mods.add_mod(__name__)
+from sdetools.modules.import_appscan.appscan_xml_importer import AppScanXMLImporter
+from sdetools.modules.import_appscan.appscan_zip_importer import AppScanZIPImporter
 
 __all__ = ['AppScanIntegrator']
 
-DEFAULT_MAPPING_FILE = os.path.join(commons.media_path, 'appscan', 'sde_appscan_map.xml')
+DEFAULT_MAPPING_FILE = os.path.join(media_path, 'appscan', 'sde_appscan_map.xml')
 
 class AppScanIntegrationError(IntegrationError):
     pass
@@ -19,7 +17,7 @@ class AppScanIntegrator(BaseIntegrator):
 
     def __init__(self, config):
         config.add_custom_option("report_file", "AppScan Report XML", "x", None)
-        config.add_custom_option("report_type", "AppScan Report Type: xml|auto", default="auto")
+        config.add_custom_option("report_type", "AppScan Report Type: xml|zip|auto", default="auto")
         super(AppScanIntegrator, self).__init__(config, DEFAULT_MAPPING_FILE)
         self.raw_findings = []
 
@@ -36,12 +34,13 @@ class AppScanIntegrator(BaseIntegrator):
 
         if self.config['report_type'] == 'xml':
             self.importer = AppScanXMLImporter()
+        elif self.config['report_type'] == 'zip':
+            self.importer = AppScanZIPImporter()
         else:
             raise UsageError("Unsupported file type (%s)" % self.config['report_type'])
 
         self.importer.parse(self.config['report_file'])
         self.raw_findings = self.importer.raw_findings
-        self.report_id = self.importer.report_id
 
         if self.importer.report_id:
             self.report_id = self.importer.report_id

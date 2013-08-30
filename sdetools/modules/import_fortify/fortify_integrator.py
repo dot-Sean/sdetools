@@ -8,9 +8,6 @@ from sdetools.modules.import_fortify.fortify_report_importer import FortifyRepor
 from sdetools.modules.import_fortify.fortify_fpr_importer import FortifyFPRImporter
 from sdetools.modules.import_fortify.fortify_fvdl_importer import FortifyFVDLImporter
 
-from sdetools.sdelib import log_mgr
-logger = log_mgr.mods.add_mod(__name__)
-
 __all__ = ['FortifyIntegrator']
 
 DEFAULT_MAPPING_FILE = os.path.join(media_path, 'fortify', 'sde_fortify_map.xml')
@@ -51,7 +48,7 @@ class FortifyIntegrator(BaseIntegrator):
         if self.importer.report_id:
             self.report_id = self.importer.report_id
         else:
-            logger.info("Report ID not found in report")
+            self.emit.info("Report ID not found in report: Using default.")
 
     def _make_finding(self, item):
         return {'weakness_id': item['id'], 'description': item['description'], 'count': item['count']}
