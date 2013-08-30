@@ -68,18 +68,19 @@ class BaseZIPImporter(BaseImporter):
                 raise BaseIntegrationError("File (%s) not found in archive %s" % (self.ARCHIVED_FILE_NAME, zip_archive))
 
             importer.parse_file(results_file)
-            self.report_id = importer.report_id
-            self.raw_findings = importer.raw_findings
 
         # Python 2.5 and prior must open the file into memory
         else:
             # Restrict the size of the file we will open into RAM
             if file_info.file_size > self.MAX_MEMORY_SIZE_IN_MB * 1024 * 1024:
                 raise BaseIntegrationError("File %s is larger than %s MB: %d bytes" %
-                        (archive_file_name, self.MAX_MEMORY_SIZE_IN_MB, file_info.file_size))
+                        (self.ARCHIVED_FILE_NAME, self.MAX_MEMORY_SIZE_IN_MB, file_info.file_size))
 
-            results_xml = scan_file.read(self.WEBINSPECT_FILE)
+            results_xml = results_archive.read(self.WEBINSPECT_FILE)
             importer.parse_string(results_xml)
+            
+        self.report_id = importer.report_id
+        self.raw_findings = importer.raw_findings            
         
 class BaseXMLImporter(BaseImporter):
 
