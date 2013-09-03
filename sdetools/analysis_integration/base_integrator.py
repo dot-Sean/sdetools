@@ -272,7 +272,7 @@ class BaseIntegrator(object):
         project_tasks is an array of maps. Each map contains a key 'id' with a corresponding integer value
         """
         for task in project_tasks:
-            task_search = re.search('^(\d+)-[^\d]+(\d+)$', task['id'])
+            task_search = re.search('^(\d+)-([CT]\d+)$', task['id'])
             if task_search:
                 project_task_id = task_search.group(2)
                 if project_task_id == task_id:
@@ -346,8 +346,6 @@ class BaseIntegrator(object):
                 stats_total_skips_findings += len(finding['weaknesses'])
                 continue
 
-            task_name = "T%s" % (task_id)
-
             analysis_findings = []
             last_weakness = None
             weakness_finding = {}
@@ -390,13 +388,13 @@ class BaseIntegrator(object):
                     finding_confidence = self.confidence[task_id]
 
                 if not self.config['trial_run']:
-                    ret = self.plugin.add_analysis_note(task_name, project_analysis_note_ref, 
+                    ret = self.plugin.add_analysis_note(task_id, project_analysis_note_ref, 
                             finding_confidence, analysis_findings)
-                logger.debug("Marked %s as FAILURE with %s confidence" % (task_name, finding_confidence))
+                logger.debug("Marked %s as FAILURE with %s confidence" % (task_id, finding_confidence))
                 stats_failures_added += 1
             except APIError, e:
-                logger.exception("Unable to mark %s as FAILURE - Reason: %s" % (task_name, str(e)))
-                self.emit.error("API Error: Unable to mark %s as FAILURE. Skipping ..." % (task_name))
+                logger.exception("Unable to mark %s as FAILURE - Reason: %s" % (task_id, str(e)))
+                self.emit.error("API Error: Unable to mark %s as FAILURE. Skipping ..." % (task_id))
                 stats_api_errors += 1
 
         stats_passes_added = 0
@@ -408,7 +406,7 @@ class BaseIntegrator(object):
             if(task['phase'] in self.phase_exceptions):
                 stats_test_tasks += 1
                 continue
-            task_search = re.search('^(\d+)-[^\d]+(\d+)$', task['id'])
+            task_search = re.search('^(\d+)-([CT]\d+)$', task['id'])
             if task_search:
                 task_id = task_search.group(2)
                 if(unique_findings.has_key(task_id)):
@@ -418,8 +416,6 @@ class BaseIntegrator(object):
 
         if not self.config['flaws_only']:
             for task_id in noflaw_tasks:
-
-                task_name = "T%s" % task_id
 
                 finding_confidence = "none"
                 if self.confidence.has_key(task_id):
@@ -431,13 +427,13 @@ class BaseIntegrator(object):
                     if not self.config['trial_run']:
                         analysis_findings = []
 
-                        self.plugin.add_analysis_note(task_name, project_analysis_note_ref, 
+                        self.plugin.add_analysis_note(task_id, project_analysis_note_ref, 
                                 finding_confidence, analysis_findings)
-                    logger.info("Marked %s as PASS with %s confidence" % (task_name, finding_confidence))
+                    logger.info("Marked %s as PASS with %s confidence" % (task_id, finding_confidence))
                     stats_passes_added += 1
                 except APIError, e:
-                    logger.exception("Unable to mark %s as PASS - Reason: %s" % (task_name, str(e)))
-                    self.emit.error("API Error: Unable to mark %s as PASS. Skipping ..." % (task_name))
+                    logger.exception("Unable to mark %s as PASS - Reason: %s" % (task_id, str(e)))
+                    self.emit.error("API Error: Unable to mark %s as PASS. Skipping ..." % (task_id))
                     stats_api_errors += 1
 
         if missing_weakness_map:
