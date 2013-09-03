@@ -1,7 +1,5 @@
-import os
 import xml.sax.handler
 
-from sdetools.sdelib import commons
 from sdetools.analysis_integration.base_integrator import BaseXMLImporter
 
 

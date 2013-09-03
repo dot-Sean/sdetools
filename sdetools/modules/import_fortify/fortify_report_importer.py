@@ -1,8 +1,6 @@
-import os
 import re
 
 from sdetools.extlib.defusedxml import minidom
-from sdetools.sdelib import commons
 from sdetools.analysis_integration.base_integrator import BaseImporter
 from sdetools.modules.import_fortify.fortify_integration_error import FortifyIntegrationError
 

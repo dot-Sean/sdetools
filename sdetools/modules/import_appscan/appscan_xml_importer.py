@@ -1,6 +1,5 @@
 from xml.sax.handler import ContentHandler
 
-from sdetools.sdelib import commons
 from sdetools.analysis_integration.base_integrator import BaseXMLImporter
 
 class AppScanXMLContent(ContentHandler):
