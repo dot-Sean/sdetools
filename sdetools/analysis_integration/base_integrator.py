@@ -147,6 +147,8 @@ class BaseIntegrator(object):
         self.plugin = PlugInExperience(self.config)
         self.config.add_custom_option("mapping_file",
                 "Task ID -> Tool Weakness mapping in XML format", "m", default_mapping_file)
+        self.config.add_custom_option("custom_mapping_file",
+                "Custom Task ID -> Tool Weakness mapping in XML format", "p", "")
         self.config.add_custom_option("flaws_only",
                 "Only update tasks identified having flaws. (True | False)", "z", "False")
         self.config.add_custom_option("trial_run",
@@ -187,6 +189,46 @@ class BaseIntegrator(object):
         if not self.mapping:
             raise IntegrationError("No mapping was found in file '%s'" % self.config['mapping_file'])
 
+    def _eliminate_task_references(self, task_id, weakness_mapping):
+        weakness_ids = unique_findings.iterkeys()
+        for weakness_id in weakness_ids:
+            if task_id in weakness_mapping[weakness_id]:
+                weakness_mapping[weakness_id].remove(task_id)
+
+    # Enable custom task->weakness mappings
+    # Custom mapping file format is identical to the base mapping file
+    #
+    # NOTE: If any task is present in both the base and custom mapping, the custom mapping
+    # overrides the base
+    def load_custom_mapping_from_xml(self):
+        # Return if no custom mapping is specified
+        if not self.config['custom_mapping_file']:
+            return
+
+        self.emit("Loading custom mapping")
+
+        try:
+            base = minidom.parse(self.config['custom_mapping_file'])
+        except KeyError, ke:
+            raise IntegrationError("Missing configuration option 'custom_mapping_file'")
+        except Exception, e:
+            raise IntegrationError("An error occurred opening mapping file '%s': %s" % (self.config['custom_mapping_file'], e))
+
+        for task in base.getElementsByTagName('task'):        
+            task_id = task.attributes['id'].value
+
+            del self.confidence[task_id]
+            self._eliminate_task_references(task_id, self.mapping)
+
+            if task.attributes.has_key('confidence'):
+                self.confidence[task_id] = task.attributes['confidence'].value
+
+            for weakness in task.getElementsByTagName('weakness'):
+                weakness_id = weakness.attributes['id'].value
+                self.mapping[weakness_id].append(task_id)
+                self.weakness_type[weakness_id] = weakness.attributes['type'].value
+                self.weakness_title[weakness_id] = weakness.attributes['title'].value
+            
     def generate_findings(self):
         return []
 

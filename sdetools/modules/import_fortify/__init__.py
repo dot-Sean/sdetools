@@ -10,6 +10,7 @@ class Command(BaseCommand):
     def handle(self):
         self.ft_integrator.initialize()
         self.ft_integrator.load_mapping_from_xml()
+        self.ft_integrator.load_custom_mapping_from_xml()
         self.ft_integrator.parse()
         self.emit.info('Finding file parsed successfully. Starting the import')
         self.ft_integrator.import_findings()

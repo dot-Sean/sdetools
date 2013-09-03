@@ -10,6 +10,7 @@ class Command(BaseCommand):
     def handle(self):
         self.wi_integrator.initialize()
         self.wi_integrator.load_mapping_from_xml()
+        self.wi_integrator.load_custom_mapping_from_xml()
         self.wi_integrator.parse()
         self.emit.info('Finding file parsed successfully. Starting the import')
         self.wi_integrator.import_findings()
