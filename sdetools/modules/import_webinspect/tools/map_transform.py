@@ -67,7 +67,7 @@ class Mapping:
         task_map = {}
         nomap = {}
 
-        task_map['193'] = [ {'check_id':'*', 'check_name': 'Unmapped Check'} ]
+        task_map['T193'] = [ {'check_id':'*', 'check_name': 'Unmapped Check'} ]
 
         keys = sorted(self.cwe_checks.iterkeys())
         for cwe in keys:
@@ -80,7 +80,7 @@ class Mapping:
                     for check in self.cwe_checks[cwe]:
                     
                         # If the check is assigned elsewhere do not put it in the catch-all task
-                        if task == '193' and self.check_mapped(task_map, check['check_id']):
+                        if task == 'T193' and self.check_mapped(task_map, check['check_id']):
                             continue
 
                         task_mapping_found = False
@@ -93,7 +93,7 @@ class Mapping:
             else: #map to 193
                     task_mapping_found = False
                     task_checks = []
-                    task = '193'
+                    task = 'T193'
                     if task_map.has_key(task):
                         task_checks = task_map[task]
                     for check in self.cwe_checks[cwe]:
