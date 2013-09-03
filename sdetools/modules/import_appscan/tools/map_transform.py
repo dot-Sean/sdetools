@@ -59,7 +59,7 @@ class Mapping:
     def remap(self):
         task_map = {}
 
-        task_map['193'] = [ {'check_id':'*', 'category_id':"", 'check_name': 'Unmapped Check'} ]
+        task_map['T193'] = [ {'check_id':'*', 'category_id':"", 'check_name': 'Unmapped Check'} ]
 
         keys = sorted(self.category_checks.iterkeys())
         for cwe in keys:
@@ -80,7 +80,7 @@ class Mapping:
             else: #map to 193
                     task_mapping_found = False
                     task_checks = []
-                    task = '193'
+                    task = 'T193'
                     if task_map.has_key(task):
                         task_checks = task_map[task]
                     for check in self.category_checks[cwe]:
