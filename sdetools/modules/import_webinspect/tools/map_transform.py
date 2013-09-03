@@ -65,7 +65,6 @@ class Mapping:
         
     def remap(self):
         task_map = {}
-        nomap = {}
 
         task_map['T193'] = [ {'check_id':'*', 'check_name': 'Unmapped Check'} ]
 
