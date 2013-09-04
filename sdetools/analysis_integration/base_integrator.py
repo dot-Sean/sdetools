@@ -126,7 +126,7 @@ class BaseXMLImporter(BaseImporter):
             sax.parseString(xml, XMLReader)
         except (xml.sax.SAXException, xml.sax.SAXParseException, xml.sax.SAXNotSupportedException, 
                 xml.sax.SAXNotRecognizedException), se:
-            raise IntegrationError("Could not parse xml source %s" % (se))
+            raise IntegrationError("Could not parse xml source: %s" % (se))
         
         self.raw_findings = XMLReader.raw_findings
         if XMLReader.report_id:
@@ -189,11 +189,14 @@ class BaseIntegrator(object):
         if not self.mapping:
             raise IntegrationError("No mapping was found in file '%s'" % self.config['mapping_file'])
 
-    def _eliminate_task_references(self, task_id, weakness_mapping):
-        weakness_ids = unique_findings.iterkeys()
+    def _eliminate_task_references(self, task_id):
+        if task_id in self.confidence:
+            del self.confidence[task_id]
+    
+        weakness_ids = self.mapping.iterkeys()
         for weakness_id in weakness_ids:
-            if task_id in weakness_mapping[weakness_id]:
-                weakness_mapping[weakness_id].remove(task_id)
+            if task_id in self.mapping[weakness_id]:
+                self.mapping[weakness_id].remove(task_id)
 
     # Enable custom task->weakness mappings
     # Custom mapping file format is identical to the base mapping file
@@ -205,7 +208,9 @@ class BaseIntegrator(object):
         if not self.config['custom_mapping_file']:
             return
 
-        self.emit("Loading custom mapping")
+        custom_task_mapping_count = 0
+
+        self.emit.info("Loading custom mapping...")
 
         try:
             base = minidom.parse(self.config['custom_mapping_file'])
@@ -214,20 +219,37 @@ class BaseIntegrator(object):
         except Exception, e:
             raise IntegrationError("An error occurred opening mapping file '%s': %s" % (self.config['custom_mapping_file'], e))
 
+        mapping_nodes = base.getElementsByTagName('mapping')
+        if not mapping_nodes:
+            raise IntegrationError("Invalid custom mapping file: missing 'mapping' node")
+
+        mapping_node = mapping_nodes[0]
+        # default: <mapping type="merge"> - use base mapping but override specific tasks
+        # <mapping type="override"> - clear out base mapping and use custom mapping only
+        if mapping_node.attributes['type'].value == 'override':
+            self.emit.info("Base mapping removed, using custom mapping only")
+            self.weakness_title = {}
+            self.confidence = {}
+            self.weakness_type = {}
+            self.mapping = {}
+
         for task in base.getElementsByTagName('task'):        
             task_id = task.attributes['id'].value
-
-            del self.confidence[task_id]
-            self._eliminate_task_references(task_id, self.mapping)
+            custom_task_mapping_count += 1
+            self._eliminate_task_references(task_id)
 
             if task.attributes.has_key('confidence'):
                 self.confidence[task_id] = task.attributes['confidence'].value
 
             for weakness in task.getElementsByTagName('weakness'):
                 weakness_id = weakness.attributes['id'].value
+                if weakness_id not in self.mapping:
+                    self.mapping[weakness_id] = []
                 self.mapping[weakness_id].append(task_id)
                 self.weakness_type[weakness_id] = weakness.attributes['type'].value
                 self.weakness_title[weakness_id] = weakness.attributes['title'].value
+
+        self.emit.info("%d task(s) loaded from custom mapping" % custom_task_mapping_count)
             
     def generate_findings(self):
         return []
@@ -268,11 +290,11 @@ class BaseIntegrator(object):
         """
         Return True if task_id is present in the array of project_tasks, False otherwise
         
-        task_id is an integer
+        task_id matches regular expression: C?T\d+ - i.e CT12 or T38
         project_tasks is an array of maps. Each map contains a key 'id' with a corresponding integer value
         """
         for task in project_tasks:
-            task_search = re.search('^(\d+)-([CT]\d+)$', task['id'])
+            task_search = re.search('^(\d+)-(C?T\d+)$', task['id'])
             if task_search:
                 project_task_id = task_search.group(2)
                 if project_task_id == task_id:
@@ -406,7 +428,7 @@ class BaseIntegrator(object):
             if(task['phase'] in self.phase_exceptions):
                 stats_test_tasks += 1
                 continue
-            task_search = re.search('^(\d+)-([CT]\d+)$', task['id'])
+            task_search = re.search('^(\d+)-(C?T\d+)$', task['id'])
             if task_search:
                 task_id = task_search.group(2)
                 if(unique_findings.has_key(task_id)):
