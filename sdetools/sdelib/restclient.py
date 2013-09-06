@@ -2,6 +2,7 @@ import urllib
 import urllib2
 import httplib
 import base64
+import cookielib
 
 from commons import json, Error, UsageError
 from sdetools.extlib import http_req
@@ -67,6 +68,7 @@ class RESTBase(object):
         self.conf_name = conf_name
         self.opener = None
         self.auth_mode = 'basic'
+        self.cookiejar = cookielib.CookieJar()
         self._customize_config(conf_opts)
 
     def _get_conf(self, name):
@@ -93,7 +95,7 @@ class RESTBase(object):
         self.opener = http_req.get_opener(
             self._get_conf('method'),
             self._get_conf('server'),
-            debuglevel=urllib_debuglevel)
+            debuglevel=urllib_debuglevel, cookies=self.cookiejar)
         self.config['%s_server' % (self.conf_prefix)] = self.opener.server
 
         self.session_info = None
@@ -101,7 +103,10 @@ class RESTBase(object):
         self.base_uri = '%s://%s/%s' % (self._get_conf('method'), self.server, self.base_path)
 
     def encode_post_args(self, args):
-        return json.dumps(args)
+        if isinstance(args, basestring):
+            return args
+        else:
+            return json.dumps(args)
 
     def parse_response(self, result):
         try:
