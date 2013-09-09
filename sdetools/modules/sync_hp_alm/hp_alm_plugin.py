@@ -11,10 +11,12 @@ from sdetools.sdelib.restclient import RESTBase, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from sdetools.alm_integration.alm_plugin_base import AlmException
 from sdetools.sdelib.conf_mgr import Config
-from sdetools.extlib import markdown
+from sdetools.extlib import markdown, http_req
 
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
+
+URLRequest = http_req.ExtendedMethodRequest
 
 HPALM_PRIORITY_MAP = {
     '10': '5-Urgent',
@@ -109,15 +111,22 @@ class HPAlmConnector(AlmConnector):
             raise AlmException('Unable to connect to HP Alm service (Check server URL, '
                     'user, pass). Reason: %s' % str(err))
 
-    def alm_connect_project(self):
+    def _call_api(self, target, query_args=None, method=URLRequest.GET):
         headers = {'Cookie':'LWSSO_COOKIE_KEY=%s' % self.COOKIE_LWSSO,
                    'Content-Type':'application/json',
                    'Accept':'application/json'}
-  
+        return self.alm_plugin.call_api(target, method = method, args = query_args, call_headers=headers)
+
+    def _call_reqs_api(self, json, method=URLRequest.GET):
+        return self._call_api('rest/domains/%s/projects/%s/requirements' 
+                                    % (self.config['hp_alm_domain'], self.config['alm_project']),
+                                    method = method, query_args = json)
+    
+    def alm_connect_project(self):
         try:
-            user = self.alm_plugin.call_api('rest/domains/%s/projects/%s/customization/users/%s' 
+            user = self._call_api('rest/domains/%s/projects/%s/customization/users/%s' 
                                     % (self.config['hp_alm_domain'], self.config['alm_project'], 
-                                       self.config['alm_user']), call_headers=headers)
+                                       self.config['alm_user']))
         except APIError, err:
             raise AlmException('Unable to verify domain and project details: %s' % (err))
         
@@ -131,14 +140,11 @@ class HPAlmConnector(AlmConnector):
 
         try:
             query_args = {
-                'alt':'application/json',
                 'query': "{name['%s:*']}" % task_id,
                 'fields': 'id,name,req-priority,status',
-                }
-            headers = {'Cookie':'LWSSO_COOKIE_KEY=%s' % self.COOKIE_LWSSO}
-            result = self.alm_plugin.call_api('rest/domains/%s/projects/%s/requirements' 
-                                        % (self.config['hp_alm_domain'], self.config['alm_project']),
-                                               args = query_args, call_headers=headers)
+            }
+            result = self._call_reqs_api(query_args)
+                                               
         except APIError, err:
             raise AlmException('Unable to get task %s from HP Alm. '
                     'Reason: %s' % (task_id, str(err)))
@@ -189,7 +195,7 @@ class HPAlmConnector(AlmConnector):
         task['title'] = json.dumps(task['title'])
 
         # HP Alm is very particular about JSON ordering
-        query_args = """{
+        json_data = """{
             "Fields":[
                 {"Name":"type-id","values":[{"value":"3"}]},
                 {"Name":"status","values":[{"value":"%s"}]},
@@ -200,13 +206,7 @@ class HPAlmConnector(AlmConnector):
             "Type":"requirement"
         }""" % (self.config['hp_alm_new_status'], task['title'], task['formatted_content'], task['alm_priority'])
         try:
-            headers = {'Cookie':'LWSSO_COOKIE_KEY=%s' % self.COOKIE_LWSSO,
-                       'Content-Type':'application/json',
-                       'Accept':'application/json'}
-            result = self.alm_plugin.call_api('rest/domains/%s/projects/%s/requirements' 
-                                        % (self.config['hp_alm_domain'], self.config['alm_project']),
-                                        method = self.alm_plugin.URLRequest.POST, args = query_args, 
-                                        call_headers=headers)
+            result = self._call_reqs_api(json_data, self.alm_plugin.URLRequest.POST)
             logger.debug('Task %s added to HP Alm Project', task['id'])
         except APIError, err:
             raise AlmException('Unable to add task to HP Alm %s because of %s' % 
@@ -226,10 +226,6 @@ class HPAlmConnector(AlmConnector):
             logger.debug('Status synchronization disabled')
             return
 
-        headers = {'Cookie':'LWSSO_COOKIE_KEY=%s' % self.COOKIE_LWSSO,
-                   'Content-Type':'application/json',
-                   'Accept':'application/json'}
-                   
         if status == 'DONE' or status == 'NA':
             json = """
                 {"entities":[{"Fields":[
@@ -248,11 +244,8 @@ class HPAlmConnector(AlmConnector):
             raise AlmException('Unexpected status %s: valid values are DONE and TODO' % status)
 
         try:
-            self.alm_plugin.call_api('rest/domains/%s/projects/%s/requirements' 
-                                    % (self.config['hp_alm_domain'], self.config['alm_project']),
-                                      args = json,
-                                      method=self.alm_plugin.URLRequest.PUT,
-                                      call_headers=headers)
+            result = self._call_reqs_api(json, self.alm_plugin.URLRequest.PUT)
+
         except APIError, err:
             raise AlmException('Unable to update task status to %s '
                                'for requirement: '
@@ -264,8 +257,7 @@ class HPAlmConnector(AlmConnector):
 
     def alm_disconnect(self):
         try:
-            headers = {'Cookie':'LWSSO_COOKIE_KEY=%s' % self.COOKIE_LWSSO}
-            result = self.alm_plugin.call_api('authentication-point/logout', call_headers=headers)
+            result = self._call_api('authentication-point/logout')
         except APIError, err:
             raise AlmException('Unable to logout from HP Alm. Reason: %s' % (str(err)))
 
