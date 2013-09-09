@@ -15,7 +15,7 @@ sde_project = SDEproj
 sde_method = https
 
 ###################################################
-#### GitHub server and project settings         #####
+#### GitHub server and project settings       #####
 ###################################################
 
 #GitHub Server name, includes port
@@ -33,8 +33,8 @@ alm_user = github_user
 #in future versions of the plugin
 alm_pass = github_passsword
               
-#GitHub Repository
-alm_project = repo_owner/repo_name
+#GitHub repository name
+alm_project = repo_name
           
 #A comma-delimited list of statuses for tasks
 #that you wish to import into the ALM.
@@ -85,7 +85,7 @@ conflict_policy = alm
 
 #[Optional] Specify a custom priority map
 #This is a JSON representation of a list of ranges mapped to certain
-#priority names. Make sure to cover all priorities 1 to 10. Note that
+#GitHub labels. Make sure to cover all priorities 1 to 10. Note that
 #the ranges are inclusive
 #alm_priority_map = {"1-6":"Trivial", "7-9":"Major", "10":"Blocker"}
 
@@ -95,7 +95,7 @@ conflict_policy = alm
 #alm_project_version = milestone_name
 
 ###################################################
-#### Advanced GitHub Settings                   #####
+#### Advanced GitHub Settings                 #####
 ###################################################
           
 #This value indicates whether or not task status
@@ -105,7 +105,10 @@ conflict_policy = alm
 alm_standard_workflow = True
 
 #[Optional] GitHub label to apply to all issues created during the sync
-#github_issue_type = github_label
+#github_issue_label = github_label
+
+#Username of the repository owner
+github_repo_owner = repo_owner
 
 #The status of a TODO task in GitHub
 github_new_status = open
