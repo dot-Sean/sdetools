@@ -24,10 +24,9 @@ alm_server = api.github.com
 #HTTP or HTTPs protocol
 alm_method = https
               
-#Username for GitHub user that can:
-# -create new issues for the project
-# -read existing issues in the project
-# -create transitions on issues (e.g. close an issue)
+#Username for GitHub user with push access
+#[Alternative] You can set the OAuth token as the username
+#and leave the password blank
 alm_user = github_user
               
 #Password for above user. Note that this will be encrypted
@@ -35,7 +34,7 @@ alm_user = github_user
 alm_pass = github_passsword
               
 #GitHub Repository
-alm_project = REPOOWNER/REPONAME
+alm_project = repo_owner/repo_name
           
 #A comma-delimited list of statuses for tasks
 #that you wish to import into the ALM.
@@ -64,7 +63,7 @@ how_tos_in_scope = True
 alm_phases = requirements
 
 #Which system takes precedence in case of
-#confliciting status. For example, if you mark
+#conflicting status. For example, if you mark
 #an issue as Closed in JIRA and the task is TODO in
 #SD Elements, it will be changed to DONE in SD Elemenets.
 #If you mark a task as Done in SD Elements, but it's still
@@ -92,9 +91,8 @@ conflict_policy = alm
 
 #[Optional] ALM Project Version
 #Specify the title of the GitHub milestone you wish to sync with.
-#If no issue is found with the specified milestone, a new issue
-#will be created and assigned to that milestone.
-#project_version = MilestoneName
+#Newly created issues will be assigned to this milestone
+#alm_project_version = milestone_name
 
 ###################################################
 #### Advanced GitHub Settings                   #####
@@ -106,17 +104,18 @@ conflict_policy = alm
 #you may wish to set this to False.
 alm_standard_workflow = True
 
-#issue type for new issues raised by SD Elements
-github_issue_type = GITHUB_LABEL
+#[Optional] GitHub label to apply to all issues created during the sync
+#github_issue_type = github_label
 
-#transition for a closed issue in GitHub
+#The status of a TODO task in GitHub
 github_new_status = open
 
-#a comma delimited list of statuses that signify a task is 
-#Done in GitHub
+#A comma delimited list of statuses in GitHub that are the
+#equivalent of DONE in SDE
 github_done_statuses = closed
 
 #GitHub label for duplicate issues
+#Issues with this label will be ignored during the sync
 github_duplicate_label = duplicate
 
 ######Base settings, do not modify######
