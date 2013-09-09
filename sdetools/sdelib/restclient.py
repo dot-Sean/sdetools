@@ -162,6 +162,9 @@ class RESTBase(object):
             req.add_header("X-Api-Token", self._get_conf('pass'))
         elif target == 'session':
             pass
+        elif auth_mode == 'cookie':
+            # we will leave it up to the caller to deal with this
+            pass
         elif auth_mode == 'basic':
             encoded_auth = base64.encodestring('%s:%s' % (self._get_conf('user'), self._get_conf('pass')))[:-1]
             authheader =  "Basic %s" % (encoded_auth)

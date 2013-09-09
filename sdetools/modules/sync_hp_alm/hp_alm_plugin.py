@@ -111,6 +111,12 @@ class HPAlmConnector(AlmConnector):
             raise AlmException('Unable to connect to HP Alm service (Check server URL, '
                     'user, pass). Reason: %s' % str(err))
 
+        if not self.COOKIE_LWSSO:
+            raise AlmException('Unable to connect to HP Alm service (Check server URL, user, pass)')
+
+        # We will authenticate via cookie
+        self.alm_plugin.auth_mode = 'cookie'
+            
     def _call_api(self, target, query_args=None, method=URLRequest.GET):
         headers = {'Cookie':'LWSSO_COOKIE_KEY=%s' % self.COOKIE_LWSSO,
                    'Content-Type':'application/json',
@@ -131,8 +137,8 @@ class HPAlmConnector(AlmConnector):
             raise AlmException('Unable to verify domain and project details: %s' % (err))
         
         if user['Name'] != self.config['alm_user']:
-            raise AlmException('Unable to verify domain and project details: %s' % (err))
-
+            raise AlmException('Unable to verify domain and project details')
+            
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])  
         if not task_id:
@@ -259,7 +265,7 @@ class HPAlmConnector(AlmConnector):
         try:
             result = self._call_api('authentication-point/logout')
         except APIError, err:
-            raise AlmException('Unable to logout from HP Alm. Reason: %s' % (str(err)))
+            logger.warn('Unable to logout from HP Alm. Reason: %s' % (str(err)))
 
     def convert_markdown_to_alm(self, content, ref): 
         return '<html>'+self.mark_down_converter.convert(content)+'</html>'
