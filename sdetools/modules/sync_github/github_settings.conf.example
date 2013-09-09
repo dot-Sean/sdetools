@@ -91,10 +91,10 @@ conflict_policy = alm
 #alm_priority_map = {"1-6":"Trivial", "7-9":"Major", "10":"Blocker"}
 
 #[Optional] ALM Project Version
-#This is the target project version we want to sync the tickets to
-#If there is a matching ticket in prior versions, we will reopen
-#and set the version to this. Otherwise, we'll create a new ticket.
-#project_version = NewRelease
+#Specify the title of the GitHub milestone you wish to sync with.
+#If no issue is found with the specified milestone, a new issue
+#will be created and assigned to that milestone.
+#project_version = MilestoneName
 
 ###################################################
 #### Advanced GitHub Settings                   #####

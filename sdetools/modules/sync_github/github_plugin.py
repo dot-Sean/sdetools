@@ -74,6 +74,7 @@ class GitHubConnector(AlmConnector):
     alm_new_status = 'github_new_status'
     alm_done_statuses = 'github_done_statuses'
     github_duplicate_label = 'github_duplicate_label'
+    alm_project_version = 'alm_project_version'
 
     def __init__(self, config, alm_plugin):
         """ Initializes connection to GitHub """
@@ -87,6 +88,8 @@ class GitHubConnector(AlmConnector):
             default='closed')
         config.add_custom_option(self.github_duplicate_label, 'GitHub label for duplicate issues',
             default='duplicate')
+        config.add_custom_option(self.alm_project_version, 'GitHub milestone',
+            default='')
         self.alm_task_title_prefix = 'SDE '
         
     def initialize(self):
@@ -124,40 +127,60 @@ class GitHubConnector(AlmConnector):
            
         if repo_info.get('message'):
             raise AlmException('Error accessing GitHub repository %s: %s' % self.project_uri, repo_info['message'])
+    
+    def github_get_milestone_id(self, milestone_name):
+        if not milestone_name:
+            return None
 
+        try:
+            milestone_list = self.alm_plugin.call_api('repos/%s/milestones' % self.project_uri)
+        except APIError, err:
+            logger.error(err)
+            raise AlmException('Unable to get milestone %s from GitHub' % milestone_name)
+    
+        for milestone in milestone_list:
+            if milestone['title'] == milestone_name:
+                return milestone['number']
+
+        raise AlmException('Unable to find milestone %s from GitHub' % milestone_name)
+            
     def alm_get_task(self, task):
         task_id = task['title']
+        milestone_name = self.config[self.alm_project_version]
         
         try:
             # We need to perform 2 API calls to search open and closed issues
-            open_issue = self.alm_plugin.call_api('legacy/issues/search/%s/%s/%s' % 
+            open_issues = self.alm_plugin.call_api('legacy/issues/search/%s/%s/%s' % 
                             (self.project_uri, self.config[self.alm_new_status], urlencode_str(task_id)))
-            closed_issue = self.alm_plugin.call_api('legacy/issues/search/%s/%s/%s' % 
+            closed_issues = self.alm_plugin.call_api('legacy/issues/search/%s/%s/%s' % 
                             (self.project_uri, self.config[self.alm_done_statuses][0], urlencode_str(task_id)))
+            issues_list = open_issues['issues']
+            issues_list.extend(closed_issues['issues'])
         except APIError, err:
             logger.error(err)
-            raise AlmException('Unable to get task %s from %s' % (task_id, self.alm_name))
-            
-        issues_list = open_issue['issues']
-        issues_list.extend(closed_issue['issues'])
-
+            raise AlmException('Unable to get task %s from GitHub' % task_id)
+        
         if (not issues_list):
             return None
         
         if len(issues_list) > 1:
             index = 0
+            
             while index < len(issues_list):
                 issue = issues_list[index]
-                if issue['labels'].count(self.config[self.github_duplicate_label]) > 0:
+                duplicate_label = self.config[self.github_duplicate_label]
+                
+                if issue['labels'].count(duplicate_label) > 0:
                     issues_list.pop(index)
                 else:
                     index = index + 1
-            
+                            
             if len(issues_list) > 1:
-                raise AlmException('Found multiple issues with the title %s that are not labeled as duplicates' % (task_id))
+                raise AlmException('Found multiple issues with the title %s in milestone %s that are not labeled as duplicates' % (task_id, milestone_name))
             elif not issues_list:
                 return None
-        logger.info('Found task %s', task_id)
+                
+        logger.info('Found task: %s', task_id)
         return GitHubTask(task_id,
                               issues_list[0]['number'],
                               issues_list[0]['state'],
@@ -165,23 +188,29 @@ class GitHubConnector(AlmConnector):
                               self.config[self.alm_done_statuses])        
 
     def alm_add_task(self, task):
+        milestone_name = self.config[self.alm_project_version]
+
         try:
             create_args = { 
                 'title': task['title'],
                 'body': self.sde_get_task_content(task),
-                'labels': [self.config[self.alm_card_type]]
+                'labels': [self.config[self.alm_card_type]],
             }
+            
+            milestone_id = self.github_get_milestone_id(milestone_name)
+            if milestone_id:
+                create_args['milestone'] = milestone_id
 
             new_issue = self.alm_plugin.call_api('repos/%s/issues' % self.project_uri,
                     method = self.alm_plugin.URLRequest.POST, args = create_args)
-            logger.debug('Task %s added to %s Project', (task['id'], self.alm_name))
+            logger.debug('Task %s added to GitHub Project', task['id'])
         except APIError, err:
-            raise AlmException('Unable to add task %s to %s because of %s' % 
-                    (task['id'], self.alm_name, err))
+            raise AlmException('Unable to add task %s to GitHub because of %s' % 
+                    (task['id'], err))
         
         if new_issue.get('errors'):
-            raise AlmException('Unable to add task %s to %s. Reason: %s - %s' % 
-                    (task['id'], self.alm_name, str(new_issue['errors']['code']), 
+            raise AlmException('Unable to add task GitHub to %s. Reason: %s - %s' % 
+                    (task['id'], str(new_issue['errors']['code']), 
                     str(new_issue['errors']['field'])))
 
         # API returns JSON of the new issue
@@ -190,8 +219,7 @@ class GitHubConnector(AlmConnector):
                               new_issue['state'],
                               new_issue['updated_at'],
                               self.config[self.alm_done_statuses])        
-        logger.info('Create new task in %s: %s' % (self.alm_name, new_issue['number']))
-        
+
         if (self.config['alm_standard_workflow'] and (task['status'] == 'DONE' or
                 task['status'] == 'NA')):
             self.alm_update_task_status(alm_task, task['status'])
@@ -213,8 +241,8 @@ class GitHubConnector(AlmConnector):
                         args=update_args, method=URLRequest.POST)
             except APIError, err:
                 raise AlmException('Unable to update task status to DONE '
-                                   'for issue: %s in %s because of %s' %
-                                   (task.get_alm_id(), self.alm_name, err))
+                                   'for issue: %s in GitHub because of %s' %
+                                   (task.get_alm_id(), err))
         elif status== 'TODO':
             try:
                 update_args = {
@@ -224,16 +252,16 @@ class GitHubConnector(AlmConnector):
                         args=update_args, method=URLRequest.PUT)
             except APIError, err:
                 raise AlmException('Unable to update task status to TODO for '
-                                   'issue: %s in %s because of %s' %
-                                   (task.get_alm_id(), self.alm_name, err))
+                                   'issue: %s in GitHub because of %s' %
+                                   (task.get_alm_id(), err))
         
         if (result and result.get('errors')):
             raise AlmException('Unable to update status of task %s to %s. Reason: %s - %s' % 
                     (task['id'], status, str(new_issue['errors']['code']), 
                     str(new_issue['errors']['field']))) 
                     
-        logger.debug('Status changed to %s for task %s in %s' %
-                (status, task.get_alm_id(), self.alm_name))
+        logger.debug('Status changed to %s for task %s in GitHub' %
+                (status, task.get_alm_id()))
                 
     def alm_disconnect(self):
         pass
