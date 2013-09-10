@@ -1,15 +1,15 @@
 from sdetools.sdelib.cmd import BaseCommand
 
-from sdetools.modules.sync_github.github_plugin import GitHubConnector, GitHubAPI
+from sdetools.modules.sync_pt.pt_plugin import PivotalTrackerConnector, PivotalTrackerAPI
 
 class Command(BaseCommand):
-    help = 'GitHub <-> SDE sync utility.'
+    help = 'PivotalTracker <-> SDE sync utility.'
 
     def configure(self):
-        sync_base = GitHubAPI(self.config)
-        self.github = GitHubConnector(self.config, sync_base)
+        sync_base = PivotalTrackerAPI(self.config)
+        self.alm = PivotalTrackerConnector(self.config, sync_base)
 
     def handle(self):
-        self.github.initialize()
-        self.github.synchronize()
+        self.alm.initialize()
+        self.alm.synchronize()
         return True

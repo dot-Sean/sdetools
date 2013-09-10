@@ -59,6 +59,7 @@ class RESTBase(object):
     APIAuthError = APIAuthError
     ServerError = ServerError
     APIFormatError = APIFormatError
+    API_TOKEN_HEADER = "X-Api-Token"
 
     def __init__(self, conf_prefix, conf_name, config, base_path, conf_opts=CONF_OPTS):
         self.config = config
@@ -154,7 +155,7 @@ class RESTBase(object):
         self.set_content_type(req, method)
 
         if auth_mode == 'api_token':
-            req.add_header("X-Api-Token", self._get_conf('pass'))
+            req.add_header(self.API_TOKEN_HEADER, self._get_conf('pass'))
         elif target == 'session':
             pass
         elif auth_mode == 'basic':

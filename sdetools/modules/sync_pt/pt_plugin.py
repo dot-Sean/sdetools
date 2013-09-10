@@ -1,10 +1,9 @@
 # Copyright SDElements Inc
-# Extensible two way integration with GitHub
+# Extensible two way integration with PivotalTracker
 
 import re
 from datetime import datetime
 
-from sdetools.extlib import http_req
 from sdetools.sdelib.commons import urlencode_str
 from sdetools.sdelib.restclient import RESTBase
 from sdetools.sdelib.restclient import URLRequest, APIError
@@ -17,30 +16,26 @@ logger = log_mgr.mods.add_mod(__name__)
 RE_MAP_RANGE_KEY = re.compile('^\d+(-\d+)?$')
 
 
-class GitHubAPI(RESTBase):
-    """ Base plugin for GitHub """
+class PivotalTrackerAPI(RESTBase):
+    """ Base plugin for PivotalTracker """
+    API_TOKEN_HEADER = 'X-TrackerToken'
+    PT_API_VERSION = 'pt_api_version'
 
     def __init__(self, config):
-        super(GitHubAPI, self).__init__('alm', 'GitHub', config, '')
+        super(PivotalTrackerAPI, self).__init__('alm', 'PivotalTracker', config, 'services')
+        self.auth_mode = 'api_token'
+        config.add_custom_option(self.PT_API_VERSION, 'PivotalTracker API version', default='v5')
 
     def post_conf_init(self):
-        urllib_debuglevel = 0
-        if __name__ in self.config['debug_mods']:
-            urllib_debuglevel = 1
+        super(PivotalTrackerAPI, self).post_conf_init()
+        if not self.config[self.PT_API_VERSION]:
+            self.config[self.PT_API_VERSION] = 'v5'
 
-        self.opener = http_req.get_opener(
-            self._get_conf('method'),
-            self._get_conf('server'),
-            debuglevel=urllib_debuglevel)
-        self.config['%s_server' % (self.conf_prefix)] = self.opener.server
-
-        self.session_info = None
-        self.server = self._get_conf('server')
-        self.base_uri = '%s://%s' % (self._get_conf('method'), self.server)
+        self.base_uri = '%s/%s' % (self.base_uri, self.config[self.PT_API_VERSION])
 
 
-class GitHubTask(AlmTask):
-    """ Representation of a task in GitHub"""
+class PivotalTrackerTask(AlmTask):
+    """ Representation of a task in PivotalTracker"""
 
     def __init__(self, task_id, alm_id, status, timestamp, done_statuses):
         self.task_id = task_id
@@ -59,7 +54,7 @@ class GitHubTask(AlmTask):
         return self.priority
 
     def get_status(self):
-        """ Translates GitHub status into SDE status """
+        """ Translates PivotalTracker status into SDE status """
         if self.status in self.done_statuses:
             return 'DONE'
         else:
@@ -70,43 +65,35 @@ class GitHubTask(AlmTask):
         return datetime.strptime(self.timestamp, '%Y-%m-%dT%H:%M:%SZ')
 
 
-class GitHubConnector(AlmConnector):
-    alm_name = 'GitHub'
-    GITHUB_ISSUE_LABEL = 'github_issue_label'
-    ALM_NEW_STATUS = 'github_new_status'
-    ALM_DONE_STATUSES = 'github_done_statuses'
-    GITHUB_DUPLICATE_LABEL = 'github_duplicate_label'
+class PivotalTrackerConnector(AlmConnector):
+    alm_name = 'PivotalTracker'
+    PT_STORY_TYPE = 'pt_story_type'
+    ALM_NEW_STATUS = 'pt_new_status'
+    ALM_DONE_STATUSES = 'pt_done_statuses'
+    PT_API_TOKEN = ''
     ALM_PROJECT_VERSION = 'alm_project_version'
-    GITHUB_REPO_OWNER = 'github_repo_owner'
     ALM_PRIORITY_MAP = 'alm_priority_map'
 
     def __init__(self, config, alm_plugin):
-        """ Initializes connection to GitHub """
-        super(GitHubConnector, self).__init__(config, alm_plugin)
+        """ Initializes connection to PivotalTracker """
+        super(PivotalTrackerConnector, self).__init__(config, alm_plugin)
 
-        config.add_custom_option(self.GITHUB_ISSUE_LABEL, 'Issue type represented'
-                                 'by labels on GitHub', default='')
-        config.add_custom_option(self.ALM_NEW_STATUS, 'Status to set for new'
-                                 'tasks in GitHub', default='open')
-        config.add_custom_option(self.ALM_DONE_STATUSES, 'Statuses that '
-                                 'signify a task is Done in GitHub',
+        config.add_custom_option(self.PT_STORY_TYPE, 'Default story type on PivotalTracker', default='bug')
+        config.add_custom_option(self.ALM_NEW_STATUS, 'Status to set for new tasks in PivotalTracker',
+                                 default='open')
+        config.add_custom_option(self.ALM_DONE_STATUSES, 'Statuses that signify a task is Done in PivotalTracker',
                                  default='closed')
-        config.add_custom_option(self.GITHUB_DUPLICATE_LABEL, 'GitHub label'
-                                 'for duplicate issues', default='duplicate')
-        config.add_custom_option(self.ALM_PROJECT_VERSION, 'GitHub milestone',
-                                 default='')
-        config.add_custom_option(self.GITHUB_REPO_OWNER, 'GitHub repository owner',
+        config.add_custom_option(self.ALM_PROJECT_VERSION, 'Name of release marker to place all new stories under',
                                  default='')
         config.add_custom_option(self.ALM_PRIORITY_MAP, 'Customized map from priority in SDE to GITHUB '
                                  '(JSON encoded dictionary of strings)', default='')
         self.alm_task_title_prefix = 'SDE '
 
     def initialize(self):
-        super(GitHubConnector, self).initialize()
+        super(PivotalTrackerConnector, self).initialize()
 
         # Verify that the configuration options are set properly
-        for item in [self.ALM_NEW_STATUS, self.ALM_DONE_STATUSES, self.GITHUB_DUPLICATE_LABEL,
-                     self.GITHUB_REPO_OWNER]:
+        for item in [self.ALM_NEW_STATUS, self.ALM_DONE_STATUSES, self.PT_STORY_TYPE]:
             if not self.config[item]:
                 raise AlmException('Missing %s in configuration' % item)
 
@@ -121,101 +108,83 @@ class GitHubConnector(AlmConnector):
                                        % (self.ALM_PRIORITY_MAP, key))
 
     def alm_connect_server(self):
-        """ Verifies that GitHub connection works """
+        """ Verifies that PivotalTracker connection works """
         # Check if user can successfully authenticate and retrieve user profile
         try:
-            user_info = self.alm_plugin.call_api('user')
+            user_info = self.alm_plugin.call_api('me')
         except APIError, err:
-            raise AlmException('Unable to connect to GitHub service (Check'
-                               'server URL, user, pass). Reason: %s' %
-                               str(err))
+            raise AlmException('Unable to connect to PivotalTracker service (Check'
+                               'server URL, user, pass). Reason: %s' % str(err))
 
-        if user_info.get('message'):
-            raise AlmException('Could not authenticate GitHub user %s: %s' %
-                              (self.config['alm_user'], user_info['message']))
+        if user_info.get('error'):
+            raise AlmException('Could not authenticate PivotalTracker user %s: %s' %
+                              (self.config['alm_user'], user_info['error']))
 
     def alm_connect_project(self):
-        """ Verifies that the GitHub repo exists """
-        self.project_uri = '%s/%s' % (urlencode_str(self.config[self.GITHUB_REPO_OWNER]),
-                                      urlencode_str(self.config['alm_project']))
+        """ Verifies that the PivotalTracker project exists """
+        self.project_uri = 'projects/%s' % urlencode_str(self.config['alm_project'])
 
-        # Check if GitHub repo is accessible
+        # Check if PivotalTracker project is accessible
         try:
-            repo_info = self.alm_plugin.call_api('repos/%s' % self.project_uri)
+            repo_info = self.alm_plugin.call_api(self.project_uri)
         except APIError, err:
-            raise AlmException('Unable to find GitHub repo. Reason: %s' % err)
+            raise AlmException('Unable to find PivotalTracker project. Reason: %s' % err)
 
-        if repo_info.get('message'):
-            raise AlmException('Error accessing GitHub repository %s: %s' %
-                               self.project_uri, repo_info['message'])
-
-    def github_get_milestone_id(self, milestone_name):
-        if not milestone_name:
-            return None
-
-        try:
-            milestone_list = self.alm_plugin.call_api('repos/%s/milestones' %
-                                                      self.project_uri)
-        except APIError, err:
-            logger.error(err)
-            raise AlmException('Unable to get milestone %s from GitHub' %
-                               milestone_name)
-
-        for milestone in milestone_list:
-            if milestone['title'] == milestone_name:
-                return milestone['number']
-
-        raise AlmException('Unable to find milestone %s from GitHub' %
-                           milestone_name)
+        if repo_info.get('error'):
+            raise AlmException('Error accessing PivotalTracker project with id %s: %s' %
+                               self.config['alm_project'], repo_info['error'])
 
     def alm_get_task(self, task):
         task_id = task['title']
+        # PT search API currently does not support search terms with colons
+        search_query = task_id.replace(':', '')
 
         try:
-            # We need to perform 2 API calls to search open and closed issues
-            open_issues = self.alm_plugin.call_api('legacy/issues/search/%s/%s/%s' %
-                                                   (self.project_uri,
-                                                    self.config[self.ALM_NEW_STATUS],
-                                                    urlencode_str(task_id)))
-            closed_issues = self.alm_plugin.call_api('legacy/issues/search/%s/%s/%s' %
-                                                     (self.project_uri,
-                                                      self.config[self.ALM_DONE_STATUSES][0],
-                                                      urlencode_str(task_id)))
+            # Fields parameter will filter response data to only contain story status, name, timestamp and id
+            stories = self.alm_plugin.call_api('%s/stories?filter=%s&fields=current_state,name,updated_at,id' %
+                                               (self.project_uri, urlencode_str(search_query)))
         except APIError, err:
             logger.error(err)
-            raise AlmException('Unable to get task %s from GitHub' % task_id)
+            raise AlmException('Unable to get task %s from PivotalTracker' % task_id)
 
-        issues_list = open_issues['issues']
-        issues_list.extend(closed_issues['issues'])
-
-        if (not issues_list):
+        if (not stories):
             return None
 
-        if len(issues_list) > 1:
-            index = 0
+        story = stories[0]
 
-            # Prune list of issues labeled as duplicate
-            while index < len(issues_list):
-                issue = issues_list[index]
-                duplicate_label = self.config[self.GITHUB_DUPLICATE_LABEL]
-
-                if issue['labels'].count(duplicate_label) > 0:
-                    issues_list.pop(index)
-                else:
-                    index = index + 1
-
-            if len(issues_list) > 1:
-                logger.warning('Found multiple issues with the title %s that are not labeled as duplicates.'
-                               'Selecting the first task found with id %s' % (task_id, issue['number']))
-            elif not issues_list:
-                return None
+        if len(stories) > 1:
+            logger.warning('Found multiple issues with the title %s. Selecting the first task found with id %s'
+                           % (task_id, story['id']))
 
         logger.info('Found task: %s', task_id)
-        return GitHubTask(task_id,
-                          issues_list[0]['number'],
-                          issues_list[0]['state'],
-                          issues_list[0]['updated_at'],
-                          self.config[self.ALM_DONE_STATUSES])
+        return PivotalTrackerTask(task_id,
+                                  story['id'],
+                                  story['current_state'],
+                                  story['updated_at'],
+                                  self.config[self.ALM_DONE_STATUSES])
+
+    def pt_get_release_marker_id(self, release_name):
+        try:
+            release_markers = self.alm_plugin.call_api('%s/stories?filter=type:release,%s&fields=id' %
+                                                       (self.project_uri, urlencode_str(release_name)))
+        except APIError, err:
+            raise AlmException('Unable to find release marker %s in PivotalTracker because of %s'
+                               % (release_name, err))
+
+        if not release_markers:
+            raise AlmException('Did not find release marker %s in PivotalTracker')
+
+        release_marker = release_markers[0]
+
+        if len(release_markers) > 1:
+            logger.warning('Found multiple release markers with the title %s. Selecting the first release marker'
+                           'found with id %s' % (release_name, release_marker['id']))
+
+        if release_marker.get('error'):
+            raise AlmException('Unable to find release marker %s in PivotalTracker. Reason: %s - %s'
+                               % (release_name, release_marker['code'], release_marker['general_problem']))
+        else:
+            return release_marker['id']
 
     def translate_priority(self, priority):
         """ Translates an SDE priority into a GitHub label """
@@ -243,52 +212,46 @@ class GitHubConnector(AlmConnector):
                     return pmap[key]
 
     def alm_add_task(self, task):
-        milestone_name = self.config[self.ALM_PROJECT_VERSION]
-        github_priority_label = self.translate_priority(task['priority'])
-        github_issue_label = self.config[self.GITHUB_ISSUE_LABEL]
-        labels = []
+        pt_priority_label = self.translate_priority(task['priority'])
+        pt_release_marker_name = self.config[self.ALM_PROJECT_VERSION]
+
         create_args = {
-            'title': task['title'],
-            'body': self.sde_get_task_content(task),
+            'name': task['title'],
+            'description': self.sde_get_task_content(task),
+            'current_state': self.config[self.ALM_NEW_STATUS],
+            'story_type': self.config[self.PT_STORY_TYPE],
         }
 
-        if github_priority_label:
-            labels.append(github_priority_label)
-        if github_issue_label:
-            labels.append(github_issue_label)
-        if labels:
-            create_args['labels'] = labels
-        if milestone_name:
-            create_args['milestone'] = self.github_get_milestone_id(milestone_name)
+        if pt_priority_label:
+            create_args['labels'] = [{'name': pt_priority_label}]
+        if pt_release_marker_name:
+            create_args['after_id'] = self.pt_get_release_marker_id(pt_release_marker_name)
 
         try:
-            new_issue = self.alm_plugin.call_api('repos/%s/issues' %
-                                                 self.project_uri,
+            new_story = self.alm_plugin.call_api('%s/stories' % self.project_uri,
                                                  method=self.alm_plugin.URLRequest.POST,
                                                  args=create_args)
-            logger.debug('Task %s added to GitHub Project', task['id'])
+            logger.debug('Story %s added to PivotalTracker Project', task['id'])
         except APIError, err:
-            raise AlmException('Unable to add task %s to GitHub because of %s'
+            raise AlmException('Unable to add story %s to PivotalTracker because of %s'
                                % (task['id'], err))
 
-        if new_issue.get('errors'):
-            raise AlmException('Unable to add task GitHub to %s. Reason: %s - %s'
-                               % (task['id'], str(new_issue['errors']['code']),
-                                  str(new_issue['errors']['field'])))
+        if new_story.get('error'):
+            raise AlmException('Unable to add story %s to PivotalTracker. Reason: %s - %s'
+                               % (task['id'], new_story['code'], new_story['general_problem']))
 
         # API returns JSON of the new issue
-        alm_task = GitHubTask(task['title'],
-                              new_issue['number'],
-                              new_issue['state'],
-                              new_issue['updated_at'],
-                              self.config[self.ALM_DONE_STATUSES])
+        alm_task = PivotalTrackerTask(task['title'],
+                                      new_story['id'],
+                                      new_story['current_state'],
+                                      new_story['updated_at'],
+                                      self.config[self.ALM_DONE_STATUSES])
 
         if (self.config['alm_standard_workflow'] and
                 (task['status'] == 'DONE' or task['status'] == 'NA')):
             self.alm_update_task_status(alm_task, task['status'])
 
-        return 'Repository: %s, Issue: %s' % (self.config['alm_project'],
-                                              alm_task.get_alm_id())
+        return 'Project: %s, Story: %s' % (self.config['alm_project'], alm_task.get_alm_id())
 
     def alm_update_task_status(self, task, status):
         if not task or not self.config['alm_standard_workflow']:
@@ -301,25 +264,22 @@ class GitHubConnector(AlmConnector):
                 alm_state = self.config[self.ALM_NEW_STATUS]
 
             update_args = {
-                'state': alm_state
+                'current_state': alm_state
             }
 
             try:
-                result = self.alm_plugin.call_api('repos/%s/issues/%s' % (self.project_uri, task.get_alm_id()),
-                                                  args=update_args, method=URLRequest.POST)
+                result = self.alm_plugin.call_api('%s/stories/%s' % (self.project_uri, task.get_alm_id()),
+                                                  args=update_args, method=URLRequest.PUT)
             except APIError, err:
                 raise AlmException('Unable to update task status to %s '
-                                   'for issue: %s in GitHub because of %s' %
+                                   'for story: %s in PivotalTracker because of %s' %
                                    (status, task.get_alm_id(), err))
 
-            if (result and result.get('errors')):
-                raise AlmException('Unable to update status of task %s to %s.'
-                                   'Reason: %s - %s' %
-                                   (task['id'], status,
-                                    str(result['errors']['code']),
-                                    str(result['errors']['field'])))
+            if (result and result.get('error')):
+                raise AlmException('Unable to update status of task %s to %s. Reason: %s - %s' %
+                                   (task['id'], status, result['code'], result['general_problem']))
 
-            logger.debug('Status changed to %s for task %s in GitHub' %
+            logger.debug('Status changed to %s for story %s in PivotalTracker' %
                          (status, task.get_alm_id()))
 
     def alm_disconnect(self):
