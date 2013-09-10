@@ -295,32 +295,32 @@ class GitHubConnector(AlmConnector):
             logger.debug('Status synchronization disabled')
             return
 
-            if status == 'DONE' or status == 'NA':
-                alm_state = self.config[self.ALM_DONE_STATUSES][0]
-            elif status == 'TODO':
-                alm_state = self.config[self.ALM_NEW_STATUS]
+        if status == 'DONE' or status == 'NA':
+            alm_state = self.config[self.ALM_DONE_STATUSES][0]
+        elif status == 'TODO':
+            alm_state = self.config[self.ALM_NEW_STATUS]
 
-            update_args = {
-                'state': alm_state
-            }
+        update_args = {
+            'state': alm_state
+        }
 
-            try:
-                result = self.alm_plugin.call_api('repos/%s/issues/%s' % (self.project_uri, task.get_alm_id()),
-                                                  args=update_args, method=URLRequest.POST)
-            except APIError, err:
-                raise AlmException('Unable to update task status to %s '
-                                   'for issue: %s in GitHub because of %s' %
-                                   (status, task.get_alm_id(), err))
+        try:
+            result = self.alm_plugin.call_api('repos/%s/issues/%s' % (self.project_uri, task.get_alm_id()),
+                                              args=update_args, method=URLRequest.POST)
+        except APIError, err:
+            raise AlmException('Unable to update task status to %s '
+                               'for issue: %s in GitHub because of %s' %
+                               (status, task.get_alm_id(), err))
 
-            if (result and result.get('errors')):
-                raise AlmException('Unable to update status of task %s to %s.'
-                                   'Reason: %s - %s' %
-                                   (task['id'], status,
-                                    str(result['errors']['code']),
-                                    str(result['errors']['field'])))
+        if (result and result.get('errors')):
+            raise AlmException('Unable to update status of task %s to %s.'
+                               'Reason: %s - %s' %
+                               (task['id'], status,
+                                str(result['errors']['code']),
+                                str(result['errors']['field'])))
 
-            logger.debug('Status changed to %s for task %s in GitHub' %
-                         (status, task.get_alm_id()))
+        logger.debug('Status changed to %s for task %s in GitHub' %
+                     (status, task.get_alm_id()))
 
     def alm_disconnect(self):
         pass
