@@ -258,29 +258,32 @@ class PivotalTrackerConnector(AlmConnector):
             logger.debug('Status synchronization disabled')
             return
 
-            if status == 'DONE' or status == 'NA':
-                alm_state = self.config[self.ALM_DONE_STATUSES][0]
-            elif status == 'TODO':
-                alm_state = self.config[self.ALM_NEW_STATUS]
+        if status == 'DONE' or status == 'NA':
+            alm_state = self.config[self.ALM_DONE_STATUSES][0]
+        elif status == 'TODO':
+            alm_state = self.config[self.ALM_NEW_STATUS]
 
-            update_args = {
-                'current_state': alm_state
-            }
+        pt_release_marker_name = self.config[self.ALM_PROJECT_VERSION]
+        update_args = {
+            'current_state': alm_state
+        }
 
-            try:
-                result = self.alm_plugin.call_api('%s/stories/%s' % (self.project_uri, task.get_alm_id()),
-                                                  args=update_args, method=URLRequest.PUT)
-            except APIError, err:
-                raise AlmException('Unable to update task status to %s '
-                                   'for story: %s in PivotalTracker because of %s' %
-                                   (status, task.get_alm_id(), err))
+        if pt_release_marker_name:
+            update_args['after_id'] = self.pt_get_release_marker_id(pt_release_marker_name)
+        try:
+            result = self.alm_plugin.call_api('%s/stories/%s' % (self.project_uri, task.get_alm_id()),
+                                              args=update_args, method=URLRequest.PUT)
+        except APIError, err:
+            raise AlmException('Unable to update task status to %s '
+                               'for story: %s in PivotalTracker because of %s' %
+                               (status, task.get_alm_id(), err))
+        logger.debug('%s' % result)
+        if (result and result.get('error')):
+            raise AlmException('Unable to update status of task %s to %s. Reason: %s - %s' %
+                               (task['id'], status, result['code'], result['general_problem']))
 
-            if (result and result.get('error')):
-                raise AlmException('Unable to update status of task %s to %s. Reason: %s - %s' %
-                                   (task['id'], status, result['code'], result['general_problem']))
-
-            logger.debug('Status changed to %s for story %s in PivotalTracker' %
-                         (status, task.get_alm_id()))
+        logger.debug('Status changed to %s for story %s in PivotalTracker' %
+                     (status, task.get_alm_id()))
 
     def alm_disconnect(self):
         pass
