@@ -33,7 +33,7 @@ class ExtAPI(restclient.RESTBase):
             if '@' not in self.config['sde_api_token']:
                 raise UsageError('Unable to process API Token')
             self.config['sde_user'] = None
-            self.config['sde_pass'], self.config['sde_server'] = (
+            self.config['sde_api_token'], self.config['sde_server'] = (
                 self.config['sde_api_token'].split('@', 1))
         super(ExtAPI, self).post_conf_init()
 
