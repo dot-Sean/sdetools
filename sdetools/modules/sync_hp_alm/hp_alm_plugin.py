@@ -95,7 +95,7 @@ class HPAlmConnector(AlmConnector):
                 self.config['hp_alm_done_statuses'].split(','))
 
         self.COOKIE_LWSSO = None
-
+        self.issue_type = None
         self.mark_down_converter = markdown.Markdown(safe_mode="escape")        
 
     def alm_connect_server(self):
@@ -116,7 +116,7 @@ class HPAlmConnector(AlmConnector):
 
         # We will authenticate via cookie
         self.alm_plugin.auth_mode = 'cookie'
-            
+        
     def _call_api(self, target, query_args=None, method=URLRequest.GET):
         headers = {'Cookie':'LWSSO_COOKIE_KEY=%s' % self.COOKIE_LWSSO,
                    'Content-Type':'application/json',
@@ -129,6 +129,7 @@ class HPAlmConnector(AlmConnector):
                                     method = method, query_args = json)
     
     def alm_connect_project(self):
+        # Connect to the project
         try:
             user = self._call_api('rest/domains/%s/projects/%s/customization/users/%s' 
                                     % (self.config['hp_alm_domain'], self.config['alm_project'], 
@@ -137,8 +138,23 @@ class HPAlmConnector(AlmConnector):
             raise AlmException('Unable to verify domain and project details: %s' % (err))
         
         if user['Name'] != self.config['alm_user']:
-            raise AlmException('Unable to verify domain and project details')
-            
+            raise AlmException('Unable to verify user access to domain and project')
+
+        # Get all the requirement types
+        try:
+            req_types = self._call_api('rest/domains/%s/projects/%s/customization/entities/requirement/types/' 
+                                    % (self.config['hp_alm_domain'], self.config['alm_project']))
+        except APIError, err:
+            raise AlmException('Unable to retrieve requirement types: %s' % (err)) 
+        
+        for req_type in req_types['types']:
+            if req_type['name'] == self.config['hp_alm_issue_type']:
+                self.issue_type = req_type['id']
+                break
+
+        if not self.issue_type:
+            raise AlmException('Requirement type %s not found in project' % (self.config['hp_alm_issue_type'])) 
+
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])  
         if not task_id:
@@ -203,14 +219,15 @@ class HPAlmConnector(AlmConnector):
         # HP Alm is very particular about JSON ordering
         json_data = """{
             "Fields":[
-                {"Name":"type-id","values":[{"value":"3"}]},
+                {"Name":"type-id","values":[{"value":"%s"}]},
                 {"Name":"status","values":[{"value":"%s"}]},
                 {"Name":"name","values":[{"value":%s}]},
                 {"Name":"description","values":[{"value":%s}]},
                 {"Name":"req-priority","values":[{"value":"%s"}]}
             ], 
             "Type":"requirement"
-        }""" % (self.config['hp_alm_new_status'], task['title'], task['formatted_content'], task['alm_priority'])
+        }""" % (self.issue_type, self.config['hp_alm_new_status'], task['title'], task['formatted_content'], 
+                task['alm_priority'])
         try:
             result = self._call_reqs_api(json_data, self.alm_plugin.URLRequest.POST)
             logger.debug('Task %s added to HP Alm Project', task['id'])
