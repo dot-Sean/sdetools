@@ -16,6 +16,7 @@ CONF_OPTS = [
     ['%(prefix)s_pass', 'Password for %(name)s Tool', None],
     ['%(prefix)s_server', 'Server of the %(name)s', None],
     ['%(prefix)s_method', 'http vs https for %(name)s server', 'https'],
+    ['%(prefix)s_api_token', 'API Token of the %(name)s Tool', None],
 ]
 
 class APIError(Error):
@@ -59,7 +60,6 @@ class RESTBase(object):
     APIAuthError = APIAuthError
     ServerError = ServerError
     APIFormatError = APIFormatError
-    API_TOKEN_HEADER = "X-Api-Token"
 
     def __init__(self, conf_prefix, conf_name, config, base_path, conf_opts=CONF_OPTS):
         self.config = config
@@ -124,6 +124,14 @@ class RESTBase(object):
         """
         return []
 
+    def generate_token_auth_header(self):
+        """
+        Override this to add your own custom authentication header
+        Expected return value:
+            [HEADER_NAME, HEADER_VALUE]
+        """
+        return ["X-Api-Token", self._get_conf('pass')]
+
     def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}):
         """
         Internal method used to call a RESTFul API
@@ -155,7 +163,8 @@ class RESTBase(object):
         self.set_content_type(req, method)
 
         if auth_mode == 'api_token':
-            req.add_header(self.API_TOKEN_HEADER, self._get_conf('api_token'))
+            authheader = self.generate_token_auth_header()
+            req.add_header(authheader[0], authheader[1])
         elif target == 'session':
             pass
         elif auth_mode == 'basic':
