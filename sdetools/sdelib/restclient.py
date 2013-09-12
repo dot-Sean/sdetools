@@ -53,6 +53,12 @@ class APIFormatError(APIError):
     pass
 
 class RESTBase(object):
+    """
+    REST base class supports three authentication mode specified by auth_mode:
+    - basic: HTTP Basic Auth using username and password
+    - api_token: We use the _pass and allow customizing the API Token header name
+    - session: Used mainly for SD Elements session
+    """
     URLRequest = URLRequest
 
     APIError = APIError
