@@ -20,21 +20,19 @@ class ExtAPI(restclient.RESTBase):
     """
 
     def __init__(self, config):
-        conf_opts = restclient.CONF_OPTS[:]
-        conf_opts.append(('sde_api_token', 'API Token for SDE', ''))
-        for i in xrange(3):
-            conf_opts[i][-1] = ''
-        super(ExtAPI, self).__init__('sde', 'SD Elements', config, 'api', conf_opts)
+        extra_conf_opts = [('sde_api_token', 'SDE API Token', '')]
+        super(ExtAPI, self).__init__('sde', 'SD Elements', config, 'api', extra_conf_opts)
         self.connected = False
 
     def post_conf_init(self):
-        if self.config['sde_api_token']:
+        if self._get_conf('api_token'):
             self.auth_mode = 'api_token'
-            if '@' not in self.config['sde_api_token']:
+            if '@' not in self._get_conf('api_token'):
                 raise UsageError('Unable to process API Token')
             self.config['sde_user'] = None
             self.config['sde_pass'], self.config['sde_server'] = (
                 self.config['sde_api_token'].split('@', 1))
+
         super(ExtAPI, self).post_conf_init()
 
     def connect(self):

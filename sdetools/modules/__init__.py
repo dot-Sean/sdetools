@@ -15,4 +15,5 @@ __all__ = [
     'connect',
     'add_ssl_cert',
     'sync_pt'
+    'sync_github',
 ]

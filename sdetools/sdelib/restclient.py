@@ -12,11 +12,13 @@ logger = logging.getLogger(__name__)
 URLRequest = http_req.ExtendedMethodRequest
 
 CONF_OPTS = [
-    ['%(prefix)s_user', 'Username for %(name)s Tool', None],
-    ['%(prefix)s_pass', 'Password for %(name)s Tool', None],
-    ['%(prefix)s_server', 'Server of the %(name)s', None],
+    ['%(prefix)s_user', 'Username for %(name)s Tool', ''],
+    ['%(prefix)s_pass', 'Password for %(name)s Tool', ''],
+    ['%(prefix)s_server', 'Server of the %(name)s', ''],
     ['%(prefix)s_method', 'http vs https for %(name)s server', 'https'],
 ]
+
+DEFAULT_API_TOKEN_HEADER_NAME = "X-Api-Token"
 
 class APIError(Error):
     pass
@@ -61,18 +63,21 @@ class RESTBase(object):
     APIFormatError = APIFormatError
     API_TOKEN_HEADER = "X-Api-Token"
 
-    def __init__(self, conf_prefix, conf_name, config, base_path, conf_opts=CONF_OPTS):
+    def __init__(self, conf_prefix, conf_name, config, base_path=None, extra_conf_opts=[]):
         self.config = config
         self.base_path = base_path
         self.conf_prefix = conf_prefix
         self.conf_name = conf_name
         self.opener = None
         self.auth_mode = 'basic'
-        self._customize_config(conf_opts)
+        self.api_token_header_name = DEFAULT_API_TOKEN_HEADER_NAME
+        self._customize_config(CONF_OPTS+extra_conf_opts)
+
+    def _get_conf_name(self, name):
+        return '%s_%s' % (self.conf_prefix, name)
 
     def _get_conf(self, name):
-        conf_name = '%s_%s' % (self.conf_prefix, name)
-        return self.config[conf_name]
+        return self.config[self._get_conf_name(name)]
 
     def _customize_config(self, conf_opts):
         for var_name, desc, default in conf_opts:
@@ -86,6 +91,9 @@ class RESTBase(object):
         return urllib.urlencode({'a':instr})[2:]
 
     def post_conf_init(self):
+        for name in ['method', 'server']:
+            if not self._get_conf(name):
+                raise UsageError('Missing Configuration %s' % self._get_conf_name(name))
 
         urllib_debuglevel = 0
         if __name__ in self.config['debug_mods']:
@@ -95,11 +103,13 @@ class RESTBase(object):
             self._get_conf('method'),
             self._get_conf('server'),
             debuglevel=urllib_debuglevel)
-        self.config['%s_server' % (self.conf_prefix)] = self.opener.server
+        self.config[self._get_conf_name('server')] = self.opener.server
 
         self.session_info = None
         self.server = self._get_conf('server') 
-        self.base_uri = '%s://%s/%s' % (self._get_conf('method'), self.server, self.base_path)
+        self.base_uri = '%s://%s' % (self._get_conf('method'), self.server)
+        if self.base_path:
+            self.base_uri = '%s/%s' % (self.base_uri, self.base_path)
 
     def encode_post_args(self, args):
         return json.dumps(args)
@@ -123,6 +133,14 @@ class RESTBase(object):
         Override this to add your own custom headers
         """
         return []
+
+    def generate_token_auth_header(self):
+        """
+        Override this to add your own custom authentication header
+        Expected return value:
+            [HEADER_NAME, HEADER_VALUE]
+        """
+        return [self.api_token_header_name, self._get_conf('pass')]
 
     def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}):
         """
@@ -155,7 +173,8 @@ class RESTBase(object):
         self.set_content_type(req, method)
 
         if auth_mode == 'api_token':
-            req.add_header(self.API_TOKEN_HEADER, self._get_conf('pass'))
+            authheader = self.generate_token_auth_header()
+            req.add_header(authheader[0], authheader[1])
         elif target == 'session':
             pass
         elif auth_mode == 'basic':
