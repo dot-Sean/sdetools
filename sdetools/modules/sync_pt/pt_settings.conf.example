@@ -29,9 +29,12 @@ alm_method = https
 alm_user = pt_user
 
 #Password for above user. Note that this will be encrypted
-#in future versions of the plugin. Alternatively, you may
-#choose to supply only an authentication token
+#in future versions of the plugin.
 alm_pass = pt_passsword
+
+#PivotalTracker authentication token for user with push
+#access. If you supply a token you don't have to supply a user/pass
+alm_api_token = pt_api_token
               
 #PivotalTracker project id
 alm_project = pt_project_id
@@ -115,11 +118,5 @@ pt_new_status = unstarted
 #Done in PT.
 pt_done_statuses = accepted
 
-#[OPTIONAL]Specify a PT API version
-#Defaults to v5
-#pt_api_version = v5
-
-######Base settings, do not modify######
-targets =  .
-skip_hidden = True
-interactive = True
+#[Optional] Specify a label to group all stories created by sync tool
+#pt_group_label = SD Elements
