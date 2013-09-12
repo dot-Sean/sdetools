@@ -25,28 +25,16 @@ class GitHubAPI(RESTBase):
     """ Base plugin for GitHub """
 
     def __init__(self, config):
-        super(GitHubAPI, self).__init__('alm', 'GitHub', config, '')
+        extra_conf_opts = [('alm_api_token', 'GitHub API Token', '')]
+        super(GitHubAPI, self).__init__('alm', 'GitHub', config, extra_conf_opts=extra_conf_opts)
 
     def post_conf_init(self):           
         if self._get_conf('api_token'):
             self.auth_mode = 'api_token'
+            self.api_token_header_name = 'Authorization'
+            self.config['alm_pass'] = 'token %s' % self._get_conf('api_token')
 
-        urllib_debuglevel = 0
-        if __name__ in self.config['debug_mods']:
-            urllib_debuglevel = 1
-
-        self.opener = http_req.get_opener(
-            self._get_conf('method'),
-            self._get_conf('server'),
-            debuglevel=urllib_debuglevel)
-        self.config['%s_server' % (self.conf_prefix)] = self.opener.server
-
-        self.session_info = None
-        self.server = self._get_conf('server')
-        self.base_uri = '%s://%s' % (self._get_conf('method'), self.server)
-
-    def generate_token_auth_header(self):
-        return ['Authorization', 'token %s' % self._get_conf('api_token')]
+        super(GitHubAPI, self).post_conf_init()
 
 
 class GitHubTask(AlmTask):
