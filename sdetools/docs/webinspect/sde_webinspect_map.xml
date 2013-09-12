@@ -451,16 +451,63 @@
 		<weakness type="check" id="937" title="WS_FTP Configuration (ws_ftp.ini)" />
 		<weakness type="check" id="942" title="Netscape Server Configuration Information" />
 	</task>
+	<task id="151" title="Use cryptographically secure random numbers" >
+		<weakness type="check" id="3274" title="wbbboard action.php Session Hijacking" />
+		<weakness type="check" id="3277" title="Sun NetDynamics ndCGI.exe Session Hijacking" />
+	</task>
 	<task id="159" title="Avoid sending detailed error messages to remote systems" >
 		<weakness type="check" id="10269" title=".NET Verbose Errors Enabled" />
 		<weakness type="check" id="10932" title="Server Error Response" />
+		<weakness type="check" id="1385" title="ColdFusion Error Message" />
 		<weakness type="check" id="1429" title="Possible Debug Application" />
+		<weakness type="check" id="1435" title="Shell Error Message" />
+		<weakness type="check" id="1436" title="Shell Error Message" />
+		<weakness type="check" id="1451" title="Shell Error Message" />
 		<weakness type="check" id="1498" title="Exception Error Message" />
 		<weakness type="check" id="3064" title="ASP Runtime Error Message" />
 		<weakness type="check" id="4250" title="VBScript Runtime Error Message" />
 		<weakness type="check" id="4939" title=".NET Error Message" />
 		<weakness type="check" id="5666" title="ASP.NET Custom Error Full Path Disclosure" />
 		<weakness type="check" id="742" title="Database Server Error Message" />
+		<weakness type="check" id="745" title="Runtime Error Message" />
+	</task>
+	<task id="16" title="Authorize every page" >
+		<weakness type="check" id="10177" title="Test Application (wm.cgi)" />
+		<weakness type="check" id="10255" title="Minb User Database Disclosure" />
+		<weakness type="check" id="10321" title="ColdFusion Default Web Application (cfm)" />
+		<weakness type="check" id="10322" title="ColdFusion Default Web Application (mdb)" />
+		<weakness type="check" id="10342" title="Common Documentation Text Files" />
+		<weakness type="check" id="10343" title="Additional Common Documentation Text Files" />
+		<weakness type="check" id="10347" title="Common Documentation HTML Files" />
+		<weakness type="check" id="10375" title="Snitz Forums Database Disclosure" />
+		<weakness type="check" id="10423" title="Common Application Test Files" />
+		<weakness type="check" id="10541" title="WSDL File Discovered (asmx)" />
+		<weakness type="check" id="10542" title="WSDL File Discovered " />
+		<weakness type="check" id="10562" title="eLineStudio Site Composer folderdel_.asp File Deletion Vulnerability" />
+		<weakness type="check" id="10564" title="eLineStudio Site Composer foldernew.asp Folder Creation Vulnerability" />
+		<weakness type="check" id="10687" title="Application Probing: General PHP" />
+		<weakness type="check" id="10700" title="Application Probing: vBulletin" />
+		<weakness type="check" id="10876" title="Directory Probing: /tmp" />
+		<weakness type="check" id="10877" title="Directory Probing: Index File Names" />
+		<weakness type="check" id="10879" title="Directory Probing: /temp" />
+		<weakness type="check" id="10884" title="Directory Probing: /cgi-bin" />
+		<weakness type="check" id="10885" title="Directory Probing: /wiki/" />
+		<weakness type="check" id="10886" title="Directory Probing: Years" />
+		<weakness type="check" id="10887" title="Directory Probing: Multiple" />
+		<weakness type="check" id="10888" title="Directory Probing: Admin Directories" />
+		<weakness type="check" id="10889" title="Directory Probing: Statistics Directories" />
+		<weakness type="check" id="10930" title="Application Probing: /WEB-INF/" />
+		<weakness type="check" id="10974" title="File Probing: WebResource.axd" />
+		<weakness type="check" id="2026" title="OmniHTTPD Statsconfig Arbitrary Command Execution" />
+		<weakness type="check" id="5" title="WebInspect Internal Check" />
+		<weakness type="check" id="659" title="AdMentor Configuration Database Disclosure" />
+		<weakness type="check" id="873" title="Unicode Folder (_vti_bin)" />
+		<weakness type="check" id="874" title="Unicode Folder (printers)" />
+		<weakness type="check" id="875" title="Unicode Folder (siteserver)" />
+		<weakness type="check" id="876" title="Unicode Folder (sites)" />
+		<weakness type="check" id="877" title="Unicode Folder (_mem_bin)" />
+		<weakness type="check" id="888" title="Unicode Folder (scripts)" />
+		<weakness type="check" id="908" title="Unicode Folder (cgi-bin)" />
 	</task>
 	<task id="176" title="Apply principles of privacy when handling personal information" >
 		<weakness type="check" id="10167" title="Password in Query or Cookie Data" />
@@ -489,7 +536,6 @@
 		<weakness type="check" id="10056" title="Netscape Enterprise Server Directory Contents Disclosure" />
 		<weakness type="check" id="10172" title="Directory (plesk-stat)" />
 		<weakness type="check" id="10173" title="Directory (plesk-stat/webstat)" />
-		<weakness type="check" id="10177" title="Test Application (wm.cgi)" />
 		<weakness type="check" id="10185" title="Directory (tst)" />
 		<weakness type="check" id="10194" title="Directory (jsp-examples)" />
 		<weakness type="check" id="10209" title="FrontPage-Related Directories" />
@@ -520,52 +566,28 @@
 		<weakness type="check" id="10234" title="Unix-Related Directories" />
 		<weakness type="check" id="10235" title="Web Application Common Directories" />
 		<weakness type="check" id="10236" title="Websphere Directories" />
-		<weakness type="check" id="10255" title="Minb User Database Disclosure" />
 		<weakness type="check" id="10274" title="Proxy CONNECT Access" />
 		<weakness type="check" id="10275" title="Proxy GET Access" />
-		<weakness type="check" id="10375" title="Snitz Forums Database Disclosure" />
-		<weakness type="check" id="10423" title="Common Application Test Files" />
 		<weakness type="check" id="10463" title="PHP Login Application" />
 		<weakness type="check" id="10493" title="Mole Settings Pages Authentication Bypass" />
 		<weakness type="check" id="10512" title="HTTP Basic Logins Sent Over Unencrypted Connection" />
-		<weakness type="check" id="10542" title="WSDL File Discovered " />
-		<weakness type="check" id="10562" title="eLineStudio Site Composer folderdel_.asp File Deletion Vulnerability" />
-		<weakness type="check" id="10564" title="eLineStudio Site Composer foldernew.asp Folder Creation Vulnerability" />
 		<weakness type="check" id="10595" title="Unencrypted Login Form" />
 		<weakness type="check" id="10675" title="Questionable Material Directories" />
-		<weakness type="check" id="10687" title="Application Probing: General PHP" />
 		<weakness type="check" id="107" title="Directory (bdatos)" />
-		<weakness type="check" id="10700" title="Application Probing: vBulletin" />
 		<weakness type="check" id="10703" title="Certificate Expired" />
 		<weakness type="check" id="108" title="Directory (beta)" />
 		<weakness type="check" id="10810" title="&amp;quot;Admin&amp;quot; Directory" />
 		<weakness type="check" id="10830" title="&amp;quot;Adm&amp;quot; Directory" />
 		<weakness type="check" id="10831" title="&amp;quot;phpMyAdmin&amp;quot; Directory" />
 		<weakness type="check" id="10832" title="&amp;quot;phpPgAdmin&amp;quot; Directory" />
-		<weakness type="check" id="10876" title="Directory Probing: /tmp" />
-		<weakness type="check" id="10877" title="Directory Probing: Index File Names" />
-		<weakness type="check" id="10879" title="Directory Probing: /temp" />
-		<weakness type="check" id="10884" title="Directory Probing: /cgi-bin" />
-		<weakness type="check" id="10885" title="Directory Probing: /wiki/" />
-		<weakness type="check" id="10886" title="Directory Probing: Years" />
-		<weakness type="check" id="10887" title="Directory Probing: Multiple" />
-		<weakness type="check" id="10888" title="Directory Probing: Admin Directories" />
-		<weakness type="check" id="10889" title="Directory Probing: Statistics Directories" />
 		<weakness type="check" id="109" title="Directory (bin)" />
-		<weakness type="check" id="10930" title="Application Probing: /WEB-INF/" />
 		<weakness type="check" id="10942" title="SSLv3/TLS Renegotiation Stream Injection" />
-		<weakness type="check" id="10944" title="ASP.NET Proxy Script Debug Version Detected" />
 		<weakness type="check" id="10972" title="DotNetNuke Arbitrary File Upload" />
-		<weakness type="check" id="10974" title="File Probing: WebResource.axd" />
 		<weakness type="check" id="10978" title="Joomla's Contact Component Spam Vulnerability" />
 		<weakness type="check" id="110" title="Directory (boot)" />
 		<weakness type="check" id="111" title="Directory (bug)" />
 		<weakness type="check" id="112" title="Directory (bugs)" />
 		<weakness type="check" id="11273" title="Apache HTTPD Range Header Denial of Service" />
-		<weakness type="check" id="11293" title="Cross-Frame Scripting" />
-		<weakness type="check" id="11294" title="Weak Cross-Frame Scripting Protection" />
-		<weakness type="check" id="11296" title="Form Validation Disabled " />
-		<weakness type="check" id="11331" title="Ruby XML YAML Remote Code Execution " />
 		<weakness type="check" id="114" title="Directory (buynow)" />
 		<weakness type="check" id="115" title="Directory (c)" />
 		<weakness type="check" id="116" title="Directory (cache-stats)" />
@@ -593,7 +615,6 @@
 		<weakness type="check" id="1425" title="phpWebLog Administrative Access" />
 		<weakness type="check" id="1426" title="Directory (accesslog)" />
 		<weakness type="check" id="1427" title="Directory (logg)" />
-		<weakness type="check" id="1429" title="Possible Debug Application" />
 		<weakness type="check" id="1431" title="Directory (~webstats)" />
 		<weakness type="check" id="1433" title="Directory (webdb)" />
 		<weakness type="check" id="1434" title="Directory (datafiles)" />
@@ -854,7 +875,6 @@
 		<weakness type="check" id="2271" title="Directory (_sharedtemplates)" />
 		<weakness type="check" id="228" title="Directory (guestbook)" />
 		<weakness type="check" id="229" title="Directory (guests)" />
-		<weakness type="check" id="2309" title="Arbitrary Server Side Include Execution" />
 		<weakness type="check" id="231" title="Directory (GXApp)" />
 		<weakness type="check" id="232" title="Directory (help)" />
 		<weakness type="check" id="233" title="Directory (helpdesk)" />
@@ -979,8 +999,6 @@
 		<weakness type="check" id="3252" title="PGP Keyserver Possible Web Application Administration" />
 		<weakness type="check" id="326" title="Directory (oradata)" />
 		<weakness type="check" id="327" title="Directory (order)" />
-		<weakness type="check" id="3274" title="wbbboard action.php Session Hijacking" />
-		<weakness type="check" id="3277" title="Sun NetDynamics ndCGI.exe Session Hijacking" />
 		<weakness type="check" id="328" title="Directory (orders)" />
 		<weakness type="check" id="329" title="Directory (outgoing)" />
 		<weakness type="check" id="330" title="Directory (pages)" />
@@ -1493,7 +1511,6 @@
 		<weakness type="check" id="4965" title="Directory (WebApplication3)" />
 		<weakness type="check" id="4966" title="Directory (WebApplication4)" />
 		<weakness type="check" id="4967" title="Directory (WebApplication5)" />
-		<weakness type="check" id="5" title="WebInspect Internal Check" />
 		<weakness type="check" id="50" title="Directory (Agent)" />
 		<weakness type="check" id="5000" title="Directory (_mmServerScripts)" />
 		<weakness type="check" id="5001" title="Directory (_mmDBScripts)" />
@@ -1519,7 +1536,6 @@
 		<weakness type="check" id="5145" title="Directory (Application_GlobalResources)" />
 		<weakness type="check" id="5146" title="Directory (Application_Themes)" />
 		<weakness type="check" id="5147" title="Directory (Application_LocalResources)" />
-		<weakness type="check" id="5151" title="Arbitrary Remote File Include" />
 		<weakness type="check" id="52" title="Directory (Agents)" />
 		<weakness type="check" id="521" title="Directory (ejemplo)" />
 		<weakness type="check" id="522" title="Directory (ejemplos)" />
@@ -1528,9 +1544,7 @@
 		<weakness type="check" id="526" title="Directory (enviamail)" />
 		<weakness type="check" id="527" title="Directory (errors)" />
 		<weakness type="check" id="528" title="Directory (es)" />
-		<weakness type="check" id="5286" title="Microsoft ASP.NET Debugging Enabled" />
 		<weakness type="check" id="530" title="IIS Web Server Account Manipulation (achg.htr)" />
-		<weakness type="check" id="5304" title="PHP Poll Remote Server Side Include" />
 		<weakness type="check" id="531" title="IIS Web Server Account Manipulation (aexp.htr)" />
 		<weakness type="check" id="532" title="IIS Web Server Account Manipulation (aexp2.htr)" />
 		<weakness type="check" id="5320" title="PHPCart Authentication Flaw" />
@@ -1555,7 +1569,6 @@
 		<weakness type="check" id="5525" title="Directory (WEB-INF/lib)" />
 		<weakness type="check" id="553" title="Directory (corp)" />
 		<weakness type="check" id="554" title="Directory (junk)" />
-		<weakness type="check" id="5541" title="XPath Error Message" />
 		<weakness type="check" id="555" title="Directory (share)" />
 		<weakness type="check" id="5573" title="Directory (usage)" />
 		<weakness type="check" id="5586" title="Directory (signup)" />
@@ -1575,7 +1588,6 @@
 		<weakness type="check" id="60" title="Directory (archive)" />
 		<weakness type="check" id="605" title="PlusMail Adminstrative Access" />
 		<weakness type="check" id="61" title="Directory (archives)" />
-		<weakness type="check" id="616" title="Guestbook.pl Server-Side Include Command Execution" />
 		<weakness type="check" id="62" title="Directory (asp)" />
 		<weakness type="check" id="620" title="Directory (cgi-bin/w3-msql)" />
 		<weakness type="check" id="621" title="Directory (PowerPlay Data files)" />
@@ -1624,18 +1636,12 @@
 		<weakness type="check" id="828" title="Directory (jsp)" />
 		<weakness type="check" id="829" title="Directory (javatest)" />
 		<weakness type="check" id="833" title="News Update Administrative Access" />
-		<weakness type="check" id="873" title="Unicode Folder (_vti_bin)" />
-		<weakness type="check" id="874" title="Unicode Folder (printers)" />
-		<weakness type="check" id="875" title="Unicode Folder (siteserver)" />
-		<weakness type="check" id="876" title="Unicode Folder (sites)" />
-		<weakness type="check" id="877" title="Unicode Folder (_mem_bin)" />
 		<weakness type="check" id="880" title="Directory (printers)" />
 		<weakness type="check" id="881" title="Directory (fpsample)" />
 		<weakness type="check" id="882" title="Directory (cmsample)" />
 		<weakness type="check" id="883" title="Directory (_mem_bin)" />
 		<weakness type="check" id="884" title="Directory (old)" />
 		<weakness type="check" id="902" title="Directory (SilverStream)" />
-		<weakness type="check" id="908" title="Unicode Folder (cgi-bin)" />
 		<weakness type="check" id="911" title="Directory (webpub)" />
 		<weakness type="check" id="912" title="Directory (nettracker)" />
 		<weakness type="check" id="913" title="Directory (document)" />
@@ -3556,6 +3562,14 @@
 		<weakness type="check" id="951" title="OmniHTTPD Statistics Information Disclosure" />
 		<weakness type="check" id="952" title="OmniHTTPD Test Application (ssiexec.shtml)" />
 	</task>
+	<task id="25" title="Enforce absolute session timeouts" >
+		<weakness type="check" id="4728" title="Persistent Cookies" />
+	</task>
+	<task id="29" title="Use anti cross site request forgery (CSRF) tokens" >
+		<weakness type="check" id="10044" title="HTML Tag Injection" />
+		<weakness type="check" id="11293" title="Cross-Frame Scripting" />
+		<weakness type="check" id="11294" title="Weak Cross-Frame Scripting Protection" />
+	</task>
 	<task id="31" title="Perform input validation on all forms of input" >
 		<weakness type="check" id="10072" title="Web Shop Manager Arbitrary Command Execution" />
 		<weakness type="check" id="10099" title="KNet Arbitrary Code Execution" />
@@ -3563,6 +3577,8 @@
 		<weakness type="check" id="10186" title="Possible MPack Infection" />
 		<weakness type="check" id="10206" title="Arbitrary Remote File Include (Scheme/Host)" />
 		<weakness type="check" id="10207" title="Arbitrary Remote File Include (Host Only)" />
+		<weakness type="check" id="10253" title="Possible Parameter Based Buffer Overflow (70 bytes)" />
+		<weakness type="check" id="10254" title="Possible Parameter Based Buffer Overflow (270 bytes)" />
 		<weakness type="check" id="10287" title="Local File Include" />
 		<weakness type="check" id="10365" title="Common Include Files (.inc)" />
 		<weakness type="check" id="10526" title="CuteNews &amp;quot;cutepath&amp;quot; Remote File Include" />
@@ -3571,6 +3587,7 @@
 		<weakness type="check" id="10662" title="phpMyAdmin Arbitrary Command Execution" />
 		<weakness type="check" id="10925" title="ActiveX Control Discovery" />
 		<weakness type="check" id="10948" title="phpMyAdmin unserialize() Remote Code Execution" />
+		<weakness type="check" id="11296" title="Form Validation Disabled " />
 		<weakness type="check" id="1437" title="SimplestMail Arbitrary Command Execution" />
 		<weakness type="check" id="1454" title="ad.cgi Arbitrary Command Execution" />
 		<weakness type="check" id="1460" title="MailMan Arbitrary Command Execution" />
@@ -3717,11 +3734,13 @@
 		<weakness type="check" id="496" title="Alibaba Web Server Arbitrary Command Execution (get16.exe)" />
 		<weakness type="check" id="497" title="Alibaba Web Server Arbitrary Command Execution (tst.bat)" />
 		<weakness type="check" id="4992" title="Mail Manage EX Arbitrary Command Execution" />
+		<weakness type="check" id="5057" title="Possible Parameter Based Buffer Overflow (2100 bytes)" />
 		<weakness type="check" id="5148" title="phpBB viewtopic.php Remote Command Execution" />
 		<weakness type="check" id="5150" title="Arbitrary Remote File Include" />
 		<weakness type="check" id="5151" title="Arbitrary Remote File Include" />
 		<weakness type="check" id="5170" title="AWStats &amp;quot;configdir&amp;quot; Parameter Arbitrary Command Execution" />
 		<weakness type="check" id="5278" title="E-Cart Module Shell Command Injection Vulnerability" />
+		<weakness type="check" id="5304" title="PHP Poll Remote Server Side Include" />
 		<weakness type="check" id="5310" title="FlatNuke Arbitrary Command Execution" />
 		<weakness type="check" id="5329" title="WebHints Arbitrary Command Execution" />
 		<weakness type="check" id="5368" title="PHPXMLRPC Library Remote Code Execution" />
@@ -3746,6 +3765,7 @@
 		<weakness type="check" id="576" title="BizDB Arbitrary Command Execution Vulnerability" />
 		<weakness type="check" id="585" title="Web+ Arbitrary Command Execution Vulnerability" />
 		<weakness type="check" id="590" title="RobPoll Arbitrary Command Execution Vulnerability" />
+		<weakness type="check" id="616" title="Guestbook.pl Server-Side Include Command Execution" />
 		<weakness type="check" id="672" title="MailStudio 2000 Arbitrary Command Execution" />
 		<weakness type="check" id="675" title="WebWho+ remote command execution" />
 		<weakness type="check" id="681" title="InfoSearch Arbitrary Command Execution Vulnerability" />
@@ -4736,6 +4756,10 @@
 		<weakness type="check" id="10915" title="SAP Web Application Server sap-exiturl Header Injection" />
 		<weakness type="check" id="3582" title="HTTP Header CRLF Injection (HTTP Response Splitting)" />
 	</task>
+	<task id="40" title="Use XML encoding when interacting with XML data" >
+		<weakness type="check" id="10845" title="Possible XPath Query" />
+		<weakness type="check" id="5541" title="XPath Error Message" />
+	</task>
 	<task id="41" title="Use Lightweight Directory Access Protocol (LDAP) encoding when interacting with LDAP data" >
 		<weakness type="check" id="10032" title="LDAP Injection" />
 		<weakness type="check" id="10842" title="Possible LDAP Query" />
@@ -4744,7 +4768,10 @@
 	</task>
 	<task id="42" title="Avoid relying on untrusted data for server side page, view, or template selection" >
 		<weakness type="check" id="10287" title="Local File Include" />
+		<weakness type="check" id="2309" title="Arbitrary Server Side Include Execution" />
 		<weakness type="check" id="5151" title="Arbitrary Remote File Include" />
+		<weakness type="check" id="5304" title="PHP Poll Remote Server Side Include" />
+		<weakness type="check" id="616" title="Guestbook.pl Server-Side Include Command Execution" />
 	</task>
 	<task id="43" title="Avoid unsafe operating system interaction" >
 		<weakness type="check" id="10192" title="Win32 Arbitrary Command Execution (Prepended Pipe)" />
@@ -4769,6 +4796,7 @@
 		<weakness type="check" id="11317" title="Server Side Script Injection Attack" />
 		<weakness type="check" id="11318" title="Expression Language Injection (Server Data Revealed)" />
 		<weakness type="check" id="11319" title="Expression Language Injection (HttpOnly Restriction Bypass)" />
+		<weakness type="check" id="11331" title="Ruby XML YAML Remote Code Execution " />
 		<weakness type="check" id="1365" title="IIS Unicode Arbitrary Command Execution (..%c1%9c..)" />
 		<weakness type="check" id="1458" title="EZShopper Arbitrary Command Execution" />
 		<weakness type="check" id="1459" title="EZShopper Arbitrary Command Execution" />
@@ -5094,6 +5122,8 @@
 	<task id="62" title="Lockdown passwords in property and configuration files (e.g. database connection strings)" >
 		<weakness type="check" id="10167" title="Password in Query or Cookie Data" />
 		<weakness type="check" id="10551" title="Possible Username or Password Disclosure" />
+		<weakness type="check" id="10965" title="User Data in Query or Cookie" />
+		<weakness type="check" id="4729" title="User supplied data without POST" />
 		<weakness type="check" id="5626" title="Possible Database Connection String (Access OleDb with MS Jet With Password)" />
 	</task>
 	<task id="76" title="Do not hard code passwords" >

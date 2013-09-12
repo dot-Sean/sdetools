@@ -128,7 +128,6 @@ class Mapping:
         fp.close()
 
     def check_mapped(self, task_map, check_id):
-        check_found = False
         keys = task_map.iterkeys()
 
         for task_id in keys:
@@ -136,7 +135,7 @@ class Mapping:
             for task_check in task_checks:
                 if check_id == task_check['check_id']:
                      return True
-        return check_found
+        return False
     
     def find_missing_checks(self):
         missing_checks = False
