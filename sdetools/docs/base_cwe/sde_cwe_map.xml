@@ -130,6 +130,7 @@
 		<weakness type="cwe" id="530" title="Exposure of Backup File to an Unauthorized Control Sphere"/>
 		<weakness type="cwe" id="506" title="Embedded Malicious Code"/>
 		<weakness type="cwe" id="514" title="Covert Channel"/>
+        <weakness type="cwe" id="11" title="ASP.NET Misconfiguration: Creating Debug Binary"/>
 	</task>
 	<task id="47" title="Implement a global error handler and generic default error page for end users" >
 		<weakness type="cwe" id="201" title="Information Exposure Through Sent Data"/>
@@ -161,6 +162,9 @@
 	<task id="189" title="Avoid usage of unmanaged code" >
 		<weakness type="cwe" id="111" title="Direct Use of Unsafe JNI"/>
 	</task>
+    <task id="29" title="Use anti cross site request forgery (CSRF) tokens">
+		<weakness type="cwe" id="352" title="Cross-Site Request Forgery"/>    
+    </task>
 	<task id="76" title="Do not hard code passwords" >
 		<weakness type="cwe" id="259" title="Use of Hard-coded Password"/>
 		<weakness type="cwe" id="321" title="Use of Hard-coded Cryptographic Key"/>
@@ -190,11 +194,15 @@
 	<task id="54" title="Validate file contents" >
 		<weakness type="cwe" id="434" title="Unrestricted Upload of File with Dangerous Type"/>
 	</task>
+	<task id="16" title="Authorize every page" >
+        <weakness type="cwe" id="425" title="Direct Request ('Forced Browsing')"/>
+    </task>
 	<task id="31" title="Perform input validation on all forms of input" >
 		<weakness type="cwe" id="93" title="Improper Neutralization of CRLF Sequences (CRLF Injection)"/>
 		<weakness type="cwe" id="94" title="Improper Control of Generation of code (Code Injection)"/>
 		<weakness type="cwe" id="501" title="Trust Boundary Violation"/>
-        <weakness type="cwe" id="713" title="OWASP Top Ten 2007 Category A2 - Injection Flaws"/>            
+        <weakness type="cwe" id="713" title="OWASP Top Ten 2007 Category A2 - Injection Flaws"/>
+        <weakness type="cwe" id="20" title="Improper Input Validation"/>
 	</task>
 	<task id="36" title="Escape untrusted data in HTML, HTML attributes, Cascading Style Sheets and JavaScript" >
 		<weakness type="cwe" id="83" title="Improper Neutralization of Script in Attributes in a Web Page"/>

@@ -5,7 +5,7 @@ import sys
 import re
 from datetime import datetime
 
-from sdetools.sdelib.commons import json
+from sdetools.sdelib.commons import json, urlencode_str
 
 from sdetools.sdelib.restclient import RESTBase, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
@@ -121,19 +121,20 @@ class HPAlmConnector(AlmConnector):
         headers = {'Cookie':'LWSSO_COOKIE_KEY=%s' % self.COOKIE_LWSSO,
                    'Content-Type':'application/json',
                    'Accept':'application/json'}
-        return self.alm_plugin.call_api(target, method = method, args = query_args, call_headers=headers)
+        return self.alm_plugin.call_api(target, method=method, args=query_args, call_headers=headers)
 
     def _call_reqs_api(self, json, method=URLRequest.GET):
         return self._call_api('rest/domains/%s/projects/%s/requirements' 
-                                    % (self.config['hp_alm_domain'], self.config['alm_project']),
-                                    method = method, query_args = json)
+                                    % (urlencode_str(self.config['hp_alm_domain']),
+                                       urlencode_str(self.config['alm_project'])), method=method, query_args=json)
     
     def alm_connect_project(self):
         # Connect to the project
         try:
             user = self._call_api('rest/domains/%s/projects/%s/customization/users/%s' 
-                                    % (self.config['hp_alm_domain'], self.config['alm_project'], 
-                                       self.config['alm_user']))
+                                    % (urlencode_str(self.config['hp_alm_domain']),
+                                       urlencode_str(self.config['alm_project']),
+                                       urlencode_str(self.config['alm_user'])))
         except APIError, err:
             raise AlmException('Unable to verify domain and project details: %s' % (err))
         
@@ -143,7 +144,8 @@ class HPAlmConnector(AlmConnector):
         # Get all the requirement types
         try:
             req_types = self._call_api('rest/domains/%s/projects/%s/customization/entities/requirement/types/' 
-                                    % (self.config['hp_alm_domain'], self.config['alm_project']))
+                                    % (urlencode_str(self.config['hp_alm_domain']),
+                                       urlencode_str(self.config['alm_project'])))
         except APIError, err:
             raise AlmException('Unable to retrieve requirement types: %s' % (err)) 
         
@@ -212,22 +214,21 @@ class HPAlmConnector(AlmConnector):
         if not task_id:
             return None
 
-        task['formatted_content'] = json.dumps(self.sde_get_task_content(task))
+        task['formatted_content'] = self.sde_get_task_content(task)
         task['alm_priority'] = self.translate_priority(task['priority'])
-        task['title'] = json.dumps(task['title'])
 
-        # HP Alm is very particular about JSON ordering
+        # HP Alm is very particular about JSON ordering - we must hand-craft it            
         json_data = """{
             "Fields":[
-                {"Name":"type-id","values":[{"value":"%s"}]},
-                {"Name":"status","values":[{"value":"%s"}]},
+                {"Name":"type-id","values":[{"value":%s}]},
+                {"Name":"status","values":[{"value":%s}]},
                 {"Name":"name","values":[{"value":%s}]},
                 {"Name":"description","values":[{"value":%s}]},
-                {"Name":"req-priority","values":[{"value":"%s"}]}
+                {"Name":"req-priority","values":[{"value":%s}]}
             ], 
             "Type":"requirement"
-        }""" % (self.issue_type, self.config['hp_alm_new_status'], task['title'], task['formatted_content'], 
-                task['alm_priority'])
+        }""" % (json.dumps(self.issue_type), json.dumps(self.config['hp_alm_new_status']), json.dumps(task['title']),
+                json.dumps(task['formatted_content']), json.dumps(task['alm_priority']))
         try:
             result = self._call_reqs_api(json_data, self.alm_plugin.URLRequest.POST)
             logger.debug('Task %s added to HP Alm Project', task['id'])
@@ -250,25 +251,24 @@ class HPAlmConnector(AlmConnector):
             return
 
         if status == 'DONE' or status == 'NA':
-            json = """
+            json_data = """
                 {"entities":[{"Fields":[
-                {"Name":"id","values":[{"value":"%s"}]},
-                {"Name":"status","values":[{"value":"%s"}]}
-                ]}]}""" % (task.get_alm_id(), self.config['hp_alm_done_statuses'][0])
+                {"Name":"id","values":[{"value":%s}]},
+                {"Name":"status","values":[{"value":%s}]}
+                ]}]}""" % (json.dumps(task.get_alm_id()), json.dumps(self.config['hp_alm_done_statuses'][0]))
             status = "DONE"
 
         elif status == 'TODO':
-            json = """
+            json_data = """
                 {"entities":[{"Fields":[
-                {"Name":"id","values":[{"value":"%s"}]},
-                {"Name":"status","values":[{"value":"%s"}]}
-                ]}]}""" % (task.get_alm_id(), self.config['hp_alm_new_status'])
+                {"Name":"id","values":[{"value":%s}]},
+                {"Name":"status","values":[{"value":%s}]}
+                ]}]}""" % (json.dumps(task.get_alm_id()), json.dumps(self.config['hp_alm_new_status']))
         else:
             raise AlmException('Unexpected status %s: valid values are DONE and TODO' % status)
 
         try:
-            result = self._call_reqs_api(json, self.alm_plugin.URLRequest.PUT)
-
+            result = self._call_reqs_api(json_data, self.alm_plugin.URLRequest.PUT)
         except APIError, err:
             raise AlmException('Unable to update task status to %s '
                                'for requirement: '
