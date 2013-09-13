@@ -1,0 +1,118 @@
+[global]
+###################################################
+#### SD Elements server and project settings  #####
+###################################################
+#SD Elements server name, includes port
+sde_server = m1.sdelements.com
+
+#HTTP or HTTPs protocol
+sde_method = https
+
+#SD Elements user login email
+sde_user = sdeuser
+
+#SD Elements user password
+sde_pass = sdepassword
+
+#SD Elements API connection string
+#Use this instead of having to provide sde_server, sde_user, sde_pass
+sde_api_token = abcdef1234567890abcdef1234567890@m1.sdelements.com
+
+#SD Elements application
+sde_application = sdeappname
+
+#SD Elements project
+sde_project = sdeproject
+
+###################################################
+#### Rally server and project settings       #####
+###################################################
+
+#Rally Server name, includes port
+alm_server = hpalm_server
+
+#HTTP or HTTPs protocol
+alm_method = https
+              
+#Username for HP Alm user that can:
+# -create new issues for the project
+# -read existing issues in the project
+# -create transitions on issues (e.g. close an issue)
+alm_user = hpalm_user
+              
+#Password for above user. Note that this will be encrypted
+#in future versions of the plugin
+alm_pass = hpalm_password
+              
+#HP Alm project identifier
+alm_project = hpalm_project
+
+#HP Alm Domain
+hp_alm_domain = hpalm_domain
+
+#A comma-delimited list of statuses for tasks
+#that you wish to import into the ALM.
+#For example, if you only want to import
+#tasks that are currently TODO in SD Elements
+#then just enter TODO
+#Valid values are:
+#TODO,DONE,NA
+sde_statuses_in_scope = TODO
+
+#Should HowTos be included in what's added
+#to the ALM tools?
+#Valid values are:
+#True or False
+how_tos_in_scope = True
+
+#SD Elements task phases that are in scope.
+#Valid values: comma separated list-
+#requirements,architecture-design,development,testing
+#NOTE: please do not include any spaces in task names
+alm_phases = requirements
+
+#Which system takes precedence in case of
+#confliciting status. For example, if you mark
+#an issue as Passed in Rally and the task is TODO in
+#SD Elements, it will be changed to DONE in SD Elemenets.
+#If you mark a task as Done in SD Elements, but it's still
+#Open in HP Alm, the task will automatically revert back
+#to TODO in SD Elements.
+#Valid values:
+#alm -> ALM tool (i.e HP Alm) takes precedence
+#sde -> SDE takes precedence
+conflict_policy = alm
+
+#Select certain tasks to sync
+#Note that this will override the other selection options
+#such as Statues, Phases, and Priority
+#This can be comma seperate or a single Task ID (Txx or CTxx)
+#
+#selected_tasks = T21,T22
+
+
+###################################################
+#### Advanced HP Alm Settings                 #####
+###################################################
+
+          
+#SD Elements has the ability to map status 
+#of a HP Alm requirement to an SD Elements task.
+#This can be non-trivial if workflow is
+#customized. If this value is set to True
+#then the plugin will attempt to synchronize
+#task statuses. If not, then the plugin
+#will simply add new tasks from SD Element
+#into the HP Alm project without attempting
+#to synchronized task status
+#Valid values: True, False
+alm_standard_workflow = True
+
+#Issue type for new requirements created by SD Elements
+hp_alm_issue_type = Functional
+
+#Initial 'status' to set for a new requirement
+hp_alm_new_status = Not Completed
+
+#a comma delimited list of statuses that signify a task is Done in HP Alm
+hp_alm_done_statuses = Passed
