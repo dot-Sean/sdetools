@@ -1,7 +1,6 @@
 # Copyright SDElements Inc
 # Extensible two way integration with HP Alm
 
-import sys
 import re
 import cookielib
 import urllib2
@@ -11,7 +10,6 @@ from sdetools.sdelib.commons import json, urlencode_str
 from sdetools.sdelib.restclient import RESTBase, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from sdetools.alm_integration.alm_plugin_base import AlmException
-from sdetools.sdelib.conf_mgr import Config
 from sdetools.extlib import markdown, http_req
 from sdetools.sdelib import log_mgr
 
@@ -50,7 +48,7 @@ class HPAlmAPIBase(RESTBase):
         if isinstance(args, basestring):
             return args
         else:
-            return json.dumps(args)        
+            return super(HPAlmAPIBase, self).encode_post_args(args)        
             
 class HPAlmTask(AlmTask):
     """ Representation of a task in HP Alm """
@@ -194,8 +192,6 @@ class HPAlmConnector(AlmConnector):
     def _get_hp_alm_task(self, task_id, task_data):
         hp_alm_id = None
         hp_alm_status = None
-        hp_alm_last_update = None
-        hp_alm_title = None
         hp_alm_last_modified = None
 
         for field in task_data['Fields']:
@@ -203,8 +199,6 @@ class HPAlmConnector(AlmConnector):
                 hp_alm_id = field['values'][0]['value']
             elif field['Name'] == 'status':
                 hp_alm_status = field['values'][0]['value']
-            elif field['Name'] == 'name':
-                hp_alm_title = field['values'][0]['value']
             elif field['Name'] == 'last-modified':
                 hp_alm_last_modified = field['values'][0]['value']
 

@@ -4,7 +4,6 @@
 import re
 from datetime import datetime
 
-from sdetools.extlib import http_req
 from sdetools.sdelib.commons import urlencode_str
 from sdetools.sdelib.restclient import RESTBase
 from sdetools.sdelib.restclient import URLRequest, APIError
