@@ -117,10 +117,7 @@ class RESTBase(object):
             self.base_uri = '%s/%s' % (self.base_uri, self.base_path)
 
     def encode_post_args(self, args):
-        if isinstance(args, basestring):
-            return args
-        else:
-            return json.dumps(args)
+        return json.dumps(args)
 
     def parse_response(self, result):
         try:

@@ -46,6 +46,12 @@ class HPAlmAPIBase(RESTBase):
     def post_conf_init(self):
         super(HPAlmAPIBase, self).post_conf_init()
         self.opener.add_handler(urllib2.HTTPCookieProcessor(self.cookiejar))
+
+    def encode_post_args(self, args):
+        if isinstance(args, basestring):
+            return args
+        else:
+            return json.dumps(args)        
             
 class HPAlmTask(AlmTask):
     """ Representation of a task in HP Alm """
