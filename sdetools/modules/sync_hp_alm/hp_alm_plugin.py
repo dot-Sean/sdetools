@@ -8,14 +8,13 @@ import urllib2
 from datetime import datetime
 
 from sdetools.sdelib.commons import json, urlencode_str
-
 from sdetools.sdelib.restclient import RESTBase, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from sdetools.alm_integration.alm_plugin_base import AlmException
 from sdetools.sdelib.conf_mgr import Config
 from sdetools.extlib import markdown, http_req
-
 from sdetools.sdelib import log_mgr
+
 logger = log_mgr.mods.add_mod(__name__)
 
 URLRequest = http_req.ExtendedMethodRequest
@@ -114,15 +113,16 @@ class HPAlmConnector(AlmConnector):
     def alm_connect_server(self):
         """ Verifies that HP Alm connection works """
         #Check to make sure that we can login
+        self.alm_plugin.auth_mode = 'basic'
         try:
-            self.alm_plugin.auth_mode = 'basic'
             self.alm_plugin.call_api('authentication-point/authenticate')
-            for cookie in self.alm_plugin.cookiejar:
-                if cookie.name == 'LWSSO_COOKIE_KEY':
-                    self.COOKIE_LWSSO = cookie.value
         except APIError, err:
             raise AlmException('Unable to connect to HP Alm service (Check server URL, '
                     'user, pass). Reason: %s' % str(err))
+
+        for cookie in self.alm_plugin.cookiejar:
+            if cookie.name == 'LWSSO_COOKIE_KEY':
+                self.COOKIE_LWSSO = cookie.value
 
         if not self.COOKIE_LWSSO:
             raise AlmException('Unable to connect to HP Alm service (Check server URL, user, pass)')
@@ -175,16 +175,15 @@ class HPAlmConnector(AlmConnector):
         if not task_id:
             return None
 
+        query_args = {
+            'query': "{name['%s:*']}" % task_id,
+            'fields': 'id,name,req-priority,status',
+        }
+
         try:
-            query_args = {
-                'query': "{name['%s:*']}" % task_id,
-                'fields': 'id,name,req-priority,status',
-            }
-            result = self._call_reqs_api(query_args)
-                                               
+            result = self._call_reqs_api(query_args)                                               
         except APIError, err:
-            raise AlmException('Unable to get task %s from HP Alm. '
-                    'Reason: %s' % (task_id, str(err)))
+            raise AlmException('Unable to get task %s from HP Alm. Reason: %s' % (task_id, str(err)))
         num_results = result['TotalResults']
 
         if not num_results:
@@ -244,10 +243,11 @@ class HPAlmConnector(AlmConnector):
                 json.dumps(task['formatted_content']), json.dumps(task['alm_priority']))
         try:
             result = self._call_reqs_api(json_data, self.alm_plugin.URLRequest.POST)
-            logger.debug('Task %s added to HP Alm Project', task['id'])
         except APIError, err:
             raise AlmException('Unable to add task to HP Alm %s because of %s' % 
                     (task['id'], err))
+
+        logger.debug('Task %s added to HP Alm Project', task['id'])
 
         alm_task = self._get_hp_alm_task(task_id, result)
         
