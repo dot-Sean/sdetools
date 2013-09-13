@@ -76,7 +76,7 @@ class HPAlmConnector(AlmConnector):
 
         """ Adds HP Alm specific config options to the config file"""
         config.add_custom_option('hp_alm_issue_type', 'IDs for issues raised in HP Alm',
-            default='3')
+            default='Functional')
         config.add_custom_option('hp_alm_new_status', 'status to set for new tasks in HP Alm',
             default='Not Completed')
         config.add_custom_option('hp_alm_done_statuses', 'Statuses that signify a task is Done in HP Alm',
