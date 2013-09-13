@@ -30,8 +30,7 @@ class HPAlmAPIBase(RESTBase):
     """ Base plugin for HP Alm """
 
     def __init__(self, config):
-        super(HPAlmAPIBase, self).__init__('alm', 'HP Alm', config, 
-                'qcbin')
+        super(HPAlmAPIBase, self).__init__('alm', 'HP Alm', config, 'qcbin')
         self.cookiejar = cookielib.CookieJar()
 
     def parse_response(self, result):
@@ -48,8 +47,9 @@ class HPAlmAPIBase(RESTBase):
         if isinstance(args, basestring):
             return args
         else:
-            return super(HPAlmAPIBase, self).encode_post_args(args)        
-            
+            return super(HPAlmAPIBase, self).encode_post_args(args)
+
+
 class HPAlmTask(AlmTask):
     """ Representation of a task in HP Alm """
 
@@ -58,7 +58,7 @@ class HPAlmTask(AlmTask):
         self.alm_id = alm_id
         self.timestamp = last_modified
         self.status = status
-        self.done_statuses = done_statuses #comma-separated list
+        self.done_statuses = done_statuses  # comma-separated list
 
     def get_task_id(self):
         return self.task_id
@@ -77,6 +77,7 @@ class HPAlmTask(AlmTask):
         """ Returns a datetime object """
         return datetime.strptime(self.timestamp, '%Y-%m-%dT%H:%M:%SZ')
 
+
 class HPAlmConnector(AlmConnector):
     """Connects SD Elements to HP Alm"""
     alm_name = 'HP Alm'
@@ -86,12 +87,13 @@ class HPAlmConnector(AlmConnector):
 
         """ Adds HP Alm specific config options to the config file"""
         config.add_custom_option('hp_alm_issue_type', 'IDs for issues raised in HP Alm',
-            default='Functional')
+                                 default='Functional')
         config.add_custom_option('hp_alm_new_status', 'status to set for new tasks in HP Alm',
-            default='Not Completed')
+                                 default='Not Completed')
         config.add_custom_option('hp_alm_done_statuses', 'Statuses that signify a task is Done in HP Alm',
-            default='Passed')
-        config.add_custom_option('hp_alm_domain', 'Domain', default=None)
+                                 default='Passed')
+        config.add_custom_option('hp_alm_domain', 'Domain',
+                                 default=None)
 
     def initialize(self):
         super(HPAlmConnector, self).initialize()
@@ -101,12 +103,11 @@ class HPAlmConnector(AlmConnector):
             if not self.config[item]:
                 raise AlmException('Missing %s in configuration' % item)
 
-        self.config['hp_alm_done_statuses'] = (
-                self.config['hp_alm_done_statuses'].split(','))
+        self.config['hp_alm_done_statuses'] = (self.config['hp_alm_done_statuses'].split(','))
 
         self.COOKIE_LWSSO = None
         self.issue_type = None
-        self.mark_down_converter = markdown.Markdown(safe_mode="escape")        
+        self.mark_down_converter = markdown.Markdown(safe_mode="escape")
 
     def alm_connect_server(self):
         """ Verifies that HP Alm connection works """
@@ -116,7 +117,7 @@ class HPAlmConnector(AlmConnector):
             self.alm_plugin.call_api('authentication-point/authenticate')
         except APIError, err:
             raise AlmException('Unable to connect to HP Alm service (Check server URL, '
-                    'user, pass). Reason: %s' % str(err))
+                               'user, pass). Reason: %s' % str(err))
 
         for cookie in self.alm_plugin.cookiejar:
             if cookie.name == 'LWSSO_COOKIE_KEY':
@@ -127,49 +128,49 @@ class HPAlmConnector(AlmConnector):
 
         # We will authenticate via cookie
         self.alm_plugin.auth_mode = 'cookie'
-        
+
     def _call_api(self, target, query_args=None, method=URLRequest.GET):
-        headers = {'Cookie':'LWSSO_COOKIE_KEY=%s' % self.COOKIE_LWSSO,
-                   'Content-Type':'application/json',
-                   'Accept':'application/json'}
+        headers = {'Cookie': 'LWSSO_COOKIE_KEY=%s' % self.COOKIE_LWSSO,
+                   'Content-Type': 'application/json',
+                   'Accept': 'application/json'}
         return self.alm_plugin.call_api(target, method=method, args=query_args, call_headers=headers)
 
     def _call_reqs_api(self, json, method=URLRequest.GET):
-        return self._call_api('rest/domains/%s/projects/%s/requirements' 
-                                    % (urlencode_str(self.config['hp_alm_domain']),
-                                       urlencode_str(self.config['alm_project'])), method=method, query_args=json)
-    
+        return self._call_api('rest/domains/%s/projects/%s/requirements'
+                              % (urlencode_str(self.config['hp_alm_domain']),
+                                 urlencode_str(self.config['alm_project'])), method=method, query_args=json)
+
     def alm_connect_project(self):
         # Connect to the project
         try:
-            user = self._call_api('rest/domains/%s/projects/%s/customization/users/%s' 
-                                    % (urlencode_str(self.config['hp_alm_domain']),
-                                       urlencode_str(self.config['alm_project']),
-                                       urlencode_str(self.config['alm_user'])))
+            user = self._call_api('rest/domains/%s/projects/%s/customization/users/%s'
+                                  % (urlencode_str(self.config['hp_alm_domain']),
+                                     urlencode_str(self.config['alm_project']),
+                                     urlencode_str(self.config['alm_user'])))
         except APIError, err:
             raise AlmException('Unable to verify domain and project details: %s' % (err))
-        
+
         if user['Name'] != self.config['alm_user']:
             raise AlmException('Unable to verify user access to domain and project')
 
         # Get all the requirement types
         try:
-            req_types = self._call_api('rest/domains/%s/projects/%s/customization/entities/requirement/types/' 
-                                    % (urlencode_str(self.config['hp_alm_domain']),
-                                       urlencode_str(self.config['alm_project'])))
+            req_types = self._call_api('rest/domains/%s/projects/%s/customization/entities/requirement/types/'
+                                       % (urlencode_str(self.config['hp_alm_domain']),
+                                          urlencode_str(self.config['alm_project'])))
         except APIError, err:
-            raise AlmException('Unable to retrieve requirement types: %s' % (err)) 
-        
+            raise AlmException('Unable to retrieve requirement types: %s' % (err))
+
         for req_type in req_types['types']:
             if req_type['name'] == self.config['hp_alm_issue_type']:
                 self.issue_type = req_type['id']
                 break
 
         if not self.issue_type:
-            raise AlmException('Requirement type %s not found in project' % (self.config['hp_alm_issue_type'])) 
+            raise AlmException('Requirement type %s not found in project' % (self.config['hp_alm_issue_type']))
 
     def alm_get_task(self, task):
-        task_id = self._extract_task_id(task['id'])  
+        task_id = self._extract_task_id(task['id'])
         if not task_id:
             return None
 
@@ -179,7 +180,7 @@ class HPAlmConnector(AlmConnector):
         }
 
         try:
-            result = self._call_reqs_api(query_args)                                               
+            result = self._call_reqs_api(query_args)
         except APIError, err:
             raise AlmException('Unable to get task %s from HP Alm. Reason: %s' % (task_id, str(err)))
         num_results = result['TotalResults']
@@ -207,23 +208,23 @@ class HPAlmConnector(AlmConnector):
                          hp_alm_status,
                          hp_alm_last_modified,
                          self.config['hp_alm_done_statuses'])
-                   
+
     def _extract_task_id(self, full_task_id):
         task_id = None
         task_search = re.search('^(\d+)-([^\d]+\d+)$', full_task_id)
         if task_search:
-            task_id = task_search.group(2)    
+            task_id = task_search.group(2)
         return task_id
 
     def alm_add_task(self, task):
-        task_id = self._extract_task_id(task['id'])  
+        task_id = self._extract_task_id(task['id'])
         if not task_id:
             return None
 
         task['formatted_content'] = self.sde_get_task_content(task)
         task['alm_priority'] = self.translate_priority(task['priority'])
 
-        # HP Alm is very particular about JSON ordering - we must hand-craft it            
+        # HP Alm is very particular about JSON ordering - we must hand-craft it
         json_data = """{
             "Fields":[
                 {"Name":"type-id","values":[{"value":%s}]},
@@ -231,24 +232,23 @@ class HPAlmConnector(AlmConnector):
                 {"Name":"name","values":[{"value":%s}]},
                 {"Name":"description","values":[{"value":%s}]},
                 {"Name":"req-priority","values":[{"value":%s}]}
-            ], 
+            ],
             "Type":"requirement"
         }""" % (json.dumps(self.issue_type), json.dumps(self.config['hp_alm_new_status']), json.dumps(task['title']),
                 json.dumps(task['formatted_content']), json.dumps(task['alm_priority']))
         try:
             result = self._call_reqs_api(json_data, self.alm_plugin.URLRequest.POST)
         except APIError, err:
-            raise AlmException('Unable to add task to HP Alm %s because of %s' % 
-                    (task['id'], err))
+            raise AlmException('Unable to add task to HP Alm %s because of %s' %
+                               (task['id'], err))
 
         logger.debug('Task %s added to HP Alm Project', task['id'])
 
         alm_task = self._get_hp_alm_task(task_id, result)
-        
-        if (self.config['alm_standard_workflow'] and
-            (task['status'] == 'DONE' or task['status'] == 'NA')):
+
+        if (self.config['alm_standard_workflow'] and (task['status'] == 'DONE' or task['status'] == 'NA')):
             self.alm_update_task_status(alm_task, task['status'])
-        
+
         return "Req ID %s" % alm_task.get_alm_id()
 
     def alm_update_task_status(self, task, status):
@@ -282,8 +282,7 @@ class HPAlmConnector(AlmConnector):
                                '%s in HP Alm because of %s' %
                                (status, task.get_alm_id(), err))
 
-        logger.debug('Status changed to %s for task %s in HP Alm',
-                      status, task.get_alm_id())
+        logger.debug('Status changed to %s for task %s in HP Alm', status, task.get_alm_id())
 
     def alm_disconnect(self):
         try:
@@ -291,7 +290,7 @@ class HPAlmConnector(AlmConnector):
         except APIError, err:
             logger.warn('Unable to logout from HP Alm. Reason: %s' % (str(err)))
 
-    def convert_markdown_to_alm(self, content, ref): 
+    def convert_markdown_to_alm(self, content, ref):
         return '<html>'+self.mark_down_converter.convert(content)+'</html>'
 
     def translate_priority(self, priority):
