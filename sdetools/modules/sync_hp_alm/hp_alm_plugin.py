@@ -3,6 +3,8 @@
 
 import sys
 import re
+import cookielib
+import urllib2
 from datetime import datetime
 
 from sdetools.sdelib.commons import json, urlencode_str
@@ -33,13 +35,18 @@ class HPAlmAPIBase(RESTBase):
     def __init__(self, config):
         super(HPAlmAPIBase, self).__init__('alm', 'HP Alm', config, 
                 'qcbin')
+        self.cookiejar = cookielib.CookieJar()
 
     def parse_response(self, result):
         if result == "":
             return "{}"
         else:
             return super(HPAlmAPIBase, self).parse_response(result)
-                
+
+    def post_conf_init(self):
+        super(HPAlmAPIBase, self).post_conf_init()
+        self.opener.add_handler(urllib2.HTTPCookieProcessor(self.cookiejar))
+            
 class HPAlmTask(AlmTask):
     """ Representation of a task in HP Alm """
 

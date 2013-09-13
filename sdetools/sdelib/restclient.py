@@ -2,7 +2,6 @@ import urllib
 import urllib2
 import httplib
 import base64
-import cookielib
 
 from commons import json, Error, UsageError
 from sdetools.extlib import http_req
@@ -76,7 +75,6 @@ class RESTBase(object):
         self.conf_name = conf_name
         self.opener = None
         self.auth_mode = 'basic'
-        self.cookiejar = cookielib.CookieJar()
         self.api_token_header_name = DEFAULT_API_TOKEN_HEADER_NAME
         self._customize_config(CONF_OPTS+extra_conf_opts)
 
@@ -109,7 +107,7 @@ class RESTBase(object):
         self.opener = http_req.get_opener(
             self._get_conf('method'),
             self._get_conf('server'),
-            debuglevel=urllib_debuglevel, cookies=self.cookiejar)
+            debuglevel=urllib_debuglevel)
         self.config[self._get_conf_name('server')] = self.opener.server
 
         self.session_info = None

@@ -226,14 +226,12 @@ def get_http_handler(mode, debuglevel=0):
             return VerifiedHTTPSHandler(debuglevel=debuglevel, ca_certs=CA_CERTS_FILE)
     raise KeyError, mode
 
-def get_opener(method, server, proxy=None, debuglevel=0, cookies=None):
+def get_opener(method, server, proxy=None, debuglevel=0):
     handler = [get_http_handler(method, debuglevel)]
     if '|' in server:
         server, http_proxy = server.split('|', 1)
         handler.append(urllib2.ProxyHandler({method: http_proxy}))
     handler.append(ExtendedMethodHTTPRedirectHandler)
-    if cookies is not None:
-        handler.append(urllib2.HTTPCookieProcessor(cookies))
     opener = urllib2.build_opener(*handler)
     opener.server = server
     return opener
