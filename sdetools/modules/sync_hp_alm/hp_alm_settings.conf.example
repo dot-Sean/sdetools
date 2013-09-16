@@ -114,5 +114,11 @@ hp_alm_issue_type = Functional
 #Initial 'status' to set for a new requirement
 hp_alm_new_status = Not Completed
 
+#Re-open a new requirement with the following 'status'
+hp_alm_reopen_status = Not Completed
+
+#Mark a requirement closed with the following 'status'
+hp_alm_close_status = Passed
+
 #a comma delimited list of statuses that signify a task is Done in HP Alm
 hp_alm_done_statuses = Passed

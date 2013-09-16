@@ -90,6 +90,10 @@ class HPAlmConnector(AlmConnector):
                                  default='Functional')
         config.add_custom_option('hp_alm_new_status', 'status to set for new tasks in HP Alm',
                                  default='Not Completed')
+        config.add_custom_option('hp_alm_reopen_status', 'status to set to reopen a task in HP Alm',
+                                 default='Not Completed')
+        config.add_custom_option('hp_alm_close_status', 'status to set to close a task in HP Alm',
+                                 default='Passed')
         config.add_custom_option('hp_alm_done_statuses', 'Statuses that signify a task is Done in HP Alm',
                                  default='Passed')
         config.add_custom_option('hp_alm_domain', 'Domain',
@@ -262,7 +266,7 @@ class HPAlmConnector(AlmConnector):
                 {"entities":[{"Fields":[
                 {"Name":"id","values":[{"value":%s}]},
                 {"Name":"status","values":[{"value":%s}]}
-                ]}]}""" % (json.dumps(task.get_alm_id()), json.dumps(self.config['hp_alm_done_statuses'][0]))
+                ]}]}""" % (json.dumps(task.get_alm_id()), json.dumps(self.config['hp_alm_close_status']))
             status = "DONE"
 
         elif status == 'TODO':
@@ -270,7 +274,7 @@ class HPAlmConnector(AlmConnector):
                 {"entities":[{"Fields":[
                 {"Name":"id","values":[{"value":%s}]},
                 {"Name":"status","values":[{"value":%s}]}
-                ]}]}""" % (json.dumps(task.get_alm_id()), json.dumps(self.config['hp_alm_new_status']))
+                ]}]}""" % (json.dumps(task.get_alm_id()), json.dumps(self.config['hp_alm_reopen_status']))
         else:
             raise AlmException('Unexpected status %s: valid values are DONE and TODO' % status)
 
