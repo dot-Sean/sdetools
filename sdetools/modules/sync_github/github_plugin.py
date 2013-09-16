@@ -149,8 +149,8 @@ class GitHubConnector(AlmConnector):
         if repo_info.get('message'):
             raise AlmException('Error accessing GitHub repository %s: %s' %
                                self.project_uri, repo_info['message'])
-
-    def alm_verify_configs(self):
+        
+        """ Validate project configurations """
         milestone_name = self.config[self.ALM_PROJECT_VERSION]
         self.milestone_id = self.github_get_milestone_id(milestone_name)
 

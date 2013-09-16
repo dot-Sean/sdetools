@@ -178,7 +178,6 @@ class AlmConnector(object):
             return
 
         self.alm_connect_project()
-        self.alm_verify_configs()
 
     @abstractmethod
     def alm_connect_server(self):
@@ -191,14 +190,6 @@ class AlmConnector(object):
     @abstractmethod
     def alm_connect_project(self):
         """ Sets up a connection to the ALM tool.
-
-        Raises an AlmException on encountering an error
-        """
-        pass
-
-    @abstractmethod
-    def alm_verify_configs(self):
-        """ Verifies that the ALM configurations are correct
 
         Raises an AlmException on encountering an error
         """
