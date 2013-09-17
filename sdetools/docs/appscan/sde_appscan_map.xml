@@ -1,5 +1,5 @@
-<mapping weaknesses="2015">
-	<task id="11" title="Disallow external redirects" >
+<mapping>
+	<task id="11" title="Disallow external redirects" confidence="high">
 		<weakness type="check" id="Comm100ForumRedirectaspxURLRedirection" category="catURLRedirectoryAbuse" title="adv_U-2419_Comm100ForumRedirectaspxURLRedirection" />
 		<weakness type="check" id="DojoToolkitURLRedirection" category="catURLRedirectoryAbuse" title="adv_U-2239_DojoToolkitURLRedirection" />
 		<weakness type="check" id="HPSystemManagementHomepageURLRedirection" category="catURLRedirectoryAbuse" title="adv_U-2392_HPSystemManagementHomepageURLRedirection" />
@@ -13,7 +13,7 @@
 		<weakness type="check" id="attRedirectInURL" category="catURLRedirectoryAbuse" title="New_Phishing_Through_URL_Redirection" />
 		<weakness type="check" id="jsOpenRedirect" category="catURLRedirectoryAbuse" title="New_Phishing_Through_URL_Redirection" />
 	</task>
-	<task id="138" title="Authenticate end users" >
+	<task id="138" title="Authenticate end users" confidence="low">
 		<weakness type="check" id="JBossConsoleAuthenticationBypass" category="catInsufficientAuthentication" title="adv_U-1826_JBossConsoleAuthenticationBypass" />
 		<weakness type="check" id="JBossJMXConsoleAuthenticationBypass" category="catInsufficientAuthentication" title="adv_U-1827_JBossJMXConsoleAuthenticationBypass" />
 		<weakness type="check" id="PE_Test_Privileged" category="catInsufficientAuthentication" title="adv_G-106_PrivilegeEscalation" />
@@ -40,17 +40,17 @@
 		<weakness type="check" id="cwvJrunAdminServerBypass" category="catInsufficientAuthentication" title="adv_U-671_JrunConsoleBackslash" />
 		<weakness type="check" id="cwvNetscapeDefaultAdminPassword" category="catInsufficientAuthentication" title="adv_U-911_NsDefaultPass" />
 	</task>
-	<task id="15" title="Centralize authorization" >
+	<task id="15" title="Centralize authorization" confidence="low">
 		<weakness type="check" id="TPHidden_probeIsSessionDependent" category="catCrossSiteRequestForgery" title="adv_P-00_probeIsSessionDependent" />
 		<weakness type="check" id="attCrossSiteRequestForgery" category="catCrossSiteRequestForgery" title="New_CSRF" />
 	</task>
-	<task id="151" title="Use cryptographically secure random numbers" >
+	<task id="151" title="Use cryptographically secure random numbers" confidence="low">
 		<weakness type="check" id="ApacheTomcatWeakAdministrativeAccountCredentials" category="catCredentialSessionPrediction" title="adv_U-2284_ApacheTomcatWeakAdministrativeAccountCredentials" />
 		<weakness type="check" id="TPHidden_OWB_SessionManagement_Cookies" category="catCredentialSessionPrediction" title="adv_YoelsTestAttack" />
 		<weakness type="check" id="attCFTOKEN" category="catCredentialSessionPrediction" title="adv_U-664_CFTOKEN" />
 		<weakness type="check" id="attJSERVcookie" category="catCredentialSessionPrediction" title="adv_U-665_JServ" />
 	</task>
-	<task id="16" title="Authorize every page" >
+	<task id="16" title="Authorize every page" confidence="low">
 		<weakness type="check" id="attInsecureIndexing" category="catInsecureIndexing" title="adv_G-91_InsecureIndexing" />
 		<weakness type="check" id="ApacheTomcatContextAdministrationToolUnprivilegedAccess" category="catInsufficientAuthorization" title="adv_U-1522_ApacheTomcatContextAdministrationToolUnprivilegedAccess" />
 		<weakness type="check" id="BEAWeblogicAdministrativeInterface" category="catInsufficientAuthorization" title="adv_U-1512_BEAWeblogicAdministrativeInterface" />
@@ -104,7 +104,7 @@
 		<weakness type="check" id="attNetscapePageServices" category="catPredictableResourceLocation" title="adv_U-103_NetscapeEnterpriseDirectoryListingVulnerability" />
 		<weakness type="check" id="attScriptDownload" category="catPredictableResourceLocation" title="adv_G-16_DownloadingTemporaryScriptFiles" />
 	</task>
-	<task id="176" title="Apply principles of privacy when handling personal information" >
+	<task id="176" title="Apply principles of privacy when handling personal information" confidence="low">
 		<weakness type="check" id="DigiNotarSSLCertificate" category="catPrivacy" title="adv_U-2407_DigiNotarSSLCertificate" />
 		<weakness type="check" id="GD_CreditCardAmericanExpress" category="catPrivacy" title="adv_U-1774_GD_CreditCardAmericanExpress" />
 		<weakness type="check" id="GD_CreditCardAmericanExpressNotSSL" category="catPrivacy" title="adv_U-1774_GD_CreditCardAmericanExpress" />
@@ -139,7 +139,7 @@
 		<weakness type="check" id="attSensitiveParamNotOverSSL" category="catPrivacy" title="adv_U-826_SensitiveNotSSL" />
 		<weakness type="check" id="paramValueCheckSSN" category="catPrivacy" title="adv_U-2411_paramValueCheckSSN" />
 	</task>
-	<task id="193" title="Review non-categorized/miscellaneous findings from static code analysis" >
+	<task id="193" title="Review non-categorized/miscellaneous findings from static code analysis" confidence="low">
 		<weakness type="check" id="*" category="" title="Unmapped Check" />
 		<weakness type="check" id="AdobeProductsMultipleXMLExternalEntityInjection" category="catAbuseOfFunctionality" title="adv_U-2455_AdobeProductsMultipleXMLExternalEntityInjection" />
 		<weakness type="check" id="BEAWeblogicCommandExecution" category="catAbuseOfFunctionality" title="adv_U-1517_BEAWeblogicCommandExecution" />
@@ -750,13 +750,13 @@
 		<weakness type="check" id="TPHidden_OWB_Injection_XML" category="catXMLInjection" title="adv_YoelsTestAttack" />
 		<weakness type="check" id="TPHidden_OWB_Injection_XSLT" category="catXMLInjection" title="adv_YoelsTestAttack" />
 	</task>
-	<task id="20" title="Invalidate old session ID after authentication" >
+	<task id="20" title="Invalidate old session ID after authentication" confidence="low">
 		<weakness type="check" id="SessionFixation" category="catSessionFixation" title="New_External_Session_Identifiers" />
 		<weakness type="check" id="attPermissiveTokens" category="catSessionFixation" title="New_External_Session_Identifiers" />
 		<weakness type="check" id="constTransient" category="catSessionFixation" title="New_Session_Identifiers_Not_Updated" />
 		<weakness type="check" id="jsDualSessionFixation" category="catSessionFixation" title="adv_YoelsTestAttack" />
 	</task>
-	<task id="202" title="Prevent buffer overflow/underflow" >
+	<task id="202" title="Prevent buffer overflow/underflow" confidence="low">
 		<weakness type="check" id="ApacheModRewriteOffByOneBufferOverflow" category="catBufferOverflow" title="adv_U-1563_ApacheModRewriteOffByOneBufferOverflow" />
 		<weakness type="check" id="CAMultipleProductsBufferOverflow" category="catBufferOverflow" title="adv_U-1047_CAMultipleProductsBufferOverflow" />
 		<weakness type="check" id="CAiGatewayGETBufferOverflow" category="catBufferOverflow" title="adv_U-1066_CAiGatewayGETBufferOverflow" />
@@ -811,20 +811,20 @@
 		<weakness type="check" id="cwvWin2KWebDavBufferOverflow" category="catBufferOverflow" title="adv_U-713_WebDAVDoS" />
 		<weakness type="check" id="cwviPlanetSunOneBufferOverflow" category="catBufferOverflow" title="adv_U-918_iPlanetSunOneBufferOverflow" />
 	</task>
-	<task id="203" title="Avoid uncontrolled format string" >
+	<task id="203" title="Avoid uncontrolled format string" confidence="low">
 		<weakness type="check" id="TPHidden_OWB_BufferOverflow_FormatString" category="catFormatStringAttack" title="adv_YoelsTestAttack" />
 		<weakness type="check" id="attFormatStrings" category="catFormatStringAttack" title="adv_G-31_FormatString" />
 		<weakness type="check" id="attFormatStringsInvasive" category="catFormatStringAttack" title="adv_G-31_FormatString_invasive" />
 	</task>
-	<task id="21" title="Ensure confidential data is sent over secure channel" >
+	<task id="21" title="Ensure confidential data is sent over secure channel" confidence="low">
 		<weakness type="check" id="TPHidden_OWB_X509Certificate_NonPortable" category="catInsufficientTransLayerProtection" title="adv_YoelsTestAttack" />
 	</task>
-	<task id="25" title="Enforce absolute session timeouts" >
+	<task id="25" title="Enforce absolute session timeouts" confidence="low">
 		<weakness type="check" id="TPHidden_OWB_SessionManagement_Timeout_Absolute" category="catInsufficientSessionExpiration" title="adv_YoelsTestAttack" />
 		<weakness type="check" id="attRespCookieSessionNotRam" category="catInsufficientSessionExpiration" title="adv_U-828_PermCookies" />
 		<weakness type="check" id="attSessionValidAfterLogout" category="catInsufficientSessionExpiration" title="New_Session_Not_Validated_After_Logout" />
 	</task>
-	<task id="31" title="Perform input validation on all forms of input" >
+	<task id="31" title="Perform input validation on all forms of input" confidence="low">
 		<weakness type="check" id="TPHidden_OWB_ABAP_DB_Generic_Connection" category="catImproperInputHandling" title="adv_YoelsTestAttack" />
 		<weakness type="check" id="TPHidden_OWB_ABAP_File_Download" category="catImproperInputHandling" title="adv_YoelsTestAttack" />
 		<weakness type="check" id="TPHidden_OWB_ABAP_File_Upload" category="catImproperInputHandling" title="adv_YoelsTestAttack" />
@@ -867,7 +867,7 @@
 		<weakness type="check" id="attNullByte" category="catNullByteInjection" title="New_Poison_Null_Byte" />
 		<weakness type="check" id="attNullByteUnix" category="catNullByteInjection" title="New_Poison_Null_Byte" />
 	</task>
-	<task id="36" title="Escape untrusted data in HTML, HTML attributes, Cascading Style Sheets and JavaScript" >
+	<task id="36" title="Escape untrusted data in HTML, HTML attributes, Cascading Style Sheets and JavaScript" confidence="low">
 		<weakness type="check" id="ACheckerindexphpXSS" category="catCrossSiteScripting" title="adv_U-2402_ACheckerindexphpXSS" />
 		<weakness type="check" id="AContentMultipleXSS" category="catCrossSiteScripting" title="adv_U-2401_AContentMultipleXSS" />
 		<weakness type="check" id="AMFPHPdetailsphpXSS" category="catCrossSiteScripting" title="adv_U-1933_AMFPHPdetailsphpXSS" />
@@ -1512,7 +1512,7 @@
 		<weakness type="check" id="zenphotoMultipleXSS" category="catCrossSiteScripting" title="adv_U-2377_zenphotoMultipleXSS" />
 		<weakness type="check" id="zenphotoadminphpXSS" category="catCrossSiteScripting" title="adv_U-2367_zenphotoadminphpXSS" />
 	</task>
-	<task id="38" title="Bind variables in SQL statements" >
+	<task id="38" title="Bind variables in SQL statements" confidence="high">
 		<weakness type="check" id="ADOdbSQLInjection" category="catSQLInjection" title="adv_U-1026_ADOdbSQLInjection" />
 		<weakness type="check" id="ASPNukeregisteraspSQLInjection" category="catSQLInjection" title="adv_U-1611_ASPNukeregisteraspSQLInjection" />
 		<weakness type="check" id="ASPPortalSQLInjection" category="catSQLInjection" title="adv_U-1144_ASPPortalSQLInjection" />
@@ -1867,21 +1867,21 @@
 		<weakness type="check" id="zenphotofullimagephpSQLInjection" category="catSQLInjection" title="adv_U-2366_zenphotofullimagephpSQLInjection" />
 		<weakness type="check" id="zenphotorssphpSQLInjection" category="catSQLInjection" title="adv_U-1880_zenphotorssphpSQLInjection" />
 	</task>
-	<task id="39" title="Disallow carriage returns and line feeds when adding data to HTTP response headers" >
+	<task id="39" title="Disallow carriage returns and line feeds when adding data to HTTP response headers" confidence="high">
 		<weakness type="check" id="GV_StoredRespSplit" category="catHTTPResponseSplitting" title="New_HTTP_Response_Splitting" />
 		<weakness type="check" id="OraclePortalHTTPResponseSplitting" category="catHTTPResponseSplitting" title="adv_U-1617_OraclePortalHTTPResponseSplitting" />
 		<weakness type="check" id="attHttpResponseSplitting" category="catHTTPResponseSplitting" title="New_HTTP_Response_Splitting" />
 	</task>
-	<task id="40" title="Use XML encoding when interacting with XML data" >
+	<task id="40" title="Use XML encoding when interacting with XML data" confidence="low">
 		<weakness type="check" id="TPHidden_OWB_Injection_XPath" category="catXPathInjection" title="adv_YoelsTestAttack" />
 		<weakness type="check" id="attXPathInjection" category="catXPathInjection" title="New_Xpath_Inj" />
 	</task>
-	<task id="41" title="Use Lightweight Directory Access Protocol (LDAP) encoding when interacting with LDAP data" >
+	<task id="41" title="Use Lightweight Directory Access Protocol (LDAP) encoding when interacting with LDAP data" confidence="low">
 		<weakness type="check" id="TPHidden_OWB_Injection_LDAP" category="catLDAPInjection" title="adv_YoelsTestAttack" />
 		<weakness type="check" id="TPHidden_WB_JNDIInjection" category="catLDAPInjection" title="adv_G-1996_WB_JNDIInjection" />
 		<weakness type="check" id="attLDAPInjection" category="catLDAPInjection" title="New_LDAP_Inj" />
 	</task>
-	<task id="42" title="Avoid relying on untrusted data for server side page, view, or template selection" >
+	<task id="42" title="Avoid relying on untrusted data for server side page, view, or template selection" confidence="high">
 		<weakness type="check" id="AWStatsPHPCommandExecution" category="catRemoteFileInclusion" title="adv_U-2065_AWStatsPHPCommandExecution" />
 		<weakness type="check" id="AardvarkTopsitesRemoteFileInclusion" category="catRemoteFileInclusion" title="adv_U-1672_AardvarkTopsitesRemoteFileInclusion" />
 		<weakness type="check" id="AriadneCMSviewphpRFI" category="catRemoteFileInclusion" title="adv_U-1793_AriadneCMSviewphpRFI" />
@@ -1945,7 +1945,7 @@
 		<weakness type="check" id="attMattWrightsGuestbookplCanBeUsedToExecuteServerSideIncludes" category="catSSIInjection" title="adv_U-161" />
 		<weakness type="check" id="attParamSSI" category="catSSIInjection" title="adv_G-13_SSI" />
 	</task>
-	<task id="43" title="Avoid unsafe operating system interaction" >
+	<task id="43" title="Avoid unsafe operating system interaction" confidence="low">
 		<weakness type="check" id="ADOdbPHPFuncExec" category="catOSCommanding" title="adv_U-1027_ADOdbPHPFuncExec" />
 		<weakness type="check" id="DotNetNukeBDPDTModuleCommandExecution" category="catOSCommanding" title="adv_U-1614_DotNetNukeBDPDTModuleCommandExecution" />
 		<weakness type="check" id="GB_CommandExecution" category="catOSCommanding" title="adv_G-1992_WB_RemoteCodeExecution" />
@@ -2010,10 +2010,10 @@
 		<weakness type="check" id="cwvSimpleServerCommandExec" category="catOSCommanding" title="adv_U-678_SimpleServerExec" />
 		<weakness type="check" id="phpBBCommandExec1" category="catOSCommanding" title="adv_U-924_phpBBScriptCommandExec" />
 	</task>
-	<task id="49" title="Remove/disable unused, test or debug code and data" >
+	<task id="49" title="Remove/disable unused, test or debug code and data" confidence="low">
 		<weakness type="check" id="TPHidden_OWB_Configuration" category="catApplicationMisconfiguration" title="adv_YoelsTestAttack" />
 	</task>
-	<task id="50" title="Use indirect object reference maps if accessing files" >
+	<task id="50" title="Use indirect object reference maps if accessing files" confidence="low">
 		<weakness type="check" id="ApacheTomcatDirectoryListing" category="catDirectoryIndexing" title="adv_U-1976_ApacheTomcatInformationDisclosure" />
 		<weakness type="check" id="ApacheTomcatDirectoyListing" category="catDirectoryIndexing" title="adv_U-1523_ApacheTomcatDirectoyListing" />
 		<weakness type="check" id="ExponentDirectoryListing" category="catDirectoryIndexing" title="adv_U-1692_ExponentDirectoryListing" />
@@ -2039,7 +2039,7 @@
 		<weakness type="check" id="cwvTomcatDirectoryListingCheck" category="catDirectoryIndexing" title="adv_U-675_TomcatDirListing" />
 		<weakness type="check" id="zenphotoDirectoryListing" category="catDirectoryIndexing" title="adv_U-1633_zenphotoDirectoryListing" />
 	</task>
-	<task id="55" title="Validate all untrusted XML input" >
+	<task id="55" title="Validate all untrusted XML input" confidence="low">
 		<weakness type="check" id="attSoapArrayDoS" category="catSOAPArrayAbuse" title="adv_U-820_SoapArrayOverflow" />
 		<weakness type="check" id="attNamespaceBlowupDoS" category="catXMLAttributeBlowup" title="adv_G-59_XmlNamespaceQuadraticBlowupDoS" />
 		<weakness type="check" id="attMultipleVendorXMLentityExplosion" category="catXMLEntityExpansion" title="adv_G-55_XMLentityBlowup" />
@@ -2047,7 +2047,7 @@
 		<weakness type="check" id="attDtdXXE" category="catXMLExternalEntities" title="adv_U-823_XXEFileDisc" />
 		<weakness type="check" id="cwvApacheAxisFileRetrievalExternalEntity" category="catXMLExternalEntities" title="adv_U-696_XmlExternalEntityFileRetr" />
 	</task>
-	<task id="6" title="Implement account lockout or authentication throttling" >
+	<task id="6" title="Implement account lockout or authentication throttling" confidence="low">
 		<weakness type="check" id="IISlocalstartaspPossibleBruteForce" category="catBruteForce" title="adv_U-1231_IISlocalstartaspPossibleBruteForce" />
 		<weakness type="check" id="LoginErrMsgPossibleBruteForce" category="catBruteForce" title="adv_G-104_LoginErrMsgPossibleBruteForce" />
 		<weakness type="check" id="TPHidden_OWB_AppDOS_Lockout" category="catBruteForce" title="adv_YoelsTestAttack" />
@@ -2061,10 +2061,10 @@
 		<weakness type="check" id="attAccountLockout" category="catBruteForce" title="adv_G-106_AccountLockout" />
 		<weakness type="check" id="attDumbBruteForce" category="catBruteForce" title="adv_G-1482_attDumbBruteForce" />
 	</task>
-	<task id="67" title="Enforce page navigation" >
+	<task id="67" title="Enforce page navigation" confidence="low">
 		<weakness type="check" id="TPHidden_OWB_Validation_Required_BusinessLogic" category="catInsufficientProcessValidation" title="adv_YoelsTestAttack" />
 	</task>
-	<task id="72" title="Use safe arithmetic to avoid integer overflow" >
+	<task id="72" title="Use safe arithmetic to avoid integer overflow" confidence="low">
 		<weakness type="check" id="TPHidden_OWB_BufferOverflow_IntegerOverflow" category="catIntegerOverflow" title="adv_YoelsTestAttack" />
 	</task>
 </mapping>

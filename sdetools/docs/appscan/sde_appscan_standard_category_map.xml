@@ -1,5 +1,5 @@
 <mapping>
-	<task id="151" title="Use cryptographically secure random numbers" confidence="high">
+	<task id="151" title="Use cryptographically secure random numbers" confidence="low">
         <category id="catCredentialSessionPrediction" title="Credential and Session Prediction"/>
 	</task>
     <task id="21" title="Ensure confidential data is sent over secure channel">
@@ -14,7 +14,7 @@
         <category id="catXMLAttributeBlowup" title="XML Attribute Blowup"/>
         <category id="catSOAPArrayAbuse" title="SOAP Array Abuse"/>
 	</task>
-    <task id="203" title="Avoid uncontrolled format string" confidence="high">
+    <task id="203" title="Avoid uncontrolled format string" confidence="low">
         <category id="catFormatStringAttack" title="Format String Attack"/>
     </task>
     <task id="15" title="Centralize authorization">
@@ -34,7 +34,7 @@
         <category id="catUserDefined" title="User Defined Weakness"/>
         <category id="catMaliciousContent" title="Malicious Content"/>
     </task>
-    <task id="202" title="Prevent buffer overflow/underflow" confidence="high">
+    <task id="202" title="Prevent buffer overflow/underflow" confidence="low">
          <category id="catBufferOverflow" title="Buffer Overflow"/>
     </task>
 	<task id="176" title="Apply principles of privacy when handling personal information" confidence="low">
