@@ -11,8 +11,8 @@ class Command(BaseCommand):
     help = 'Rally <-> SDE sync utility.'
 
     def configure(self):
-        rbase = RallyAPIBase(self.config)
-        self.rally = RallyConnector(self.config, rbase)
+        alm_api = RallyAPIBase(self.config)
+        self.rally = RallyConnector(self.config, alm_api)
 
     def handle(self):
         self.rally.initialize()

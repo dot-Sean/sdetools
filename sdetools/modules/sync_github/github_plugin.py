@@ -4,7 +4,6 @@
 import re
 from datetime import datetime
 
-from sdetools.extlib import http_req
 from sdetools.sdelib.commons import urlencode_str
 from sdetools.sdelib.restclient import RESTBase
 from sdetools.sdelib.restclient import URLRequest, APIError
@@ -30,7 +29,7 @@ class GitHubAPI(RESTBase):
 
     def post_conf_init(self):           
         if self._get_conf('api_token'):
-            self.auth_mode = 'api_token'
+            self.set_auth_mode('api_token')
             self.api_token_header_name = 'Authorization'
             self.config['alm_pass'] = 'token %s' % self._get_conf('api_token')
 
@@ -149,6 +148,10 @@ class GitHubConnector(AlmConnector):
         if repo_info.get('message'):
             raise AlmException('Error accessing GitHub repository %s: %s' %
                                self.project_uri, repo_info['message'])
+        
+        """ Validate project configurations """
+        milestone_name = self.config[self.ALM_PROJECT_VERSION]
+        self.milestone_id = self.github_get_milestone_id(milestone_name)
 
     def github_get_milestone_id(self, milestone_name):
         if not milestone_name:
@@ -261,8 +264,8 @@ class GitHubConnector(AlmConnector):
             labels.append(github_issue_label)
         if labels:
             create_args['labels'] = labels
-        if milestone_name:
-            create_args['milestone'] = self.github_get_milestone_id(milestone_name)
+        if self.milestone_id:
+            create_args['milestone'] = self.milestone_id
 
         try:
             new_issue = self.alm_plugin.call_api('repos/%s/issues' %

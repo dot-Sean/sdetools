@@ -95,10 +95,15 @@ class Mapping:
     def output_mapping(self, file_name):
         fp = open(file_name, "w")
         keys = sorted(self.task_map.iterkeys())
-        fp.write('<mapping weaknesses="%d">\n' % len(self.checks))
+        fp.write('<mapping>\n')
         for task_id in keys:
             task_checks = self.task_map[task_id]
-            fp.write('\t<task id="%s" title="%s" >\n'%(task_id, self.base_tasks[task_id].attributes['title'].value))
+            confidence = "low"
+            if 'confidence' in self.base_tasks[task_id].attributes.keys():
+                confidence = self.base_tasks[task_id].attributes['confidence'].value
+
+            fp.write('\t<task id="%s" title="%s" confidence="%s">\n'%
+                    (task_id, self.base_tasks[task_id].attributes['title'].value, confidence))
             task_checks = sorted(task_checks)
             for check in task_checks:
                 fp.write('\t\t<weakness type="check" id="%s" category="%s" title="%s" />\n'% (check['check_id'], check['category_id'], check['check_name']))
