@@ -63,7 +63,8 @@ class Mapping:
             
         self.cwe_checks = cwe_checks
         
-    def remap(self):
+    def remap(self, unmapped_cwe_file_name):
+        fp = open(unmapped_cwe_file_name, "w")
         task_map = {}
         nomap = {}
 
@@ -91,6 +92,7 @@ class Mapping:
                             task_checks.append(check)
                     task_map[task] = task_checks
             else: #map to 193
+                    fp.write("CWE-%s %d un-mapped\n" % (cwe, len(self.cwe_checks[cwe])))
                     task_mapping_found = False
                     task_checks = []
                     task = '193'
@@ -108,6 +110,7 @@ class Mapping:
                         if not task_mapping_found:
                             task_checks.append(check)
                     task_map[task] = task_checks
+        fp.close()
         self.task_map = task_map
 
     def output_mapping(self, file_name):
@@ -116,7 +119,12 @@ class Mapping:
         fp.write('<mapping weaknesses="%d">\n' % len(self.checks))
         for task_id in keys:
             task_checks = self.task_map[task_id]
-            fp.write('\t<task id="%s" title="%s" >\n'%(task_id, self.base_tasks[task_id].attributes['title'].value))
+            confidence = "low"
+            if 'confidence' in self.base_tasks[task_id].attributes.keys():
+                confidence = self.base_tasks[task_id].attributes['confidence'].value
+
+            fp.write('\t<task id="%s" title="%s" confidence="%s">\n' %
+                    (task_id, self.base_tasks[task_id].attributes['title'].value, confidence))
             task_checks = sorted(task_checks)
             for weakness in task_checks:
                 fp.write('\t\t<weakness type="check" id="%s" title="%s" />\n'% (weakness['check_id'], weakness['check_name']))
@@ -145,7 +153,7 @@ class Mapping:
 
 def main(argv):
 
-    usage = "Usage: %s <base mapping> <webinspect checks> <webinspect map>\n" % (argv[0])
+    usage = "Usage: %s <base mapping> <webinspect checks> <unmapped cwes> <webinspect map>\n" % (argv[0])
 
     if len(argv) == 2 and argv[1] == 'help':
         print usage
@@ -153,7 +161,7 @@ def main(argv):
         print "webinspect checks: (input) WebInspect checks in xml format [i.e. webinspect_checks.xml]"
         print "webinspect map: (output) WebInspect map file"
         sys.exit(0)
-    elif len(argv) < 4:
+    elif len(argv) < 5:
         print usage
         sys.exit(1)
 
@@ -165,16 +173,16 @@ def main(argv):
     print "Loading WebInspect Checks..."    
     base.load_weaknesses_from_xml(argv[2])
     
-    print "Re-mapping Checks..."
-    base.remap()
+    print "Re-mapping Checks... unmapped CWE's recorded in %s" % argv[3]
+    base.remap(argv[3])
     
     print "Validating..."
     if base.find_missing_checks():
         print "Aborted"
         sys.exit(1)
         
-    print "Outputting WebInspect map to %s..." % argv[3]
-    base.output_mapping(argv[3])
+    print "Outputting WebInspect map to %s..." % argv[4]
+    base.output_mapping(argv[4])
 
     print "Done."        
 
