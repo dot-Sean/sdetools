@@ -95,7 +95,7 @@ class RESTBase(object):
                 group_name='%s Connector' % (self.conf_name))
 
     def set_auth_mode(self, auth_mode):
-        if auth_mode not in ['basic', 'session', 'auth_token', 'cookie']:
+        if auth_mode not in ['basic', 'session', 'api_token', 'cookie']:
             raise UsageError('Invalid auth mode %s' % auth_mode)
         if auth_mode == self._auth_mode:
             return
