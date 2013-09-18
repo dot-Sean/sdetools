@@ -26,12 +26,12 @@ class ExtAPI(restclient.RESTBase):
 
     def post_conf_init(self):
         if self._get_conf('api_token'):
-            self.auth_mode = 'api_token'
             if '@' not in self._get_conf('api_token'):
                 raise UsageError('Unable to process API Token')
             self.config['sde_user'] = None
             self.config['sde_pass'], self.config['sde_server'] = (
                 self.config['sde_api_token'].split('@', 1))
+            self.set_auth_mode('api_token')
 
         super(ExtAPI, self).post_conf_init()
 
