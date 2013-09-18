@@ -9,6 +9,7 @@ __all__ = [
     'sync_jira',
     'sync_mingle',
     'sync_rally',
+    'sync_hp_alm',
     'api_proxy',
     'list_projects',
     'sync_trac',

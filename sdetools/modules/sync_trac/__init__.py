@@ -6,8 +6,8 @@ class Command(BaseCommand):
     help = 'Trac <-> SDE sync utility.'
 
     def configure(self):
-        mbase = TracXMLRPCAPI(self.config)
-        self.trac = TracConnector(self.config, mbase)
+        alm_api = TracXMLRPCAPI(self.config)
+        self.trac = TracConnector(self.config, alm_api)
 
     def handle(self):
         self.trac.initialize()
