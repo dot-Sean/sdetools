@@ -199,7 +199,7 @@ class RESTBase(object):
         elif target == 'session':
             pass
         elif auth_mode == 'cookie':
-            # we will leave it up to the caller to deal with this
+            # cookie jar will automatically handle this
             pass
         elif auth_mode == 'basic':
             encoded_auth = base64.encodestring('%s:%s' % (self._get_conf('user'), self._get_conf('pass')))[:-1]
