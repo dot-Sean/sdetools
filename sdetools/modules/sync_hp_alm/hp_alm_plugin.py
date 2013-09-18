@@ -2,8 +2,6 @@
 # Extensible two way integration with HP Alm
 
 import re
-import cookielib
-import urllib2
 from datetime import datetime
 
 from sdetools.sdelib.commons import json, urlencode_str
@@ -18,11 +16,11 @@ logger = log_mgr.mods.add_mod(__name__)
 URLRequest = http_req.ExtendedMethodRequest
 
 HPALM_PRIORITY_MAP = {
-    '10': '5-Urgent',
-    '8-9': '4-Very High',
-    '7': '3-High',
-    '4-6': '2-Medium',
-    '1-3': '1-Low',
+    '9-10': '5-Urgent',
+    '7-8': '4-Very High',
+    '5-6': '3-High',
+    '3-4': '2-Medium',
+    '1-2': '1-Low',
     }
 
 
@@ -31,17 +29,12 @@ class HPAlmAPIBase(RESTBase):
 
     def __init__(self, config):
         super(HPAlmAPIBase, self).__init__('alm', 'HP Alm', config, 'qcbin')
-        self.cookiejar = cookielib.CookieJar()
 
     def parse_response(self, result):
         if result == "":
             return "{}"
         else:
             return super(HPAlmAPIBase, self).parse_response(result)
-
-    def post_conf_init(self):
-        super(HPAlmAPIBase, self).post_conf_init()
-        self.opener.add_handler(urllib2.HTTPCookieProcessor(self.cookiejar))
 
     def encode_post_args(self, args):
         if isinstance(args, basestring):
@@ -115,10 +108,12 @@ class HPAlmConnector(AlmConnector):
 
     def alm_connect_server(self):
         """ Verifies that HP Alm connection works """
+        # We will authenticate via cookie
+        self.alm_plugin.set_auth_mode('cookie')
+
         #Check to make sure that we can login
-        self.alm_plugin.auth_mode = 'basic'
         try:
-            self.alm_plugin.call_api('authentication-point/authenticate')
+            self.alm_plugin.call_api('authentication-point/authenticate', auth_mode='basic')
         except APIError, err:
             raise AlmException('Unable to connect to HP Alm service (Check server URL, '
                                'user, pass). Reason: %s' % str(err))
@@ -129,9 +124,6 @@ class HPAlmConnector(AlmConnector):
 
         if not self.COOKIE_LWSSO:
             raise AlmException('Unable to connect to HP Alm service (Check server URL, user, pass)')
-
-        # We will authenticate via cookie
-        self.alm_plugin.auth_mode = 'cookie'
 
     def _call_api(self, target, query_args=None, method=URLRequest.GET):
         headers = {'Cookie': 'LWSSO_COOKIE_KEY=%s' % self.COOKIE_LWSSO,

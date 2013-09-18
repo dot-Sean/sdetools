@@ -29,7 +29,7 @@ class GitHubAPI(RESTBase):
 
     def post_conf_init(self):           
         if self._get_conf('api_token'):
-            self.auth_mode = 'api_token'
+            self.set_auth_mode('api_token')
             self.api_token_header_name = 'Authorization'
             self.config['alm_pass'] = 'token %s' % self._get_conf('api_token')
 

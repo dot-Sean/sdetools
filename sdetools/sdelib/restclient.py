@@ -2,6 +2,7 @@ import urllib
 import urllib2
 import httplib
 import base64
+import cookielib
 
 from commons import json, Error, UsageError
 from sdetools.extlib import http_req
@@ -54,10 +55,11 @@ class APIFormatError(APIError):
 
 class RESTBase(object):
     """
-    REST base class supports three authentication mode specified by auth_mode:
+    REST base class supports four authentication mode specified by auth_mode:
     - basic: HTTP Basic Auth using username and password
     - api_token: We use the _pass and allow customizing the API Token header name
     - session: Used mainly for SD Elements session
+    - cookie: A cookie jar is added and cookies will be maintained
     """
     URLRequest = URLRequest
 
@@ -74,7 +76,7 @@ class RESTBase(object):
         self.conf_prefix = conf_prefix
         self.conf_name = conf_name
         self.opener = None
-        self.auth_mode = 'basic'
+        self._auth_mode = 'basic'
         self.api_token_header_name = DEFAULT_API_TOKEN_HEADER_NAME
         self._customize_config(CONF_OPTS+extra_conf_opts)
 
@@ -91,6 +93,19 @@ class RESTBase(object):
                 desc % {'name': self.conf_name},
                 default=default,
                 group_name='%s Connector' % (self.conf_name))
+
+    def set_auth_mode(self, auth_mode):
+        if auth_mode not in ['basic', 'session', 'auth_token', 'cookie']:
+            raise UsageError('Invalid auth mode %s' % auth_mode)
+        if auth_mode == self._auth_mode:
+            return
+        if auth_mode == 'session':
+            self.start_session()
+        elif auth_mode == 'cookie':
+            self.cookiejar = cookielib.CookieJar()
+            self.opener.add_handler(urllib2.HTTPCookieProcessor(self.cookiejar))
+            
+        self._auth_mode = auth_mode
 
     def urlencode_str(self, instr):
         return urllib.urlencode({'a':instr})[2:]
@@ -147,7 +162,7 @@ class RESTBase(object):
         """
         return [self.api_token_header_name, self._get_conf('pass')]
 
-    def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}):
+    def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}, auth_mode=None):
         """
         Internal method used to call a RESTFul API
 
@@ -164,7 +179,8 @@ class RESTBase(object):
         logger.info('Calling %s API: %s %s' % (self.conf_name, method, target))
         logger.debug(' + Args: %s' % ((repr(args)[:200]) + (repr(args)[200:] and '...')))
         req_url = '%s/%s' % (self.base_uri, target)
-        auth_mode = self.auth_mode
+        if auth_mode is None:
+            auth_mode = self._auth_mode
         args = args or {}
         data = None
 
@@ -256,7 +272,7 @@ class RESTBase(object):
             'username': self._get_conf('user'),
             'password': self._get_conf('pass')}
         try:
-            result = self.call_api('session', URLRequest.PUT, args=args)
+            result = self.call_api('session', URLRequest.PUT, args=args, auth_mode='basic')
         except APIHTTPError, err:
             if err.code == 400:
                 raise APIAuthError('Invalid Credentials for %s' % self.conf_name)
@@ -266,4 +282,3 @@ class RESTBase(object):
             if key not in result:
                 raise APIFormatError('Invalid session information structure.')
         self.session_info = result
-        self.auth_mode = 'session'

@@ -37,7 +37,8 @@ class ExtAPI(restclient.RESTBase):
 
     def connect(self):
         if self.config['authmode'] == 'session':
-            result = self.start_session()
+            self.set_auth_mode('session')
+            result = True
         else:
             #TODO: Find a better alternative ->
             #In 'basic' mode, we make an extra call just to verify that credentials are correct
