@@ -18,8 +18,8 @@ class Command(BaseCommand):
 
         # We start with REST to get configuration and other stuff right
         # Then we switch to SOAP for JIRA 4 if we need to
-        jbase = JIRARestAPI(self.config)
-        self.jira = JIRAConnector(self.config, jbase)
+        alm_api = JIRARestAPI(self.config)
+        self.jira = JIRAConnector(self.config, alm_api)
 
     def handle(self):
         api_ver = self.config['jira_version'][:1]

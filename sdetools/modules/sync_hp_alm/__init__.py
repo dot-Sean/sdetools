@@ -10,8 +10,8 @@ class Command(BaseCommand):
     help = 'HP Alm <-> SDE sync utility.'
 
     def configure(self):
-        alm_base = HPAlmAPIBase(self.config)
-        self.hp_alm = HPAlmConnector(self.config, alm_base)
+        alm_api = HPAlmAPIBase(self.config)
+        self.hp_alm = HPAlmConnector(self.config, alm_api)
 
     def handle(self):
         self.hp_alm.initialize()
