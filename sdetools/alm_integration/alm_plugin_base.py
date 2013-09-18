@@ -168,6 +168,8 @@ class AlmConnector(object):
         self.config.process_boolean_config('alm_standard_workflow')
         self.config.process_json_str_dict('alm_custom_fields')
 
+        self.alm_plugin.post_conf_init()
+
         logger.info('*** AlmConnector initialized ***')
 
     def alm_connect(self):

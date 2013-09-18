@@ -71,6 +71,7 @@ class RESTBase(object):
     APIFormatError = APIFormatError
 
     def __init__(self, conf_prefix, conf_name, config, base_path=None, extra_conf_opts=[]):
+        self._post_init_done = False
         self.config = config
         self.base_path = base_path
         self.conf_prefix = conf_prefix
@@ -102,6 +103,8 @@ class RESTBase(object):
         if auth_mode == 'session':
             self.start_session()
         elif auth_mode == 'cookie':
+            if not self.opener:
+                self.post_conf_init()
             self.cookiejar = cookielib.CookieJar()
             self.opener.add_handler(urllib2.HTTPCookieProcessor(self.cookiejar))
             
@@ -111,6 +114,9 @@ class RESTBase(object):
         return urllib.urlencode({'a':instr})[2:]
 
     def post_conf_init(self):
+        if self._post_init_done:
+            return
+
         for name in ['method', 'server']:
             if not self._get_conf(name):
                 raise UsageError('Missing Configuration %s' % self._get_conf_name(name))
@@ -130,6 +136,8 @@ class RESTBase(object):
         self.base_uri = '%s://%s' % (self._get_conf('method'), self.server)
         if self.base_path:
             self.base_uri = '%s/%s' % (self.base_uri, self.base_path)
+
+        self._post_init_done = True
 
     def encode_post_args(self, args):
         return json.dumps(args)
