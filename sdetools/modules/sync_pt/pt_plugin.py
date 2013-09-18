@@ -30,7 +30,7 @@ class PivotalTrackerAPI(RESTBase):
 
     def post_conf_init(self):
         if self._get_conf('api_token'):
-                self.auth_mode = 'api_token'
+                self.set_auth_mode('api_token')
                 self.api_token_header_name = 'X-TrackerToken'
                 self.config[self._get_conf_name('pass')] = self._get_conf('api_token')
 
@@ -151,7 +151,7 @@ class PivotalTrackerConnector(AlmConnector):
                                                (self.project_uri, urlencode_str(search_query)))
         except APIError, err:
             logger.error(err)
-            raise AlmException('Unable to get task %s from PivotalTracker' % task_id)
+            raise AlmException('Unable to get story %s from PivotalTracker' % task_id)
 
         if (not stories):
             return None
@@ -326,7 +326,7 @@ class PivotalTrackerConnector(AlmConnector):
             raise AlmException('Unable to update task status to %s '
                                'for story: %s in PivotalTracker because of %s' %
                                (status, task.get_alm_id(), err))
-        logger.debug('%s' % result)
+
         if (result and result.get('error')):
             raise AlmException('Unable to update status of task %s to %s. Reason: %s - %s' %
                                (task['id'], status, result['code'], result['general_problem']))
