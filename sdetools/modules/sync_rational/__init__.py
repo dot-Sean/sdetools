@@ -1,6 +1,6 @@
 from sdetools.sdelib.cmd import BaseCommand
 
-from sdetools.modules.sync_github.github_plugin import RationalConnector, RationalAPI
+from sdetools.modules.sync_rational.rational_plugin import RationalConnector, RationalAPI
 
 class Command(BaseCommand):
     help = 'Rational CLM <-> SDE sync utility.'

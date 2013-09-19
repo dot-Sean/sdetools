@@ -16,4 +16,5 @@ __all__ = [
     'add_ssl_cert',
     'sync_pt',
     'sync_github',
+    'sync_rational',
 ]
