@@ -1,15 +1,26 @@
 import random
+from mock import MagicMock
+from sdetools.alm_integration.alm_plugin_base import AlmException
 
 class AlmPluginTestHelper(object):
+
+    def sf_error(self):
+        raise AlmException('Mocked')
+        
     def setUp(self):
         self.sde_tasks = None
         self.alm_tasks = None
-        # Connect to SDE / ALM
-        self.assertTrue(self.tac)
-        self.tac.sde_connect()
-        self.tac.alm_connect()
-        self.assertTrue(self.tac.is_sde_connected())
 
+    def test_alm_configurations(self):
+        configs = self.tac.config
+        self.assertTrue(configs.get('sde_server'))
+        self.assertTrue(configs.get('alm_server'))
+    
+    def test_alm_connect(self, mock_class):
+        mc = mock_class.return_value
+        mc.alm_connect_server.return_value = 'Done' 
+        self.tac.alm_connect = MagicMock()
+        
     def _create_test_task(self):
         random_id = 'T%d' % random.randint(1, 999999999)
         random_title = '%s: Test task' % (random_id)

@@ -6,7 +6,7 @@ sys.path.append(os.path.split(os.path.split(os.path.split(os.path.abspath(__file
 
 import csv
 
-from sdetools.sdelib.conf_mgr import config
+from sdetools.sdelib.conf_mgr import Config
 from sdetools.sdelib.interactive_plugin import PlugInExperience
 import logging
 
