@@ -4,8 +4,7 @@
 import sys, os, unittest
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
 
-from sdetools.alm_integration.tests.alm_plugin_test_helper import AlmPluginTestHelper
-import sdetools.alm_integration.tests.alm_mock_sde_plugin
+from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 
 from sdetools.sdelib.conf_mgr import Config
 from sdetools.sdelib.mod_mgr import ReturnChannel
@@ -39,8 +38,9 @@ CONF_FILE_LOCATION = 'test_settings.conf'
 def stdout_callback(obj):
     print obj
     
-class TestJiraCase(AlmPluginTestHelper, unittest.TestCase):
+class TestJiraCase(AlmPluginTestBase, unittest.TestCase):
     def setUp(self):
+        """ Jira Tests """ 
         conf_path = os.path.abspath('%s\%s' % (os.path.dirname(os.path.realpath(__file__)), CONF_FILE_LOCATION))
         ret_chn = ReturnChannel(stdout_callback, {})
         config = Config('', '', ret_chn, 'import')
@@ -78,7 +78,7 @@ class TestJiraCase(AlmPluginTestHelper, unittest.TestCase):
         self.assertEqual(self.tac.sde_get_task_content('task'), 'Task content')
 
     def test_connect(self):
-        """ Test mocked Jira connection """
+        """[JIRA] Test mocked Jira connection """
         # Assert Server Success
         self.tac.alm_plugin.connect_server
         # Assert Project Success
@@ -90,7 +90,7 @@ class TestJiraCase(AlmPluginTestHelper, unittest.TestCase):
         MOCK_FLAG = None
 
     def test_parse_result(self):
-        """ Test Jira response parser """
+        """[JIRA] Test response parser """
         # Assert bad json error checking
         result = "crappy json"
         self.assertRaises(APIFormatError, self.tac.alm_plugin.parse_response, result)
@@ -106,5 +106,5 @@ class TestJiraCase(AlmPluginTestHelper, unittest.TestCase):
         self.assertTrue(json[0].get('avatarUrls').get('24x24'))
         self.assertFalse(json[0].get('non-existant-key'))
 
-if __name__ == "__main__":
-    unittest.main()
+    if __name__ == "__main__":
+        unittest.main()
