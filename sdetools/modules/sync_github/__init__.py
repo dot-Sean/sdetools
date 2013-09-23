@@ -6,8 +6,8 @@ class Command(BaseCommand):
     help = 'GitHub <-> SDE sync utility.'
 
     def configure(self):
-        sync_base = GitHubAPI(self.config)
-        self.github = GitHubConnector(self.config, sync_base)
+        alm_api = GitHubAPI(self.config)
+        self.github = GitHubConnector(self.config, alm_api)
 
     def handle(self):
         self.github.initialize()

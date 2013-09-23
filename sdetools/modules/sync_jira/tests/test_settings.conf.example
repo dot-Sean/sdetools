@@ -110,4 +110,3 @@ targets =  .
 skip_hidden = True
 interactive =True
 askpasswd = False
-auth_mode = basic

@@ -119,7 +119,12 @@ class Mapping:
         fp.write('<mapping weaknesses="%d">\n' % len(self.checks))
         for task_id in keys:
             task_checks = self.task_map[task_id]
-            fp.write('\t<task id="%s" title="%s" >\n'%(task_id, self.base_tasks[task_id].attributes['title'].value))
+            confidence = "low"
+            if 'confidence' in self.base_tasks[task_id].attributes.keys():
+                confidence = self.base_tasks[task_id].attributes['confidence'].value
+
+            fp.write('\t<task id="%s" title="%s" confidence="%s">\n' %
+                    (task_id, self.base_tasks[task_id].attributes['title'].value, confidence))
             task_checks = sorted(task_checks)
             for weakness in task_checks:
                 fp.write('\t\t<weakness type="check" id="%s" title="%s" />\n'% (weakness['check_id'], weakness['check_name']))
