@@ -2,26 +2,22 @@
 #       configuration file
 
 import sys, os, unittest
+from urllib2 import HTTPError
+from json import JSONEncoder
+from mock import patch
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
 
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
-
-from sdetools.sdelib.conf_mgr import Config
-from sdetools.sdelib.mod_mgr import ReturnChannel
-from sdetools.sdelib.interactive_plugin import PlugInExperience
 from sdetools.modules.sync_jira.jira_plugin import JIRAConnector
-
-from mock import patch
+from sdetools.sdelib.conf_mgr import Config
 from sdetools.sdelib.restclient import URLRequest, APIFormatError
-from sdetools.alm_integration.alm_plugin_base import AlmException
 from sdetools.modules.sync_jira.jira_rest import APIError
 from jira_response_generator import JiraResponseGenerator
-from urllib2 import HTTPError
-from json import JSONEncoder
+from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
 
+CONF_FILE_LOCATION = 'test_settings.conf'
 MOCK_FLAG = None
 JIRA_RESPONSE_GENERATOR = None
-
 def mock_call_api(self, target, method=URLRequest.GET, args=None, call_headers={}):
     try:
         return JIRA_RESPONSE_GENERATOR.get_response(target, MOCK_FLAG, args, method)
@@ -31,30 +27,44 @@ def mock_call_api(self, target, method=URLRequest.GET, args=None, call_headers={
         err.headers = call_headers
         raise APIError(err)
 
-patch('sdetools.modules.sync_jira.jira_rest.RESTBase.call_api', mock_call_api).start()
-from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
 
-CONF_FILE_LOCATION = 'test_settings.conf'
-def stdout_callback(obj):
-    print obj
-    
 class TestJiraCase(AlmPluginTestBase, unittest.TestCase):
-    def setUp(self):
-        """ Jira Tests """ 
+    @classmethod
+    def setUpClass(self):
+        PATH_TO_JIRA_CONNECTOR = 'sdetools.modules.sync_jira.jira_plugin'
+        super(TestJiraCase, self).initTest(PATH_TO_JIRA_CONNECTOR)
+
+        self.config.add_custom_option('jira_version', 'Version of JIRA [e.g. 4.3.3, 5, or 6.0]', default='6')
         conf_path = os.path.abspath('%s\%s' % (os.path.dirname(os.path.realpath(__file__)), CONF_FILE_LOCATION))
-        ret_chn = ReturnChannel(stdout_callback, {})
-        config = Config('', '', ret_chn, 'import')
-        self.tac = JIRAConnector(config, JIRARestAPI(config))
-        Config.parse_config_file(config, conf_path)
+        self.tac = JIRAConnector(self.config, JIRARestAPI(self.config))
+        Config.parse_config_file(self.config, conf_path)
+
+        api_ver = self.config['jira_version'][:1]
+        if api_ver not in ['4', '5', '6']:
+            raise AlmException('Only JIRA versions 4.3.3 and up are supported')
+        self.config.jira_api_ver = int(api_ver)
+
+        if self.config.jira_api_ver == 4:
+            self.tac.alm_plugin = JIRASoapAPI(self.config)
+
+        self.tac.initialize()
+
         global JIRA_RESPONSE_GENERATOR
-        JIRA_RESPONSE_GENERATOR = JiraResponseGenerator(config['alm_server'],
-                                                        config['alm_project'],
-                                                        config['alm_project_version'],
-                                                        config['alm_user'])
+        JIRA_RESPONSE_GENERATOR = JiraResponseGenerator(self.config['alm_server'],
+                                                        self.config['alm_project'],
+                                                        self.config['alm_project_version'],
+                                                        self.config['alm_user']) 
+        patch('sdetools.modules.sync_jira.jira_rest.RESTBase.call_api', mock_call_api).start()                                                        
+        
+    def setUp(self):
         super(TestJiraCase, self).setUp()
-    
+
+    def tearDown(self):
+        super(TestJiraCase, self).tearDown()
+        JIRA_RESPONSE_GENERATOR.clear_jira_tasks()
+
     def test_sde(self):
-        """ Test SDE Mock """
+        """[SDE] Test mocked functions """
         # Assert mock connect doesn't throw error
         self.tac.sde_connect()
         # Test connection status
@@ -105,6 +115,3 @@ class TestJiraCase(AlmPluginTestBase, unittest.TestCase):
         self.assertTrue(json[0].get('avatarUrls'))
         self.assertTrue(json[0].get('avatarUrls').get('24x24'))
         self.assertFalse(json[0].get('non-existant-key'))
-
-    if __name__ == "__main__":
-        unittest.main()

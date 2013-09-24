@@ -3,7 +3,6 @@
    IMPORT THIS FILE BEFORE IMPORTING THE ALM CONNECTOR 
 
 """
-from mock import patch
 from json import JSONEncoder
 import re
 
@@ -89,10 +88,6 @@ def generate_sde_task(priority, project_id=1000):
             ]
         }
         
-# Patch SDE Calls
-patch('sdetools.modules.sync_jira.jira_plugin.AlmConnector.sde_connect', mock_sde_connect).start()
-patch('sdetools.modules.sync_jira.jira_plugin.AlmConnector.is_sde_connected', mock_is_sde_connected).start()
-patch('sdetools.modules.sync_jira.jira_plugin.AlmConnector.sde_get_tasks', mock_sde_get_tasks).start()
-patch('sdetools.modules.sync_jira.jira_plugin.AlmConnector.sde_get_task', mock_sde_get_task).start()
-patch('sdetools.modules.sync_jira.jira_plugin.AlmConnector.sde_update_task_status', mock_sde_update_task_status).start()
-patch('sdetools.modules.sync_jira.jira_plugin.AlmConnector.sde_get_task_content', mock_sde_get_task_content).start()
+def mock_add_note(self, task_id, note_msg, filename, status):
+    pass
+
