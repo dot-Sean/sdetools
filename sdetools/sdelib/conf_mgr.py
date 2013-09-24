@@ -310,9 +310,10 @@ class Config(object):
         self[key] = (str(self[key]).lower() == 'true')
 
     def process_list_config(self, key):
-        if self[key]:
-            vals = [x.strip(' ') for x in self[key].split(',')]
-            self[key] = vals
+        if isinstance(self[key], collection):
+            return
+        elif self[key]:
+            self[key] = [x.strip() for x in self[key].split(',')]
 
     def process_json_str_dict(self, key):
         try:
