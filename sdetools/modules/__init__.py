@@ -10,10 +10,11 @@ __all__ = [
     'sync_mingle',
     'sync_rally',
     'sync_hp_alm',
+    'sync_pt',
+    'sync_github',
     'api_proxy',
     'list_projects',
     'sync_trac',
     'connect',
     'add_ssl_cert',
-    'sync_github',
 ]

@@ -69,6 +69,7 @@ class RESTBase(object):
     APIAuthError = APIAuthError
     ServerError = ServerError
     APIFormatError = APIFormatError
+    API_TOKEN_HEADER = "X-Api-Token"
 
     def __init__(self, conf_prefix, conf_name, config, base_path=None, extra_conf_opts=[]):
         self._post_init_done = False
