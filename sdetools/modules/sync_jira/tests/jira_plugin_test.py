@@ -42,6 +42,8 @@ class JiraBaseCase(AlmPluginTestBase):
 
     def tearDown(self):
         super(JiraBaseCase, self).tearDown()
+        global MOCK_FLAG
+        MOCK_FLAG = None
         JIRA_RESPONSE_GENERATOR.clear_alm_tasks()
 
     def test_sde(self):
@@ -78,7 +80,6 @@ class JiraBaseCase(AlmPluginTestBase):
         global MOCK_FLAG
         MOCK_FLAG = 'fail'
         self.assertRaises(APIError, self.tac.alm_plugin.call_api, 'project')
-        MOCK_FLAG = None
 
     def test_parse_result(self):
         """[JIRA] Test response parser """
@@ -112,12 +113,13 @@ class TestJiraAPI5Case(JiraBaseCase, unittest.TestCase):
                                                         self.config['alm_project_version'],
                                                         self.config['alm_user']) 
         patch('sdetools.modules.sync_jira.jira_rest.RESTBase.call_api', mock_call_api).start()
-        
-class TestJiraAPI4Case(JiraBaseCase):
+
+class TestJiraAPI4Case(JiraBaseCase, unittest.TestCase):
     @classmethod
     def setUpClass(self):
         super(TestJiraAPI4Case, self).setUpClass()
-        self.tac = JIRAConnector(self.config, JIRASoapAPI(self.config))
+        self.tac = JIRAConnector(self.config, JIRARestAPI(self.config))
+        self.tac.alm_plugin = JIRASoapAPI(self.config)
         Config.parse_config_file(self.config, self.conf_path)
         self.config.jira_api_ver = 4
         self.tac.initialize()
