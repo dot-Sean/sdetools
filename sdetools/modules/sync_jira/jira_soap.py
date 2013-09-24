@@ -271,3 +271,7 @@ class JIRASoapAPI:
         except SOAPpy.Types.faultType, err:
             logger.error(err)
             raise AlmException("Unable to set task status: %s" % err)
+            
+    def post_conf_init(self):
+        pass
+

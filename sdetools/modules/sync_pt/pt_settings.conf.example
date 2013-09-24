@@ -1,0 +1,122 @@
+[global]
+###################################################
+#### SD Elements server and project settings  #####
+###################################################
+#SD Elements server name, includes port
+sde_api_token = abcdef1234567890abcdef1234567890$m1.sdelements.com
+
+#SD Elements application
+sde_application = SDEapp
+
+#SD Elements project
+sde_project = SDEproj
+
+#SD Elements connection method (Avoid http in production env)
+sde_method = https
+
+#####################################################
+#### PivotalTracker server and project settings #####
+#####################################################
+
+#PivotalTracker Server name, includes port
+alm_server = pt_server
+
+#HTTP or HTTPs protocol
+alm_method = https
+              
+#Username for PivotalTracker user that can create
+#and update stories
+alm_user = pt_user
+
+#Password for above user. Note that this will be encrypted
+#in future versions of the plugin.
+alm_pass = pt_passsword
+
+#PivotalTracker authentication token for user with push
+#access. If you supply a token you don't have to supply a user/pass
+alm_api_token = pt_api_token
+              
+#PivotalTracker project name
+alm_project = pt_project_name
+          
+#A comma-delimited list of statuses for tasks
+#that you wish to import into the ALM.
+#For example, if you only want to import
+#tasks that are currently TODO in SD Elements
+#then just enter TODO
+#Valid values are:
+#TODO,DONE,NA
+sde_statuses_in_scope = TODO
+
+#Should HowTos be included in what's added
+#to the ALM tools?
+#Valid values are:
+#True or False
+how_tos_in_scope = True
+
+# Synchronize all SD Elements tasks having the following
+# minimum priority
+# Default: 1 (all tasks)
+#sde_min_priority = 1
+
+#SD Elements task phases that are in scope.
+#Valid values: comma separated list-
+#requirements,architecture-design,development,testing
+#NOTE: please do not include any spaces in task names
+alm_phases = requirements
+
+#Which system takes precedence in case of
+#confliciting status. For example, if you mark
+#an issue as Closed in Pivotal Tracker and the task is TODO in
+#SD Elements, it will be changed to DONE in SD Elemenets.
+#If you mark a task as Done in SD Elements, but it's still
+#Open in Pivotal Tracker, the task will automatically revert back
+#to TODO in SD Elements.
+#Valid values:
+#alm -> ALM tool (i.e Pivotal Tracker) takes precedence
+#sde -> SDE takes precedence
+#Note that timezone is currently unsupported
+#since Pivotal Tracker does not provide timezone support
+conflict_policy = alm
+
+#[Optional] Select certain tasks to sync
+#Note that this will override the other selection options
+#such as Statues, Phases, and Priority
+#This can be comma seperate or a single Task ID (Txx or CTxx)
+#
+#selected_tasks = T21,T22
+
+#[Optional] Specify a custom priority map
+#This is a JSON representation of a list of ranges mapped to certain
+#labels in PivotalTracker. Make sure to cover all priorities 1 to 10. Note that
+#the ranges are inclusive
+#alm_priority_map = {"1-3":"Low", "4-6":"Medium", "7-10":"High"}
+
+#[Optional] ALM Project Version
+#The name of the release marker you wish to place all new
+#stories under
+#alm_project_version = release_marker
+
+###################################################
+#### Advanced PivotalTracker Settings         #####
+###################################################
+          
+#This value indicates whether or not task status
+#should be synchronized. In cases of difficult
+#custom workflow that can't easily be integrated,
+#you may wish to set this to False.
+alm_standard_workflow = True
+
+#PT story type for new issues raised by SD Elements
+pt_story_type = bug
+
+#PT state for newly created story
+#Note: unscheduled puts the story in the icebox, unstarted puts it in backlog/current sprint
+pt_new_status = unstarted
+
+#A comma delimited list of statuses that signify a task is 
+#Done in PT.
+pt_done_statuses = accepted
+
+#[Optional] Specify a label to group all stories created by sync tool
+#pt_group_label = SD Elements
