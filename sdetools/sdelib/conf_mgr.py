@@ -1,4 +1,5 @@
 import sys
+import collections
 import os
 import optparse
 import ConfigParser
@@ -307,6 +308,11 @@ class Config(object):
         if self[key] in [True, False]:
             return
         self[key] = (str(self[key]).lower() == 'true')
+
+    def process_list_config(self, key):
+        if self[key]:
+            vals = [x.strip(' ') for x in self[key].split(',')]
+            self[key] = vals
 
     def process_json_str_dict(self, key):
         try:

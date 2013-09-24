@@ -88,8 +88,7 @@ class MingleConnector(AlmConnector):
             len(self.sde_plugin.config['mingle_done_statuses']) < 1):
             raise AlmException('Missing mingle_done_statuses in configuration')
 
-        self.sde_plugin.config['mingle_done_statuses'] =  (
-                self.sde_plugin.config['mingle_done_statuses'].split(','))
+        self.config.process_list_config('mingle_done_statuses')
 
         if not self.sde_plugin.config['mingle_card_type']:
             raise AlmException('Missing mingle_card_type in configuration')

@@ -54,7 +54,7 @@ class JIRAConnector(AlmConnector):
             len(self.config['jira_done_statuses']) < 1):
             raise AlmException('Missing jira_done_statuses in configuration')
 
-        self.config['jira_done_statuses'] = (self.config['jira_done_statuses'].split(','))
+        self.config.process_list_config('jira_done_statuses')
 
         if not self.config['jira_issue_type']:
             raise AlmException('Missing jira_issue_type in configuration')

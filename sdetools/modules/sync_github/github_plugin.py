@@ -109,7 +109,7 @@ class GitHubConnector(AlmConnector):
             if not self.config[item]:
                 raise AlmException('Missing %s in configuration' % item)
 
-        self.config[self.ALM_DONE_STATUSES] = self.config[self.ALM_DONE_STATUSES].split(',')
+        self.config.process_list_config(self.ALM_DONE_STATUSES)
         self.config.process_json_str_dict(self.ALM_PRIORITY_MAP)
 
         if not self.config[self.ALM_PRIORITY_MAP]:
