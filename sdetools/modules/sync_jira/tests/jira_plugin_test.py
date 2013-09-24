@@ -4,7 +4,7 @@
 import sys, os, unittest
 from urllib2 import HTTPError
 from json import JSONEncoder
-from mock import patch
+from mock import patch, MagicMock
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
 
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
@@ -14,6 +14,7 @@ from sdetools.sdelib.restclient import URLRequest, APIFormatError
 from sdetools.modules.sync_jira.jira_rest import APIError
 from jira_response_generator import JiraResponseGenerator
 from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
+from sdetools.modules.sync_jira.jira_soap import JIRASoapAPI
 
 CONF_FILE_LOCATION = 'test_settings.conf'
 MOCK_FLAG = None
@@ -28,39 +29,19 @@ def mock_call_api(self, target, method=URLRequest.GET, args=None, call_headers={
         raise APIError(err)
 
 
-class TestJiraCase(AlmPluginTestBase, unittest.TestCase):
+class JiraBaseCase(AlmPluginTestBase):
     @classmethod
     def setUpClass(self):
         PATH_TO_JIRA_CONNECTOR = 'sdetools.modules.sync_jira.jira_plugin'
-        super(TestJiraCase, self).initTest(PATH_TO_JIRA_CONNECTOR)
-
+        super(JiraBaseCase, self).initTest(PATH_TO_JIRA_CONNECTOR)
         self.config.add_custom_option('jira_version', 'Version of JIRA [e.g. 4.3.3, 5, or 6.0]', default='6')
-        conf_path = os.path.abspath('%s\%s' % (os.path.dirname(os.path.realpath(__file__)), CONF_FILE_LOCATION))
-        self.tac = JIRAConnector(self.config, JIRARestAPI(self.config))
-        Config.parse_config_file(self.config, conf_path)
-
-        api_ver = self.config['jira_version'][:1]
-        if api_ver not in ['4', '5', '6']:
-            raise AlmException('Only JIRA versions 4.3.3 and up are supported')
-        self.config.jira_api_ver = int(api_ver)
-
-        if self.config.jira_api_ver == 4:
-            self.tac.alm_plugin = JIRASoapAPI(self.config)
-
-        self.tac.initialize()
-
-        global JIRA_RESPONSE_GENERATOR
-        JIRA_RESPONSE_GENERATOR = JiraResponseGenerator(self.config['alm_server'],
-                                                        self.config['alm_project'],
-                                                        self.config['alm_project_version'],
-                                                        self.config['alm_user']) 
-        patch('sdetools.modules.sync_jira.jira_rest.RESTBase.call_api', mock_call_api).start()                                                        
+        self.conf_path = os.path.abspath('%s\%s' % (os.path.dirname(os.path.realpath(__file__)), CONF_FILE_LOCATION))                       
         
     def setUp(self):
-        super(TestJiraCase, self).setUp()
+        super(JiraBaseCase, self).setUp()
 
     def tearDown(self):
-        super(TestJiraCase, self).tearDown()
+        super(JiraBaseCase, self).tearDown()
         JIRA_RESPONSE_GENERATOR.clear_alm_tasks()
 
     def test_sde(self):
@@ -115,3 +96,43 @@ class TestJiraCase(AlmPluginTestBase, unittest.TestCase):
         self.assertTrue(json[0].get('avatarUrls'))
         self.assertTrue(json[0].get('avatarUrls').get('24x24'))
         self.assertFalse(json[0].get('non-existant-key'))
+  
+class TestJiraAPI5Case(JiraBaseCase, unittest.TestCase):
+    @classmethod
+    def setUpClass(self):
+        super(TestJiraAPI5Case, self).setUpClass()
+        self.tac = JIRAConnector(self.config, JIRARestAPI(self.config))
+        Config.parse_config_file(self.config, self.conf_path)
+        self.config.jira_api_ver = 5
+        self.tac.initialize()
+
+        global JIRA_RESPONSE_GENERATOR
+        JIRA_RESPONSE_GENERATOR = JiraResponseGenerator(self.config['alm_server'],
+                                                        self.config['alm_project'],
+                                                        self.config['alm_project_version'],
+                                                        self.config['alm_user']) 
+        patch('sdetools.modules.sync_jira.jira_rest.RESTBase.call_api', mock_call_api).start()
+        
+class TestJiraAPI4Case(JiraBaseCase):
+    @classmethod
+    def setUpClass(self):
+        super(TestJiraAPI4Case, self).setUpClass()
+        self.tac = JIRAConnector(self.config, JIRASoapAPI(self.config))
+        Config.parse_config_file(self.config, self.conf_path)
+        self.config.jira_api_ver = 4
+        self.tac.initialize()
+
+        global JIRA_RESPONSE_GENERATOR
+        JIRA_RESPONSE_GENERATOR = JiraResponseGenerator(self.config['alm_server'],
+                                                        self.config['alm_project'],
+                                                        self.config['alm_project_version'],
+                                                        self.config['alm_user']) 
+        patch('sdetools.modules.sync_jira.jira_rest.RESTBase.call_api', mock_call_api).start()
+        mock_opener = MagicMock()
+        mock_opener.open = lambda x: x
+        patch('sdetools.modules.sync_jira.jira_soap.http_req.get_opener', mock_opener).start()
+        mock_proxy = MagicMock()
+        mock_proxy().getIssueTypes.return_value = mock_call_api(self, 'issuetype')
+
+        patch('sdetools.modules.sync_jira.jira_soap.SOAPpy.WSDL.Proxy', mock_proxy).start()
+  
