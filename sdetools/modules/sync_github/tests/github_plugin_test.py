@@ -50,4 +50,4 @@ class TestGitHubCase(AlmPluginTestBase, unittest.TestCase):
 
     def tearDown(self):
         super(TestGitHubCase, self).tearDown()
-        GITHUB_RESPONSE_GENERATOR.clear_github_tasks()
+        GITHUB_RESPONSE_GENERATOR.clear_alm_tasks()

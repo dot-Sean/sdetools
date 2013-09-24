@@ -94,6 +94,7 @@ class AlmPluginTestBase(object):
         alm_task = self.tac.alm_get_task(test_task)
         self.tac.alm_update_task_status(alm_task,'DONE')
         test_task_result = self.tac.alm_get_task(test_task)
+        self.assertTrue(test_task_result)
         self.assertTrue(test_task_result.get_status() == 'DONE')
         # Case 2: Create a task and update the status to NA
         test_task2 = self._create_sde_test_task()

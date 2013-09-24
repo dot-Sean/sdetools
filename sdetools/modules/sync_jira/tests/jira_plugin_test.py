@@ -61,7 +61,7 @@ class TestJiraCase(AlmPluginTestBase, unittest.TestCase):
 
     def tearDown(self):
         super(TestJiraCase, self).tearDown()
-        JIRA_RESPONSE_GENERATOR.clear_jira_tasks()
+        JIRA_RESPONSE_GENERATOR.clear_alm_tasks()
 
     def test_sde(self):
         """[SDE] Test mocked functions """
