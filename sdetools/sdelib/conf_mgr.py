@@ -310,6 +310,7 @@ class Config(object):
 
     def process_list_config(self, key):
         if not self[key]:
+            self[key] = []
             return
         if isinstance(self[key], basestring):
             self[key] = [x.strip() for x in self[key].split(',')]
