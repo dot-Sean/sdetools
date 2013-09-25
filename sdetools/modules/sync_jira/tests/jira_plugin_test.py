@@ -15,7 +15,7 @@ from sdetools.modules.sync_jira.jira_rest import APIError
 from jira_response_generator import JiraResponseGenerator
 from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
 from sdetools.modules.sync_jira.jira_soap import JIRASoapAPI
-
+from functools import partial
 CONF_FILE_LOCATION = 'test_settings.conf'
 MOCK_FLAG = None
 JIRA_RESPONSE_GENERATOR = None
@@ -46,6 +46,23 @@ class JiraBaseCase(AlmPluginTestBase):
         MOCK_FLAG = None
         JIRA_RESPONSE_GENERATOR.clear_alm_tasks()
 
+  
+class TestJiraAPI5Case(JiraBaseCase, unittest.TestCase):
+    @classmethod
+    def setUpClass(self):
+        super(TestJiraAPI5Case, self).setUpClass()
+        self.tac = JIRAConnector(self.config, JIRARestAPI(self.config))
+        Config.parse_config_file(self.config, self.conf_path)
+        self.config.jira_api_ver = 5
+        self.tac.initialize()
+        
+        global JIRA_RESPONSE_GENERATOR
+        JIRA_RESPONSE_GENERATOR = JiraResponseGenerator(self.config['alm_server'],
+                                                        self.config['alm_project'],
+                                                        self.config['alm_project_version'],
+                                                        self.config['alm_user']) 
+        patch('sdetools.modules.sync_jira.jira_rest.RESTBase.call_api', mock_call_api).start()
+
     def test_sde(self):
         """[SDE] Test mocked functions """
         # Assert mock connect doesn't throw error
@@ -70,17 +87,6 @@ class JiraBaseCase(AlmPluginTestBase):
         # Test SDE get content
         self.assertEqual(self.tac.sde_get_task_content('task'), 'Task content')
 
-    def test_connect(self):
-        """[JIRA] Test mocked Jira connection """
-        # Assert Server Success
-        self.tac.alm_plugin.connect_server
-        # Assert Project Success
-        self.tac.alm_plugin.connect_project
-        # Assert Error
-        global MOCK_FLAG
-        MOCK_FLAG = 'fail'
-        self.assertRaises(APIError, self.tac.alm_plugin.call_api, 'project')
-
     def test_parse_result(self):
         """[JIRA] Test response parser """
         # Assert bad json error checking
@@ -97,22 +103,28 @@ class JiraBaseCase(AlmPluginTestBase):
         self.assertTrue(json[0].get('avatarUrls'))
         self.assertTrue(json[0].get('avatarUrls').get('24x24'))
         self.assertFalse(json[0].get('non-existant-key'))
-  
-class TestJiraAPI5Case(JiraBaseCase, unittest.TestCase):
-    @classmethod
-    def setUpClass(self):
-        super(TestJiraAPI5Case, self).setUpClass()
-        self.tac = JIRAConnector(self.config, JIRARestAPI(self.config))
-        Config.parse_config_file(self.config, self.conf_path)
-        self.config.jira_api_ver = 5
-        self.tac.initialize()
+   
+    def test_connect(self):
+        """[JIRA] Test mocked Jira connection """
+        # Assert Server Success
+        self.tac.alm_plugin.connect_server
+        # Assert Project Success
+        self.tac.alm_plugin.connect_project
+        # Assert Error
+        global MOCK_FLAG
+        MOCK_FLAG = 'fail'
+        self.assertRaises(APIError, self.tac.alm_plugin.call_api, 'project')
+        
+        
+class MockProxy():
+    def __init__(self, wsdlsource, config=Config, **kw ):
+        pass
+        
+    def __getattr__(self, name):
+        return partial(self.getResponse, name)
 
-        global JIRA_RESPONSE_GENERATOR
-        JIRA_RESPONSE_GENERATOR = JiraResponseGenerator(self.config['alm_server'],
-                                                        self.config['alm_project'],
-                                                        self.config['alm_project_version'],
-                                                        self.config['alm_user']) 
-        patch('sdetools.modules.sync_jira.jira_rest.RESTBase.call_api', mock_call_api).start()
+    def getResponse(self, *args, **keywords):
+        return JIRA_RESPONSE_GENERATOR.soap_reply(args)
 
 class TestJiraAPI4Case(JiraBaseCase, unittest.TestCase):
     @classmethod
@@ -133,8 +145,10 @@ class TestJiraAPI4Case(JiraBaseCase, unittest.TestCase):
         mock_opener = MagicMock()
         mock_opener.open = lambda x: x
         patch('sdetools.modules.sync_jira.jira_soap.http_req.get_opener', mock_opener).start()
-        mock_proxy = MagicMock()
-        mock_proxy().getIssueTypes.return_value = mock_call_api(self, 'issuetype')
+        mock_proxy = MockProxy
 
+        #mock_proxy().getIssueTypes.return_value = mock_call_api(self, 'issuetype')
+        #mock_proxy().login.return_value = mock_call_api(self, 'get_auth_token')
+        
         patch('sdetools.modules.sync_jira.jira_soap.SOAPpy.WSDL.Proxy', mock_proxy).start()
   
