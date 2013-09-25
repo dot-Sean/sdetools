@@ -112,8 +112,7 @@ class RallyConnector(AlmConnector):
             if not self.config[item]:
                 raise AlmException('Missing %s in configuration' % item)
 
-        self.config['rally_done_statuses'] = (
-                self.config['rally_done_statuses'].split(','))
+        self.config.process_list_config('rally_done_statuses')
 
         self.project_ref = None
         self.workspace_ref = None

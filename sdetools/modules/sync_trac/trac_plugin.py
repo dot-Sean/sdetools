@@ -89,7 +89,7 @@ class TracConnector(AlmConnector):
         super(TracConnector, self).initialize()
 
         #Verify that the configuration options are set properly
-        self.config['alm_done_statuses'] = self.config['alm_done_statuses'].split(',')
+        self.config.process_list_config('alm_done_statuses')
 
         if (not self.config['alm_done_statuses'] or
             len(self.config['alm_done_statuses']) < 1):
