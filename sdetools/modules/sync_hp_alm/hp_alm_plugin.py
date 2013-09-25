@@ -94,13 +94,12 @@ class HPAlmConnector(AlmConnector):
 
     def initialize(self):
         super(HPAlmConnector, self).initialize()
-
         #Verify that the configuration options are set properly
         for item in ['hp_alm_done_statuses', 'hp_alm_issue_type', 'hp_alm_new_status', 'hp_alm_domain']:
             if not self.config[item]:
                 raise AlmException('Missing %s in configuration' % item)
 
-        self.config['hp_alm_done_statuses'] = (self.config['hp_alm_done_statuses'].split(','))
+        self.config.process_list_config('hp_alm_done_statuses')
 
         self.COOKIE_LWSSO = None
         self.issue_type = None

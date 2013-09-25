@@ -119,8 +119,7 @@ class AlmConnector(object):
 
         #Note: This will consider space as empty due to strip
         #We do this before checking if the config is non-empty later
-        self.config['selected_tasks'] = [x.strip(' ') 
-            for x in self.config['selected_tasks'].split(',') if x.strip(' ')]
+        self.config.process_list_config('selected_tasks')
         for task in self.config['selected_tasks']:
             if not RE_TASK_IDS.match(task):
                 raise UsageError('Invalid Task ID: %s' % (task))
@@ -129,12 +128,12 @@ class AlmConnector(object):
             if not self.config['alm_phases']:
                 raise AlmException('Missing alm_phases in configuration')
 
-            self.config['alm_phases'] = self.config['alm_phases'].split(',')
+            self.config.process_list_config('alm_phases')
 
             if not self.config['sde_statuses_in_scope']:
                 raise AlmException('Missing the SD Elements statuses in scope')
 
-            self.config['sde_statuses_in_scope'] = self.config['sde_statuses_in_scope'].split(',')
+            self.config.process_list_config('sde_statuses_in_scope')
             for status in self.config['sde_statuses_in_scope']:
                 if status not in('TODO', 'DONE', 'NA'):
                     raise AlmException('Invalid status specified in '
