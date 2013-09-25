@@ -15,10 +15,13 @@ from sdetools.modules.sync_jira.jira_rest import APIError
 from jira_response_generator import JiraResponseGenerator
 from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
 from sdetools.modules.sync_jira.jira_soap import JIRASoapAPI
+from sdetools.extlib.SOAPpy.Types import faultType
 from functools import partial
+
 CONF_FILE_LOCATION = 'test_settings.conf'
 MOCK_FLAG = None
 JIRA_RESPONSE_GENERATOR = None
+
 def mock_call_api(self, target, method=URLRequest.GET, args=None, call_headers={}):
     try:
         return JIRA_RESPONSE_GENERATOR.get_response(target, MOCK_FLAG, args, method)
@@ -35,8 +38,16 @@ class JiraBaseCase(AlmPluginTestBase):
         PATH_TO_JIRA_CONNECTOR = 'sdetools.modules.sync_jira.jira_plugin'
         super(JiraBaseCase, self).initTest(PATH_TO_JIRA_CONNECTOR)
         self.config.add_custom_option('jira_version', 'Version of JIRA [e.g. 4.3.3, 5, or 6.0]', default='6')
-        self.conf_path = os.path.abspath('%s\%s' % (os.path.dirname(os.path.realpath(__file__)), CONF_FILE_LOCATION))                       
-        
+        conf_path = os.path.abspath('%s\%s' % (os.path.dirname(os.path.realpath(__file__)), CONF_FILE_LOCATION))                       
+        self.tac = JIRAConnector(self.config, JIRARestAPI(self.config))
+        Config.parse_config_file(self.config, conf_path)
+
+        global JIRA_RESPONSE_GENERATOR
+        JIRA_RESPONSE_GENERATOR = JiraResponseGenerator(self.config['alm_server'],
+                                                        self.config['alm_project'],
+                                                        self.config['alm_project_version'],
+                                                        self.config['alm_user']) 
+                                                        
     def setUp(self):
         super(JiraBaseCase, self).setUp()
 
@@ -48,19 +59,13 @@ class JiraBaseCase(AlmPluginTestBase):
 
   
 class TestJiraAPI5Case(JiraBaseCase, unittest.TestCase):
+
     @classmethod
     def setUpClass(self):
         super(TestJiraAPI5Case, self).setUpClass()
-        self.tac = JIRAConnector(self.config, JIRARestAPI(self.config))
-        Config.parse_config_file(self.config, self.conf_path)
         self.config.jira_api_ver = 5
         self.tac.initialize()
-        
-        global JIRA_RESPONSE_GENERATOR
-        JIRA_RESPONSE_GENERATOR = JiraResponseGenerator(self.config['alm_server'],
-                                                        self.config['alm_project'],
-                                                        self.config['alm_project_version'],
-                                                        self.config['alm_user']) 
+
         patch('sdetools.modules.sync_jira.jira_rest.RESTBase.call_api', mock_call_api).start()
 
     def test_sde(self):
@@ -86,69 +91,59 @@ class TestJiraAPI5Case(JiraBaseCase, unittest.TestCase):
         self.tac.sde_update_task_status('task', 'status')
         # Test SDE get content
         self.assertEqual(self.tac.sde_get_task_content('task'), 'Task content')
-
-    def test_parse_result(self):
-        """[JIRA] Test response parser """
-        # Assert bad json error checking
-        result = "crappy json"
-        self.assertRaises(APIFormatError, self.tac.alm_plugin.parse_response, result)
-        # Assert successful json parsing
-        result = self.tac.alm_plugin.call_api('project')
-        encoded_result = JSONEncoder().encode(result)
-        json = self.tac.alm_plugin.parse_response(encoded_result)
-        self.assertTrue(json[0].get('self'))
-        self.assertTrue(json[0].get('id'))
-        self.assertTrue(json[0].get('key'))
-        self.assertTrue(json[0].get('name'))
-        self.assertTrue(json[0].get('avatarUrls'))
-        self.assertTrue(json[0].get('avatarUrls').get('24x24'))
-        self.assertFalse(json[0].get('non-existant-key'))
    
-    def test_connect(self):
-        """[JIRA] Test mocked Jira connection """
-        # Assert Server Success
-        self.tac.alm_plugin.connect_server
-        # Assert Project Success
-        self.tac.alm_plugin.connect_project
-        # Assert Error
+    def test_failures(self):
+        """[JIRA api5] Test using MOCK_FLAG to force-fail REST API calls"""
         global MOCK_FLAG
-        MOCK_FLAG = 'fail'
+        MOCK_FLAG = '401'
         self.assertRaises(APIError, self.tac.alm_plugin.call_api, 'project')
+        self.assertRaises(APIError, self.tac.alm_plugin.call_api, 'project/%s/versions' % self.config['alm_project'])
+        self.assertRaises(APIError, self.tac.alm_plugin.call_api, 'issue/createmeta')
+        self.assertFalse(self.tac.alm_plugin.call_api('issuetype'))     # Returns empty list
+        self.assertRaises(APIError, self.tac.alm_plugin.call_api, 'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'T10\'' % self.config['alm_project'])
+        self.assertRaises(APIError, self.tac.alm_plugin.call_api, 'issue/%s-10/remotelink' % self.config['alm_project'])
+        self.assertRaises(APIError, self.tac.alm_plugin.call_api, 'issue')
+        self.assertRaises(APIError, self.tac.alm_plugin.call_api, 'issue/%s-10.*/transitions' % self.config['alm_project'])
         
-        
-class MockProxy():
+class MockSoapProxy():
     def __init__(self, wsdlsource, config=Config, **kw ):
         pass
         
     def __getattr__(self, name):
-        return partial(self.getResponse, name)
+        return partial(self._getResponse, name, MOCK_FLAG)
 
-    def getResponse(self, *args, **keywords):
-        return JIRA_RESPONSE_GENERATOR.soap_reply(args)
+    def _getResponse(self, *args, **keywords):
+        return JIRA_RESPONSE_GENERATOR.get_proxy_response(args)
+
 
 class TestJiraAPI4Case(JiraBaseCase, unittest.TestCase):
     @classmethod
     def setUpClass(self):
         super(TestJiraAPI4Case, self).setUpClass()
-        self.tac = JIRAConnector(self.config, JIRARestAPI(self.config))
         self.tac.alm_plugin = JIRASoapAPI(self.config)
-        Config.parse_config_file(self.config, self.conf_path)
         self.config.jira_api_ver = 4
         self.tac.initialize()
 
-        global JIRA_RESPONSE_GENERATOR
-        JIRA_RESPONSE_GENERATOR = JiraResponseGenerator(self.config['alm_server'],
-                                                        self.config['alm_project'],
-                                                        self.config['alm_project_version'],
-                                                        self.config['alm_user']) 
-        patch('sdetools.modules.sync_jira.jira_rest.RESTBase.call_api', mock_call_api).start()
         mock_opener = MagicMock()
         mock_opener.open = lambda x: x
         patch('sdetools.modules.sync_jira.jira_soap.http_req.get_opener', mock_opener).start()
-        mock_proxy = MockProxy
-
-        #mock_proxy().getIssueTypes.return_value = mock_call_api(self, 'issuetype')
-        #mock_proxy().login.return_value = mock_call_api(self, 'get_auth_token')
-        
+        mock_proxy = MockSoapProxy       
         patch('sdetools.modules.sync_jira.jira_soap.SOAPpy.WSDL.Proxy', mock_proxy).start()
   
+    def test_failures(self):
+        """[JIRA api4] Test using MOCK_FLAG to force-fail SOAP Proxy calls"""
+        global MOCK_FLAG
+        MOCK_FLAG = '401'
+        self.assertTrue(type(self.tac.alm_plugin.proxy.getProjectByKey('authToken12345')) == faultType)
+        self.assertFalse(self.tac.alm_plugin.proxy.getIssueTypes('authToken12345'))
+        self.assertTrue(type(self.tac.alm_plugin.proxy.login('authToken12345','user','pass')) == faultType)
+        self.assertFalse(self.tac.alm_plugin.proxy.getStatuses('authToken12345'))
+        self.assertFalse(self.tac.alm_plugin.proxy.getPriorities('authToken12345'))
+        self.assertTrue(type(self.tac.alm_plugin.proxy.getVersions('authToken12345','data')) == faultType)
+        self.assertTrue(type(self.tac.alm_plugin.proxy.getFieldsForCreate('authToken12345')) == faultType)
+        self.assertFalse(self.tac.alm_plugin.proxy.getIssuesFromJqlSearch('authToken12345','data'))
+        self.assertTrue(type(self.tac.alm_plugin.proxy.createIssue('authToken12345','data')) == faultType)
+        self.assertTrue(type(self.tac.alm_plugin.proxy.updateIssue('authToken12345','data')) == faultType)
+        self.assertTrue(type(self.tac.alm_plugin.proxy.getAvailableActions('authToken12345')) == faultType)
+        self.assertTrue(type(self.tac.alm_plugin.proxy.progressWorkflowAction('authToken12345','data','data')) == faultType)
+     

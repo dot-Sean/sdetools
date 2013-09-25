@@ -4,7 +4,7 @@ from mock import MagicMock
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
 from sdetools.alm_integration.tests.alm_response_generator import AlmResponseGenerator
-from sdetools.extlib.SOAPpy.Types import structType
+from sdetools.extlib.SOAPpy.Types import structType, faultType
 
 class JiraResponseGenerator(AlmResponseGenerator):
     api_url = 'rest/api/2'
@@ -13,8 +13,15 @@ class JiraResponseGenerator(AlmResponseGenerator):
     JIRA_PRIORITY_NAMES = ['Blocker', 'Critical']
     JIRA_STATUS_NAMES = ['Open', 'In Progress', 'Resolved', 'Closed', 'Open']
     JIRA_TRANSITION_NAMES = ['Start Progress', 'Resolve Issue', 'Close Issue', 'Reopen Issue']
-    project_name = 'Test Project'
-
+    REST_API_TARGETS = {'get_projects':'project',
+                        'get_project_versions':'project/%s/versions',
+                        'get_create_meta':'issue/createmeta',
+                        'get_issue_types':'issuetype',
+                        'get_issue':'search?jql=project%%3D\'%s\'%%20AND%%20summary~',
+                        'post_remote_link':'issue/%s-\S.*/remotelink$',
+                        'post_issue':'issue',
+                        'update_status':'issue/%s-\S.*/transitions$'}
+    
     def __init__(self, host, project_key, project_version, username, protocol='http'):
         initial_task_status = 1
         test_dir = os.path.dirname(os.path.abspath(__file__)) 
@@ -25,64 +32,57 @@ class JiraResponseGenerator(AlmResponseGenerator):
         self.project_key = project_key
         self.project_version = project_version
         self.username = username
-    
-    def soap_reply(self, args):
-        name = args[0]
 
-        if name == 'getIssueTypes':
-            return self.get_response('issuetype')
-        elif name == 'login':
-            return self.get_auth_token()
-        elif name == 'getStatuses':
-            response = []
-            for i in range(1, len(self.JIRA_STATUS_NAMES) + 1):
-                response.append(self.generate_status(i))
-            return response
-        elif name == 'getPriorities':
-            response = []
-            for i in range(1, len(self.JIRA_PRIORITY_NAMES) + 1):
-                response.append(self.generate_priority(i))
-            return response
-        elif name == 'getProjectByKey':
-            return self.get_response('project')[0]
-        elif name == 'getVersions':
-            return self.get_response('project/%s/versions' % self.project_key)
-        elif name == 'getFieldsForCreate':
-            return self.get_fields_for_create()
-        elif name == 'getIssuesFromJqlSearch':
-            task_name = re.sub(r".*summary~", '', args[2])
-            rest_response = self.get_issue(None, None, task_name)
-            issues = rest_response.get('issues')
-            if not issues:
-                return []
+    def get_proxy_response(self, args):
+        method_name = args[0]
+        flag = args[1]
+        token = args[2]
+
+        try:
+            if method_name == 'getProjectByKey':
+                return self.get_projects(flag)[0]
+            elif method_name == 'getIssueTypes':
+                return self.get_issue_types(flag)
+            elif method_name == 'login':
+                return self.get_auth_token(flag)
+            elif method_name == 'getStatuses':
+                return self.get_statuses(flag)
+            elif method_name == 'getPriorities':
+                return self.get_priorities(flag)
+            elif method_name == 'getVersions':
+                return self.get_project_versions(flag)
+            elif method_name == 'getFieldsForCreate':
+                return self.get_fields_for_create(flag)
+            elif method_name == 'getIssuesFromJqlSearch':
+                task_name = re.sub(r".*summary~", '', args[3])
+                rest_response = self.get_issue(None, None, task_name)
+                issues = rest_response.get('issues')
+                if not issues:
+                    return []
+                else:
+                    issue = issues[0].get('fields')
+                    issue['status'] = issue['status']['id']
+                    issue['key'] = issues[0].get('key')
+                    return [structType(data=issue)]
+            elif method_name == 'createIssue':
+                return self.post_issue(flag, data=args[3])
+            elif method_name == 'updateIssue':
+                if not flag:
+                    pass
+                else:
+                    self.raise_error('401')
+            elif method_name == 'getAvailableActions':
+                return self.update_status(flag, None, 'GET', None).get('transitions')
+            elif method_name == 'progressWorkflowAction':
+                transition_data = {"transition":{"id":args[4]}}
+                return self.update_status(flag, args[3], 'POST', transition_data)
             else:
-                issue = issues[0].get('fields')
-                issue['status'] = issue['status']['id']
-                issue['key'] = issues[0].get('key')
-                return [structType(data=issue)]
-        elif name == 'createIssue':
-            return self.get_response('issue', data=args[2])
-        elif name == 'updateIssue':
-            pass
-        elif name == 'getAvailableActions':
-            return self.update_status(None, None, 'GET', None).get('transitions')
-        elif name == 'progressWorkflowAction':
-            transition_data = {"transition":{"id":args[3]}}
-            return self.update_status(None, args[2], 'POST', transition_data)
-        else:
-            self.raise_error('404')
-    REST_API_TARGETS = {'get_projects':'project',
-                        'get_project_versions':'project/%s/versions',
-                        'get_create_meta':'issue/createmeta',
-                        'get_issue_types':'issuetype',
-                        'get_issue':'search?jql=project%%3D\'%s\'%%20AND%%20summary~',
-                        'post_remote_link':'issue/%s-\S.*/remotelink$',
-                        'post_issue':'issue',
-                        'update_status':'issue/%s-\S.*/transitions$'}
-    SOAP_TARGETS = ['getIssueTypes']
+                self.raise_error('404')
+        except HTTPError as err:
+            # Return a faultType object instead
+            return faultType(err.code, err.msg)
 
     def get_response(self, target, flag=None, data=None, method='GET'):
-
         if target == self.REST_API_TARGETS['get_projects']:
             return self.get_projects(flag)
         elif target == self.REST_API_TARGETS['get_issue_types']:
@@ -115,6 +115,8 @@ class JiraResponseGenerator(AlmResponseGenerator):
             message = 'Not found'
         elif error_code == '500':
             message = 'Server error'
+        else:
+            message = 'Unknown error'
 
         if not return_value:
             fp_mock.read.return_value = message
@@ -126,13 +128,13 @@ class JiraResponseGenerator(AlmResponseGenerator):
     """
        Response functions 
     """
-    def get_fields_for_create(self, flag=None):
+    def get_fields_for_create(self, flag):
         if not flag:
             self.get_json_from_file('createFields')
         else:
             self.raise_error('401')
 
-    def get_auth_token(self, flag=None):
+    def get_auth_token(self, flag):
         if not flag:
             return 'authToken12345'
         else:
@@ -151,11 +153,8 @@ class JiraResponseGenerator(AlmResponseGenerator):
         response = []
 
         if not flag:
-            response.append(self.generate_issue_type('1'))
-            response.append(self.generate_issue_type('2'))
-            response.append(self.generate_issue_type('3'))
-            response.append(self.generate_issue_type('4'))
-            response.append(self.generate_issue_type('5'))
+            for i in range(1, len(self.JIRA_ISSUE_TYPES) + 1):
+                response.append(self.generate_issue_type(i))
 
         return response
 
@@ -269,6 +268,22 @@ class JiraResponseGenerator(AlmResponseGenerator):
         else:
             self.raise_error(flag)
 
+    def get_statuses(self, flag):
+        response = []
+        if not flag:
+            # We can skip the last entry since it is a repeat
+            for i in range(1, len(self.JIRA_STATUS_NAMES)):
+                response.append(self.generate_status(i))
+
+        return response
+        
+    def get_priorities(self, flag):
+        response = []
+        if not flag:
+            for i in range(1, len(self.JIRA_PRIORITY_NAMES) + 1):
+                response.append(self.generate_priority(i))
+
+        return response
     """
        JSON Generator 
     """
@@ -333,7 +348,6 @@ class JiraResponseGenerator(AlmResponseGenerator):
         response['self'] = '%s/project/%s' % (self.api_url, self.project_key)
         response['id'] = self.PROJECT_ID
         response['key'] = self.project_key
-        response['name'] = self.project_name
         
         return response
 
