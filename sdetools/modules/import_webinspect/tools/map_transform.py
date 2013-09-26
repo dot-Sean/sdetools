@@ -1,11 +1,14 @@
 #!/usr/bin/python
-import sys, os
+import sys
+import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from xml.dom import minidom
 
+
 class MappingError(Exception):
     pass
+
 
 class Mapping:
     def __init__(self):
@@ -13,22 +16,23 @@ class Mapping:
         self.cwe_checks = {}
         self.base_tasks = {}
         self.checks = []
+        self.task_map = {}
 
     def load_base_mapping_from_xml(self, mapping_file):
         try:
             base = minidom.parse(mapping_file)
         except Exception, e:
-            raise MappingError("An error occured opening mapping file '%s': %s" % (mapping_file, e))
+            raise MappingError("An error occurred opening mapping file '%s': %s" % (mapping_file, e))
 
         cwe_mapping = {}
         for task in base.getElementsByTagName('task'):
             self.base_tasks[ task.attributes['id'].value ] = task
             for cwe in task.getElementsByTagName('weakness'):
-                 tasks = []
-                 if (cwe_mapping.has_key(cwe.attributes['id'].value)):
-                     tasks = cwe_mapping[cwe.attributes['id'].value]
-                 tasks.append(task.attributes['id'].value)
-                 cwe_mapping[cwe.attributes['id'].value] = tasks
+                tasks = []
+                if cwe_mapping.has_key(cwe.attributes['id'].value):
+                    tasks = cwe_mapping[cwe.attributes['id'].value]
+                tasks.append(task.attributes['id'].value)
+                cwe_mapping[cwe.attributes['id'].value] = tasks
 
         self.mapping = cwe_mapping
 
@@ -43,17 +47,17 @@ class Mapping:
             check = {}
             check['check_id'] = weakness_row.getElementsByTagName('CheckID')[0].firstChild.data
             check['check_name'] = weakness_row.getElementsByTagName('CheckName')[0].firstChild.data
-            check['check_name'] = check['check_name'].replace('"','&quot;')
-            check['check_name'] = check['check_name'].replace('&','&amp;')
+            check['check_name'] = check['check_name'].replace('"', '&quot;')
+            check['check_name'] = check['check_name'].replace('&', '&amp;')
             
             cwe = weakness_row.getElementsByTagName('CWE')[0].firstChild.data
             check['cwe_desc'] = weakness_row.getElementsByTagName('CWE_Desc')[0].firstChild.data
-            check['cwe_desc'] = check['cwe_desc'].replace('"','&quot;')
-            check['cwe_desc'] = check['cwe_desc'].replace('&','&amp;')
+            check['cwe_desc'] = check['cwe_desc'].replace('"', '&quot;')
+            check['cwe_desc'] = check['cwe_desc'].replace('&', '&amp;')
             check['cwe_id'] = cwe[4:]
             
             weaknesses = []
-            if (cwe_checks.has_key(check['cwe_id'])):
+            if cwe_checks.has_key(check['cwe_id']):
                 weaknesses = cwe_checks[check['cwe_id']]
             weaknesses.append(check)
             cwe_checks[check['cwe_id']] = weaknesses
@@ -68,7 +72,7 @@ class Mapping:
         task_map = {}
         nomap = {}
 
-        task_map['193'] = [ {'check_id':'*', 'check_name': 'Unmapped Check'} ]
+        task_map['193'] = [{'check_id': '*', 'check_name': 'Unmapped Check'}]
 
         keys = sorted(self.cwe_checks.iterkeys())
         for cwe in keys:
@@ -91,7 +95,7 @@ class Mapping:
                         if not task_mapping_found:
                             task_checks.append(check)
                     task_map[task] = task_checks
-            else: #map to 193
+            else:  # map to 193
                     fp.write("CWE-%s %d un-mapped\n" % (cwe, len(self.cwe_checks[cwe])))
                     task_mapping_found = False
                     task_checks = []
@@ -122,7 +126,8 @@ class Mapping:
             fp.write('\t<task id="%s" title="%s" >\n'%(task_id, self.base_tasks[task_id].attributes['title'].value))
             task_checks = sorted(task_checks)
             for weakness in task_checks:
-                fp.write('\t\t<weakness type="check" id="%s" title="%s" />\n'% (weakness['check_id'], weakness['check_name']))
+                fp.write('\t\t<weakness type="check" id="%s" title="%s" />\n' % (weakness['check_id'],
+                                                                                 weakness['check_name']))
             fp.write('\t</task>\n')
         fp.write('</mapping>\n')
         fp.close()
@@ -134,7 +139,7 @@ class Mapping:
             task_checks = task_map[task_id]
             for task_check in task_checks:
                 if check_id == task_check['check_id']:
-                     return True
+                    return True
         return False
     
     def find_missing_checks(self):
