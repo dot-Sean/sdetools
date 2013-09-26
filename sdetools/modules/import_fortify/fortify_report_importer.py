@@ -28,12 +28,18 @@ class FortifyReportImporter(BaseImporter):
 
         self.report_id = ""
 
+        if base.nodeName != "ReportDefinition":
+            raise FortifyIntegrationError("Malformed report detected: ReportDefinition is not found")
+
         report_sections = base.getElementsByTagName('ReportSection')
         if not report_sections:
             raise FortifyIntegrationError("Malformed report detected: ReportSection not found")
 
         for report_section in report_sections:
-            title = report_section.getElementsByTagName('Title')[0]
+            titles = report_section.getElementsByTagName('Title')
+            if not titles:
+                raise FortifyIntegrationError("Malformed report detected: Title not found")
+            title = title[0]
             if title.firstChild.data == 'Issue Count by Category':
                 issue_listing = report_section.getElementsByTagName('IssueListing')[0]
                 grouping_sections = issue_listing.getElementsByTagName('GroupingSection')
