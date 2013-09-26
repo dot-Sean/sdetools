@@ -6,6 +6,10 @@ abstractmethod = abc.abstractmethod
 
 
 class TwoWayDict(dict):
+    """
+        Allows you to fetch a dict value given a key, or a key given a dict value.
+        Used to fetch alm_tasks via id or search term.
+    """
     def __len__(self):
         return dict.__len__(self) / 2
 
@@ -44,4 +48,8 @@ class AlmResponseGenerator(object):
         return urllib.urlencode({'a':instr})[2:]
 
     def get_json_from_file(self, file_name):
-        return json.loads(open('%s\\response\\%s.json' % (self.test_dir, file_name)).read())
+        file_path = '%s\\response\\%s.json' % (self.test_dir, file_name)
+        f = open(file_path)
+        raw_json = f.read()
+
+        return json.loads(raw_json)

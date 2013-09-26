@@ -78,8 +78,8 @@ class GitHubResponseGenerator(AlmResponseGenerator):
 
     def get_task(self, flag, target):
         params = target.split('/')
-        state = params[len(params) - 2]
-        task_name = params[len(params) - 1]
+        state = params[-2]
+        task_name = params[-1]
         task_name = task_name.split(self.urlencode_str(':'))[0]
 
         if not flag and self.get_alm_task(task_name):

@@ -3,53 +3,42 @@
 import sys
 import os
 import unittest
-from urllib2 import HTTPError
-from mock import patch
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
-from sdetools.modules.sync_github.github_plugin import GitHubConnector, GitHubAPI, APIError
-from sdetools.sdelib.conf_mgr import Config
-from sdetools.sdelib.restclient import URLRequest
+import sdetools.alm_integration.tests.alm_mock_response
+from sdetools.modules.sync_github.github_plugin import GitHubConnector, GitHubAPI
 from github_response_generator import GitHubResponseGenerator
 
 CONF_FILE_LOCATION = 'test_settings.conf'
-MOCK_FLAG = None
-GITHUB_RESPONSE_GENERATOR = None
-
-
-def mock_call_api(self, target, method=URLRequest.GET, args=None, call_headers={}):
-    try:
-        return GITHUB_RESPONSE_GENERATOR.get_response(target, MOCK_FLAG, args, method)
-    except HTTPError, err:
-        # Re-raise with more info
-        err.url = '%s/%s' % (err.url, target)
-        err.headers = call_headers
-        raise APIError(err)
 
 
 class TestGitHubCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         path_to_github_connector = 'sdetools.modules.sync_github.github_plugin'
-        super(TestGitHubCase, cls).initTest(path_to_github_connector)
+        current_dir = os.path.dirname(os.path.realpath(__file__))
+        conf_path = os.path.join(current_dir, CONF_FILE_LOCATION)
+        super(TestGitHubCase, cls).setUpClass(path_to_github_connector, conf_path)
 
-        conf_path = os.path.abspath('%s\%s' % (os.path.dirname(os.path.realpath(__file__)), CONF_FILE_LOCATION))
+    @classmethod
+    def init_alm_connector(cls):
         cls.tac = GitHubConnector(cls.config, GitHubAPI(cls.config))
-        Config.parse_config_file(cls.config, conf_path)
-        cls.tac.initialize()
 
-        global GITHUB_RESPONSE_GENERATOR
-        GITHUB_RESPONSE_GENERATOR = GitHubResponseGenerator(cls.config['alm_server'],
-                                                            cls.config['github_repo_owner'],
-                                                            cls.config['alm_project'],
-                                                            cls.config['alm_project_version'],
-                                                            cls.config['alm_user'])
-        patch('sdetools.modules.sync_github.github_plugin.RESTBase.call_api', mock_call_api).start()                                                        
+    @classmethod
+    def init_response_generator(cls):
+        response_generator = GitHubResponseGenerator(cls.config['alm_server'],
+                                                     cls.config['github_repo_owner'],
+                                                     cls.config['alm_project'],
+                                                     cls.config['alm_project_version'],
+                                                     cls.config['alm_user'])
+
+        path_to_rest_plugin = 'sdetools.modules.sync_github.github_plugin'
+        mock_rest_api = sdetools.alm_integration.tests.alm_mock_response
+        mock_rest_api.patch_call_rest_api(response_generator, path_to_rest_plugin)
 
     def setUp(self):
         super(TestGitHubCase, self).setUp()
 
     def tearDown(self):
         super(TestGitHubCase, self).tearDown()
-        GITHUB_RESPONSE_GENERATOR.clear_alm_tasks()

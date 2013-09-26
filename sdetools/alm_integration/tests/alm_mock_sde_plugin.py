@@ -1,5 +1,16 @@
 import re
 import random
+from mock import patch
+
+
+def patch_sde_mocks(path_to_alm_connector):
+    patch('%s.AlmConnector.sde_connect' % path_to_alm_connector, mock_sde_connect).start()
+    patch('%s.AlmConnector.is_sde_connected' % path_to_alm_connector, mock_is_sde_connected).start()
+    patch('%s.AlmConnector.sde_get_tasks' % path_to_alm_connector, mock_sde_get_tasks).start()
+    patch('%s.AlmConnector.sde_get_task' % path_to_alm_connector, mock_sde_get_task).start()
+    patch('%s.AlmConnector.sde_update_task_status' % path_to_alm_connector, mock_sde_update_task_status).start()
+    patch('%s.AlmConnector.sde_get_task_content' % path_to_alm_connector, mock_sde_get_task_content).start()
+    patch('%s.AlmConnector._add_note' % path_to_alm_connector, mock_add_note).start()
 
 
 def mock_sde_connect(self):

@@ -27,7 +27,7 @@ class JiraResponseGenerator(AlmResponseGenerator):
         'post_issue': 'issue',
         'update_status': 'issue/%s-\S.*/transitions$'
     }
-    
+
     def __init__(self, host, project_key, project_version, username, protocol='http'):
         initial_task_status = 1
         test_dir = os.path.dirname(os.path.abspath(__file__)) 
@@ -363,7 +363,6 @@ class JiraResponseGenerator(AlmResponseGenerator):
         issue_type['self'] = '%s/issueType/%s' % (self.api_url, issue_id)
         issue_type['id'] = issue_id
         issue_type['description'] = 'Issue type %s, %s' % (issue_id, issue_type_name)
-        issue_type['iconUrl'] = '%s/images/icons/%s.gif' % (self.base_url, self.urlencode_str(issue_type_name))
         issue_type['name'] = issue_type_name
 
         if issue_type_name == 'Sub-task':
