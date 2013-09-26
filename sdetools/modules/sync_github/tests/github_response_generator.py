@@ -1,4 +1,7 @@
-import re, os, sys
+import re
+import os
+import sys
+
 from urllib2 import HTTPError
 from mock import MagicMock
 
@@ -7,6 +10,14 @@ from sdetools.alm_integration.tests.alm_response_generator import AlmResponseGen
 
 class GitHubResponseGenerator(AlmResponseGenerator):
     GITHUB_STATUS_NAMES = ['open', 'closed']
+    REST_API_TARGETS = {
+        'get_user': 'user',
+        'get_repo': 'repos/%s',
+        'get_milestones': 'repos/%s/milestones',
+        'get_task': 'legacy/issues/search/%s',
+        'post_issue': 'repos/%s/issues',
+        'update_status': 'repos/%s/issues/[0-9]*$'
+    }
 
     def __init__(self, host, repo_org, repo_name, project_milestone, username, protocol='http'):
         initial_task_status = self.GITHUB_STATUS_NAMES[0]
@@ -19,24 +30,17 @@ class GitHubResponseGenerator(AlmResponseGenerator):
         self.username = username
 
     def get_response(self, target, flag, data, method):
-        GITHUB_API_TARGETS = {'get_user':'user',
-                            'get_repo':'repos/%s',
-                            'get_milestones':'repos/%s/milestones',
-                            'get_task':'legacy/issues/search/%s',
-                            'post_issue':'repos/%s/issues',
-                            'update_status':'repos/%s/issues/[0-9]*$'}
-
-        if target == GITHUB_API_TARGETS['get_user']:
+        if target == self.REST_API_TARGETS['get_user']:
             return self.get_user(flag)
-        elif target == GITHUB_API_TARGETS['get_repo'] % self.project_uri:
+        elif target == self.REST_API_TARGETS['get_repo'] % self.project_uri:
             return self.get_repo(flag)
-        elif target == GITHUB_API_TARGETS['get_milestones'] % self.project_uri:
+        elif target == self.REST_API_TARGETS['get_milestones'] % self.project_uri:
             return self.get_milestones(flag)
-        elif GITHUB_API_TARGETS['get_task'] % self.project_uri in target:
+        elif self.REST_API_TARGETS['get_task'] % self.project_uri in target:
             return self.get_task(flag, target)
-        elif target == GITHUB_API_TARGETS['post_issue'] % self.project_uri:
+        elif target == self.REST_API_TARGETS['post_issue'] % self.project_uri:
             return self.post_issue(flag, data)
-        elif re.match(GITHUB_API_TARGETS['update_status'] % self.project_uri, target):
+        elif re.match(self.REST_API_TARGETS['update_status'] % self.project_uri, target):
             return self.update_status(flag, target, data)
         else:
             self.raise_error('404')
@@ -73,10 +77,11 @@ class GitHubResponseGenerator(AlmResponseGenerator):
             return []
 
     def get_task(self, flag, target):
-        ids = target.split('/')
-        state = ids[len(ids) - 2]
-        task_name = ids[len(ids) - 1]
+        params = target.split('/')
+        state = params[len(params) - 2]
+        task_name = params[len(params) - 1]
         task_name = task_name.split(self.urlencode_str(':'))[0]
+
         if not flag and self.get_alm_task(task_name):
             status = self.get_alm_task('%s:status' % task_name)
             if status == state:
@@ -89,26 +94,26 @@ class GitHubResponseGenerator(AlmResponseGenerator):
                 return response
 
         return {"issues": []}
-            
+
     def post_issue(self, flag, data):
         if not flag:
             name = data['title'].split(':')[0]
             id = name.split('T')[1]
             self.add_alm_task(name, id)
             response = self.generate_issue(name, id, 'open')
-            
+
             return response
         else:
             self.raise_error('404')
-            
+
     def update_status(self, flag, target, data):
-        id = target.split('/')[4]
-        
+        task_id = target.split('/')[4]
+
         if not flag:
-            if self.get_alm_task(id) and data['state']:
-                name = self.get_alm_task(id)
+            if self.get_alm_task(task_id) and data['state']:
+                name = self.get_alm_task(task_id)
                 status = data['state']
-                response = self.generate_issue(name, id, status)
+                response = self.generate_issue(name, task_id, status)
                 self.update_alm_task('%s:status' % name, status)
 
                 return response
@@ -116,7 +121,7 @@ class GitHubResponseGenerator(AlmResponseGenerator):
                 self.raise_error('404')
         else:
             self.raise_error('401')
-            
+
     """
        JSON Generator 
     """
@@ -125,5 +130,5 @@ class GitHubResponseGenerator(AlmResponseGenerator):
         response['number'] = id
         response['state'] = status
         response['title'] = name
-        
+
         return response
