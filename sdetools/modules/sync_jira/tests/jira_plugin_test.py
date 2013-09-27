@@ -9,13 +9,12 @@ from functools import partial
 from jira_response_generator import JiraResponseGenerator
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
+import sdetools.alm_integration.tests.alm_mock_response
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
-from sdetools.extlib.SOAPpy.Types import faultType
 from sdetools.modules.sync_jira.jira_plugin import JIRAConnector, AlmException
 from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
 from sdetools.modules.sync_jira.jira_soap import JIRASoapAPI
 from sdetools.sdelib.conf_mgr import Config
-import sdetools.alm_integration.tests.alm_mock_response
 
 CONF_FILE_LOCATION = 'test_settings.conf'
 MOCK_RESPONSE = sdetools.alm_integration.tests.alm_mock_response
@@ -43,16 +42,11 @@ class JiraBaseCase(AlmPluginTestBase):
         path_to_rest_plugin = 'sdetools.modules.sync_jira.jira_rest'
         MOCK_RESPONSE.patch_call_rest_api(response_generator, path_to_rest_plugin)
 
-    def setUp(self):
-        super(JiraBaseCase, self).setUp()
-
-    def tearDown(self):
-        super(JiraBaseCase, self).tearDown()
-
 
 class TestJiraAPI6Case(JiraBaseCase, unittest.TestCase):
     def test_fail_connect_server(self):
         MOCK_RESPONSE.set_response_flags({'get_projects': '500'})
+
         self.assert_exception(AlmException, '', 'HTTP Error 500: Server error', self.tac.alm_plugin.connect_server)
 
 
@@ -84,5 +78,6 @@ class TestJiraAPI4Case(JiraBaseCase, unittest.TestCase):
 
     def test_bad_credentials(self):
         MOCK_RESPONSE.set_response_flags({'login': '401'})
+
         self.assert_exception(AlmException, '', 'Unable to login to JIRA. Please check ID, password',
                               self.tac.alm_plugin.connect_server)

@@ -4,11 +4,12 @@ import sys
 import os
 import unittest
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
-from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
-import sdetools.alm_integration.tests.alm_mock_response
-from sdetools.modules.sync_github.github_plugin import GitHubConnector, GitHubAPI, AlmException
 from github_response_generator import GitHubResponseGenerator
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
+import sdetools.alm_integration.tests.alm_mock_response
+from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
+from sdetools.modules.sync_github.github_plugin import GitHubConnector, GitHubAPI, AlmException
 
 CONF_FILE_LOCATION = 'test_settings.conf'
 MOCK_RESPONSE = sdetools.alm_integration.tests.alm_mock_response
@@ -35,12 +36,6 @@ class TestGitHubCase(AlmPluginTestBase, unittest.TestCase):
 
         path_to_rest_plugin = 'sdetools.modules.sync_github.github_plugin'
         MOCK_RESPONSE.patch_call_rest_api(response_generator, path_to_rest_plugin)
-
-    def setUp(self):
-        super(TestGitHubCase, self).setUp()
-
-    def tearDown(self):
-        super(TestGitHubCase, self).tearDown()
 
     def test_connecting_to_public_repo(self):
         MOCK_RESPONSE.set_response_flags({'get_repo': 'private-false'})

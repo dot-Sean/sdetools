@@ -55,6 +55,7 @@ class AlmPluginTestBase(object):
         test_task = MOCK_SDE.generate_sde_task()
         self.tac.alm_add_task(test_task)
         test_task_result = self.tac.alm_get_task(test_task)
+
         self.assertNotNone(test_task_result, 'Failed retrieve newly added task')
 
     def test_update_task_status_to_done(self):
@@ -62,10 +63,13 @@ class AlmPluginTestBase(object):
         test_task = MOCK_SDE.generate_sde_task()
         self.tac.alm_add_task(test_task)
         alm_task = self.tac.alm_get_task(test_task)
+
         self.assertNotEqual(alm_task.get_status(), 'DONE',
                             'Cannot update task status to DONE because status is already DONE')
+
         self.tac.alm_update_task_status(alm_task, 'DONE')
         test_task_result = self.tac.alm_get_task(test_task)
+
         self.assertEqual(test_task_result.get_status(), 'DONE', 'Failed to update task status to DONE')
 
     def test_update_task_status_to_na(self):
@@ -73,9 +77,12 @@ class AlmPluginTestBase(object):
         test_task = MOCK_SDE.generate_sde_task()
         self.tac.alm_add_task(test_task)
         alm_task = self.tac.alm_get_task(test_task)
+
         self.assertNotEqual(alm_task.get_status(), 'NA', 'Cannot update task status to NA because status is already NA')
+
         self.tac.alm_update_task_status(alm_task,'NA')
         test_task_result = self.tac.alm_get_task(test_task)
+
         self.assertIn(test_task_result.get_status(), ['DONE', 'NA'], 'Failed to update task status to NA')
 
     def test_update_task_status_to_todo(self):
@@ -84,10 +91,13 @@ class AlmPluginTestBase(object):
         test_task['status'] = 'DONE'
         self.tac.alm_add_task(test_task)
         alm_task = self.tac.alm_get_task(test_task)
+
         self.assertNotEqual(alm_task.get_status(), 'TODO',
                             'Cannot update task status to TODO because status is already TODO')
+
         self.tac.alm_update_task_status(alm_task, 'TODO')
         test_task_result = self.tac.alm_get_task(test_task)
+
         self.assertEqual(test_task_result.get_status(), 'TODO', 'Failed to update task status to TODO')
 
     def test_synchronize(self):
