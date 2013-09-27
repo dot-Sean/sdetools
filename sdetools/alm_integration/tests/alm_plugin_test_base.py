@@ -5,6 +5,7 @@ abstractmethod = abc.abstractmethod
 
 import sdetools.alm_integration.tests.alm_mock_sde_plugin
 import sdetools.alm_integration.tests.alm_mock_response
+from sdetools.sdelib.commons import Error
 
 MOCK_SDE = sdetools.alm_integration.tests.alm_mock_sde_plugin
 MOCK_RESPONSE = sdetools.alm_integration.tests.alm_mock_response
@@ -40,7 +41,7 @@ class AlmPluginTestBase(object):
 
     def tearDown(self):
         MOCK_RESPONSE.response_generator_clear_tasks()
-        MOCK_RESPONSE.set_mock_flag(None)
+        MOCK_RESPONSE.set_mock_flag({})
 
     def test_alm_configurations(self):
         configs = self.tac.config
@@ -63,7 +64,7 @@ class AlmPluginTestBase(object):
         test_task = MOCK_SDE.generate_sde_task()
         self.tac.alm_add_task(test_task)
         alm_task = self.tac.alm_get_task(test_task)
-        self.tac.alm_update_task_status(alm_task,'DONE')
+        self.tac.alm_update_task_status(alm_task, 'DONE')
         test_task_result = self.tac.alm_get_task(test_task)
         self.assertEqual(test_task_result.get_status(), 'DONE')
 
@@ -84,11 +85,30 @@ class AlmPluginTestBase(object):
         self.tac.alm_update_task_status(alm_task, 'DONE')
         new_alm_task = self.tac.alm_get_task(test_task)
         self.assertEqual(new_alm_task.get_status(), 'DONE')
-        self.tac.alm_update_task_status(new_alm_task,'TODO')
+        self.tac.alm_update_task_status(new_alm_task, 'TODO')
         test_task_result = self.tac.alm_get_task(test_task)
-        self.assertTrue(test_task_result.get_status() == 'TODO')
+        self.assertEqual(test_task_result.get_status(), 'TODO')
 
     def test_synchronize(self):
         # TODO: This isn't really a test. We aren't verifying anything
         #       besides the fact it doesn't raise exceptions.
         self.tac.synchronize()
+
+    def assert_exception(self, exception, error_code, reason, fn, *args):
+        if not exception:
+            raise AssertionError('No exception specified')
+        if not fn:
+            raise AssertionError('No function specified')
+        if not exception and not error_code:
+            raise AssertionError('No error code or error message to assert')
+
+        try:
+            fn.__call__(*args)
+        except Error, err:
+            print err.value
+            self.assertEqual(type(err), exception, 'Expected exception type %s, Got %s' % (exception, type(err)))
+
+            if error_code:
+                self.assertEqual(err.code, error_code, 'Expected error code %s, Got %s' % (error_code, err.code))
+            if reason:
+                self.assertTrue(reason in err.value, "Expected error message '%s', Got '%s'" % (reason, err.value))

@@ -43,10 +43,6 @@ class AlmResponseGenerator(object):
     def clear_alm_tasks(self):
         self.alm_tasks = TwoWayDict()
 
-    @staticmethod
-    def urlencode_str(instr):
-        return urllib.urlencode({'a':instr})[2:]
-
     def get_json_from_file(self, file_name):
         file_path = '%s\\response\\%s.json' % (self.test_dir, file_name)
         f = open(file_path)

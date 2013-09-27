@@ -11,5 +11,6 @@
 	"name": "test repo",
 	"full_name": "testOrg/testRepo",
 	"description": "TestRepo",
-	"url": "https://api.github.com/repos/org:/repo:"
+	"url": "https://api.github.com/repos/org:/repo:",
+	"private": true
 }

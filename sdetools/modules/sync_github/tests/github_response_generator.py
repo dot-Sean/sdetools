@@ -7,6 +7,7 @@ from mock import MagicMock
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
 from sdetools.alm_integration.tests.alm_response_generator import AlmResponseGenerator
+from sdetools.sdelib.commons import urlencode_str
 
 class GitHubResponseGenerator(AlmResponseGenerator):
     GITHUB_STATUS_NAMES = ['open', 'closed']
@@ -24,28 +25,28 @@ class GitHubResponseGenerator(AlmResponseGenerator):
         test_dir = os.path.dirname(os.path.abspath(__file__)) 
         super(GitHubResponseGenerator, self).__init__(initial_task_status, test_dir)
 
-        self.project_uri = '%s/%s' % (self.urlencode_str(repo_org), self.urlencode_str(repo_name))
+        self.project_uri = '%s/%s' % (urlencode_str(repo_org), urlencode_str(repo_name))
         self.api_url = '%s://%s/%s' % (protocol, host, self.project_uri)
         self.project_milestone = project_milestone
         self.username = username
 
     def get_response(self, target, flag, data, method):
         if target == self.REST_API_TARGETS['get_user']:
-            return self.get_user(flag)
+            return self.get_user(flag.get('get_user'))
         elif target == self.REST_API_TARGETS['get_repo'] % self.project_uri:
-            return self.get_repo(flag)
+            return self.get_repo(flag.get('get_repo'))
         elif target == self.REST_API_TARGETS['get_milestones'] % self.project_uri:
-            return self.get_milestones(flag)
+            return self.get_milestones(flag.get('get_milestones'))
         elif self.REST_API_TARGETS['get_task'] % self.project_uri in target:
-            return self.get_task(flag, target)
+            return self.get_task(flag.get('get_task'), target)
         elif target == self.REST_API_TARGETS['post_issue'] % self.project_uri:
-            return self.post_issue(flag, data)
+            return self.post_issue(flag.get('post_issue'), data)
         elif re.match(self.REST_API_TARGETS['update_status'] % self.project_uri, target):
-            return self.update_status(flag, target, data)
+            return self.update_status(flag.get('update_status'), target, data)
         else:
             self.raise_error('404')
 
-    def raise_error(self, error_code):
+    def raise_error(self, error_code, ):
         fp_mock = MagicMock()
         if error_code == '401':
             fp_mock.read.return_value = '{"message":"Requires authentication","documentation_url":"http://developer.github.com/v3"}'
@@ -67,6 +68,11 @@ class GitHubResponseGenerator(AlmResponseGenerator):
     def get_repo(self, flag):
         if not flag:
             return self.get_json_from_file('repo')
+        elif flag == 'private-false':
+            repo = self.get_json_from_file('repo')
+            repo['private'] = False
+
+            return repo
         else:
             self.raise_error('404')
 
@@ -80,7 +86,7 @@ class GitHubResponseGenerator(AlmResponseGenerator):
         params = target.split('/')
         state = params[-2]
         task_name = params[-1]
-        task_name = task_name.split(self.urlencode_str(':'))[0]
+        task_name = task_name.split(urlencode_str(':'))[0]
 
         if not flag and self.get_alm_task(task_name):
             status = self.get_alm_task('%s:status' % task_name)

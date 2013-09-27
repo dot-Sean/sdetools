@@ -41,7 +41,8 @@ class JiraResponseGenerator(AlmResponseGenerator):
 
     def get_proxy_response(self, args):
         method_name = args[0]
-        flag = args[1]
+        flags = args[1]
+        flag = flags.get(method_name)
         token = args[2]
 
         try:
@@ -90,25 +91,25 @@ class JiraResponseGenerator(AlmResponseGenerator):
             # Return a faultType object instead
             return faultType(err.code, err.msg)
 
-    def get_response(self, target, flag=None, data=None, method='GET'):
+    def get_response(self, target, flag, data=None, method='GET'):
         if target == self.REST_API_TARGETS['get_projects']:
-            return self.get_projects(flag)
+            return self.get_projects(flag.get('get_projects'))
         elif target == self.REST_API_TARGETS['get_issue_types']:
-            return self.get_issue_types(flag)
+            return self.get_issue_types(flag.get('get_issue_types'))
         elif target == self.REST_API_TARGETS['get_project_versions'] % self.project_key:
-            return self.get_project_versions(flag)
+            return self.get_project_versions(flag.get('get_project_versions'))
         elif target == self.REST_API_TARGETS['get_create_meta']:
-            return self.get_create_meta(flag)
+            return self.get_create_meta(flag.get('get_create_meta'))
         elif self.REST_API_TARGETS['get_issue'] % self.project_key in target:
-            return self.get_issue(flag, target)
+            return self.get_issue(flag.get('get_issue'), target)
         elif target == self.REST_API_TARGETS['post_issue']:
-            return self.post_issue(flag, data)
+            return self.post_issue(flag.get('post_issue'), data)
         elif re.match(self.REST_API_TARGETS['post_remote_link'] % self.project_key, target):
             task_id = target.split('/')[1]
-            return self.post_remote_link(flag, data, task_id)
+            return self.post_remote_link(flag.get('post_remote_link'), data, task_id)
         elif re.match(self.REST_API_TARGETS['update_status'] % self.project_key, target):
             task_id = target.split('/')[1]
-            return self.update_status(flag, task_id, method, data)
+            return self.update_status(flag.get('update_status'), task_id, method, data)
         else:
             self.raise_error('404')
 

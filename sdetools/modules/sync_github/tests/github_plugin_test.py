@@ -7,10 +7,11 @@ import unittest
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 import sdetools.alm_integration.tests.alm_mock_response
-from sdetools.modules.sync_github.github_plugin import GitHubConnector, GitHubAPI
+from sdetools.modules.sync_github.github_plugin import GitHubConnector, GitHubAPI, AlmException
 from github_response_generator import GitHubResponseGenerator
 
 CONF_FILE_LOCATION = 'test_settings.conf'
+MOCK_REST_API = sdetools.alm_integration.tests.alm_mock_response
 
 
 class TestGitHubCase(AlmPluginTestBase, unittest.TestCase):
@@ -34,11 +35,18 @@ class TestGitHubCase(AlmPluginTestBase, unittest.TestCase):
                                                      cls.config['alm_user'])
 
         path_to_rest_plugin = 'sdetools.modules.sync_github.github_plugin'
-        mock_rest_api = sdetools.alm_integration.tests.alm_mock_response
-        mock_rest_api.patch_call_rest_api(response_generator, path_to_rest_plugin)
+        MOCK_REST_API.patch_call_rest_api(response_generator, path_to_rest_plugin)
 
     def setUp(self):
         super(TestGitHubCase, self).setUp()
 
     def tearDown(self):
         super(TestGitHubCase, self).tearDown()
+
+    def test_connecting_to_public_repo(self):
+        MOCK_REST_API.set_mock_flag({'get_repo': 'private-false'})
+        self.assert_exception(AlmException, '', 'Syncing with a public repository is currently not supported', self.tac.alm_connect_project)
+
+    def test_connecting_to_invalid_repo(self):
+         MOCK_REST_API.set_mock_flag({'get_repo': '404'})
+         self.assert_exception(AlmException, '', 'Unable to find GitHub repo. Reason: FATAL ERROR: HTTP Error 404: Not found', self.tac.alm_connect_project)

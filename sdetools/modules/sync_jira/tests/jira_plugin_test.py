@@ -11,8 +11,8 @@ from jira_response_generator import JiraResponseGenerator
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.extlib.SOAPpy.Types import faultType
-from sdetools.modules.sync_jira.jira_plugin import JIRAConnector
-from sdetools.modules.sync_jira.jira_rest import JIRARestAPI, APIError
+from sdetools.modules.sync_jira.jira_plugin import JIRAConnector, AlmException
+from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
 from sdetools.modules.sync_jira.jira_soap import JIRASoapAPI
 from sdetools.sdelib.conf_mgr import Config
 import sdetools.alm_integration.tests.alm_mock_response
@@ -52,17 +52,9 @@ class JiraBaseCase(AlmPluginTestBase):
 
 
 class TestJiraAPI6Case(JiraBaseCase, unittest.TestCase):
-    def test_failures(self):
-        """[JIRA api6] Test using MOCK_FLAG to force-fail REST API calls"""
-        MOCK_RESPONSE.set_mock_flag('401')
-        self.assertRaises(APIError, self.tac.alm_plugin.call_api, 'project')
-        self.assertRaises(APIError, self.tac.alm_plugin.call_api, 'project/%s/versions' % self.config['alm_project'])
-        self.assertRaises(APIError, self.tac.alm_plugin.call_api, 'issue/createmeta')
-        self.assertFalse(self.tac.alm_plugin.call_api('issuetype'))     # Returns empty list
-        self.assertRaises(APIError, self.tac.alm_plugin.call_api, 'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'T10\'' % self.config['alm_project'])
-        self.assertRaises(APIError, self.tac.alm_plugin.call_api, 'issue/%s-10/remotelink' % self.config['alm_project'])
-        self.assertRaises(APIError, self.tac.alm_plugin.call_api, 'issue')
-        self.assertRaises(APIError, self.tac.alm_plugin.call_api, 'issue/%s-10.*/transitions' % self.config['alm_project'])
+    def test_fail_connect_server(self):
+        MOCK_RESPONSE.set_mock_flag({'get_projects': '500'})
+        self.assert_exception(AlmException, '', 'HTTP Error 500: Server error', self.tac.alm_plugin.connect_server)
 
 
 class MockSoapProxy():
@@ -93,18 +85,7 @@ class TestJiraAPI4Case(JiraBaseCase, unittest.TestCase):
         mock_proxy = MockSoapProxy
         patch('sdetools.modules.sync_jira.jira_soap.SOAPpy.WSDL.Proxy', mock_proxy).start()
 
-    def test_failures(self):
-        """[JIRA api4] Test using MOCK_FLAG to force-fail SOAP Proxy calls"""
-        MOCK_RESPONSE.set_mock_flag('401')
-        self.assertTrue(type(self.tac.alm_plugin.proxy.getProjectByKey('authToken12345')) == faultType)
-        self.assertFalse(self.tac.alm_plugin.proxy.getIssueTypes('authToken12345'))
-        self.assertTrue(type(self.tac.alm_plugin.proxy.login('authToken12345', 'user', 'pass')) == faultType)
-        self.assertFalse(self.tac.alm_plugin.proxy.getStatuses('authToken12345'))
-        self.assertFalse(self.tac.alm_plugin.proxy.getPriorities('authToken12345'))
-        self.assertTrue(type(self.tac.alm_plugin.proxy.getVersions('authToken12345', 'data')) == faultType)
-        self.assertTrue(type(self.tac.alm_plugin.proxy.getFieldsForCreate('authToken12345')) == faultType)
-        self.assertFalse(self.tac.alm_plugin.proxy.getIssuesFromJqlSearch('authToken12345','data'))
-        self.assertTrue(type(self.tac.alm_plugin.proxy.createIssue('authToken12345', 'data')) == faultType)
-        self.assertTrue(type(self.tac.alm_plugin.proxy.updateIssue('authToken12345', 'data')) == faultType)
-        self.assertTrue(type(self.tac.alm_plugin.proxy.getAvailableActions('authToken12345')) == faultType)
-        self.assertTrue(type(self.tac.alm_plugin.proxy.progressWorkflowAction('authToken12345', 'data', 'data')) == faultType)
+    def test_fail_connect_server(self):
+        MOCK_RESPONSE.set_mock_flag({'login': '401'})
+        self.assert_exception(AlmException, '', 'HTTP Error 401', self.tac.alm_plugin.connect_server)
+
