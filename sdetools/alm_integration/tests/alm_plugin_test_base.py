@@ -43,7 +43,7 @@ class AlmPluginTestBase(object):
 
     def tearDown(self):
         MOCK_RESPONSE.response_generator_clear_tasks()
-        MOCK_RESPONSE.set_mock_flag({})
+        MOCK_RESPONSE.set_response_flags({})
 
     def test_alm_connect(self):
         self.tac.alm_connect()

@@ -2,7 +2,7 @@ from mock import patch
 from urllib2 import HTTPError
 from sdetools.sdelib.restclient import URLRequest, APIError
 
-mock_flag = {}
+mock_response_flags = {}
 alm_response_generator = None
 
 
@@ -16,12 +16,17 @@ def response_generator_clear_tasks():
     alm_response_generator.clear_alm_tasks()
 
 
-def set_mock_flag(_mock_flag):
-    if type(_mock_flag) == dict:
-        global mock_flag
-        mock_flag = _mock_flag
+def set_response_flags(_response_flags):
+    if type(_response_flags) == dict:
+        global mock_response_flags
+        mock_response_flags = _response_flags
     else:
         raise APIError('Bad mock flag')
+
+
+def get_response_flags():
+    return mock_response_flags
+
 
 def get_response_generator():
     return alm_response_generator
@@ -29,7 +34,7 @@ def get_response_generator():
 
 def mock_call_rest_api(self, target, method=URLRequest.GET, args=None, call_headers={}):
     try:
-        return alm_response_generator.get_response(target, mock_flag, args, method)
+        return alm_response_generator.get_response(target, mock_response_flags, args, method)
     except HTTPError, err:
         # Re-raise with more info
         err.url = '%s/%s' % (err.url, target)

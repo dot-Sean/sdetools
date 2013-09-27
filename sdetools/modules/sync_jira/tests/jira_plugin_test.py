@@ -52,7 +52,7 @@ class JiraBaseCase(AlmPluginTestBase):
 
 class TestJiraAPI6Case(JiraBaseCase, unittest.TestCase):
     def test_fail_connect_server(self):
-        MOCK_RESPONSE.set_mock_flag({'get_projects': '500'})
+        MOCK_RESPONSE.set_response_flags({'get_projects': '500'})
         self.assert_exception(AlmException, '', 'HTTP Error 500: Server error', self.tac.alm_plugin.connect_server)
 
 
@@ -61,7 +61,7 @@ class MockSoapProxy():
         pass
 
     def __getattr__(self, name):
-        return partial(self.get_response, name, MOCK_RESPONSE.mock_flag)
+        return partial(self.get_response, name, MOCK_RESPONSE.get_response_flags())
 
     @staticmethod
     def get_response(*args, **keywords):
@@ -83,6 +83,6 @@ class TestJiraAPI4Case(JiraBaseCase, unittest.TestCase):
         patch('sdetools.modules.sync_jira.jira_soap.SOAPpy.WSDL.Proxy', mock_proxy).start()
 
     def test_bad_credentials(self):
-        MOCK_RESPONSE.set_mock_flag({'login': '401'})
+        MOCK_RESPONSE.set_response_flags({'login': '401'})
         self.assert_exception(AlmException, '', 'Unable to login to JIRA. Please check ID, password',
                               self.tac.alm_plugin.connect_server)
