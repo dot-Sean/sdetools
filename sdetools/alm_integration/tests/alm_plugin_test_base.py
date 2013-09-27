@@ -18,94 +18,110 @@ def stdout_callback(obj):
 class AlmPluginTestBase(object):
     @classmethod
     def setUpClass(cls, path_to_alm_connector, conf_path):
+        cls.path_to_alm_connector = path_to_alm_connector
+        cls.conf_path = conf_path
         MOCK_SDE.patch_sde_mocks(path_to_alm_connector)
-        ret_chn = ReturnChannel(stdout_callback, {})
-        cls.config = Config('', '', ret_chn, 'import')
-
-        cls.init_alm_connector()
-        Config.parse_config_file(cls.config, conf_path)
-        cls.tac.initialize()
-        cls.init_response_generator()
 
     @abstractmethod
     def init_response_generator(self):
         pass
 
     @abstractmethod
-    def init_alm_connector(self):
-        pass
+    def init_alm_connector(self, alm_connector):
+        self.tac = alm_connector
 
     def setUp(self):
         self.sde_tasks = None
         self.alm_tasks = None
+        ret_chn = ReturnChannel(stdout_callback, {})
+        self.config = Config('', '', ret_chn, 'import')
+
+        self.init_alm_connector()
+        Config.parse_config_file(self.config, self.conf_path)
+        self.tac.initialize()
+        self.init_response_generator()
 
     def tearDown(self):
         MOCK_RESPONSE.response_generator_clear_tasks()
         MOCK_RESPONSE.set_mock_flag({})
 
-    def test_alm_configurations(self):
-        configs = self.tac.config
-        self.assertTrue(configs.get('sde_server'))
-        self.assertTrue(configs.get('alm_server'))
-
     def test_alm_connect(self):
         self.tac.alm_connect()
 
-    def test_add_task(self):
+    def test_add_and_get_task(self):
+        # The plugin may initialize variables during alm_connect() so we need
+        # to call alm_connect() before proceeding
         self.tac.alm_connect()
         test_task = MOCK_SDE.generate_sde_task()
         self.tac.alm_add_task(test_task)
         test_task_result = self.tac.alm_get_task(test_task)
-        self.assertTrue(test_task_result.get_alm_id())
-        self.assertTrue(test_task_result.get_status())
+        self.assertNotNone(test_task_result, 'Failed retrieve newly added task')
 
     def test_update_task_status_to_done(self):
         self.tac.alm_connect()
         test_task = MOCK_SDE.generate_sde_task()
         self.tac.alm_add_task(test_task)
         alm_task = self.tac.alm_get_task(test_task)
+        self.assertNotEqual(alm_task.get_status(), 'DONE',
+                            'Cannot update task status to DONE because status is already DONE')
         self.tac.alm_update_task_status(alm_task, 'DONE')
         test_task_result = self.tac.alm_get_task(test_task)
-        self.assertEqual(test_task_result.get_status(), 'DONE')
+        self.assertEqual(test_task_result.get_status(), 'DONE', 'Failed to update task status to DONE')
 
     def test_update_task_status_to_na(self):
+        self.tac.alm_connect()
         test_task = MOCK_SDE.generate_sde_task()
         self.tac.alm_add_task(test_task)
         alm_task = self.tac.alm_get_task(test_task)
+        self.assertNotEqual(alm_task.get_status(), 'NA', 'Cannot update task status to NA because status is already NA')
         self.tac.alm_update_task_status(alm_task,'NA')
         test_task_result = self.tac.alm_get_task(test_task)
-        self.assertTrue((test_task_result.get_status() == 'DONE') or
-                        (test_task_result.get_status() == 'NA'))
+        self.assertIn(test_task_result.get_status(), ['DONE', 'NA'], 'Failed to update task status to NA')
 
     def test_update_task_status_to_todo(self):
+        self.tac.alm_connect()
         test_task = MOCK_SDE.generate_sde_task()
+        test_task['status'] = 'DONE'
         self.tac.alm_add_task(test_task)
         alm_task = self.tac.alm_get_task(test_task)
-        self.assertEqual(alm_task.get_status(), 'TODO')
-        self.tac.alm_update_task_status(alm_task, 'DONE')
-        new_alm_task = self.tac.alm_get_task(test_task)
-        self.assertEqual(new_alm_task.get_status(), 'DONE')
-        self.tac.alm_update_task_status(new_alm_task, 'TODO')
+        self.assertNotEqual(alm_task.get_status(), 'TODO',
+                            'Cannot update task status to TODO because status is already TODO')
+        self.tac.alm_update_task_status(alm_task, 'TODO')
         test_task_result = self.tac.alm_get_task(test_task)
-        self.assertEqual(test_task_result.get_status(), 'TODO')
+        self.assertEqual(test_task_result.get_status(), 'TODO', 'Failed to update task status to TODO')
 
     def test_synchronize(self):
-        # TODO: This isn't really a test. We aren't verifying anything
-        #       besides the fact it doesn't raise exceptions.
+        # Verify no exceptions are thrown
         self.tac.synchronize()
+
+    @staticmethod
+    def assertIn(value, expectations, msg=None):
+        if not value in expectations:
+            if not msg:
+                msg = 'Value %s is not one of the following expected values: %s' % (value, expectations)
+
+            raise AssertionError(msg)
+
+    @staticmethod
+    def assertNotNone(obj, msg=None):
+        if obj is None:
+            if not msg:
+                msg = 'Expected None, got %s' % obj
+
+            raise AssertionError(msg)
 
     def assert_exception(self, exception, error_code, reason, fn, *args):
         if not exception:
-            raise AssertionError('No exception specified')
+            raise AssertionError('No exception type specified')
         if not fn:
             raise AssertionError('No function specified')
         if not exception and not error_code:
-            raise AssertionError('No error code or error message to assert')
+            raise AssertionError('No error code or error message to assert against')
 
         try:
             fn.__call__(*args)
+            raise AssertionError('Expected an exception to be thrown')
         except Error, err:
-            print err.value
             self.assertEqual(type(err), exception, 'Expected exception type %s, Got %s' % (exception, type(err)))
 
             if error_code:

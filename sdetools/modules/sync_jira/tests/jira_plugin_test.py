@@ -29,17 +29,16 @@ class JiraBaseCase(AlmPluginTestBase):
         conf_path = os.path.join(current_dir, CONF_FILE_LOCATION)
         super(JiraBaseCase, cls).setUpClass(path_to_jira_connector, conf_path)
 
-    @classmethod
-    def init_alm_connector(cls):
-        cls.config.add_custom_option('jira_version', 'Version of JIRA [e.g. 4.3.3, 5, or 6.0]', default='6')
-        cls.tac = JIRAConnector(cls.config, JIRARestAPI(cls.config))
+    def init_alm_connector(self):
+        self.config.add_custom_option('jira_version', 'Version of JIRA [e.g. 4.3.3, 5, or 6.0]', default='6')
+        connector = JIRAConnector(self.config, JIRARestAPI(self.config))
+        super(JiraBaseCase, self).init_alm_connector(connector)
 
-    @classmethod
-    def init_response_generator(cls):
-        response_generator = JiraResponseGenerator(cls.config['alm_server'],
-                                                   cls.config['alm_project'],
-                                                   cls.config['alm_project_version'],
-                                                   cls.config['alm_user'])
+    def init_response_generator(self):
+        response_generator = JiraResponseGenerator(self.config['alm_server'],
+                                                   self.config['alm_project'],
+                                                   self.config['alm_project_version'],
+                                                   self.config['alm_user'])
 
         path_to_rest_plugin = 'sdetools.modules.sync_jira.jira_rest'
         MOCK_RESPONSE.patch_call_rest_api(response_generator, path_to_rest_plugin)
@@ -70,22 +69,20 @@ class MockSoapProxy():
 
 
 class TestJiraAPI4Case(JiraBaseCase, unittest.TestCase):
-    @classmethod
-    def init_alm_connector(cls):
-        super(TestJiraAPI4Case, cls).init_alm_connector()
-        cls.tac.alm_plugin = JIRASoapAPI(cls.config)
-        cls.config.jira_api_ver = 4
+    def init_alm_connector(self):
+        super(TestJiraAPI4Case, self).init_alm_connector()
+        self.tac.alm_plugin = JIRASoapAPI(self.config)
+        self.config.jira_api_ver = 4
 
-    @classmethod
-    def init_response_generator(cls):
-        super(TestJiraAPI4Case, cls).init_response_generator()
+    def init_response_generator(self):
+        super(TestJiraAPI4Case, self).init_response_generator()
         mock_opener = MagicMock()
         mock_opener.open = lambda x: x
         patch('sdetools.modules.sync_jira.jira_soap.http_req.get_opener', mock_opener).start()
         mock_proxy = MockSoapProxy
         patch('sdetools.modules.sync_jira.jira_soap.SOAPpy.WSDL.Proxy', mock_proxy).start()
 
-    def test_fail_connect_server(self):
+    def test_bad_credentials(self):
         MOCK_RESPONSE.set_mock_flag({'login': '401'})
-        self.assert_exception(AlmException, '', 'HTTP Error 401', self.tac.alm_plugin.connect_server)
-
+        self.assert_exception(AlmException, '', 'Unable to login to JIRA. Please check ID, password',
+                              self.tac.alm_plugin.connect_server)

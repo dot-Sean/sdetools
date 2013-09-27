@@ -16,23 +16,22 @@ MOCK_REST_API = sdetools.alm_integration.tests.alm_mock_response
 
 class TestGitHubCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(self):
         path_to_github_connector = 'sdetools.modules.sync_github.github_plugin'
         current_dir = os.path.dirname(os.path.realpath(__file__))
         conf_path = os.path.join(current_dir, CONF_FILE_LOCATION)
-        super(TestGitHubCase, cls).setUpClass(path_to_github_connector, conf_path)
+        super(TestGitHubCase, self).setUpClass(path_to_github_connector, conf_path)
 
-    @classmethod
-    def init_alm_connector(cls):
-        cls.tac = GitHubConnector(cls.config, GitHubAPI(cls.config))
+    def init_alm_connector(self):
+        connector = GitHubConnector(self.config, GitHubAPI(self.config))
+        super(TestGitHubCase, self).init_alm_connector(connector)
 
-    @classmethod
-    def init_response_generator(cls):
-        response_generator = GitHubResponseGenerator(cls.config['alm_server'],
-                                                     cls.config['github_repo_owner'],
-                                                     cls.config['alm_project'],
-                                                     cls.config['alm_project_version'],
-                                                     cls.config['alm_user'])
+    def init_response_generator(self):
+        response_generator = GitHubResponseGenerator(self.config['alm_server'],
+                                                     self.config['github_repo_owner'],
+                                                     self.config['alm_project'],
+                                                     self.config['alm_project_version'],
+                                                     self.config['alm_user'])
 
         path_to_rest_plugin = 'sdetools.modules.sync_github.github_plugin'
         MOCK_REST_API.patch_call_rest_api(response_generator, path_to_rest_plugin)
@@ -45,8 +44,12 @@ class TestGitHubCase(AlmPluginTestBase, unittest.TestCase):
 
     def test_connecting_to_public_repo(self):
         MOCK_REST_API.set_mock_flag({'get_repo': 'private-false'})
-        self.assert_exception(AlmException, '', 'Syncing with a public repository is currently not supported', self.tac.alm_connect_project)
+        self.assert_exception(AlmException, '',
+                              'Syncing with a public repository is currently not supported',
+                              self.tac.alm_connect_project)
 
     def test_connecting_to_invalid_repo(self):
          MOCK_REST_API.set_mock_flag({'get_repo': '404'})
-         self.assert_exception(AlmException, '', 'Unable to find GitHub repo. Reason: FATAL ERROR: HTTP Error 404: Not found', self.tac.alm_connect_project)
+         self.assert_exception(AlmException, '',
+                               'Unable to find GitHub repo. Reason: FATAL ERROR: HTTP Error 404: Not found',
+                               self.tac.alm_connect_project)

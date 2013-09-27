@@ -44,7 +44,6 @@ class JiraResponseGenerator(AlmResponseGenerator):
         flags = args[1]
         flag = flags.get(method_name)
         token = args[2]
-
         try:
             if not token:
                 self.raise_error('401')
@@ -89,7 +88,7 @@ class JiraResponseGenerator(AlmResponseGenerator):
                 self.raise_error('404')
         except HTTPError as err:
             # Return a faultType object instead
-            return faultType(err.code, err.msg)
+            raise faultType(err.code, err.msg)
 
     def get_response(self, target, flag, data=None, method='GET'):
         if target == self.REST_API_TARGETS['get_projects']:

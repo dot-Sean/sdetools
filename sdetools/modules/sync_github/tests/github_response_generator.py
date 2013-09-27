@@ -46,7 +46,7 @@ class GitHubResponseGenerator(AlmResponseGenerator):
         else:
             self.raise_error('404')
 
-    def raise_error(self, error_code, ):
+    def raise_error(self, error_code):
         fp_mock = MagicMock()
         if error_code == '401':
             fp_mock.read.return_value = '{"message":"Requires authentication","documentation_url":"http://developer.github.com/v3"}'

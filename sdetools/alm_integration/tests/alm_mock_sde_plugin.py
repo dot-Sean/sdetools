@@ -23,12 +23,12 @@ def mock_is_sde_connected(self):
 
 def mock_sde_get_tasks(self):
     task_list = [
-        generate_sde_task(10),
-        generate_sde_task(9),
-        generate_sde_task(7),
-        generate_sde_task(5),
-        generate_sde_task(3),
-        generate_sde_task(1)
+        generate_sde_task(priority=10),
+        generate_sde_task(priority=9),
+        generate_sde_task(priority=7),
+        generate_sde_task(priority=5),
+        generate_sde_task(priority=3),
+        generate_sde_task(priority=1)
     ]
 
     return task_list
@@ -37,7 +37,7 @@ def mock_sde_get_tasks(self):
 def mock_sde_get_task(self, id):
     task_id = re.search('[0-9]*$', id).group(0)
 
-    return generate_sde_task(int(task_id))
+    return generate_sde_task(_task_number=int(task_id))
 
 
 def mock_sde_update_task_status(self, task, status):
@@ -48,9 +48,15 @@ def mock_sde_get_task_content(self, task):
     return 'Task content'
 
 
-def generate_sde_task(priority=10, project_id=1000):
-        random_id = 'T%d' % random.randint(1, 999999999)
-        random_title = '%s: Test task' % random_id
+def generate_sde_task(priority=10, project_id=1000, _task_number=None):
+        if _task_number is not None:
+            task_number = _task_number
+        else:
+            task_number = random.randint(1, 999999999)
+
+        task_id = 'T%d' % task_number
+        title = '%s: Test task' % task_id
+
         return {
             'status': 'TODO',
             'contextrulesets': [],
@@ -58,7 +64,7 @@ def generate_sde_task(priority=10, project_id=1000):
             'note_count': 0,
             'implementations': [],
             'phase': 'requirements',
-            'id': random_id,
+            'id': task_id,
             'categories': ['Authentication'],
             'priority': priority,
             'weakness': {
@@ -68,7 +74,7 @@ def generate_sde_task(priority=10, project_id=1000):
                 'id': 'W9999',
                 'cwe_id': 0
             },
-            'title': random_title,
+            'title': title,
             'url': 'https://example.sdelements.com/library/tasks/T99999/',
             'age': 'current',
             'project': project_id,
