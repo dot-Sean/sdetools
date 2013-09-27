@@ -150,7 +150,7 @@ class GitHubConnector(AlmConnector):
                                self.project_uri, repo_info['message'])
 
         if not repo_info.get('private'):
-            raise AlmException('Syncing with a public repository is forbidden')
+            raise AlmException('Syncing with a public repository is currently not supported')
 
         """ Validate project configurations """
         milestone_name = self.config[self.ALM_PROJECT_VERSION]
