@@ -87,13 +87,14 @@ class GitHubResponseGenerator(AlmResponseGenerator):
         state = params[-2]
         task_name = params[-1]
         task_name = task_name.split(urlencode_str(':'))[0]
-
-        if not flag and self.get_alm_task(task_name):
-            status = self.get_alm_task('%s:status' % task_name)
+        task_number = self.get_task_number_from_title(task_name)
+        task = self.get_alm_task(task_number)
+        if not flag and task:
+            status = task.get('status')
             if status == state:
                 response = self.get_json_from_file('issues')
                 issue = response['issues'][0]
-                issue['number'] = self.get_alm_task(task_name)
+                issue['number'] = task_number
                 issue['state'] = state
                 issue['title'] = task_name
 
@@ -103,10 +104,9 @@ class GitHubResponseGenerator(AlmResponseGenerator):
 
     def post_issue(self, flag, data):
         if not flag:
-            name = data['title'].split(':')[0]
-            id = name.split('T')[1]
-            self.add_alm_task(name, id)
-            response = self.generate_issue(name, id, 'open')
+            task_number = self.get_task_number_from_title(data['title'])
+            self.add_alm_task(task_number)
+            response = self.generate_issue(task_number, 'open')
 
             return response
         else:
@@ -117,10 +117,9 @@ class GitHubResponseGenerator(AlmResponseGenerator):
 
         if not flag:
             if self.get_alm_task(task_id) and data['state']:
-                name = self.get_alm_task(task_id)
                 status = data['state']
-                response = self.generate_issue(name, task_id, status)
-                self.update_alm_task('%s:status' % name, status)
+                response = self.generate_issue(task_id, status)
+                self.update_alm_task(task_id, 'status', status)
 
                 return response
             else:
@@ -131,10 +130,10 @@ class GitHubResponseGenerator(AlmResponseGenerator):
     """
        JSON Generator 
     """
-    def generate_issue(self, name, id, status):
+    def generate_issue(self, task_id, status):
         response = self.get_json_from_file('issue')
-        response['number'] = id
+        response['number'] = task_id
         response['state'] = status
-        response['title'] = name
+        response['title'] = 'T%s' % task_id
 
         return response

@@ -23,16 +23,16 @@ class AlmPluginTestBase(object):
         MOCK_SDE.patch_sde_mocks(path_to_alm_connector)
 
     @abstractmethod
+    def init_alm_connector(self, alm_connector):
+        self.tac = alm_connector
+
+    @abstractmethod
     def post_parse_config(self):
         """
              Setup steps needed after the config file has been parsed;
              such as setting up the response generator.
         """
         pass
-
-    @abstractmethod
-    def init_alm_connector(self, alm_connector):
-        self.tac = alm_connector
 
     def setUp(self):
         """
@@ -53,7 +53,8 @@ class AlmPluginTestBase(object):
         MOCK_RESPONSE.set_response_flags({})
 
     def test_parsing_alm_task(self):
-        # This test can be extended to verify the contents of AlmTask
+        # Verify that none of the abstract methods inherited from AlmTask will break.
+        # This test can be extended to verify the contents of task.
         self.tac.alm_connect()
         test_task = MOCK_SDE.generate_sde_task()
         self.tac.alm_add_task(test_task)

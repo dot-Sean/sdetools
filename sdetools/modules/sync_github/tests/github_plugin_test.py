@@ -46,7 +46,6 @@ class TestGitHubCase(AlmPluginTestBase, unittest.TestCase):
         task_id = test_task['title']
         alm_id = test_task['id'].split('T')[1]
         alm_status = test_task['status']
-
         result_task_id = test_task_result.get_task_id()
         result_alm_id = test_task_result.get_alm_id()
         result_status = test_task_result.get_status()

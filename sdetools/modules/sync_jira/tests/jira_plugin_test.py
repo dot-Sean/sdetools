@@ -21,6 +21,7 @@ CONF_FILE_LOCATION = 'test_settings.conf'
 MOCK_RESPONSE = sdetools.alm_integration.tests.alm_mock_response
 MOCK_SDE = sdetools.alm_integration.tests.alm_mock_sde_plugin
 
+
 class JiraBaseCase(AlmPluginTestBase):
     @classmethod
     def setUpClass(cls):

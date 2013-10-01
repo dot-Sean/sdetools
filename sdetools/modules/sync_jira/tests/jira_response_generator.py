@@ -146,10 +146,9 @@ class JiraResponseGenerator(AlmResponseGenerator):
         if not flag:
             version_name = data['update']['versions'][0]['add']['name']
             task_number = task_id.split('-')[1]
-            task_name = 'T%s' % task_number
 
-            if task_name:
-                self.update_alm_task('%s:version' % task_name, version_name)
+            if task_number:
+                self.update_alm_task(task_number, 'version', version_name)
 
                 return {
                     "id": "10000",
@@ -226,17 +225,15 @@ class JiraResponseGenerator(AlmResponseGenerator):
                 'issues': []
             }
 
-            if not name:
-                task_name = target.replace('search?jql=project%%3D\'%s\'%%20AND%%20summary~' % self.project_key, '')
-            else:
-                task_name = name
+            if name:
+                target = name
 
-            task_name = task_name.replace('\'','')
-
-            if self.get_alm_task(task_name):
-                status_id = self.get_alm_task('%s:status' % task_name)
-                version = self.get_alm_task('%s:version' % task_name)
-                response['issues'].append(self.generate_issue(task_name, self.get_alm_task(task_name), status_id, version))
+            task_number = self.get_task_number_from_title(target)
+            task = self.get_alm_task(task_number)
+            if task:
+                status_id = task.get('status')
+                version = task.get('version')
+                response['issues'].append(self.generate_issue('T%s' % task_number, task_number, status_id, version))
                 response['total'] = 1
 
             return response
@@ -257,10 +254,10 @@ class JiraResponseGenerator(AlmResponseGenerator):
             transition_id = data['transition']['id']
             task_number = task_id.split('-')[1]
 
-            if not self.get_alm_task('T%s' % task_number):
-                self.add_alm_task('T%s' % task_number, task_number)
+            if not self.get_alm_task(task_number):
+                self.raise_error('404')
 
-            self.update_alm_task('T%s:status' % task_number, int(transition_id) + 1)
+            self.update_alm_task(task_number, 'status', int(transition_id) + 1)
 
             return None
         else:
@@ -275,9 +272,8 @@ class JiraResponseGenerator(AlmResponseGenerator):
                 task_name = data.get('summary')
                 
             if task_name:
-                task_name = task_name.partition(':')[0]
-                task_id = task_name.split('T')[1]
-                self.add_alm_task(task_name, task_id)
+                task_id = self.get_task_number_from_title(task_name)
+                self.add_alm_task(task_id)
                 response = {
                     'id': task_id,
                     'key': '%s-%s' % (self.project_key, 1),
@@ -350,8 +346,6 @@ class JiraResponseGenerator(AlmResponseGenerator):
         fields['project'] = self.generate_project()
         if version:
             fields['versions'].append(self.generate_project_version(version))
-
-        self.add_alm_task(task_name, task_number)
 
         return issue
 
