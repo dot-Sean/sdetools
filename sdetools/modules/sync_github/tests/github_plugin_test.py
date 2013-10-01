@@ -12,9 +12,9 @@ import sdetools.alm_integration.tests.alm_mock_sde_plugin
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_github.github_plugin import GitHubConnector, GitHubAPI, AlmException
 
-MOCK_SDE = sdetools.alm_integration.tests.alm_mock_sde_plugin
 CONF_FILE_LOCATION = 'test_settings.conf'
 MOCK_RESPONSE = sdetools.alm_integration.tests.alm_mock_response
+MOCK_SDE = sdetools.alm_integration.tests.alm_mock_sde_plugin
 
 
 class TestGitHubCase(AlmPluginTestBase, unittest.TestCase):

@@ -1,6 +1,7 @@
 import json
 import re
 
+from sdetools.extlib.defusedxml import minidom
 from sdetools.sdelib.commons import abc
 abstractmethod = abc.abstractmethod
 
@@ -15,15 +16,20 @@ class AlmResponseGenerator(object):
     def get_response(self, target, flag, data, method):
         pass
 
-    def add_alm_task(self, task_number):
+    def add_alm_task(self, task_number, task_name=None, status=None):
         """
             Save task using the task number as the id
         """
         if not self.alm_tasks.get(task_number):
+            if not task_name:
+                task_name = "T%s" % task_number
+            if not status:
+                status = self.initial_task_status
+
             self.alm_tasks[task_number] = {
-                "name": "T%s" % task_number,
+                "name": task_name,
                 "id": task_number,
-                "status": self.initial_task_status,
+                "status": status
             }
 
     def get_alm_task(self, task_number):
@@ -36,12 +42,18 @@ class AlmResponseGenerator(object):
     def clear_alm_tasks(self):
         self.alm_tasks = {}
 
-    def get_json_from_file(self, file_name):
-        file_path = '%s\\response\\%s.json' % (self.test_dir, file_name)
+    def _read_response_file(self, file_name):
+        file_path = '%s\\response\\%s' % (self.test_dir, file_name)
         f = open(file_path)
-        raw_json = f.read()
+        return f.read()
 
+    def get_json_from_file(self, file_name):
+        raw_json = self._read_response_file('%s.json' % file_name)
         return json.loads(raw_json)
+
+    def get_xml_from_file(self, file_name):
+        raw_xml = self._read_response_file('%s.xml' % file_name)
+        return minidom.parseString(raw_xml)
 
     def get_task_number_from_title(self, s):
         task_number = re.search("(?<=T)[0-9]+((?=[:'])|$)", s)
