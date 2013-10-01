@@ -45,6 +45,7 @@ class GitHubTask(AlmTask):
         self.status = status
         self.timestamp = timestamp
         self.done_statuses = done_statuses  # comma-separated list
+        self.priority = None
 
     def get_task_id(self):
         return self.task_id
