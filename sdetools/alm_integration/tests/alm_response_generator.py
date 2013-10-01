@@ -1,4 +1,3 @@
-import urllib
 import json
 
 from sdetools.sdelib.commons import abc
@@ -29,6 +28,7 @@ class AlmResponseGenerator(object):
         pass
 
     def add_alm_task(self, task_name, id):
+        print 'Add %s' % task_name
         if not self.alm_tasks.get(task_name):
             self.alm_tasks[task_name] = id
             self.alm_tasks['%s:status' % task_name] = self.initial_task_status
@@ -37,8 +37,7 @@ class AlmResponseGenerator(object):
         return self.alm_tasks.get(key)
 
     def update_alm_task(self, key, value):
-        if self.get_alm_task(key):
-            self.alm_tasks[key] = value
+        self.alm_tasks[key] = value
 
     def clear_alm_tasks(self):
         self.alm_tasks = TwoWayDict()

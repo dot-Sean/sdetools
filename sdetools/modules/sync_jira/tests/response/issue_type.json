@@ -6,11 +6,14 @@
 	"name": "Task",
 	"subtask": false,
 	"fields": {
-				"issuetype":
-							{
-							  "required": true,
-							  "name": "Issue Type",
-							  "operations": ["set"]
-							 }
-				}
+        "issuetype": {
+            "required": true,
+            "name": "Issue Type",
+            "operations": ["set"]
+        },
+        "customField": {
+            "required": false,
+            "name": "Custom Field"
+        }
+    }
 }

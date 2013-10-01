@@ -14,7 +14,7 @@ class JiraResponseGenerator(AlmResponseGenerator):
     api_url = 'rest/api/2'
     PROJECT_ID = '10000'
     JIRA_ISSUE_TYPES = ["Bug", "New Feature", "Task", "Improvement", "Sub-task"]
-    JIRA_PRIORITY_NAMES = ['Blocker', 'Critical']
+    JIRA_PRIORITY_NAMES = ['Blocker', 'Critical', 'Major', 'Minor', 'Trivial']
     JIRA_STATUS_NAMES = ['Open', 'In Progress', 'Resolved', 'Closed', 'Open']
     JIRA_TRANSITION_NAMES = ['Start Progress', 'Resolve Issue', 'Close Issue', 'Reopen Issue']
     REST_API_TARGETS = {
@@ -25,6 +25,7 @@ class JiraResponseGenerator(AlmResponseGenerator):
         'get_issue': 'search?jql=project%%3D\'%s\'%%20AND%%20summary~',
         'post_remote_link': 'issue/%s-\S.*/remotelink$',
         'post_issue': 'issue',
+        'update_version': 'issue/%s-[0-9]*$',
         'update_status': 'issue/%s-\S.*/transitions$'
     }
 
@@ -84,6 +85,8 @@ class JiraResponseGenerator(AlmResponseGenerator):
             elif method_name == 'progressWorkflowAction':
                 transition_data = {"transition": {"id": args[4]}}
                 return self.update_status(flag, args[3], 'POST', transition_data)
+            elif method_name == 'getFieldsForEdit':
+                return self.get_fields_for_edit(flag)
             else:
                 self.raise_error('404')
         except HTTPError as err:
@@ -109,6 +112,9 @@ class JiraResponseGenerator(AlmResponseGenerator):
         elif re.match(self.REST_API_TARGETS['update_status'] % self.project_key, target):
             task_id = target.split('/')[1]
             return self.update_status(flag.get('update_status'), task_id, method, data)
+        elif re.match(self.REST_API_TARGETS['update_version'] % self.project_key, target):
+            task_id = target.split('/')[1]
+            return self.update_version(flag.get('update_version'), data, task_id)
         else:
             self.raise_error('404')
 
@@ -136,9 +142,33 @@ class JiraResponseGenerator(AlmResponseGenerator):
     """
        Response functions 
     """
+    def update_version(self, flag, data, task_id):
+        if not flag:
+            version_name = data['update']['versions'][0]['add']['name']
+            task_number = task_id.split('-')[1]
+            task_name = 'T%s' % task_number
+
+            if task_name:
+                self.update_alm_task('%s:version' % task_name, version_name)
+
+                return {
+                    "id": "10000",
+                    "key": "TEST-24",
+                    "self": "http://www.example.com/jira/rest/api/2/issue/10000"
+                }
+            self.raise_error('500')
+        else:
+            self.raise_error('400')
+
     def get_fields_for_create(self, flag):
         if not flag:
-            self.get_json_from_file('createFields')
+            return self.get_json_from_file('createFields')
+        else:
+            self.raise_error('401')
+
+    def get_fields_for_edit(self, flag):
+        if not flag:
+            return self.get_json_from_file('editFields')
         else:
             self.raise_error('401')
 
@@ -169,10 +199,7 @@ class JiraResponseGenerator(AlmResponseGenerator):
             response = []
 
             if self.project_version:
-                version = self.get_json_from_file('project_version')
-                version['self'] = "%s/version/%s" % (self.api_url, self.project_version)
-                version['id'] = self.project_version
-                response.append(version)
+                response.append(self.generate_project_version())
 
             return response
         else:
@@ -208,7 +235,8 @@ class JiraResponseGenerator(AlmResponseGenerator):
 
             if self.get_alm_task(task_name):
                 status_id = self.get_alm_task('%s:status' % task_name)
-                response['issues'].append(self.generate_issue(task_name, self.get_alm_task(task_name), status_id))
+                version = self.get_alm_task('%s:version' % task_name)
+                response['issues'].append(self.generate_issue(task_name, self.get_alm_task(task_name), status_id, version))
                 response['total'] = 1
 
             return response
@@ -305,7 +333,7 @@ class JiraResponseGenerator(AlmResponseGenerator):
 
         return transition
 
-    def generate_issue(self, task_name, task_number, status_id):
+    def generate_issue(self, task_name, task_number, status_id, version=None):
         if status_id is None:
             status_id = 1
 
@@ -320,6 +348,9 @@ class JiraResponseGenerator(AlmResponseGenerator):
         fields['status'] = self.generate_status(status_id)
         fields['assignee'] = self.generate_user()
         fields['project'] = self.generate_project()
+        if version:
+            fields['versions'].append(self.generate_project_version(version))
+
         self.add_alm_task(task_name, task_number)
 
         return issue
@@ -369,3 +400,10 @@ class JiraResponseGenerator(AlmResponseGenerator):
             issue_type['subTask'] = True
 
         return issue_type
+
+    def generate_project_version(self, version_name=None):
+        version = self.get_json_from_file('project_version')
+        version['self'] = "%s/version/%s" % (self.api_url, self.project_version)
+        version['id'] = self.project_version
+
+        return version

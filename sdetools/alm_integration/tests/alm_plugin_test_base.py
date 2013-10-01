@@ -23,7 +23,11 @@ class AlmPluginTestBase(object):
         MOCK_SDE.patch_sde_mocks(path_to_alm_connector)
 
     @abstractmethod
-    def init_response_generator(self):
+    def post_parse_config(self):
+        """
+             Setup steps needed after the config file has been parsed;
+             such as setting up the response generator.
+        """
         pass
 
     @abstractmethod
@@ -31,6 +35,9 @@ class AlmPluginTestBase(object):
         self.tac = alm_connector
 
     def setUp(self):
+        """
+            Plugin setup mirrors the setup that occurs during a sync_alm call
+        """
         self.sde_tasks = None
         self.alm_tasks = None
         ret_chn = ReturnChannel(stdout_callback, {})
@@ -38,12 +45,26 @@ class AlmPluginTestBase(object):
 
         self.init_alm_connector()
         Config.parse_config_file(self.config, self.conf_path)
+        self.post_parse_config()
         self.tac.initialize()
-        self.init_response_generator()
 
     def tearDown(self):
         MOCK_RESPONSE.response_generator_clear_tasks()
         MOCK_RESPONSE.set_response_flags({})
+
+    def test_parsing_alm_task(self):
+        # This test can be extended to verify the contents of AlmTask
+        self.tac.alm_connect()
+        test_task = MOCK_SDE.generate_sde_task()
+        self.tac.alm_add_task(test_task)
+        test_task_result = self.tac.alm_get_task(test_task)
+        test_task_result.get_task_id()
+        test_task_result.get_priority()
+        test_task_result.get_alm_id()
+        test_task_result.get_status()
+        test_task_result.get_timestamp()
+
+        return [test_task, test_task_result]
 
     def test_alm_connect(self):
         self.tac.alm_connect()
