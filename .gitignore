@@ -38,3 +38,6 @@ test_settings.conf
 
 # Test files
 info.log
+
+#ides
+.idea
