@@ -10,6 +10,9 @@
 	<task id="198" title="Encrypt sensitive information in memory" >
 		<weakness type="cwe" id="316" title="Plaintext Storage in Memory"/>
 	</task>
+	<task id="21" title="Ensure confidential data is sent over an encrypted channel">
+        <weakness type="cwe" id="319" title="Cleartext Transmission of Sensitive Information"/>
+	</task>    
 	<task id="157" title="Securely create and cleanup of temporary files must be cleaned up after the resource is used" >
 		<weakness type="cwe" id="378" title="Creation of Temporary File With Insecure Permissions"/>
 		<weakness type="cwe" id="377" title="Insecure Temporary File"/>
@@ -82,8 +85,6 @@
 		<weakness type="cwe" id="311" title="Missing Encryption of Sensitive Data"/>	
 		<weakness type="cwe" id="312" title="Cleartext Storage of Sensitive Information"/>
 		<weakness type="cwe" id="313" title="Plaintext Storage in a File or on Disk"/>
-		<weakness type="cwe" id="193" title="Off-by-One Error"/>
-		<weakness type="cwe" id="135" title="Incorrect Calculation of Multi-Byte String Length"/>
 		<weakness type="cwe" id="170" title="Improper Null Termination"/>
 	    <weakness type="cwe" id="*" title="Unmapped CWE"/>
     </task>
@@ -104,6 +105,8 @@
 		<weakness type="cwe" id="119" title="Failure to Constrain Operations within the Bounds of a Memory Buffer"/>
 		<weakness type="cwe" id="131" title="Incorrect Calculation of Buffer Size"/>
         <weakness type="cwe" id="787" title="Out-of-bounds Write"/>
+		<weakness type="cwe" id="193" title="Off-by-One Error"/>
+		<weakness type="cwe" id="135" title="Incorrect Calculation of Multi-Byte String Length"/>
     </task>
     <task id="35" title="Specify HTTP protocol limits in the server settings">
         <weakness type="cwe" id="400" title="Uncontrolled Resource Consumption ('Resource Exhaustion')"/>

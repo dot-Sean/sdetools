@@ -42,6 +42,29 @@ class Mapping:
 
         self.mapping = cwe_mapping
 
+    def load_custom_mapping_from_xml(self, mapping_file):
+        try:
+            base = minidom.parse(mapping_file)
+        except Exception, e:
+            raise MappingError("An error occurred opening mapping file '%s': %s" % (mapping_file, e))
+
+        for task in base.getElementsByTagName('task'):
+            task_id = task.attributes['id'].value
+            task_checks = []
+            if task_id in self.task_map.keys():
+                task_checks = self.task_map[task_id]
+            for check_row in task.getElementsByTagName('weakness'):
+                check = {}
+                check['check_id'] = check_row.attributes['id'].value
+                check['check_name'] = check_row.attributes['title'].value
+                check['check_name'] = check['check_name'].replace('"', '&quot;')
+                check['check_name'] = check['check_name'].replace('&', '&amp;')
+
+                if not self.check_in_list(task_checks, check['check_id']):
+                    task_checks.append(check)
+
+            self.task_map[task_id] = task_checks
+
     def load_groups_from_xml(self, group_file):
         try:
             base = minidom.parse(group_file)
@@ -49,7 +72,7 @@ class Mapping:
             raise MappingError("An error occurred opening group file '%s': %s" % (group_file, e))
 
         # sometimes the data is all over the place
-        for i in range(0, 4):
+        for i in range(0, 2):
             for check_group_row in base.getElementsByTagName('Table1'):
                 check_group_id = check_group_row.getElementsByTagName('CheckGroupID')[0].firstChild.data
                 parent_check_node = check_group_row.getElementsByTagName('ParentCheckGroupID')
@@ -71,11 +94,10 @@ class Mapping:
 
     def remap(self, unmapped_cwe_file_name):
         fp = open(unmapped_cwe_file_name, "w")
-        task_map = {}
 
-        task_map['186'] = self.thirdparty_checks
-        task_map['193'] = [{'check_id': '*', 'check_name': 'Unmapped Check'}]
-        task_map['193'].extend(self.misc_checks)
+        self.task_map['186'].extend(self.thirdparty_checks)
+        self.task_map['193'] = [{'check_id': '*', 'check_name': 'Unmapped Check'}]
+        self.task_map['193'].extend(self.misc_checks)
 
         keys = sorted(self.cwe_checks.iterkeys())
         for cwe in keys:
@@ -83,32 +105,28 @@ class Mapping:
                 tasks = self.mapping[cwe]
                 for task in tasks:
                     task_checks = []
-                    if task_map.has_key(task):
-                        task_checks = task_map[task]
+                    if task in self.task_map.keys():
+                        task_checks = self.task_map[task]
                     for check in self.cwe_checks[cwe]:
 
                         # If the check is assigned elsewhere do not put it in the catch-all task
-                        if task == '193' and self.check_mapped(task_map, check['check_id']):
+                        if self.check_mapped(self.task_map, check['check_id']):
                             continue
 
-                        task_mapping_found = False
-                        for task_check in task_checks:
-                            if task_check['check_id'] == check['check_id']:
-                                task_mapping_found = True
-                        if not task_mapping_found:
-                            task_checks.append(check)
-                    task_map[task] = task_checks
+                        task_checks.append(check)
+
+                    self.task_map[task] = task_checks
             else:  # map to 193
                     fp.write("CWE-%s %d un-mapped\n" % (cwe, len(self.cwe_checks[cwe])))
                     task_mapping_found = False
                     task_checks = []
                     task = '193'
-                    if task_map.has_key(task):
-                        task_checks = task_map[task]
+                    if task in self.task_map.keys():
+                        task_checks = self.task_map[task]
                     for check in self.cwe_checks[cwe]:
 
                         # If the check is assigned elsewhere do not put it in the catch-all task
-                        if self.check_mapped(task_map, check['check_id']):
+                        if self.check_mapped(self.task_map, check['check_id']):
                             continue
 
                         for chk in task_checks:
@@ -116,10 +134,9 @@ class Mapping:
                                 task_mapping_found = True
                         if not task_mapping_found:
                             task_checks.append(check)
-                    task_map[task] = task_checks
+                    self.task_map[task] = task_checks
 
         fp.close()
-        self.task_map = task_map
 
     def load_weaknesses_from_xml(self, weakness_file):
         try:
@@ -142,7 +159,9 @@ class Mapping:
             check['check_name'] = check['check_name'].replace('&', '&amp;')
 
             # try to map immediately based on check grouping, without CWE
-            if self.check_in_list(self.thirdparty_checks, check['check_id']):
+            if self.check_mapped(self.task_map, check['check_id']):
+                continue
+            elif self.check_in_list(self.thirdparty_checks, check['check_id']):
                 continue
             elif check['check_group_id'] in self.appcheck_group:
                 self.appcheck_checks.append(check)
@@ -216,17 +235,18 @@ class Mapping:
 
 def main(argv):
 
-    usage = "Usage: %s <base mapping> <webinspect groups> <webinspect checks> <unmapped cwes> <webinspect map> \n" % (argv[0])
+    usage = "Usage: %s <base mapping> <custom map> <webinspect groups> <webinspect checks> <unmapped cwes> <webinspect map> \n" % (argv[0])
 
     if len(argv) == 2 and argv[1] == 'help':
         print usage
         print "base mapping: (input) docs/base_cwe/sde_cwe_map.xml"
+        print "custom map: (input) Task->WebInspect check mapping in xml format [i.e. custom_webinspect_map.xml]"
         print "webinspect groups: (input) WebInspect groups in xml format [i.e. webinspect_groups.xml]"
         print "webinspect checks: (input) WebInspect checks in xml format [i.e. webinspect_checks.xml]"
         print "unmapped cwes: (output) list of cwes that were not mapped using the mapping"
         print "webinspect map: (output) WebInspect map file"
         sys.exit(0)
-    elif len(argv) < 3:
+    elif len(argv) < 7:
         print usage
         sys.exit(1)
 
@@ -235,22 +255,25 @@ def main(argv):
     print "Loading CWE map..."
     base.load_base_mapping_from_xml(argv[1])
 
+    print "Loading custom map..."
+    base.load_custom_mapping_from_xml(argv[2])
+
     print "Loading WebInspect Groups..."
-    base.load_groups_from_xml(argv[2])
+    base.load_groups_from_xml(argv[3])
 
     print "Loading WebInspect Checks..."
-    base.load_weaknesses_from_xml(argv[3])
+    base.load_weaknesses_from_xml(argv[4])
 
-    print "Re-mapping Checks... unmapped CWE's recorded in %s" % argv[4]
-    base.remap(argv[4])
+    print "Re-mapping Checks... unmapped CWE's recorded in %s" % argv[5]
+    base.remap(argv[5])
 
     print "Validating..."
     if base.find_missing_checks():
         print "Aborted"
         sys.exit(1)
 
-    print "Outputting WebInspect map to %s..." % argv[5]
-    base.output_mapping(argv[5])
+    print "Outputting WebInspect map to %s..." % argv[6]
+    base.output_mapping(argv[6])
 
     print "Done."        
 
