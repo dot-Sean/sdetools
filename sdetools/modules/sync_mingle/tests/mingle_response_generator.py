@@ -34,14 +34,26 @@ class MingleResponseGenerator(AlmResponseGenerator):
         else:
             self.raise_error('404')
 
-    def raise_error(self, error_code):
+    def raise_error(self, error_code, return_value=None):
         fp_mock = MagicMock()
-        if error_code == '401':
-            fp_mock.read.return_value = '{"message":"Requires authentication","documentation_url":"http://developer.github.com/v3"}'
-            raise HTTPError('%s' % self.api_url, '401', 'Unauthorized user', '', fp_mock)
+
+        if error_code == '400':
+            message = 'Invalid parameters'
+        elif error_code == '403':
+            message = 'No permission'
         elif error_code == '404':
-            fp_mock.read.return_value = '{"message":"Not found","documentation_url":"http://developer.github.com/v3"}'
-            raise HTTPError('%s' % self.api_url, '404', 'Not found', '', fp_mock)
+            message = 'Not found'
+        elif error_code == '500':
+            message = 'Server error'
+        else:
+            message = 'Unknown error'
+
+        if not return_value:
+            fp_mock.read.return_value = message
+        else:
+            fp_mock.read.return_value = return_value
+
+        raise HTTPError('', error_code, message, '', fp_mock)
 
     """
        Response functions 

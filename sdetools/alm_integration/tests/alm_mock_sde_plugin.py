@@ -9,7 +9,6 @@ def patch_sde_mocks(path_to_alm_connector):
     patch('%s.AlmConnector.sde_get_tasks' % path_to_alm_connector, mock_sde_get_tasks).start()
     patch('%s.AlmConnector.sde_get_task' % path_to_alm_connector, mock_sde_get_task).start()
     patch('%s.AlmConnector.sde_update_task_status' % path_to_alm_connector, mock_sde_update_task_status).start()
-    patch('%s.AlmConnector.sde_get_task_content' % path_to_alm_connector, mock_sde_get_task_content).start()
     patch('%s.AlmConnector._add_note' % path_to_alm_connector, mock_add_note).start()
 
 
@@ -42,10 +41,6 @@ def mock_sde_get_task(self, id):
 
 def mock_sde_update_task_status(self, task, status):
     pass
-
-
-def mock_sde_get_task_content(self, task):
-    return 'Task content'
 
 
 def generate_sde_task(priority=10, project_id=1000, _task_number=None):
