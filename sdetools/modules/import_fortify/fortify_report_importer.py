@@ -24,14 +24,15 @@ class FortifyReportImporter(BaseImporter):
         try:
             base = minidom.parse(report_xml)
         except Exception, e:
-            raise FortifyIntegrationError("Error opening report xml (%s)" % report_xml)
+            raise FortifyIntegrationError("Error opening report xml %s Reason: %s" % report_xml, str(e))
 
         self.report_id = ""
+        root = base.documentElement
 
-        if base.nodeName != "ReportDefinition":
+        if root.tagName != "ReportDefinition":
             raise FortifyIntegrationError("Malformed report detected: ReportDefinition is not found")
 
-        report_sections = base.getElementsByTagName('ReportSection')
+        report_sections = root.getElementsByTagName('ReportSection')
         if not report_sections:
             raise FortifyIntegrationError("Malformed report detected: ReportSection not found")
 
@@ -39,7 +40,7 @@ class FortifyReportImporter(BaseImporter):
             titles = report_section.getElementsByTagName('Title')
             if not titles:
                 raise FortifyIntegrationError("Malformed report detected: Title not found")
-            title = title[0]
+            title = titles[0]
             if title.firstChild.data == 'Issue Count by Category':
                 issue_listing = report_section.getElementsByTagName('IssueListing')[0]
                 grouping_sections = issue_listing.getElementsByTagName('GroupingSection')
