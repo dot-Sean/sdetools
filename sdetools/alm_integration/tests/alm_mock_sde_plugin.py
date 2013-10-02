@@ -64,7 +64,7 @@ def generate_sde_task(priority=10, project_id=1000, _task_number=None):
             'note_count': 0,
             'implementations': [],
             'phase': 'requirements',
-            'id': task_id,
+            'id': '%s-%s' % (project_id, task_id),
             'categories': ['Authentication'],
             'priority': priority,
             'weakness': {
