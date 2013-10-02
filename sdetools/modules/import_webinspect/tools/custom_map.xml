@@ -16,6 +16,9 @@
 	<task id="22" title="Set secure flag on session cookies" confidence="high">
 		<weakness type="check" id="4720" title="SSL Cookie Not Used" />        
 	</task>
+    <task id="23" title="Set HttpOnly flag on session cookies" confidence="high">
+		<weakness type="check" id="10543" title="Set-Cookie does not use HTTPOnly Keyword" />        
+    </task>
 	<task id="16" title="Authorize every page" confidence="low">
 	</task>
 	<task id="176" title="Apply principles of privacy when handling personal information" confidence="low">
@@ -41,7 +44,11 @@
 		<weakness type="check" id="5128" title="Microsoft ASP.NET URI Canonicalization Remote Information Disclosure Vulnerability" />        
 	</task>
 	<task id="193" title="Review non-categorized/miscellaneous findings from static code analysis" confidence="low">
+		<weakness type="check" id="5" title="WebInspect Internal Check" />    
 	</task>
+    <task id="56" title="Restrict access to WSDL">
+		<weakness type="check" id="10542" title="WSDL File Discovered " />
+    </task>    
 	<task id="20" title="Invalidate old session ID after authentication" confidence="low">
 	</task>
 	<task id="202" title="Prevent buffer overflow/underflow" confidence="low">
@@ -55,6 +62,8 @@
 	<task id="25" title="Enforce absolute session timeouts" confidence="low">
 	</task>
 	<task id="29" title="Use anti cross site request forgery (CSRF) tokens" confidence="low">
+		<weakness type="check" id="10963" title="Cross-Site Request Forgery" />
+		<weakness type="check" id="10977" title="Cross-Site Request Forgery (High)" />    
 	</task>
 	<task id="31" title="Perform input validation on all forms of input" confidence="low">
 	</task>

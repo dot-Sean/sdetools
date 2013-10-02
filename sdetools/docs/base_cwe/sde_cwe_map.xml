@@ -111,6 +111,9 @@
     <task id="35" title="Specify HTTP protocol limits in the server settings">
         <weakness type="cwe" id="400" title="Uncontrolled Resource Consumption ('Resource Exhaustion')"/>
     </task>
+    <task id="56" title="Restrict access to WSDL">
+        <weakness type="cwe" id="651" title="Information Exposure Through WSDL File"/>
+    </task>
     <task id="204" title="Follow security best practices when dealing with pointers" >
         <weakness type="cwe" id="125" title="Out-of-Bounds Read"/>
         <weakness type="cwe" id="415" title="Double Free"/>
