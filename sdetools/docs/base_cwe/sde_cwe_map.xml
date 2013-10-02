@@ -87,6 +87,8 @@
 		<weakness type="cwe" id="170" title="Improper Null Termination"/>
 	    <weakness type="cwe" id="*" title="Unmapped CWE"/>
     </task>
+    <task id="186" title="Verify that third party libraries do not have any outstanding security patches" >
+    </task>
     <task id="206" title="Avoid time of check time of use race condition against external resources" >
         <weakness type="cwe" id="367" title="Time-of-check Time-of-use (TOCTOU) Race Condition"/>
     </task>
