@@ -37,7 +37,8 @@ class AlmResponseGenerator(object):
     def clear_alm_tasks(self):
         self.alm_tasks = {}
 
-    def get_json_from_file(self, file_name):
+    def get_json_from_file(self, obj_name):
+        file_name = '%s.json' % (obj_name)
         file_path = os.path.join(self.test_dir, 'response', file_name)
         f = open(file_path)
         raw_json = f.read()
