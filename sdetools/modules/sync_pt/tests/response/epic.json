@@ -1,0 +1,18 @@
+{
+   "updated_at": "2013-09-24T12:00:00Z",
+   "project_id": 99,
+   "url": "http://localhost/epic/show/8",
+   "name": "Tractor Beams",
+   "label":
+   {
+       "updated_at": "2013-09-24T12:00:00Z",
+       "project_id": 99,
+       "name": "tractor beams",
+       "created_at": "2013-09-24T12:00:00Z",
+       "kind": "label",
+       "id": 2015
+   },
+   "created_at": "2013-09-24T12:00:00Z",
+   "kind": "epic",
+   "id": 8
+}

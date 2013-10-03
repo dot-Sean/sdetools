@@ -1,4 +1,3 @@
-import re
 import os
 import sys
 
@@ -9,19 +8,12 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(
 from sdetools.alm_integration.tests.alm_response_generator import AlmResponseGenerator
 from sdetools.sdelib.commons import urlencode_str
 
+
 class GitHubResponseGenerator(AlmResponseGenerator):
-    GITHUB_STATUS_NAMES = ['open', 'closed']
-    REST_API_TARGETS = {
-        'get_user': 'user',
-        'get_repo': 'repos/%s',
-        'get_milestones': 'repos/%s/milestones',
-        'get_task': 'legacy/issues/search/%s',
-        'post_issue': 'repos/%s/issues',
-        'update_status': 'repos/%s/issues/[0-9]*$'
-    }
+    STATUS_NAMES = ['open', 'closed']
 
     def __init__(self, host, repo_org, repo_name, project_milestone, username, protocol='http'):
-        initial_task_status = self.GITHUB_STATUS_NAMES[0]
+        initial_task_status = self.STATUS_NAMES[0]
         test_dir = os.path.dirname(os.path.abspath(__file__)) 
         super(GitHubResponseGenerator, self).__init__(initial_task_status, test_dir)
 
@@ -29,24 +21,16 @@ class GitHubResponseGenerator(AlmResponseGenerator):
         self.api_url = '%s://%s/%s' % (protocol, host, self.project_uri)
         self.project_milestone = project_milestone
         self.username = username
+        self.rest_api_targets = {
+            'user': 'get_user',
+            'repos/%s$' % self.project_uri: 'get_repo',
+            'repos/%s/milestones' % self.project_uri: 'get_milestones',
+            'legacy/issues/search/%s' % self.project_uri: 'get_task',
+            'repos/%s/issues$' % self.project_uri: 'post_issue',
+            'repos/%s/issues/[0-9]*$' % self.project_uri: 'update_status'
+        }
 
-    def get_response(self, target, flag, data, method):
-        if target == self.REST_API_TARGETS['get_user']:
-            return self.get_user(flag.get('get_user'))
-        elif target == self.REST_API_TARGETS['get_repo'] % self.project_uri:
-            return self.get_repo(flag.get('get_repo'))
-        elif target == self.REST_API_TARGETS['get_milestones'] % self.project_uri:
-            return self.get_milestones(flag.get('get_milestones'))
-        elif self.REST_API_TARGETS['get_task'] % self.project_uri in target:
-            return self.get_task(flag.get('get_task'), target)
-        elif target == self.REST_API_TARGETS['post_issue'] % self.project_uri:
-            return self.post_issue(flag.get('post_issue'), data)
-        elif re.match(self.REST_API_TARGETS['update_status'] % self.project_uri, target):
-            return self.update_status(flag.get('update_status'), target, data)
-        else:
-            self.raise_error('404')
-
-    def raise_error(self, error_code):
+    def raise_error(self, error_code, return_value=None):
         fp_mock = MagicMock()
         if error_code == '401':
             fp_mock.read.return_value = '{"message":"Requires authentication","documentation_url":"http://developer.github.com/v3"}'
@@ -54,18 +38,20 @@ class GitHubResponseGenerator(AlmResponseGenerator):
         elif error_code == '404':
             fp_mock.read.return_value = '{"message":"Not found","documentation_url":"http://developer.github.com/v3"}'
             raise HTTPError('%s' % self.api_url, '404', 'Not found', '', fp_mock)
-
+        else:
+            fp_mock.read.return_value = 'Error'
+            raise HTTPError('%s' % self.api_url, error_code, 'Error', '', fp_mock)
 
     """
        Response functions 
     """
-    def get_user(self, flag):
+    def get_user(self, target, flag, data, method):
         if not flag:
             return self.get_json_from_file('user')
         else:
             self.raise_error('401')
 
-    def get_repo(self, flag):
+    def get_repo(self, target, flag, data, method):
         if not flag:
             return self.get_json_from_file('repo')
         elif flag == 'private-false':
@@ -76,13 +62,13 @@ class GitHubResponseGenerator(AlmResponseGenerator):
         else:
             self.raise_error('404')
 
-    def get_milestones(self, flag):
+    def get_milestones(self, target, flag, data, method):
         if not flag:
             return self.get_json_from_file('milestones')
         else:
             return []
 
-    def get_task(self, flag, target):
+    def get_task(self, target, flag, data, method):
         params = target.split('/')
         state = params[-2]
         task_name = params[-1]
@@ -102,7 +88,7 @@ class GitHubResponseGenerator(AlmResponseGenerator):
 
         return {"issues": []}
 
-    def post_issue(self, flag, data):
+    def post_issue(self, target, flag, data, method):
         if not flag:
             task_number = self.get_task_number_from_title(data['title'])
             self.add_alm_task(task_number)
@@ -112,7 +98,7 @@ class GitHubResponseGenerator(AlmResponseGenerator):
         else:
             self.raise_error('404')
 
-    def update_status(self, flag, target, data):
+    def update_status(self, target, flag, data, method):
         task_id = target.split('/')[4]
 
         if not flag:

@@ -1,3 +1,5 @@
+import re
+
 from sdetools.sdelib.mod_mgr import ReturnChannel
 from sdetools.sdelib.conf_mgr import Config
 from sdetools.sdelib.commons import abc
@@ -59,7 +61,12 @@ class AlmPluginTestBase(object):
         test_task = MOCK_SDE.generate_sde_task()
         self.tac.alm_add_task(test_task)
         test_task_result = self.tac.alm_get_task(test_task)
-        test_task_result.get_task_id()
+
+        task_id = test_task_result.get_task_id()
+        regex = 'C?T[0-9a-zA-z]+$'
+
+        self.assertMatch(regex, task_id,
+                         'Task id does not match the expected pattern. pattern:%s, task_id:%s' % (regex, task_id))
         test_task_result.get_priority()
         test_task_result.get_alm_id()
         test_task_result.get_status()
@@ -139,6 +146,17 @@ class AlmPluginTestBase(object):
         if obj is None:
             if not msg:
                 msg = 'Expected None, got %s' % obj
+
+            raise AssertionError(msg)
+
+    @staticmethod
+    def assertMatch(regex, str, msg):
+        pattern = re.compile(regex)
+        result = pattern.match(str)
+
+        if not result:
+            if not msg:
+                msg = 'String %s did not match the following regular expression: %s' % (str, regex)
 
             raise AssertionError(msg)
 

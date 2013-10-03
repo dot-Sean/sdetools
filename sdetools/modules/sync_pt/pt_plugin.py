@@ -83,9 +83,11 @@ class PivotalTrackerConnector(AlmConnector):
 
         config.add_custom_option(self.PT_STORY_TYPE, 'Default story type on PivotalTracker', default='bug')
         config.add_custom_option(self.ALM_NEW_STATUS, 'Status to set for new tasks in PivotalTracker',
-                                 default='open')
+
+                                 default='unstarted')
         config.add_custom_option(self.ALM_DONE_STATUSES, 'Statuses that signify a task is Done in PivotalTracker',
-                                 default='closed')
+
+                                 default='accepted')
         config.add_custom_option(self.ALM_PROJECT_VERSION, 'Name of release marker to place all new stories under',
                                  default='')
         config.add_custom_option(self.ALM_PRIORITY_MAP, 'Customized priority mapping from SDE to PivotalTracker '

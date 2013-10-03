@@ -51,15 +51,12 @@ class JiraBaseCase(AlmPluginTestBase):
         test_task = result[0]
         test_task_result = result[1]
 
-        task_id = test_task['title'].split(':')[0]
         alm_id = 'TEST-%s' % test_task['id'].split('T')[1]
         alm_status = test_task['status']
-        result_task_id = test_task_result.get_task_id()
         result_alm_id = test_task_result.get_alm_id()
         result_status = test_task_result.get_status()
         result_timestamp = test_task_result.get_timestamp()
 
-        self.assertEqual(result_task_id, task_id, 'Expected task id %s, got %s' % (task_id, result_task_id))
         self.assertEqual(result_alm_id, alm_id, 'Expected alm_id %s, got %s' % (alm_id, result_alm_id))
         self.assertEqual(result_status, alm_status, 'Expected %s status, got %s' % (alm_status, result_status))
         self.assertEqual(type(result_timestamp), datetime, 'Expected a datetime object')
@@ -166,7 +163,6 @@ class TestJiraAPI4Case(JiraBaseCase, unittest.TestCase):
         self.tac.alm_add_task(test_task)
         alm_task = self.tac.alm_get_task(test_task)
         self.config['jira_existing_issue'] = alm_task.get_alm_id()
-        print alm_task.get_alm_id()
         self.tac.initialize()
         self.tac.alm_connect()
 
