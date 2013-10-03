@@ -18,12 +18,10 @@ class JiraResponseGenerator(AlmResponseGenerator):
     JIRA_STATUS_NAMES = ['Open', 'In Progress', 'Resolved', 'Closed', 'Open']
     JIRA_TRANSITION_NAMES = ['Start Progress', 'Resolve Issue', 'Close Issue', 'Reopen Issue']
 
-
     def __init__(self, host, project_key, project_version, username, protocol='http'):
         initial_task_status = 1
         test_dir = os.path.dirname(os.path.abspath(__file__)) 
         super(JiraResponseGenerator, self).__init__(initial_task_status, test_dir)
-
 
         self.base_url = '%s://%s' % (protocol, host)
         self.api_url = '%s/%s' % (self.base_url, self.api_url)
@@ -56,10 +54,8 @@ class JiraResponseGenerator(AlmResponseGenerator):
             if not token:
                 self.raise_error('401')
             if method_name == 'getProjectByKey':
-
                 return self.get_projects(flag, None, None, None)[0]
             elif method_name == 'getIssueTypes':
-
                 return self.get_issue_types(flag, None, None, None)
             elif method_name == 'login':
                 return self.get_auth_token(flag)
@@ -68,24 +64,23 @@ class JiraResponseGenerator(AlmResponseGenerator):
             elif method_name == 'getPriorities':
                 return self.get_priorities(flag)
             elif method_name == 'getVersions':
-
                 return self.get_project_versions(flag, None, None, None)
             elif method_name == 'getFieldsForCreate':
                 return self.get_fields_for_create(flag)
             elif method_name == 'getIssuesFromJqlSearch':
                 task_name = re.sub(r".*summary~", '', args[3])
-
                 rest_response = self.get_issue(flag, None, None, None, task_name)
                 issues = rest_response.get('issues')
+
                 if not issues:
                     return []
                 else:
                     issue = issues[0].get('fields')
                     issue['status'] = issue['status']['id']
                     issue['key'] = issues[0].get('key')
+
                     return [structType(data=issue)]
             elif method_name == 'createIssue':
-
                 return self.post_issue(flag, None, args[3], None)
             elif method_name == 'updateIssue':
                 if not flag:
@@ -108,11 +103,9 @@ class JiraResponseGenerator(AlmResponseGenerator):
             # Return a faultType object instead
             raise faultType(err.code, err.msg)
 
-
     """
        Response functions 
     """
-
     def update_version(self, target, flag, data, method):
         if not flag:
             task_id = target.split('/')[1]
@@ -149,14 +142,12 @@ class JiraResponseGenerator(AlmResponseGenerator):
         else:
             self.raise_error('401')
 
-
     def get_projects(self, target, flag, data, method):
         if not flag:
             response = [self.generate_project()]
             return response
         else:
             self.raise_error('500')
-
 
     def get_issue_types(self, target=None, flag=None, data=None, method=None):
         response = []
@@ -166,7 +157,6 @@ class JiraResponseGenerator(AlmResponseGenerator):
                 response.append(self.generate_issue_type(i))
 
         return response
-
 
     def get_project_versions(self, target, flag, data, method):
         if not flag:
@@ -179,7 +169,6 @@ class JiraResponseGenerator(AlmResponseGenerator):
         else:
             self.raise_error('404')
 
-
     def get_create_meta(self, target, flag, data, method):
         if not flag:
             response = {'expands': 'projects'}
@@ -191,7 +180,6 @@ class JiraResponseGenerator(AlmResponseGenerator):
             return response
         else:
             self.raise_error('403')
-
 
     def get_issue(self, target, flag, data, method, name=None):
         if not flag:
@@ -218,7 +206,6 @@ class JiraResponseGenerator(AlmResponseGenerator):
         else:
             self.raise_error('400')
 
-
     def update_status(self, target, flag, data, method):
         if not flag and method == 'GET':
             response = {"expand": "transitions"}
@@ -231,7 +218,6 @@ class JiraResponseGenerator(AlmResponseGenerator):
             return response
         elif not flag and data and method == 'POST':
             transition_id = data['transition']['id']
-
             task_number = re.search('(?<=%s-)[0-9a-zA-z]+' % self.project_key, target).group(0)
 
             if not self.get_alm_task(task_number):
@@ -243,17 +229,14 @@ class JiraResponseGenerator(AlmResponseGenerator):
         else:
             self.raise_error(flag)
 
-
     def post_issue(self, target, flag, data, method):
         if not flag and data:
-
             task_name = None
 
             if data.get('fields') and data.get('fields').get('summary'):
                 task_name = data.get('fields').get('summary')
             elif data.get('summary'):
                 task_name = data.get('summary')
-                
 
             if task_name is not None:
                 task_id = self.get_task_number_from_title(task_name)
@@ -267,13 +250,11 @@ class JiraResponseGenerator(AlmResponseGenerator):
                 return response
 
         self.raise_error('400', '{"errorMessages":["Missing field"],"errors":{}}')
-    
 
     def post_remote_link(self, target, flag, data, method):
         if not flag:
             task_id = target.split('/')[1]
             if data and data.get('object') and data.get('object').get('title'):
-
                 task_number = task_id.split('-')[1]
                 response = {
 
@@ -295,7 +276,7 @@ class JiraResponseGenerator(AlmResponseGenerator):
                 response.append(self.generate_status(i))
 
         return response
-        
+
     def get_priorities(self, flag):
         response = []
         if not flag:

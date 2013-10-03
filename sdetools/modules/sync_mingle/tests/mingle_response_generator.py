@@ -9,17 +9,13 @@ from sdetools.sdelib.commons import urlencode_str
 
 
 class MingleResponseGenerator(AlmResponseGenerator):
-
     BASE_PATH = 'api/v2'
     STATUS_NAMES = ['New', 'Done']
-
 
     def __init__(self, project_name):
         initial_task_status = self.STATUS_NAMES[0]
         test_dir = os.path.dirname(os.path.abspath(__file__)) 
         super(MingleResponseGenerator, self).__init__(initial_task_status, test_dir)
-
-
 
         self.project_uri = 'projects/%s/cards' % urlencode_str(project_name)
         self.rest_api_targets = {
@@ -36,7 +32,6 @@ class MingleResponseGenerator(AlmResponseGenerator):
             return self.get_xml_from_file('projects')
         else:
             self.raise_error('401')
-
 
     def project_cards(self, target, flag, data, method):
         if not flag:
@@ -82,7 +77,6 @@ class MingleResponseGenerator(AlmResponseGenerator):
 
        XML Generator
     """
-
     def generate_card(self, card_id, card_name, status, card_type):
         card = self.get_xml_from_file('card')
         name_node = card.getElementsByTagName('name').item(0)
@@ -105,4 +99,3 @@ class MingleResponseGenerator(AlmResponseGenerator):
         card_type_name_node.firstChild.nodeValue = card_type
 
         return card
-

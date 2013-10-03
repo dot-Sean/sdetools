@@ -65,12 +65,8 @@ class AlmResponseGenerator(object):
                 status = self.initial_task_status
 
             self.alm_tasks[task_number] = {
-
-
                 "name": task_name,
                 "id": task_number,
-
-
                 "status": status
             }
 
@@ -88,6 +84,7 @@ class AlmResponseGenerator(object):
         file_path = os.path.join(self.test_dir, 'response', file_name)
         f = open(file_path)
         response = f.read()
+        f.close()
 
         return response
 
