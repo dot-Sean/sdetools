@@ -1,3 +1,4 @@
+import os
 import json
 import re
 
@@ -20,7 +21,6 @@ class AlmResponseGenerator(object):
         self.rest_api_targets = {}
 
     def get_response(self, target, flag, data, method):
-
         for api_target in self.rest_api_targets:
             if re.match(api_target, target):
                 func_name = self.rest_api_targets.get(api_target)
@@ -66,8 +66,10 @@ class AlmResponseGenerator(object):
 
             self.alm_tasks[task_number] = {
 
+
                 "name": task_name,
                 "id": task_number,
+
 
                 "status": status
             }
@@ -83,10 +85,11 @@ class AlmResponseGenerator(object):
         self.alm_tasks = {}
 
     def _read_response_file(self, file_name):
-        file_path = '%s\\response\\%s' % (self.test_dir, file_name)
+        file_path = os.path.join(self.test_dir, 'response', file_name)
         f = open(file_path)
+        response = f.read()
 
-        return f.read()
+        return response
 
     def get_json_from_file(self, file_name):
         raw_json = self._read_response_file('%s.json' % file_name)
