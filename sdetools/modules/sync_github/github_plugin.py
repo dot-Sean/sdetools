@@ -196,7 +196,7 @@ class GitHubConnector(AlmConnector):
         issues_list = open_issues['issues']
         issues_list.extend(closed_issues['issues'])
 
-        if (not issues_list):
+        if not issues_list:
             return None
 
         index = 0
@@ -209,7 +209,7 @@ class GitHubConnector(AlmConnector):
             if issue['labels'].count(duplicate_label) > 0:
                 issues_list.pop(index)
             else:
-                index = index + 1
+                index += 1
 
         if len(issues_list) > 1:
             logger.warning('Found multiple issues with the title %s that are not labeled as duplicates.'
@@ -233,7 +233,7 @@ class GitHubConnector(AlmConnector):
 
         try:
             priority = int(priority)
-        except (TypeError):
+        except TypeError:
             logger.error('Could not coerce %s into an integer' % priority)
             raise AlmException("Error in translating SDE priority to GitHub label: "
                                "%s is not an integer priority" % priority)
@@ -250,7 +250,6 @@ class GitHubConnector(AlmConnector):
                     return pmap[key]
 
     def alm_add_task(self, task):
-        milestone_name = self.config[self.ALM_PROJECT_VERSION]
         github_priority_label = self.translate_priority(task['priority'])
         github_group_label = self.config[self.GITHUB_GROUP_LABEL]
         github_issue_label = self.config[self.GITHUB_ISSUE_LABEL]
@@ -322,7 +321,7 @@ class GitHubConnector(AlmConnector):
                                'for issue: %s in GitHub because of %s' %
                                (status, task.get_alm_id(), err))
 
-        if (result and result.get('errors')):
+        if result and result.get('errors'):
             raise AlmException('Unable to update status of task %s to %s.'
                                'Reason: %s - %s' %
                                (task['id'], status,
