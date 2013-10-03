@@ -3,9 +3,6 @@ import os
 import sys
 import random
 
-from urllib2 import HTTPError
-from mock import MagicMock
-
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
 from sdetools.alm_integration.tests.alm_response_generator import AlmResponseGenerator
 from sdetools.sdelib.commons import urlencode_str
@@ -14,20 +11,10 @@ from sdetools.sdelib.commons import urlencode_str
 class PivotalTrackerResponseGenerator(AlmResponseGenerator):
     PROJECT_ID = '1000'
     STATUS_NAMES = ['unstarted', 'accepted']
-    REST_API_TARGETS = {
-        'me': 'get_user',
-        'projects': 'get_projects',
-        '%project_uri/stories\?filter="(.*):"&fields=current_state,name,updated_at,id': 'get_stories',
-        '%project_uri/stories\?filter=type:release,(.*)&fields=id': 'get_release_marker',
-        '%project_uri/epics\?filter=(.*)&fields=id': 'get_epic',
-        '%project_uri/epics': 'add_epic',
-        '%project_uri/stories': 'add_story',
-        '%project_uri/stories/[0-9]*': 'update_status'
-    }
 
     def __init__(self, project_name, release_marker_name, epic_name):
         initial_task_status = self.STATUS_NAMES[0]
-        test_dir = os.path.dirname(os.path.abspath(__file__)) 
+        test_dir = os.path.dirname(os.path.abspath(__file__))
         super(PivotalTrackerResponseGenerator, self).__init__(initial_task_status, test_dir)
 
         self.project_uri = 'projects/%s' % self.PROJECT_ID
@@ -35,40 +22,16 @@ class PivotalTrackerResponseGenerator(AlmResponseGenerator):
         self.release_marker_name = release_marker_name
         self.epic_name = epic_name
         self.epics = {}
-
-    def get_response(self, target, flag, data, method):
-        for api_target in self.REST_API_TARGETS:
-            match_target = re.sub('%project_uri', self.project_uri, api_target)
-            if re.match(match_target, target):
-                func_name = self.REST_API_TARGETS.get(api_target)
-                func = getattr(self, func_name)
-                if callable(func):
-                    return func(target, flag.get(func_name), data, method)
-                else:
-                    self.raise_error('500', 'Response generator error: Could not find method %s' % func_name)
-
-        self.raise_error('404')
-
-    def raise_error(self, error_code, return_value=None):
-        fp_mock = MagicMock()
-
-        if error_code == '400':
-            message = 'Invalid parameters'
-        elif error_code == '403':
-            message = 'No permission'
-        elif error_code == '404':
-            message = 'Not found'
-        elif error_code == '500':
-            message = 'Server error'
-        else:
-            message = 'Unknown error'
-
-        if not return_value:
-            fp_mock.read.return_value = message
-        else:
-            fp_mock.read.return_value = return_value
-
-        raise HTTPError('', error_code, message, '', fp_mock)
+        self.rest_api_targets = {
+            'me': 'get_user',
+            'projects$': 'get_projects',
+            '%s/stories\?filter="(.*):"&fields=current_state,name,updated_at,id' % self.project_uri: 'get_stories',
+            '%s/stories\?filter=type:release,(.*)&fields=id' % self.project_uri: 'get_release_marker',
+            '%s/epics\?filter=(.*)&fields=id' % self.project_uri: 'get_epic',
+            '%s/epics$' % self.project_uri: 'add_epic',
+            '%s/stories$' % self.project_uri: 'add_story',
+            '%s/stories/[0-9]*' % self.project_uri: 'update_status'
+        }
 
     """
        Response functions 

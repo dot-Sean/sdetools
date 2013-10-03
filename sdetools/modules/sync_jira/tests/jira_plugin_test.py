@@ -163,7 +163,6 @@ class TestJiraAPI4Case(JiraBaseCase, unittest.TestCase):
         self.tac.alm_add_task(test_task)
         alm_task = self.tac.alm_get_task(test_task)
         self.config['jira_existing_issue'] = alm_task.get_alm_id()
-        print alm_task.get_alm_id()
         self.tac.initialize()
         self.tac.alm_connect()
 
