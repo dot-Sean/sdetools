@@ -69,7 +69,6 @@ class RallyResponseGenerator(AlmResponseGenerator):
 
     def call_card(self, target, flag, data, method):
         if not flag:
-            print target
             task_number = re.search('[0-9]+(?=\.js$)', target).group(0)
             task = self.get_alm_task(task_number)
 
