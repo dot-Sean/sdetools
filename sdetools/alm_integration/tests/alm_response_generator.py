@@ -13,7 +13,6 @@ class AlmResponseGenerator(object):
         self.initial_task_status = initial_task_status
         self.test_dir = test_dir
         self.alm_tasks = {}
-        self.project_uri = ''
 
         """
             rest_api_targets should contain key-value pairs in the following format:
