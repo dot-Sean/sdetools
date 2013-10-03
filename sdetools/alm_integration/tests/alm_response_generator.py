@@ -1,3 +1,4 @@
+import os
 import json
 import re
 
@@ -37,9 +38,10 @@ class AlmResponseGenerator(object):
         self.alm_tasks = {}
 
     def get_json_from_file(self, file_name):
-        file_path = '%s\\response\\%s.json' % (self.test_dir, file_name)
+        file_path = os.path.join(self.test_dir, 'response', file_name)
         f = open(file_path)
         raw_json = f.read()
+        f.close()
 
         return json.loads(raw_json)
 
