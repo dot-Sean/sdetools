@@ -29,13 +29,13 @@ class JIRAConnector(AlmConnector):
         super(JIRAConnector, self).__init__(config, alm_plugin)
 
         config.add_custom_option('jira_issue_type', 'IDs for issues raised in JIRA',
-                default='Bug')
+                default='Task')
         config.add_custom_option('jira_close_transition', 'Close transition in JIRA',
-                default='Close Issue')
+                default='Done')
         config.add_custom_option('jira_reopen_transition', 'Re-open transition in JIRA',
-                default='Reopen Issue')
+                default='Reopen')
         config.add_custom_option('jira_done_statuses', 'Statuses that signify a task is Done in JIRA',
-                default='Resolved,Closed')
+                default='Done')
         config.add_custom_option('jira_existing_issue', 'Provide the key of an existing issue to support custom fields (JIRA 4.x only)',
                 default='')
         config.add_custom_option('alm_project_version', 'Project version',
@@ -153,7 +153,8 @@ class JIRAConnector(AlmConnector):
 
         trans_name = self.config['jira_%s_transition' % new_state]
         if trans_name not in trans_table:
-            raise AlmException('Unable to find transition %s' % trans_name)
+            raise AlmException('Transition %s is invalid for issue %s. Valid entries are: %s' % (
+                trans_name, alm_id, ', '.join(trans_table)))
         trans_id = trans_table[trans_name]
 
         self.alm_plugin.update_task_status(alm_id, trans_id)
