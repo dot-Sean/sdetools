@@ -20,7 +20,8 @@ GITHUB_DEFAULT_PRIORITY_MAP = {
     '4-6': 'Medium',
     '1-3': 'Low',
     }
-PUBLIC_TASK_CONTENT = 'Contact us at http://www.sdelements.com/ about our detailed security requirements'
+PUBLIC_TASK_CONTENT = 'Visit us at http://www.sdelements.com/ to find out how you can easily add project-specific '\
+                      'software security requirements to your existing development processes.'
 
 
 class GitHubAPI(RESTBase):
