@@ -204,13 +204,6 @@ class HPAlmConnector(AlmConnector):
                          hp_alm_last_modified,
                          self.config['hp_alm_done_statuses'])
 
-    def _extract_task_id(self, full_task_id):
-        task_id = None
-        task_search = re.search('^(\d+)-([^\d]+\d+)$', full_task_id)
-        if task_search:
-            task_id = task_search.group(2)
-        return task_id
-
     def alm_add_task(self, task):
         task_id = self._extract_task_id(task['id'])
         if not task_id:
