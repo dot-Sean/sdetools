@@ -10,9 +10,11 @@ from sdetools.sdelib.commons import urlencode_str
 
 
 class GitHubResponseGenerator(AlmResponseGenerator):
+
     STATUS_NAMES = ['open', 'closed']
 
     def __init__(self, host, repo_org, repo_name, project_milestone, username, protocol='http'):
+
         initial_task_status = self.STATUS_NAMES[0]
         test_dir = os.path.dirname(os.path.abspath(__file__)) 
         super(GitHubResponseGenerator, self).__init__(initial_task_status, test_dir)
@@ -30,6 +32,7 @@ class GitHubResponseGenerator(AlmResponseGenerator):
             'repos/%s/issues/[0-9]*$' % self.project_uri: 'update_status'
         }
 
+
     def raise_error(self, error_code, return_value=None):
         fp_mock = MagicMock()
         if error_code == '401':
@@ -45,11 +48,13 @@ class GitHubResponseGenerator(AlmResponseGenerator):
     """
        Response functions 
     """
+
     def get_user(self, target, flag, data, method):
         if not flag:
             return self.get_json_from_file('user')
         else:
             self.raise_error('401')
+
 
     def get_repo(self, target, flag, data, method):
         if not flag:
@@ -62,11 +67,13 @@ class GitHubResponseGenerator(AlmResponseGenerator):
         else:
             self.raise_error('404')
 
+
     def get_milestones(self, target, flag, data, method):
         if not flag:
             return self.get_json_from_file('milestones')
         else:
             return []
+
 
     def get_task(self, target, flag, data, method):
         params = target.split('/')
@@ -87,6 +94,7 @@ class GitHubResponseGenerator(AlmResponseGenerator):
                 return response
 
         return {"issues": []}
+
 
     def post_issue(self, target, flag, data, method):
         if not flag:

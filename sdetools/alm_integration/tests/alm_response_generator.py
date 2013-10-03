@@ -14,6 +14,7 @@ class AlmResponseGenerator(object):
         self.test_dir = test_dir
         self.alm_tasks = {}
 
+
         """
             rest_api_targets should contain key-value pairs in the following format:
                 "regex_pattern_of_api_target": "method_to_call_on_match"
@@ -21,10 +22,12 @@ class AlmResponseGenerator(object):
         self.rest_api_targets = {}
 
     def get_response(self, target, flag, data, method):
+
         for api_target in self.rest_api_targets:
             if re.match(api_target, target):
                 func_name = self.rest_api_targets.get(api_target)
                 func = getattr(self, func_name)
+
 
                 if callable(func):
                     return func(target, flag.get(func_name), data, method)
@@ -65,8 +68,10 @@ class AlmResponseGenerator(object):
                 status = self.initial_task_status
 
             self.alm_tasks[task_number] = {
+
                 "name": task_name,
                 "id": task_number,
+
                 "status": status
             }
 
@@ -80,9 +85,11 @@ class AlmResponseGenerator(object):
     def clear_alm_tasks(self):
         self.alm_tasks = {}
 
+
     def _read_response_file(self, file_name):
         file_path = '%s\\response\\%s' % (self.test_dir, file_name)
         f = open(file_path)
+
         return f.read()
 
     def get_json_from_file(self, file_name):
