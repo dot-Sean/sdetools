@@ -24,13 +24,14 @@ class AlmResponseGenerator(object):
         for api_target in self.rest_api_targets:
             if re.match(api_target, target):
                 func_name = self.rest_api_targets.get(api_target)
-                func = getattr(self, func_name)
 
-                if callable(func):
-                    return func(target, flag.get(func_name), data, method)
-                else:
-                    self.raise_error('500', 'Response generator error: Could not find method %s' % func_name)
+                if func_name is not None:
+                    func = getattr(self, func_name)
 
+                    if callable(func):
+                        return func(target, flag.get(func_name), data, method)
+
+                self.raise_error('500', 'Response generator error: Could not find method %s' % func_name)
         self.raise_error('404')
 
     def raise_error(self, error_code, return_value=None):

@@ -3,10 +3,10 @@
 
 import xmlrpclib
 import socket
+from datetime import datetime
 
 from sdetools.sdelib.commons import UsageError, json, urlencode_str
 from sdetools.sdelib.restclient import RESTBase
-from sdetools.sdelib.restclient import URLRequest, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from sdetools.alm_integration.alm_plugin_base import AlmException
 
@@ -204,7 +204,7 @@ class TracConnector(AlmConnector):
         task_list = self.alm_plugin.proxy.ticket.update(task.get_alm_id(),
                 comment, update_args)
         if not task_list:
-            logging.error('Update failed for %s' % task.task_id)
+            logger.error('Update failed for %s' % task.task_id)
             return None
 
         logger.debug('Milestone changed to %s for ticket %s in Trac' %
@@ -251,7 +251,7 @@ class TracConnector(AlmConnector):
         task_list = self.alm_plugin.proxy.ticket.update(task.get_alm_id(),
                 comment, update_args)
         if not task_list:
-            logging.error('Update failed for %s' % task.task_id)
+            logger.error('Update failed for %s' % task.task_id)
             return None
 
         logger.debug('Status changed to %s for ticket %s in Trac' %
