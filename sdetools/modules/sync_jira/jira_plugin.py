@@ -29,13 +29,13 @@ class JIRAConnector(AlmConnector):
         super(JIRAConnector, self).__init__(config, alm_plugin)
 
         config.add_custom_option('jira_issue_type', 'IDs for issues raised in JIRA',
-                default='Task')
+                default='Bug')
         config.add_custom_option('jira_close_transition', 'Close transition in JIRA',
-                default='Done')
+                default='Close Issue')
         config.add_custom_option('jira_reopen_transition', 'Re-open transition in JIRA',
-                default='Reopen')
+                default='Reopen Issue')
         config.add_custom_option('jira_done_statuses', 'Statuses that signify a task is Done in JIRA',
-                default='Done')
+                default='Resolved,Closed')
         config.add_custom_option('jira_existing_issue', 'Provide the key of an existing issue to support custom fields (JIRA 4.x only)',
                 default='')
         config.add_custom_option('alm_project_version', 'Project version',
