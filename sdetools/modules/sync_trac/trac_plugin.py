@@ -152,7 +152,7 @@ class TracConnector(AlmConnector):
                           self.config['alm_done_statuses'], trac_task[3]['milestone'])
 
     def alm_get_task(self, task):
-        sde_id = task['title'].partition(':')[0]
+        sde_id = task['title'].split(':', 1)[0]
 
         # The colon is needed, otherwise for "T6" we match on "T6" and "T68"
         qstr = 'summary^=%s%s:' % (self.alm_task_title_prefix, sde_id)
@@ -172,7 +172,7 @@ class TracConnector(AlmConnector):
         return trac_ticket
 
     def alm_add_task(self, task):
-        sde_id = task['title'].partition(':')[0]
+        sde_id = task['title'].split(':', 1)[0]
         title = '%s%s' % (self.alm_task_title_prefix, task['title'])
 
         alm_id = self.alm_plugin.proxy.ticket.create(
