@@ -129,7 +129,7 @@ class PivotalTrackerResponseGenerator(AlmResponseGenerator):
 
     def add_story(self, target, flag, data, method):
         if not flag and data:
-            story_id = self.get_task_number_from_title(data['name'])
+            story_id = self.extract_task_number_from_title(data['name'])
             task = self.get_alm_task(story_id)
             if not task:
                 self.add_alm_task(story_id, data['name'], data['current_state'])

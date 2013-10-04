@@ -41,7 +41,7 @@ class MingleResponseGenerator(AlmResponseGenerator):
                 if data:
                     filter_arg = data.get('filters[]')
                     card_name = re.search('(?<=\[Name\]\[is\]\[).*(?=\])', filter_arg).group(0)
-                    card_number = self.get_task_number_from_title(card_name)
+                    card_number = self.extract_task_number_from_title(card_name)
                     task = self.get_alm_task(card_number)
 
                     if task:
@@ -53,7 +53,7 @@ class MingleResponseGenerator(AlmResponseGenerator):
                 card_name = data['card[name]']
                 card_type = data['card[card_type_name]']
                 status = data['card[properties][][value]']
-                card_number = self.get_task_number_from_title(card_name)
+                card_number = self.extract_task_number_from_title(card_name)
                 self.add_alm_task(card_number, card_name, status)
                 self.update_alm_task(card_number, 'card_type', card_type)
 

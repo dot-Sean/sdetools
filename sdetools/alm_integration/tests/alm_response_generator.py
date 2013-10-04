@@ -11,16 +11,34 @@ abstractmethod = abc.abstractmethod
 
 class AlmResponseGenerator(object):
     def __init__(self, initial_task_status, test_dir):
+        """
+            Initializes commonly used variables.
+
+            initial_task_status - default status to use during create alm_task
+            test_dir            - directory containing current test; used to locate response files
+            alm_tasks           - stores tasks created through our mock
+            rest_api_targets    - dict object containing key-value pairs used in get_response to triage API calls
+                                  to its corresponding response generating method.
+                                  Expected format:
+                                    "regex_pattern_of_api_target": "method_to_call_on_match"
+        """
         self.initial_task_status = initial_task_status
         self.test_dir = test_dir
         self.alm_tasks = {}
-        """
-            rest_api_targets should contain key-value pairs in the following format:
-                "regex_pattern_of_api_target": "method_to_call_on_match"
-        """
         self.rest_api_targets = {}
 
-    def get_response(self, target, flag, data, method):
+    def get_response(self, target, flags, data, method):
+        """
+            Triage get_response calls to the correct response generator method based on the specified target.
+            Response generator methods must accept the following parameters: [target, flag, data, method]
+
+            Keywords:
+            target - the path of the API call (without host name)
+            flags  - dict object containing response modifier flags in the form of
+                     {target: keyword}.
+            data   - data passed along with the API call
+            method - HTTP Verb, specified by the URLRequest class
+        """
         for api_target in self.rest_api_targets:
             if re.match(api_target, target):
                 func_name = self.rest_api_targets.get(api_target)
@@ -29,7 +47,7 @@ class AlmResponseGenerator(object):
                     func = getattr(self, func_name)
 
                     if callable(func):
-                        return func(target, flag.get(func_name), data, method)
+                        return func(target, flags.get(func_name), data, method)
 
                 self.raise_error('500', 'Response generator error: Could not find method %s' % func_name)
         self.raise_error('404')
@@ -57,7 +75,8 @@ class AlmResponseGenerator(object):
 
     def add_alm_task(self, task_number, task_name=None, status=None):
         """
-            Save task using the task number as the id
+            Save a task created through our mock. Uses the task number
+            as the alm_id
         """
         if not self.alm_tasks.get(task_number):
             if not task_name:
@@ -97,7 +116,8 @@ class AlmResponseGenerator(object):
         raw_xml = self._read_response_file('%s.xml' % file_name)
         return minidom.parseString(raw_xml)
 
-    def get_task_number_from_title(self, s):
+    @staticmethod
+    def extract_task_number_from_title(s):
         task_number = re.search("(?<=T)[0-9]+((?=[:'])|$)", s)
 
         if task_number:

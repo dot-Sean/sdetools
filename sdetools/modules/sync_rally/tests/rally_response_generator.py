@@ -50,7 +50,7 @@ class RallyResponseGenerator(AlmResponseGenerator):
     def get_requirements(self, target, flag, data, method):
         if not flag:
             task_name = data['query']
-            task_number = self.get_task_number_from_title(task_name)
+            task_number = self.extract_task_number_from_title(task_name)
             task = self.get_alm_task(task_number)
             requirements = self.get_json_from_file('hierarchical_requirements')
 
@@ -96,7 +96,7 @@ class RallyResponseGenerator(AlmResponseGenerator):
     def create_card(self, target, flag, data, method):
         if not flag:
             create_args = data['HierarchicalRequirement']
-            task_number = self.get_task_number_from_title(create_args['Name'])
+            task_number = self.extract_task_number_from_title(create_args['Name'])
             task = self.get_alm_task(task_number)
 
             if not task:

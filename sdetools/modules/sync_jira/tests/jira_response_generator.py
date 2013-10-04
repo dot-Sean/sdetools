@@ -194,7 +194,7 @@ class JiraResponseGenerator(AlmResponseGenerator):
             if name:
                 target = name
 
-            task_number = self.get_task_number_from_title(target)
+            task_number = self.extract_task_number_from_title(target)
             task = self.get_alm_task(task_number)
             if task:
                 status_id = task.get('status')
@@ -239,7 +239,7 @@ class JiraResponseGenerator(AlmResponseGenerator):
                 task_name = data.get('summary')
 
             if task_name is not None:
-                task_id = self.get_task_number_from_title(task_name)
+                task_id = self.extract_task_number_from_title(task_name)
                 self.add_alm_task(task_id)
                 response = {
                     'id': task_id,

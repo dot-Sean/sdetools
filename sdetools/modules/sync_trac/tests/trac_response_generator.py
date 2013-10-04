@@ -68,7 +68,7 @@ class TracResponseGenerator(AlmResponseGenerator):
         if not flag:
             if data:
                 task_id = data[0]
-                task_number = self.get_task_number_from_title(task_id)
+                task_number = self.extract_task_number_from_title(task_id)
                 response = []
 
                 if self.get_alm_task(task_number):
@@ -84,7 +84,7 @@ class TracResponseGenerator(AlmResponseGenerator):
         if not flag:
             if data:
                 task_title = data[0]
-                task_number = self.get_task_number_from_title(task_title)
+                task_number = self.extract_task_number_from_title(task_title)
                 alm_task = self.get_alm_task(task_number)
 
                 if not alm_task:

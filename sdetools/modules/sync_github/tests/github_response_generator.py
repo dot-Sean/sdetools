@@ -73,7 +73,7 @@ class GitHubResponseGenerator(AlmResponseGenerator):
         state = params[-2]
         task_name = params[-1]
         task_name = task_name.split(urlencode_str(':'))[0]
-        task_number = self.get_task_number_from_title(task_name)
+        task_number = self.extract_task_number_from_title(task_name)
         task = self.get_alm_task(task_number)
         if not flag and task:
             status = task.get('status')
@@ -90,7 +90,7 @@ class GitHubResponseGenerator(AlmResponseGenerator):
 
     def post_issue(self, target, flag, data, method):
         if not flag:
-            task_number = self.get_task_number_from_title(data['title'])
+            task_number = self.extract_task_number_from_title(data['title'])
             self.add_alm_task(task_number)
             response = self.generate_issue(task_number, 'open')
 
