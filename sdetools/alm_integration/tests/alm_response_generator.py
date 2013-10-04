@@ -4,6 +4,7 @@ import re
 
 from mock import MagicMock
 from urllib2 import HTTPError
+from datetime import datetime
 from sdetools.extlib.defusedxml import minidom
 from sdetools.sdelib.commons import abc
 abstractmethod = abc.abstractmethod
@@ -14,7 +15,7 @@ class AlmResponseGenerator(object):
         """
             Initializes commonly used variables.
 
-            initial_task_status - default status to use during create alm_task
+            initial_task_status - default status to use when creating a task through our mock
             test_dir            - directory containing current test; used to locate response files
             alm_tasks           - stores tasks created through our mock
             rest_api_targets    - dict object containing key-value pairs used in get_response to triage API calls
@@ -87,7 +88,8 @@ class AlmResponseGenerator(object):
             self.alm_tasks[task_number] = {
                 "name": task_name,
                 "id": task_number,
-                "status": status
+                "status": status,
+                "timestamp": self.get_current_timestamp()
             }
 
     def get_alm_task(self, task_number):
@@ -124,3 +126,7 @@ class AlmResponseGenerator(object):
             return  task_number.group(0)
         else:
             return None
+
+    @staticmethod
+    def get_current_timestamp():
+        return datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")

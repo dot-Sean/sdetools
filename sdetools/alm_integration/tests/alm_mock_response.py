@@ -32,9 +32,14 @@ def get_response_generator():
     return alm_response_generator
 
 
-def mock_call_rest_api(self, target, method=URLRequest.GET, args=None, call_headers={}):
+def mock_call_rest_api(self, target, method=URLRequest.GET, args=None, call_headers={}, auth_mode=None):
     try:
-        return alm_response_generator.get_response(target, mock_response_flags, args, method)
+        response =  alm_response_generator.get_response(target, mock_response_flags, args, method)
+
+        if response and type(response) == dict and response.get('cookiejar'):
+            self.cookiejar.set_cookie(response.get('cookiejar'))
+
+        return response
     except HTTPError, err:
         # Re-raise with more info
         err.url = '%s/%s' % (err.url, target)
