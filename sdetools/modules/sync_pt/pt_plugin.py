@@ -184,7 +184,7 @@ class PivotalTrackerConnector(AlmConnector):
                                % (release_name, err))
 
         if not release_markers:
-            raise AlmException('Could not find release marker %s in PivotalTracker')
+            raise AlmException('Could not find release marker %s in PivotalTracker' % release_name)
 
         release_marker = release_markers[0]
 
