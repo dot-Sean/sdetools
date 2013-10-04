@@ -74,9 +74,6 @@ class RallyTask(AlmTask):
     def get_alm_id(self):
         return self.alm_id
 
-    def get_priority(self):
-        return None
-
     def get_status(self):
         """Translates Rally status into SDE status"""
         if self.status in self.done_statuses:

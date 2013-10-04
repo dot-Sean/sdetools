@@ -8,8 +8,9 @@ class JIRATask(AlmTask):
                  timestamp, done_statuses, versions):
         self.task_id = task_id
         self.alm_id = alm_id
-        self.priority = priority
         self.status = status
+
+        self.priority = priority
         self.resolution = resolution
         self.timestamp = timestamp
         self.done_statuses = done_statuses  # comma-separated list
@@ -20,9 +21,6 @@ class JIRATask(AlmTask):
 
     def get_alm_id(self):
         return self.alm_id
-
-    def get_priority(self):
-        return self.priority
 
     def get_status(self):
         """ Translates JIRA priority into SDE priority """

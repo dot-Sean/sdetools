@@ -67,7 +67,6 @@ class AlmPluginTestBase(object):
 
         self.assertMatch(regex, task_id,
                          'Task id does not match the expected pattern. pattern:%s, task_id:%s' % (regex, task_id))
-        test_task_result.get_priority()
         test_task_result.get_alm_id()
         test_task_result.get_status()
         test_task_result.get_timestamp()

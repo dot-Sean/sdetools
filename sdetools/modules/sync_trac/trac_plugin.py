@@ -50,9 +50,6 @@ class TracTask(AlmTask):
     def get_alm_id(self):
         return self.alm_id
 
-    def get_priority(self):
-        return self.priority
-
     def get_milestone(self):
         return self.milestone
 

@@ -39,11 +39,6 @@ class AlmTask(object):
         pass
 
     @abstractmethod
-    def get_priority(self):
-        """ Returns a priority string compatible with SD Elements """
-        pass
-
-    @abstractmethod
     def get_alm_id(self):
         """ Returns a unique identifier for the task in the ALM system """
         pass
