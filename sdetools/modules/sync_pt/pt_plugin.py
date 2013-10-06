@@ -159,7 +159,7 @@ class PivotalTrackerConnector(AlmConnector):
             logger.error(err)
             raise AlmException('Unable to get story %s from PivotalTracker' % task_id)
 
-        if (not stories):
+        if not stories:
             return None
 
         story = stories[0]
@@ -184,7 +184,7 @@ class PivotalTrackerConnector(AlmConnector):
                                % (release_name, err))
 
         if not release_markers:
-            raise AlmException('Could not find release marker %s in PivotalTracker')
+            raise AlmException('Could not find release marker %s in PivotalTracker' % release_name)
 
         release_marker = release_markers[0]
 
@@ -252,13 +252,6 @@ class PivotalTrackerConnector(AlmConnector):
         except APIError, err:
             raise AlmException('Unable to add epic %s to PivotalTracker because of %s'
                                % (group_name, err))
-
-    def _extract_task_id(self, full_task_id):
-        task_id = None
-        task_search = re.search('^(\d+)-([^\d]+\d+)$', full_task_id)
-        if task_search:
-            task_id = task_search.group(2)
-        return task_id
 
     def alm_add_task(self, task):
         pt_priority_label = self.translate_priority(task['priority'])
@@ -340,7 +333,7 @@ class PivotalTrackerConnector(AlmConnector):
                                'for story %s in PivotalTracker because of %s' %
                                (status, task.get_alm_id(), err))
 
-        if (result and result.get('error')):
+        if result and result.get('error'):
             raise AlmException('Unable to update status to %s for story %s. Reason: %s - %s' %
                                (status, task['id'], result['code'], result['general_problem']))
 
