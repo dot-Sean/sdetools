@@ -1,6 +1,5 @@
 __all__ = [
     'help',
-    'test',
     'lint',
     'report',
     'import_appscan',
