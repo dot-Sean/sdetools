@@ -60,9 +60,10 @@ def compile_certs():
 
     candidates = OS_ROOT_BUNDLES[:]
 
-    for fname in os.listdir(CERT_PATH_NAME):
-        if fname.endswith('.crt'):
-            candidates.append(os.path.join(CERT_PATH_NAME, fname))
+    if os.path.isdir(CERT_PATH_NAME):
+        for fname in os.listdir(CERT_PATH_NAME):
+            if fname.endswith('.crt'):
+                candidates.append(os.path.join(CERT_PATH_NAME, fname))
 
     for fpath in candidates:
         if not os.path.isfile(fpath):
