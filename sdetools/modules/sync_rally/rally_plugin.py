@@ -83,7 +83,7 @@ class RallyTask(AlmTask):
 
     def get_timestamp(self):
         """ Returns a datetime object """
-        return datetime.strptime(self.timestamp, '%Y-%m-%dT%H:%M:%SZ')
+        return datetime.strptime(self.timestamp, '%Y-%m-%dT%H:%M:%S.%fZ')
 
 class RallyConnector(AlmConnector):
     """Connects SD Elements to Rally"""
