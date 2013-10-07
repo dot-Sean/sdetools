@@ -14,6 +14,9 @@ class Mapping:
         self.base_tasks = {}
         self.checks = []
         self.task_map = {}
+        self.task_map['186'] = []
+        self.task_map['193'] = [{'check_id': '*', 'category_id': '', 'check_name': 'Unmapped Check'}]
+
 
     def load_base_mapping_from_xml(self, mapping_file):
         try:
@@ -28,7 +31,7 @@ class Mapping:
                 tasks = []
                 if category_mapping.has_key(category.attributes['id'].value):
                     tasks = category_mapping[category.attributes['id'].value]
-                    tasks.append(task.attributes['id'].value)
+                tasks.append(task.attributes['id'].value)
                 category_mapping[category.attributes['id'].value] = tasks
 
         self.mapping = category_mapping
@@ -41,12 +44,15 @@ class Mapping:
 
         for task in base.getElementsByTagName('task'):
             task_id = task.attributes['id'].value
+            if task_id not in self.base_tasks.keys():
+                self.base_tasks[task_id] = task
             task_checks = []
             if task_id in self.task_map.keys():
                 task_checks = self.task_map[task_id]
             for check_row in task.getElementsByTagName('weakness'):
                 check = {}
                 check['check_id'] = check_row.attributes['id'].value
+                check['category_id'] = check_row.attributes['category'].value
                 check['check_name'] = check_row.attributes['title'].value
                 check['check_name'] = check['check_name'].replace('"', '&quot;')
                 check['check_name'] = check['check_name'].replace('&', '&amp;')
@@ -72,11 +78,13 @@ class Mapping:
 
             if check['third_party']:
                 self.task_map['186'].append(check)
+                continue
 
             checks = []
             if category_checks.has_key(check['category_id']):
                 checks = category_checks[check['category_id']]
             checks.append(check)
+
             category_checks[check['category_id']] = checks
 
             if not check['check_id'] in self.checks:
@@ -86,43 +94,45 @@ class Mapping:
 
     def remap(self):
 
-        self.task_map['193'] = [{'check_id': '*', 'check_name': 'Unmapped Check'}]
-
         keys = sorted(self.category_checks.iterkeys())
         for cwe in keys:
             if self.mapping.has_key(cwe):
                 tasks = self.mapping[cwe]
                 for task in tasks:
                     task_checks = []
-                    if task in self.task_map.keys():
+                    if self.task_map.has_key(task):
                         task_checks = self.task_map[task]
                     for check in self.category_checks[cwe]:
 
-                        # If the check is assigned elsewhere do not put it in the catch-all task
+                        # If the check is assigned elsewhere - move on
                         if self.check_mapped(self.task_map, check['check_id']):
                             continue
 
-                        task_checks.append(check)
-
-                    self.task_map[task] = task_checks
-            else:  # map to 193
-                    task_mapping_found = False
-                    task_checks = []
-                    task = '193'
-                    if task in self.task_map.keys():
-                        task_checks = self.task_map[task]
-                    for check in self.category_checks[cwe]:
-
-                        # If the check is assigned elsewhere do not put it in the catch-all task
-                        if self.check_mapped(self.task_map, check['check_id']):
-                            continue
-
-                        for chk in task_checks:
-                            if chk['check_id'] == check['check_id']:
+                        task_mapping_found = False
+                        for task_check in task_checks:
+                            if task_check['check_id'] == check['check_id']:
                                 task_mapping_found = True
                         if not task_mapping_found:
                             task_checks.append(check)
                     self.task_map[task] = task_checks
+            else:  # map to 193
+                task_mapping_found = False
+                task_checks = []
+                task = '193'
+                if task in self.task_map.keys():
+                    task_checks = self.task_map[task]
+                for check in self.category_checks[cwe]:
+
+                    # If the check is assigned elsewhere do not put it in the catch-all task
+                    if self.check_mapped(self.task_map, check['check_id']):
+                        continue
+
+                    for chk in task_checks:
+                        if chk['check_id'] == check['check_id']:
+                            task_mapping_found = True
+                    if not task_mapping_found:
+                        task_checks.append(check)
+                self.task_map[task] = task_checks
 
     def check_in_list(self, a_list, check_id):
         for item in a_list:
@@ -197,7 +207,7 @@ def main(argv):
     base.remap()
     
     print "Validating..."
-    if base.find_missing_checks():
+    if False and base.find_missing_checks():
         print "Aborted"
         sys.exit(1)
 
