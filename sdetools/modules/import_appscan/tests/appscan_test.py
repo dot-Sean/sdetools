@@ -13,17 +13,13 @@ TESTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'files')
 class TestAppScanIntegration(BaseIntegrationTest, unittest.TestCase):
     SDE_CMD = "import_appscan"
 
-    def setUp(self):
-        super(TestAppScanIntegration, self).setUp()
+    def init_integrator(self):
         self.integrator = appscan_integrator.AppScanIntegrator(self.config)
         self.integrator.config['mapping_file'] = os.path.join(TESTS_DIR, 'mapping.xml')
         self.integrator.config['report_file'] = os.path.join(TESTS_DIR, 'results.zip')
 
     def expected_number_of_findings(self):
-        return 4
-
-    def test_import_findings(self):
-        super(TestAppScanIntegration, self).test_import_findings()
+        return 3
 
 if __name__ == "__main__":
     unittest.main()

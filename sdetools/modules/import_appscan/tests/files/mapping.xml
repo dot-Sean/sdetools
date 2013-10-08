@@ -10,6 +10,6 @@
         <weakness type="check" id="attXPathInjection" category="catXPathInjection" title="New_Xpath_Inj" />
     </task>
     <task id="193" title="Review non-categorized/miscellaneous findings from static code analysis" confidence="low">
-        <weakness type="check" id="*" title="Unmapped weakness"/>
+        <weakness type="check" id="unknown" title="Unmapped weakness"/>
     </task>
 </mapping>

@@ -1,0 +1,240 @@
+{
+    "status": "TODO",
+    "contextrulesets": [],
+    "timestamp": 1381173270,
+    "note_count": 0,
+    "implementations": [
+        {
+            "contextrulesets": [
+                {
+                    "required": [
+                        {
+                            "type": "imports",
+                            "value": "java.sql.*"
+                        },
+                        {
+                            "type": "regex",
+                            "value": "\\.prepareStatement\\(|\\.execute"
+                        }
+                    ],
+                    "excluded": []
+                }
+            ],
+            "url": "https://m1.sdelements.com/library/tasks/T38/bind-variables-in-sql-statements-java-with-jdbc-prepared-statements/",
+            "title": "I51: Java with JDBC Prepared Statements",
+            "id": "I51",
+            "content": "## Description\r\n\r\nThe following code demonstrates this implementation:\r\n\r\n## Code\r\n\r\n    PreparedStatement query = connection.prepareStatement(\r\n        \"select * from users where loginid=? and pasword=?\"\r\n    );\r\n    query.setString(1, requestUser);\r\n    query.setString(2, requestPassword);\r\n    ResultSet rs = query.executeQuery();\r\n\r\n[Download the Complete Code Example]({{ USE_MEDIA_URL }}code/J2EE/j2ee.prepared_statements.war){@class=code-download}",
+            "slug": "bind-variables-in-sql-statements-java-with-jdbc-prepared-statements"
+        },
+        {
+            "contextrulesets": [
+                {
+                    "required": [
+                        {
+                            "type": "imports",
+                            "value": "org.hibernate.Query"
+                        }
+                    ],
+                    "excluded": []
+                }
+            ],
+            "url": "https://m1.sdelements.com/library/tasks/T38/bind-variables-in-sql-statements-java-ee-with-hibernate/",
+            "title": "I52: Java EE with Hibernate",
+            "id": "I52",
+            "content": "## Description\r\n\r\nHibernate queries are not normally vulnerable to injection. However, if you use dynamic queries with Hibernate Query Language (HQL) and you concatenate String parameters without binding them, then you may be vulnerable to injection. The following code shows how to bind parameters in HQL properly:\r\n\r\n## Code\r\n\r\n    Session session = HibernateUtil.getSessionFactory().getCurrentSession();  \r\n    org.hibernate.Transaction tx = session.beginTransaction();  \r\n    Query q = session.createQuery(  \r\n        \"from Customer as customer where customer.name = :name \"  \r\n    );  \r\n    q.setString(\"name\", name);  \r\n    output = (List<Customer>) q.list();  \r\n\r\n[Download the Complete Code Example]({{ USE_MEDIA_URL }}code/J2EE/j2ee.hibernate.parameter_binding.war){@class=code-download}\r\n\r\n## 3rd Party Libraries\r\n\r\nHibernate\r\n",
+            "slug": "bind-variables-in-sql-statements-java-ee-with-hibernate"
+        },
+        {
+            "contextrulesets": [
+                {
+                    "required": [
+                        {
+                            "type": "imports",
+                            "value": "javax.persistence.Query"
+                        }
+                    ],
+                    "excluded": []
+                }
+            ],
+            "url": "https://m1.sdelements.com/library/tasks/T38/bind-variables-in-sql-statements-java-ee-with-java-persistance-architecture-jpa/",
+            "title": "I53: Java EE with Java Persistance Architecture (JPA)",
+            "id": "I53",
+            "content": "## Description\r\n\r\nAs with other persistence frameworks, JPA queries are not normally vulnerable to injection attacks. However, if you create a query manually and concatenate strings rather than binding variables, then your code may be vulnerable to injection. The following is an example of how to bind your variables in JPA correctly:\r\n\r\n## Code\r\n\r\n    //First define a named query\r\n    @NamedQuery(\r\n     name =  \"Customer.findCustomer\"\r\n    query = \"SELECT *FROM customer WHERE firstName = :firstNameParam )\r\n    \u2026\r\n    //Later call the named query and bind \r\n    //the variable with the setParameter method\r\n    Query namedQuery = entityManager.createNamedQuery(\"Customer.findCustomer\");\r\n     namedQuery.setParameter(\"firstNameParam\", firstNameString);\r\n\r\n## 3rd Party Libraries\r\n\r\nJPA\r\n",
+            "slug": "bind-variables-in-sql-statements-java-ee-with-java-persistance-architecture-jpa"
+        },
+        {
+            "contextrulesets": [
+                {
+                    "required": [
+                        {
+                            "type": "imports",
+                            "value": "System.Data.Linq"
+                        }
+                    ],
+                    "excluded": []
+                }
+            ],
+            "url": "https://m1.sdelements.com/library/tasks/T38/bind-variables-in-sql-statements-aspnet-with-linq/",
+            "title": "I98: C# with Linq",
+            "id": "I98",
+            "content": "## Description\r\n\r\nLinq code may be vulnerable to SQL injection. There are a number of functions that allow dynamic string concatenation with untrusted input, which could result in SQL injection. For example, the following command would be vulnerable SQL Injection: ctx.ExecuteQuery<model>(@\"select ...\" + request[\"parameter\"]) ;.\r\nInstead, use proper variable finding such as the following:\r\n\r\n## Code\r\n\r\n    using System;\r\n    using System.Linq;\r\n    using System.Data;\r\n    using System.Security;\r\n    using System.Data.SqlClient;\r\n    using System.Data.Linq;\r\n    using System.Data.Linq.Mapping;\r\n\r\n    namespace SecurityCompass.Examples\r\n    {\r\n     public class LinqQuery\r\n     {\r\n      public User getUserDetails()\r\n      {\r\n       return getUserDetails(1, \"jv\");\r\n      }\r\n      public User getUserDetails(int userId, string loginId)\r\n      {\r\n       var connectionString = \r\n        @\"Server=.\\SQLEXPRESS;Database=DB_Name;Trusted_Connection=true\";\r\n       DataContext db = new DataContext(connectionString);\r\n       try\r\n       {\r\n        var users =  db.GetTable<User>();\r\n        var userid = (from user in users\r\n              where user.UserId == userId && user.LoginId == loginId\r\n              select user).First();\r\n        return userid;\r\n       }\r\n       catch(Exception ex)\r\n       {\r\n        // handle login failure\r\n        return null;\r\n       }\r\n      }\r\n     }\r\n\r\n     // this is the LINQ to SQL data model class\r\n     [Table(Name = \"fsb_users\")]\r\n     public class User\r\n     {\r\n      [Column(Name=\"login_id\")]\r\n      public string LoginId {get;set;}\r\n      [Column(Name=\"user_name\")]\r\n      public string Name {get;set;}\r\n      [Column(Name=\"user_id\")]\r\n      public decimal UserId {get;set;}\r\n     }\r\n    }\r\n\r\n[Download the Complete Code Example]({{ USE_MEDIA_URL }}code/DotNet/DotNet.Bind variables in SQL Statements.zip){@class=code-download}\r\n\r\n## 3rd Party Libraries\r\n\r\nSystem.data.linq\r\n",
+            "slug": "bind-variables-in-sql-statements-aspnet-with-linq"
+        },
+        {
+            "contextrulesets": [
+                {
+                    "required": [
+                        {
+                            "type": "imports",
+                            "value": "System.Data.SqlClient"
+                        }
+                    ],
+                    "excluded": []
+                }
+            ],
+            "url": "https://m1.sdelements.com/library/tasks/T38/bind-variables-in-sql-statements-aspnet-with-sqlclient/",
+            "title": "I123: C# with SqlClient",
+            "id": "I123",
+            "content": "## Description\r\n\r\nThe following code demonstrates this implementation using the .NET SqlClient API:\r\n\r\n## Code\r\n\r\n    using System;\r\n    using System.Data;\r\n    using System.Security;\r\n    using System.Data.SqlClient;\r\n\r\n    namespace SecurityCompass.Examples\r\n    {\r\n     public class ParameterizedQuery\r\n     {\r\n      public SqlDataReader getUserDetails()\r\n      {\r\n       return getUserDetails(1, \"jv\");\r\n      }\r\n      public SqlDataReader getUserDetails(int userId, string loginId)\r\n      {\r\n       // instead of creating and executing directely the sqlQuery\r\n       /*\r\n        var sqlQuery = String.Format(\r\n    \"select * from  fsb_users where user_id  = '{0}' and login_id = '{1}'\",\r\n            userId, \r\n            loginId\r\n        );\r\n        SqlCommand sqlCommand = new SqlCommand(sqlQuery,getSqlConnection());\r\n       */\r\n       // use strongly-typed SqlParameters to hold the data\r\n       var sqlQuery = \r\n        \"select * from  fsb_users where \r\n            user_id = @user_id and login_id = @login_id\";\r\n       SqlCommand sqlCommand = new SqlCommand(sqlQuery,getSqlConnection());\r\n       sqlCommand.Parameters.Add(\"user_id\",SqlDbType.Int).Value= userId;\r\n    sqlCommand.Parameters.Add(\"login_id\",SqlDbType.VarChar,3).Value= loginId;\r\n\r\n       SqlDataReader sqlDataReader = sqlCommand.ExecuteReader();\r\n       if (sqlDataReader.HasRows)\r\n        return sqlDataReader;\r\n       throw new SecurityException(\"Login Failed\");\r\n      }\r\n\r\n      // simple example that doesn't handle SqlConnection reuse and closing\r\n      public SqlConnection getSqlConnection()\r\n      {\r\n       var connectionString = \r\n        @\"Server=.\\SQLEXPRESS;Database=DB_Name;Trusted_Connection=true\";\r\n       var sqlConnection = new SqlConnection(connectionString);\r\n       sqlConnection.Open();\r\n       return sqlConnection;\r\n      }\r\n\r\n[Download the Complete Code Example]({{ USE_MEDIA_URL }}code/DotNet/DotNet.Bind variables in SQL Statements.zip){@class=code-download}\r\n\r\n## 3rd Party Libraries\r\n\r\nSqlClient\r\n",
+            "slug": "bind-variables-in-sql-statements-aspnet-with-sqlclient"
+        },
+        {
+            "contextrulesets": [
+                {
+                    "required": [
+                        {
+                            "type": "imports",
+                            "value": "Microsoft.Practices.EnterpriseLibrary.Data.Sql"
+                        }
+                    ],
+                    "excluded": []
+                }
+            ],
+            "url": "https://m1.sdelements.com/library/tasks/T38/bind-variables-in-sql-statements-aspnet-with-enterprise-library/",
+            "title": "I124: C# with Enterprise Library",
+            "id": "I124",
+            "content": "## Description\r\n\r\nThe following code demonstrates this implementation using the Microsoft's Enterprise Library 5.0 Data API:\r\n\r\n## Code\r\n\r\n    Func<int, string, string> getUserDetails =\r\n     (userId, loginId)=>{\r\n     var connectionString = \r\n        @\"Server=.\\SQLEXPRESS;Database=DB_Name;Trusted_Connection=true\";\r\n     var sqlDatabase = new SqlDatabase(connectionString);\r\n\r\n     var sqlQuery = \r\n        \"select * from  fsb_users where \r\n            user_id = @user_id and login_id = @login_id\";\r\n     var sqlStringCommand = sqlDatabase.GetSqlStringCommand(sqlQuery);\r\n     sqlDatabase.AddInParameter(\r\n        sqlStringCommand,\r\n        \"@user_id\", \r\n        SqlDbType.Int, \r\n        userId\r\n     );\r\n     sqlDatabase.AddInParameter(\r\n        sqlStringCommand,\r\n        \"@login_id\", \r\n        SqlDbType.VarChar, \r\n        loginId\r\n     );\r\n\r\n     var loginResult = new DataSet();\r\n     sqlDatabase.LoadDataSet(sqlStringCommand, loginResult, \"loginResult\");\r\n     var xmlResult = loginResult.GetXml();\r\n\r\n     return xmlResult;\r\n    };\r\n    return getUserDetails(1,\"jv\");\r\n\r\n[Download the Complete Code Example]({{ USE_MEDIA_URL }}code/DotNet/DotNet.Bind variables in SQL Statements.zip){@class=code-download}\r\n\r\n## 3rd Party Libraries\r\n\r\nEnterprise Library\r\n",
+            "slug": "bind-variables-in-sql-statements-aspnet-with-enterprise-library"
+        },
+        {
+            "contextrulesets": [
+                {
+                    "required": [
+                        {
+                            "type": "imports",
+                            "value": "System.Data.Odbc"
+                        }
+                    ],
+                    "excluded": []
+                }
+            ],
+            "url": "https://m1.sdelements.com/library/tasks/T38/bind-variables-in-sql-statements-aspnet-with-odbc/",
+            "title": "I126: C# with ODBC",
+            "id": "I126",
+            "content": "## Description\r\n\r\nThe following code demonstrates this implementation using the .NET ODBC API:\r\n\r\n## Code\r\n\r\n    Func<int, string, OdbcDataReader> getUserDetails =\r\n     (userId, loginId)=>{\r\n     var connectionString = \r\n        @\"Driver={SQL Server};Server=.\\SQLEXPRESS;\"\r\n      + @\"Database=DB_Name;Trusted_Connection=true\";\r\n     var odbcConnection = new OdbcConnection(connectionString);\r\n     \r\n     // if using a local ODBC mapping\r\n     //var odbcConnection = new OdbcConnection(\"DSN=ODBC_DB_Name\");\r\n     \r\n     odbcConnection.Open();\r\n\r\n     var sqlQuery = \r\n        \"select * from  fsb_users where user_id = ? and login_id = ?\";\r\n     var odbcCommand = new OdbcCommand();\r\n     odbcCommand.CommandText = sqlQuery;\r\n     odbcCommand.CommandType = CommandType.Text;\r\n     odbcCommand.Connection = odbcConnection;\r\n     odbcCommand.Parameters.Add(\"@user_id\", OdbcType.Int).Value = userId;\r\n     odbcCommand.Parameters.Add(\r\n        \"@login_id\", \r\n        OdbcType.VarChar, \r\n        10\r\n     ).Value = loginId;\r\n     var result = odbcCommand.ExecuteReader();\r\n     return result;\r\n    };\r\n\r\n    return getUserDetails(1,\"jv\");\r\n\r\n[Download the Complete Code Example]({{ USE_MEDIA_URL }}code/DotNet/DotNet.Bind variables in SQL Statements.zip){@class=code-download}\r\n\r\n## 3rd Party Libraries\r\n\r\nODBC\r\n",
+            "slug": "bind-variables-in-sql-statements-aspnet-with-odbc"
+        },
+        {
+            "contextrulesets": [],
+            "url": "https://m1.sdelements.com/library/tasks/T38/bind-variables-sql-statements-rails/",
+            "title": "I218: Rails",
+            "id": "I218",
+            "content": "## Description\r\n\r\nRails provides helper methods to bind variables in SQL conditions and automatically\r\nescapes SQL special characters and effectively mitigate SQL injection in most\r\nActiveRecord methods.\r\n\r\nEnsure that you always bind variables correctly in the ARel 'where' method and never dynamically concatenate SQL statements with untrusted data.\r\n\r\n## Code\r\n\r\n    User.where({:first_name => params[:user][:first_name], :last_name => params[:user][:last_name]})\r\n\r\n[Download the Complete Code Example]({{ USE_MEDIA_URL }}code/Rails/bind-variables-sql-statements.zip){@class=code-download}\r\n\r\nOr if more control is required over the generated SQL,\r\n\r\n    User.where([\"first_name = ? AND last_name = ?\",\r\n                params[:user][:first_name], params[:user][:last_name]])\r\n\r\n[Download the Complete Code Example]({{ USE_MEDIA_URL }}code/Rails/bind-variables-sql-statements.zip){@class=code-download}\r\n",
+            "slug": "bind-variables-sql-statements-rails"
+        },
+        {
+            "contextrulesets": [],
+            "url": "https://m1.sdelements.com/library/tasks/T38/apex/",
+            "title": "I351: Apex",
+            "id": "I351",
+            "content": "*Note: This content has been extracted from the DeveloperForce [Secure Coding Guideline](http://wiki.developerforce.com/page/Secure_Coding_Guideline). Content is courtesy of salesforce.com*\r\n\r\nApex does not use SQL, but its own database query language, SOQL. SOQL is much simpler and more limited in functionality than SQL. Therefore, the risks are much lower for SOQL injection than for SQL injection, but the attacks are nearly identical to traditional SQL injection. \r\n\r\nTo prevent a SOQL injection attack, avoid using dynamic SOQL queries. Instead, use static queries and bind variables. For example:\r\n\r\n    public with sharing class SOQLController {\r\n        public String name {\r\n            get { return name;}\r\n            set { name = value;}\r\n        }\r\n\r\n        public PageReference query() {\r\n            String queryName = '%' + name + '%'\r\n            queryResult = [SELECT Id FROM Contact\r\n              WHERE (IsDeleted = false and Name like :queryName)];\r\n            return null;\r\n        }\r\n    }",
+            "slug": "apex"
+        },
+        {
+            "contextrulesets": [
+                {
+                    "required": [
+                        {
+                            "type": "regex",
+                            "value": "(mysql_query|mysql_unbuffered_query|mysqli_send_query|mysqli_multi_query|mysqli_query|mysqli_real_query|mysqli_prepare)\\s*\\("
+                        }
+                    ],
+                    "excluded": []
+                },
+                {
+                    "required": [
+                        {
+                            "type": "regex",
+                            "value": "->(send_query|multi_query|query|real_query|prepare)\\s*\\("
+                        },
+                        {
+                            "type": "regex",
+                            "value": "mysqli"
+                        }
+                    ],
+                    "excluded": []
+                }
+            ],
+            "url": "https://m1.sdelements.com/library/tasks/T38/bind-variables-in-sql-statements-php-mysqli/",
+            "title": "I367: PHP MySQLi",
+            "id": "I367",
+            "content": "## Description\r\n\r\nUse the`?` character to bind variables as parameters in SQL statements. Next, use `mysqli_stmt_bind_param` to bind a parameter to a specific type.\r\n\r\nSample code is provided below.\r\n\r\nFor more information consult the [MySQLi documentation](http://www.php.net/manual/en/book.mysqli.php)\r\n\r\n## Code\r\n\r\n    <?php\r\n    $searchId = 1;  // untrusted search value\r\n\r\n    $link = mysqli_connect(\"127.0.0.1\",\"db_user\",\"db_password\",\"inventory\");\r\n    if(!$link){\r\n        print \"An internal error occurred\\n\";\r\n        exit;\r\n    }\r\n    $query = \"SELECT id, data FROM sample_table WHERE id = ?\";\r\n    $stmt = mysqli_prepare($link, $query);\r\n\r\n    $rowId = \"\";\r\n    $rowData = \"\";\r\n\r\n    mysqli_stmt_bind_param($stmt, \"i\", $searchId);\r\n    mysqli_stmt_execute($stmt);\r\n    mysqli_stmt_bind_result($stmt, $rowId, $rowData);\r\n\r\n    while(mysqli_stmt_fetch($stmt)){\r\n        print \"Returned result: id=$rowId data=$rowData\\n\";\r\n    }\r\n\r\n    mysqli_close($link);\r\n    ?>",
+            "slug": "bind-variables-in-sql-statements-php-mysqli"
+        },
+        {
+            "contextrulesets": [
+                {
+                    "required": [
+                        {
+                            "type": "regex",
+                            "value": "(mysql_query|mysql_unbuffered_query|mysqli_send_query|mysqli_multi_query|mysqli_query|mysqli_real_query|mysqli_prepare)\\s*\\("
+                        }
+                    ],
+                    "excluded": []
+                },
+                {
+                    "required": [
+                        {
+                            "type": "regex",
+                            "value": "exec\\s*\\("
+                        }
+                    ],
+                    "excluded": []
+                }
+            ],
+            "url": "https://m1.sdelements.com/library/tasks/T38/bind-variables-in-sql-statements-php-pdo/",
+            "title": "I370: PHP PDO",
+            "id": "I370",
+            "content": "## Description\r\n\r\nUse the`?` character, or `:var` variables to bind values as parameters in SQL statements. Next, use the functions,\r\n\r\n* `bindParam()` to bind a parameter to a specific type.\r\n* `execute()` to bind parameters to the prepared SQL.\r\n\r\nSample code is provided below illustrating a SELECT query using `:var` parameter variables.\r\n\r\nFor more information consult the [PDO documentation](http://www.php.net/manual/en/book.pdo.php)\r\n\r\n## Code\r\n\r\n    <?php\r\n    $searchId = 1;  // untrusted search value\r\n\r\n    $dbh = new PDO(\"mysql:host=127.0.0.1;dbname=inventory\",\"db_user\",\"db_password\");\r\n    if(!$dbh){\r\n        print \"An internal error occurred\\n\";\r\n        exit;\r\n    }\r\n    $stmt = $dbh->prepare(\"SELECT id, data FROM sample_table WHERE id=:search\");\r\n\r\n    if($stmt->execute( array( ':search'=>$searchId) ))\r\n    {\r\n        while($row = $stmt->fetch())\r\n            print \"Returned result: id={$row['id']} data={$row['data']}\\n\";\r\n    }\r\n    $dbh = null;\r\n    ?>",
+            "slug": "bind-variables-in-sql-statements-php-pdo"
+        }
+    ],
+    "phase": "development",
+    "id": "1296-T38",
+    "categories": [
+        "Data Storage",
+        "Input Validation"
+    ],
+    "priority": 10,
+    "weakness": {
+        "content": "Without sufficient removal or quoting of SQL syntax in user-controllable inputs, the generated SQL query can cause those inputs to be interpreted as SQL instead of ordinary user data. This can be used to alter query logic to bypass security checks, or to insert additional statements that modify the back-end database, possibly including execution of system commands.SQL injection has become a common issue with database-driven web sites. The flaw is easily detected, and easily exploited, and as such, any site or software package with even a minimal user base is likely to be subject to an attempted attack of this kind. This flaw depends on the fact that SQL makes no real distinction between the control and data planes.\r\n\r\n### Training\r\n * Learn about [SQL injection](http://securitycompass.com/training/free/course-demos/modules/SQL_Injection/player.html)",
+        "cwe": [
+            {
+                "url": "http://cwe.mitre.org/data/definitions/89",
+                "title": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+                "cwe_id": 89
+            }
+        ],
+        "id": "P664",
+        "title": "P664: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+    },
+    "title": "T38: Bind variables in SQL statements",
+    "url": "https://m1.sdelements.com/library/tasks/T38/",
+    "age": "current",
+    "project": 1296,
+    "assigned_to": [],
+    "content": "Most persistence frameworks provide a feature to bind runtime variables with pre-generated SQL statements. Generally, these bind functions automatically escape SQL special characters and effectively mitigate SQL injection. Ensure that you always bind variables correctly and never dynamically concatenate SQL statements with untrusted data.\r\n\r\nNote that in rare cases, researchers have found that persistence frameworks do not properly escape bound variables and may still be vulnerable to SQL injection. When using any new persistence framework, programming language, or Object-Relationship Manager (ORM), investigate how it binds variables and if it explicitly protects against SQL injection.\r\n\r\nYou may also accomplish proper binding by using database-stored procedures. Note that many databases allow you to dynamically create and execute an SQL statement within the stored procedure; this approach may be vulnerable to SQL injection as well.",
+    "verification_coverage": [
+        "No Automated Dynamic Analysis Coverage"
+    ]
+}
