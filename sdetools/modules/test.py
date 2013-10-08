@@ -32,16 +32,18 @@ class Command(BaseCommand):
         if hasattr(test_mod, '__all__'):
             for test_class in test_mod.__all__:
                 try:
-                    __import__('sdetools.modules.%s.tests.%s' % (mod_name, test_class))
+                    inmod = __import__('sdetools.modules.%s.tests.%s' % (mod_name, test_class))
                 except:
                     print '  ***** Unable to import from %s.tests.%s' % (mod_name, test_class)
                     print traceback.format_exc()
                     continue
                 print '  - importing tests from %s.tests.%s' % (mod_name, test_class)
+                test_inmod = getattr(getattr(mod.modules, mod_name).tests, test_class)
+                self.suite.addTest(unittest.findTestCases(test_inmod))
         return True
 
     def handle(self):
-        self.suite = unittest.TestLoader()
+        self.suite = unittest.TestSuite()
         if self.test_mod:
             res = self.import_test(self.test_mod)
             if not res:
