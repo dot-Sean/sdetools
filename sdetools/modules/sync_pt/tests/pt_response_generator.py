@@ -1,12 +1,9 @@
 import re
 import os
-import sys
 import random
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
 from sdetools.alm_integration.tests.alm_response_generator import AlmResponseGenerator
 from sdetools.sdelib.commons import urlencode_str
-
 
 class PivotalTrackerResponseGenerator(AlmResponseGenerator):
     PROJECT_ID = '1000'

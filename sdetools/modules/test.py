@@ -41,6 +41,7 @@ class Command(BaseCommand):
         return True
 
     def handle(self):
+        self.suite = unittest.TestLoader()
         if self.test_mod:
             res = self.import_test(self.test_mod)
             if not res:
@@ -51,6 +52,6 @@ class Command(BaseCommand):
                 if not res:
                     print '-> Module missing tests: %s' % mod_name
 
-        unittest.main()
+        unittest.TextTestRunner(verbosity=2).run(self.suite)
         return True
 

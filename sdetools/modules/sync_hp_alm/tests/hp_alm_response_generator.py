@@ -1,13 +1,10 @@
 import os
-import sys
 import json
 from cookielib import Cookie
 
 from sdetools.sdelib.commons import urlencode_str
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
 from sdetools.alm_integration.tests.alm_response_generator import AlmResponseGenerator
-
 
 class HPAlmResponseGenerator(AlmResponseGenerator):
     STATUS_NAMES = ['Not Completed', 'Passed']

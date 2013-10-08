@@ -1,8 +1,7 @@
 #NOTE: Before running ensure that the options are set
 #properly in the configuration file
 
-import sys, os, unittest, datetime
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+import unittest, datetime
 
 from xml.dom import minidom
 

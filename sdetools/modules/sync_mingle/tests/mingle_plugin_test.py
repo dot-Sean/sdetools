@@ -1,10 +1,8 @@
-import sys
 import os
 import unittest
 from datetime import datetime
 from mingle_response_generator import MingleResponseGenerator
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
 import sdetools.alm_integration.tests.alm_mock_response
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_mingle.mingle_plugin import MingleConnector, MingleAPIBase
