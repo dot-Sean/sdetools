@@ -17,7 +17,7 @@
     <task id="203" title="Avoid uncontrolled format string" confidence="low">
         <category id="catFormatStringAttack" title="Format String Attack"/>
     </task>
-    <task id="15" title="Centralize authorization">
+	<task id="29" title="Use anti cross site request forgery (CSRF) tokens" confidence="low">
         <category id="catCrossSiteRequestForgery" title="Cross Site Request Forgery"/>
     </task>
 	<task id="193" title="Review non-categorized/miscellaneous findings from static code analysis" confidence="low">
