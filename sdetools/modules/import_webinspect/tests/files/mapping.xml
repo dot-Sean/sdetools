@@ -14,6 +14,6 @@
         <weakness type="check" id="5541" title="XPath Error Message" />
     </task>
     <task id="193" title="Review non-categorized/miscellaneous findings from static code analysis" confidence="none">
-        <weakness type="category" id="*" title="Unmapped weakness"/>
+        <weakness type="category" id="unknown" title="Unmapped weakness"/>
     </task>
 </mapping>
