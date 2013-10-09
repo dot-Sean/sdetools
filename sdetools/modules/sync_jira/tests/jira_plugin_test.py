@@ -1,6 +1,5 @@
 # NOTE: Before running ensure that the options are set properly in the
 #       configuration file
-import sys
 import os
 import unittest
 from datetime import datetime
@@ -8,7 +7,6 @@ from mock import patch, MagicMock
 from functools import partial
 from jira_response_generator import JiraResponseGenerator
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
 import sdetools.alm_integration.tests.alm_mock_response
 import sdetools.alm_integration.tests.alm_mock_sde_plugin
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase

@@ -1,14 +1,10 @@
 import re
 import os
-import sys
 
 from urllib2 import HTTPError
 
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
 from sdetools.alm_integration.tests.alm_response_generator import AlmResponseGenerator
 from sdetools.extlib.SOAPpy.Types import structType, faultType
-
 
 class JiraResponseGenerator(AlmResponseGenerator):
     api_url = 'rest/api/2'

@@ -1,10 +1,7 @@
 import os
-import sys
 import re
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
 from sdetools.alm_integration.tests.alm_response_generator import AlmResponseGenerator
-
 
 class RallyResponseGenerator(AlmResponseGenerator):
     API_VERSION = '1.39'
