@@ -60,12 +60,6 @@ class TestGitHubCase(AlmPluginTestBase, unittest.TestCase):
 
         self.assertEqual(test_task_result.get_status(), "TODO", 'Expected status to default to TODO')
 
-    def test_connecting_to_public_repo(self):
-        MOCK_RESPONSE.set_response_flags({'get_repo': 'private-false'})
-        self.assert_exception(AlmException, '',
-                              'Syncing with a public repository is currently not supported',
-                              self.tac.alm_connect_project)
-
     def test_connecting_to_invalid_repo(self):
          MOCK_RESPONSE.set_response_flags({'get_repo': '404'})
          self.assert_exception(AlmException, '',
