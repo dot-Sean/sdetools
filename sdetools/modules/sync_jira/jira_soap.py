@@ -135,7 +135,7 @@ class JIRASoapAPI:
             for version in jtask.affectsVersions:
                 task_versions.append(version['name'])
 
-        return JIRATask(task['id'],
+        return JIRATask(task_id,
                         jtask['key'],
                         task_priority,
                         task_status,

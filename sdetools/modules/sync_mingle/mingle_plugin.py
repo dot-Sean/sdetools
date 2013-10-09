@@ -154,7 +154,7 @@ class MingleConnector(AlmConnector):
                     else:
                         status = 'TODO'
                     break
-        return MingleTask(task_id, card_num, status, modified_date,
+        return MingleTask(self._extract_task_id(task['id']), card_num, status, modified_date,
                           self.sde_plugin.config['mingle_done_statuses'])
 
     def alm_add_task(self, task):

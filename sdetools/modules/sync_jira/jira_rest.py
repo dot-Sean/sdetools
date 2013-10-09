@@ -103,7 +103,7 @@ class JIRARestAPI(RESTBase):
         if 'priority' in jtask['fields'] and jtask['fields']['priority']:
             task_priority = jtask['fields']['priority']['name']
 
-        return JIRATask(task['id'],
+        return JIRATask(task_id,
                         jtask['key'],
                         task_priority,
                         jtask['fields']['status']['name'],
