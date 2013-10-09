@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from sdetools.alm_integration.alm_plugin_base import AlmTask
 
 class JIRATask(AlmTask):
@@ -8,9 +8,8 @@ class JIRATask(AlmTask):
                  timestamp, done_statuses, versions):
         self.task_id = task_id
         self.alm_id = alm_id
-        self.status = status
-
         self.priority = priority
+        self.status = status
         self.resolution = resolution
         self.timestamp = timestamp
         self.done_statuses = done_statuses  # comma-separated list

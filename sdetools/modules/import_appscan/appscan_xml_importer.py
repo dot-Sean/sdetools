@@ -1,9 +1,10 @@
-from xml.sax.handler import ContentHandler
+from sdetools.analysis_integration.base_integrator import BaseXMLImporter, BaseContentHandler
 
-from sdetools.analysis_integration.base_integrator import BaseXMLImporter
 
-class AppScanXMLContent(ContentHandler):
+class AppScanXMLContent(BaseContentHandler):
     def __init__(self):
+        self.saw_xml_report_node = False # top-level node
+        self.saw_app_scan_node = False
         self.in_hosts_node = False
         self.in_hosts_host_id_node = False
         self.in_issuetype_node = False
@@ -15,11 +16,18 @@ class AppScanXMLContent(ContentHandler):
         self.report_id = ""
         self.check_id = ""
 
+    def valid_content_detected(self):
+        return self.saw_app_scan_node
+
     def processingInstruction(self, target, data):
         pass
 
     def startElement(self, name, attrs):
-        if name == 'IssueType':
+        if name == 'XmlReport':
+            self.saw_xml_report_node = True
+        elif self.saw_xml_report_node and name == 'AppScanInfo':
+            self.saw_app_scan_node = True
+        elif name == 'IssueType':
             self.in_issuetype_node = True
             self.count = int(attrs['Count'])
             self.check_id = attrs['ID']
@@ -69,4 +77,3 @@ class AppScanXMLImporter(BaseXMLImporter):
 
     def _get_content_handler(self):
         return AppScanXMLContent()
-    
