@@ -1,9 +1,9 @@
 #NOTE: Before running ensure that the options are set
 #properly in the configuration file
 
-import unittest, datetime
+import unittest
+import os
 
-from xml.dom import minidom
 
 from sdetools.analysis_integration.tests.base_integration_test import BaseIntegrationTest
 from sdetools.modules.import_veracode.veracode_integrator import VeracodeIntegrator

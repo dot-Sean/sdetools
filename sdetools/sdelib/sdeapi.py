@@ -107,7 +107,7 @@ class ExtAPI(restclient.RESTBase):
 
     def get_task_notes(self, task, note_type, options={}, **filters):
         end_point = 'tasknotes'
-        if note_type not in ['', 'ide', 'text']:
+        if note_type not in ['', 'ide', 'text', 'analysis']:
             return
         if note_type:
             end_point += '/%s' % (note_type)
