@@ -19,7 +19,7 @@ class TestVeracode(BaseIntegrationTest, unittest.TestCase):
         self.integrator.config['report_file'] = os.path.join(TESTS_DIR, 'report.xml')
 
     def expected_number_of_findings(self):
-        return 3
+        return 2
 
 if __name__ == "__main__":
     unittest.main()

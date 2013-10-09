@@ -21,42 +21,6 @@
       </category>
    </severity>
    <severity level="4">
-      <category categoryid="19" categoryname="SQL Injection" pcirelated="true">
-         <desc>
-            <para text="SQL injection vulnerabilities occur when data enters an application from an untrusted source and is used to dynamically construct a SQL query.  This allows an attacker to manipulate database queries in order to access, modify, or delete arbitrary data.  Depending on the platform, database type, and configuration, it may also be possible to execute administrative operations on the database, access the filesystem, or execute arbitrary system commands.  SQL injection attacks can also be used to subvert authentication and authorization schemes, which would enable an attacker to gain privileged access to restricted portions of the application."/>
-         </desc>
-         <recommendations>
-            <para text="Several techniques can be used to prevent SQL injection attacks. These techniques complement each other and address security at different points in the application. Using multiple techniques provides defense-in-depth and minimizes the likelihood of a SQL injection vulnerability.">
-               <bulletitem text="Use parameterized prepared statements rather than dynamically constructing SQL queries.  This will prevent the database from interpreting the contents of bind variables as part of the query and is the most effective defense against SQL injection."/>
-               <bulletitem text="Validate user-supplied input using positive filters (white lists) to ensure that it conforms to the expected format, using centralized data validation routines when possible. "/>
-               <bulletitem text="Normalize all user-supplied data before applying filters or regular expressions, or submitting the data to a database. This means that all URL-encoded (%xx), HTML-encoded (&amp;#xx;), or other encoding schemes should be reduced to the internal character representation expected by the application. This prevents attackers from using alternate encoding schemes to bypass filters."/>
-               <bulletitem text="When using database abstraction libraries such as Hibernate, do not assume that all methods exposed by the API will automatically prevent SQL injection attacks.  Most libraries contain methods that pass arbitrary queries to the database in an unsafe manner."/>
-            </para>
-         </recommendations>
-         <cwe cweid="89" cwename="Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')" pcirelated="true" owasp="810" sans="801">
-            <description>
-               <text text="This database query contains a SQL injection flaw.  The function call constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database."/>
-            </description>
-            <staticflaws>
-               <flaw severity="4" categoryname="Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')" count="1" issueid="140" module="WebGoat-5.4.war" type="java.sql.Statement.executeQuery" description="This database query contains a SQL injection flaw. The call to java.sql.Statement.executeQuery() constructs a dynamic SQL query using a variable derived from user-supplied input. An attacker could exploit this flaw to execute arbitrary SQL queries against the database. The first argument to executeQuery() contains tainted data from the variable arrSQL. The tainted data originated from an earlier call to javax.servlet.ServletRequest.getParameterValues.
-
-Avoid dynamically constructing SQL queries. Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query. Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.
-
-References:
-CWE (http://cwe.mitre.org/data/definitions/89.html)
-OWASP (http://www.owasp.org/index.php/SQL_injection)
-WASC (http://webappsec.pbworks.com/SQL-Injection)
-
-" note="" cweid="89" remediationeffort="3" exploitLevel="2" categoryid="19" pcirelated="true" date_first_occurrence="2012-07-23 16:23:28 UTC" remediation_status="New" cia_impact="ppp" grace_period_expires="2012-07-23 17:28:40 UTC" affects_policy_compliance="true" sourcefile="BackDoors.java" line="148" sourcefilepath="org/owasp/webgoat/lessons/" scope="org.owasp.webgoat.lessons.BackDoors" functionprototype="apache.ecs.Element concept1(session.WebSession)" functionrelativelocation="81">
-                  <exploitability_adjustments>
-                     <exploitability_adjustment score_adjustment="1">
-                        <note>This source of the tainted data is an external web request.</note>
-                     </exploitability_adjustment>
-                  </exploitability_adjustments>
-               </flaw>
-            </staticflaws>
-         </cwe>
-      </category>
    </severity>
    <severity level="3">
       <category categoryid="20" categoryname="Cross-Site Scripting" pcirelated="true">

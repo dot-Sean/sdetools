@@ -217,6 +217,7 @@ class SdeResponseGenerator(AlmResponseGenerator):
                 data['status'] = 'partial'
             else:
                 data['status'] = 'failed'
+                data['confidence'] = 'high'
 
             new_analysis_notes.append(data)
             self.update_alm_task(task_number, 'analysis_notes', new_analysis_notes)

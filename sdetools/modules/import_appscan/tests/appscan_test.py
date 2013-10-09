@@ -19,7 +19,7 @@ class TestAppScanIntegration(BaseIntegrationTest, unittest.TestCase):
         self.integrator.config['report_file'] = os.path.join(TESTS_DIR, 'results.zip')
 
     def expected_number_of_findings(self):
-        return 3
+        return 2
 
 if __name__ == "__main__":
     unittest.main()
