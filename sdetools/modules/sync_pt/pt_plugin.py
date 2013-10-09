@@ -56,9 +56,6 @@ class PivotalTrackerTask(AlmTask):
     def get_alm_id(self):
         return self.alm_id
 
-    def get_priority(self):
-        return self.priority
-
     def get_status(self):
         """ Translates PivotalTracker status into SDE status """
         if self.status in self.done_statuses:
@@ -86,8 +83,10 @@ class PivotalTrackerConnector(AlmConnector):
 
         config.add_custom_option(self.PT_STORY_TYPE, 'Default story type on PivotalTracker', default='bug')
         config.add_custom_option(self.ALM_NEW_STATUS, 'Status to set for new tasks in PivotalTracker',
+
                                  default='unstarted')
         config.add_custom_option(self.ALM_DONE_STATUSES, 'Statuses that signify a task is Done in PivotalTracker',
+
                                  default='accepted')
         config.add_custom_option(self.ALM_PROJECT_VERSION, 'Name of release marker to place all new stories under',
                                  default='')

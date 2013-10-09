@@ -21,9 +21,6 @@ class JIRATask(AlmTask):
     def get_alm_id(self):
         return self.alm_id
 
-    def get_priority(self):
-        return self.priority
-
     def get_status(self):
         """ Translates JIRA priority into SDE priority """
         if self.status in self.done_statuses:

@@ -1,0 +1,31 @@
+{
+   "updated_at": "2013-09-24T12:00:15Z",
+   "initial_velocity": 10,
+   "enable_tasks": true,
+   "enable_incoming_emails": true,
+   "atom_enabled": true,
+   "public": false,
+   "enable_planned_mode": false,
+   "bugs_and_chores_are_estimatable": false,
+   "start_time": "2013-09-24T12:00:05Z",
+   "name": "Test Project",
+   "iteration_length": 1,
+   "version": 2,
+   "enable_following": true,
+   "velocity_averaged_over": 3,
+   "point_scale_is_custom": false,
+   "created_at": "2013-09-24T12:00:10Z",
+   "week_start_day": "Monday",
+   "time_zone":
+   {
+       "offset": "-07:00",
+       "olson_name": "America/Los_Angeles",
+       "kind": "time_zone"
+   },
+   "kind": "project",
+   "has_google_domain": false,
+   "point_scale": "0,1,2,3",
+   "id": 98,
+   "current_iteration_number": 1,
+   "number_of_done_iterations_to_show": 12
+}

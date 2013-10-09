@@ -1,0 +1,13 @@
+{
+    "self": "http://www.example.com/jira/rest/api/2/user?username=test",
+    "name": "test",
+    "emailAddress": "test@example.com",
+    "avatarUrls": {
+        "24x24": "http://www.example.com/jira/secure/useravatar?size=small&ownerId=fred",
+        "16x16": "http://www.example.com/jira/secure/useravatar?size=xsmall&ownerId=fred",
+        "32x32": "http://www.example.com/jira/secure/useravatar?size=medium&ownerId=fred",
+        "48x48": "http://www.example.com/jira/secure/useravatar?size=large&ownerId=fred"
+    },
+    "displayName": "Test User",
+    "active": true
+}

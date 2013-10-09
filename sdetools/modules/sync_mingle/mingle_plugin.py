@@ -52,9 +52,6 @@ class MingleTask(AlmTask):
     def get_alm_id(self):
         return self.alm_id
 
-    def get_priority(self):
-        return self.priority
-
     def get_status(self):
         """ Translates Mingle status into SDE status """
         if self.status in self.done_statuses:
@@ -157,7 +154,7 @@ class MingleConnector(AlmConnector):
                     else:
                         status = 'TODO'
                     break
-        return MingleTask(task_id, card_num, status, modified_date,
+        return MingleTask(self._extract_task_id(task['id']), card_num, status, modified_date,
                           self.sde_plugin.config['mingle_done_statuses'])
 
     def alm_add_task(self, task):

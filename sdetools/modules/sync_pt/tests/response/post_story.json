@@ -1,0 +1,15 @@
+{
+   "updated_at": "2013-09-24T12:00:00Z",
+   "project_id": 99,
+   "current_state": "unscheduled",
+   "url": "http://localhost/story/show/568",
+   "name": "Exhaust ports are ray shielded",
+   "story_type": "feature",
+   "requested_by_id": 101,
+   "created_at": "2013-09-24T12:00:00Z",
+   "kind": "story",
+   "id": 568,
+   "labels":
+   [
+   ]
+}
