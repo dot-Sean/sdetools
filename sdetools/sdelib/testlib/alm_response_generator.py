@@ -10,7 +10,7 @@ from sdetools.sdelib.commons import abc
 abstractmethod = abc.abstractmethod
 
 
-class AlmResponseGenerator(object):
+class ResponseGenerator(object):
     def __init__(self, initial_task_status, test_dir):
         """
             Initializes commonly used variables.
@@ -27,6 +27,13 @@ class AlmResponseGenerator(object):
         self.test_dir = test_dir
         self.alm_tasks = {}
         self.rest_api_targets = {}
+        self.init_with_tasks()
+
+    def init_with_tasks(self):
+        """
+            Default tasks
+        """
+        pass
 
     def get_response(self, target, flags, data, method):
         """
@@ -74,7 +81,7 @@ class AlmResponseGenerator(object):
 
         raise HTTPError('', error_code, message, '', fp_mock)
 
-    def add_alm_task(self, task_number, task_name=None, status=None):
+    def generator_add_task(self, task_number, task_name=None, status=None):
         """
             Save a task created through our mock. Uses the task number
             as the alm_id
@@ -92,18 +99,21 @@ class AlmResponseGenerator(object):
                 "timestamp": self.get_current_timestamp()
             }
 
-    def get_alm_task(self, task_number):
+    def generator_get_task(self, task_number):
         return self.alm_tasks.get(task_number)
 
-    def get_all_tasks(self):
+    def generator_get_all_tasks(self):
         return self.alm_tasks
 
-    def update_alm_task(self, task_number, field, value):
+    def generator_update_task(self, task_number, field, value):
         if self.alm_tasks.get(task_number):
             self.alm_tasks[task_number][field] = value
 
-    def clear_alm_tasks(self):
+    def generator_clear_tasks(self, full_clear=False):
         self.alm_tasks = {}
+
+        if not full_clear:
+            self.init_with_tasks()
 
     def _read_response_file(self, file_name):
         file_path = os.path.join(self.test_dir, 'response', file_name)
@@ -126,7 +136,7 @@ class AlmResponseGenerator(object):
         task_number = re.search("(?<=T)[0-9]+((?=[:'])|$)", s)
 
         if task_number:
-            return  task_number.group(0)
+            return task_number.group(0)
         else:
             return None
 

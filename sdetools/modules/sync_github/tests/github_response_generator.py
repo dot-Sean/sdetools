@@ -3,11 +3,11 @@ import os
 from urllib2 import HTTPError
 from mock import MagicMock
 
-from sdetools.alm_integration.tests.alm_response_generator import AlmResponseGenerator
+from sdetools.sdelib.testlib.alm_response_generator import ResponseGenerator
 from sdetools.sdelib.commons import urlencode_str
 
 
-class GitHubResponseGenerator(AlmResponseGenerator):
+class GitHubResponseGenerator(ResponseGenerator):
     STATUS_NAMES = ['open', 'closed']
 
     def __init__(self, host, repo_org, repo_name, project_milestone, username, protocol='http'):
@@ -72,7 +72,7 @@ class GitHubResponseGenerator(AlmResponseGenerator):
         task_name = params[-1]
         task_name = task_name.split(urlencode_str(':'))[0]
         task_number = self.extract_task_number_from_title(task_name)
-        task = self.get_alm_task(task_number)
+        task = self.generator_get_task(task_number)
         if not flag and task:
             status = task.get('status')
             if status == state:
@@ -89,7 +89,7 @@ class GitHubResponseGenerator(AlmResponseGenerator):
     def post_issue(self, target, flag, data, method):
         if not flag:
             task_number = self.extract_task_number_from_title(data['title'])
-            self.add_alm_task(task_number)
+            self.generator_add_task(task_number)
             response = self.generate_issue(task_number, 'open')
 
             return response
@@ -100,10 +100,10 @@ class GitHubResponseGenerator(AlmResponseGenerator):
         task_id = target.split('/')[4]
 
         if not flag:
-            if self.get_alm_task(task_id) and data['state']:
+            if self.generator_get_task(task_id) and data['state']:
                 status = data['state']
                 response = self.generate_issue(task_id, status)
-                self.update_alm_task(task_id, 'status', status)
+                self.generator_update_task(task_id, 'status', status)
 
                 return response
             else:

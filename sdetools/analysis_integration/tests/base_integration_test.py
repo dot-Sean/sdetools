@@ -1,48 +1,25 @@
 from sdetools.sdelib import conf_mgr
 from sdetools.sdelib.mod_mgr import ReturnChannel
-
+from sdetools.sdelib.testlib.alm_mock_response import MOCK_SDE_RESPONSE
 from sdetools.sdelib.commons import abc
 abstractmethod = abc.abstractmethod
 
-import sdetools.alm_integration.tests.alm_mock_response
-from sdetools.sdelib.testlib.sde_response_generator import SdeResponseGenerator
-MOCK_RESPONSE = sdetools.alm_integration.tests.alm_mock_response
 
-def null_callback(obj):
-    pass
+def stdout_callback(obj):
+    print obj
 
-class NullReturnChannel(ReturnChannel):
-    def __init__(self, call_back, call_back_args={}):
-        super(NullReturnChannel, self).__init__(call_back, call_back_args)
-
-    def set_info_container(self, info_cls):
-        pass
-
-    def emit_obj(self, obj):
-        pass
-
-    def emit_it(self, *args, **kwargs):
-        pass
-
-    def queue(self, **kwargs):
-        pass
-
-    def close(self, *args, **kwargs):
-        pass
-
-    def emit_info(self, *args, **kwargs):
-        pass
-
-    def emit_error(self, *args, **kwargs):
-        pass
 
 class BaseIntegrationTest(object):
     SDE_CMD = ""
     integrator = None
     config = None
 
+    def setUpClass(cls):
+        cls.mock_sde_response = MOCK_SDE_RESPONSE
+
     def setUp(self):
-        self.config = conf_mgr.Config(self.SDE_CMD, [], NullReturnChannel(null_callback), 'shell', {})
+        ret_chn = ReturnChannel(stdout_callback, {})
+        self.config = conf_mgr.Config(self.SDE_CMD, [], ret_chn, 'shell', {})
 
         self.init_integrator()
         self.config['sde_api_token'] = 'apiToken123@sdelements.com'
@@ -50,21 +27,16 @@ class BaseIntegrationTest(object):
         self.config['sde_project'] = 'Test Project'
         self.config['trial_run'] = False
         self.config['flaws_only'] = False
-        mock_path = 'sdetools.sdelib.sdeapi.restclient'
-        response_generator = SdeResponseGenerator(self.config['sde_api_token'].split('a')[1],
-                                                  self.config['sde_application'],
-                                                  self.config['sde_project'],
-                                                  self.config['sde_method'])
 
-        MOCK_RESPONSE.patch_call_rest_api(response_generator, mock_path)
+        self.mock_sde_response.initialize(self.config)
+        self.mock_sde_response.get_response_generator().add_default_tasks()
 
         self.integrator.initialize()
         self.integrator.load_mapping_from_xml()
         self.integrator.parse()
 
     def tearDown(self):
-        MOCK_RESPONSE.response_generator_clear_tasks()
-        MOCK_RESPONSE.set_response_flags({})
+        self.mock_sde_response.teardown()
 
     @abstractmethod
     def init_integrator(self):
