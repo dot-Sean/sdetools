@@ -1,15 +1,26 @@
 #!/usr/bin/python
 import sys, os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from xml.dom import minidom
 
+
 class MappingError(Exception):
     pass
 
+
 class Mapping:
     def __init__(self):
+        self.check_causes = {}
+        self.task_cause_map = {'186': ['insecureThirdPartySoftware', 'missingPatchesForThirdPartyProds'],
+                            '49': ['sampleScriptsFound', 'backDoorLeftBehind'],
+                            '157': ['tempFilesLeftBehind'],
+                            '23': ['nonHttpOnlySessionCookie'],
+                            '33': ['hiddenParameterUsed']
+                            }
         self.mapping = {}
+        self.third_party_checks = []
         self.category_checks = {}
         self.base_tasks = {}
         self.checks = []
@@ -17,6 +28,21 @@ class Mapping:
         self.task_map['186'] = []
         self.task_map['193'] = [{'check_id': '*', 'category_id': '', 'check_name': 'Unmapped Check'}]
 
+    def load_causes_from_xml(self, third_party_map):
+        try:
+            base = minidom.parse(third_party_map)
+        except Exception, e:
+            raise MappingError("An error occurred opening mapping file '%s': %s" % (third_party_map, e))
+
+        check_causes = {}
+        for check_row in base.getElementsByTagName('ROW'):
+            causes = []
+            issue_type_id = check_row.attributes['ISSUETYPEID'].value
+            if issue_type_id in check_causes:
+                causes = check_causes[issue_type_id]
+            causes.append(check_row.attributes['CAUSEID'].value)
+            check_causes[issue_type_id] = causes
+        self.check_causes = check_causes
 
     def load_base_mapping_from_xml(self, mapping_file):
         try:
@@ -26,7 +52,7 @@ class Mapping:
 
         category_mapping = {}
         for task in base.getElementsByTagName('task'):
-            self.base_tasks[ task.attributes['id'].value ] = task
+            self.base_tasks[task.attributes['id'].value] = task
             for category in task.getElementsByTagName('category'):
                 tasks = []
                 if category_mapping.has_key(category.attributes['id'].value):
@@ -80,6 +106,11 @@ class Mapping:
                 self.task_map['186'].append(check)
                 continue
 
+            task_id = self.get_task_based_cause(check['check_id'])
+            if task_id:
+                self.task_map[task_id].append(check)
+                continue
+
             checks = []
             if category_checks.has_key(check['category_id']):
                 checks = category_checks[check['category_id']]
@@ -89,8 +120,17 @@ class Mapping:
 
             if not check['check_id'] in self.checks:
                 self.checks.append(check['check_id'])
-            
+
         self.category_checks = category_checks
+
+    def get_task_based_cause(self, check_id):
+        if check_id in self.check_causes:
+            for check_cause in self.check_causes[check_id]:
+                for task_id in self.task_cause_map.keys():
+                    for task_cause in self.task_cause_map[task_id]:
+                        if task_cause == check_cause:
+                            return task_id
+        return None
 
     def remap(self):
 
@@ -160,11 +200,12 @@ class Mapping:
             if 'confidence' in self.base_tasks[task_id].attributes.keys():
                 confidence = self.base_tasks[task_id].attributes['confidence'].value
             """
-            fp.write('\t<task id="%s" title="%s" confidence="%s">\n'%
-                    (task_id, self.base_tasks[task_id].attributes['title'].value, confidence))
+            fp.write('\t<task id="%s" title="%s" confidence="%s">\n' %
+                     (task_id, self.base_tasks[task_id].attributes['title'].value, confidence))
             task_checks = sorted(task_checks)
             for check in task_checks:
-                fp.write('\t\t<weakness type="check" id="%s" category="%s" title="%s" />\n'% (check['check_id'], check['category_id'], check['check_name']))
+                fp.write('\t\t<weakness type="check" id="%s" category="%s" title="%s" />\n' % (
+                    check['check_id'], check['category_id'], check['check_name']))
             fp.write('\t</task>\n')
         fp.write('</mapping>\n')
         fp.close()
@@ -177,44 +218,49 @@ class Mapping:
                 missing_checks = True
         return missing_checks
 
-def main(argv):
 
-    usage = "Usage: %s <category mapping> <custom map> <appscan checks> <appscan map>\n" % (argv[0])
+def main(argv):
+    usage = "Usage: %s <check causes> <category mapping> <custom map> <appscan checks> <appscan map>\n" % (argv[0])
 
     if len(argv) == 2 and argv[1] == 'help':
         print usage
+        print "check causes: (input) list of checks/causes (i.e. issuetypecauses.xml)"
         print "category mapping: (input) docs/appscan/sde_appscan_standard_category_map.xml"
         print "custom map: (input) Task->WebInspect check mapping in xml format [i.e. custom_webinspect_map.xml]"
         print "appscan checks: (input) AppScan checks in xml format [i.e. appscan_checks.xml]"
         print "appscan map: (output) AppScan map file"
         sys.exit(0)
-    elif len(argv) < 4:
+    elif len(argv) < 5:
         print usage
         sys.exit(1)
 
     base = Mapping()
 
+    print "Loading third party map..."
+    base.load_causes_from_xml(argv[1])
+
     print "Loading category map..."
-    base.load_base_mapping_from_xml(argv[1])
-    
+    base.load_base_mapping_from_xml(argv[2])
+
     print "Loading custom map..."
-    base.load_custom_mapping_from_xml(argv[2])
+    base.load_custom_mapping_from_xml(argv[3])
 
     print "Loading AppScan Checks..."
-    base.load_weaknesses_from_xml(argv[3])
-    
+    base.load_weaknesses_from_xml(argv[4])
+
     print "Re-mapping Checks..."
     base.remap()
-    
+
     print "Validating..."
     if False and base.find_missing_checks():
         print "Aborted"
         sys.exit(1)
 
-    print "Outputting AppScan map to %s..." % argv[4]
-    base.output_mapping(argv[4])
+    print "Outputting AppScan map to %s..." % argv[5]
+    base.output_mapping(argv[5])
 
-    print "Done."        
+    print "Done."
+
 
 if __name__ == "__main__":
     main(sys.argv)
