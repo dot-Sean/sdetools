@@ -1,11 +1,11 @@
 import re
 import os
 
-from sdetools.alm_integration.tests.alm_response_generator import AlmResponseGenerator
+from sdetools.sdelib.testlib.alm_response_generator import ResponseGenerator
 from sdetools.sdelib.commons import urlencode_str
 
 
-class MingleResponseGenerator(AlmResponseGenerator):
+class MingleResponseGenerator(ResponseGenerator):
     BASE_PATH = 'api/v2'
     STATUS_NAMES = ['New', 'Done']
 
@@ -39,7 +39,7 @@ class MingleResponseGenerator(AlmResponseGenerator):
                     filter_arg = data.get('filters[]')
                     card_name = re.search('(?<=\[Name\]\[is\]\[).*(?=\])', filter_arg).group(0)
                     card_number = self.extract_task_number_from_title(card_name)
-                    task = self.get_alm_task(card_number)
+                    task = self.generator_get_task(card_number)
 
                     if task:
                         card = self.generate_card(card_number, task['name'], task['status'], task['card_type'])
@@ -51,8 +51,8 @@ class MingleResponseGenerator(AlmResponseGenerator):
                 card_type = data['card[card_type_name]']
                 status = data['card[properties][][value]']
                 card_number = self.extract_task_number_from_title(card_name)
-                self.add_alm_task(card_number, card_name, status)
-                self.update_alm_task(card_number, 'card_type', card_type)
+                self.generator_add_task(card_number, card_name, status)
+                self.generator_update_task(card_number, 'card_type', card_type)
 
                 return None
         else:
@@ -63,8 +63,8 @@ class MingleResponseGenerator(AlmResponseGenerator):
             status = data['card[properties][][value]']
             card_number = re.search('[0-9]+(?=\.xml)', target).group(0)
 
-            if self.get_alm_task(card_number):
-                self.update_alm_task(card_number, 'status', status)
+            if self.generator_get_task(card_number):
+                self.generator_update_task(card_number, 'status', status)
 
             return None
         else:

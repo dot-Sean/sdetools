@@ -56,7 +56,7 @@ class AlmPluginTestBase(object):
         self.init_response_generator()
         self.post_parse_config()
         self.mock_sde_response.initialize(self.config)
-        self.mock_alm_response.initialize(self.response_generator, self.path_to_alm_connector)
+        self.mock_alm_response.initialize(self.response_generator, self.path_to_alm_rest_api)
         self.connector.initialize()
 
     def tearDown(self):

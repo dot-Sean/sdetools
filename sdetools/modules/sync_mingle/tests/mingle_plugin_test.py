@@ -2,31 +2,22 @@ import os
 import unittest
 from datetime import datetime
 from mingle_response_generator import MingleResponseGenerator
-
-import sdetools.alm_integration.tests.alm_mock_response
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_mingle.mingle_plugin import MingleConnector, MingleAPIBase
-
-CONF_FILE_LOCATION = 'test_settings.conf'
-MOCK_RESPONSE = sdetools.alm_integration.tests.alm_mock_response
 
 
 class TestMingleCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
-    def setUpClass(self):
-        path_to_mingle_connector = 'sdetools.modules.sync_mingle.mingle_plugin'
-        current_dir = os.path.dirname(os.path.realpath(__file__))
-        conf_path = os.path.join(current_dir, CONF_FILE_LOCATION)
-        super(TestMingleCase, self).setUpClass(path_to_mingle_connector, conf_path)
+    def setUpClass(cls):
+        cls.path_to_alm_rest_api = 'sdetools.modules.sync_mingle.mingle_plugin'
+        cls.current_dir = os.path.dirname(os.path.realpath(__file__))
+        super(TestMingleCase, cls).setUpClass()
 
     def init_alm_connector(self):
-        connector = MingleConnector(self.config, MingleAPIBase(self.config))
-        super(TestMingleCase, self).init_alm_connector(connector)
+        super(TestMingleCase, self).init_alm_connector(MingleConnector(self.config, MingleAPIBase(self.config)))
 
-    def post_parse_config(self):
-        response_generator = MingleResponseGenerator(self.config['alm_project'])
-
-        MOCK_RESPONSE.patch_call_rest_api(response_generator, self.path_to_alm_connector)
+    def init_response_generator(self):
+        super(TestMingleCase, self).init_response_generator(MingleResponseGenerator(self.config['alm_project']))
 
     def test_parsing_alm_task(self):
         result = super(TestMingleCase, self).test_parsing_alm_task()

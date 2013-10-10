@@ -3,10 +3,10 @@ import os
 
 from urllib2 import HTTPError
 
-from sdetools.alm_integration.tests.alm_response_generator import AlmResponseGenerator
+from sdetools.sdelib.testlib.alm_response_generator import ResponseGenerator
 from sdetools.extlib.SOAPpy.Types import structType, faultType
 
-class JiraResponseGenerator(AlmResponseGenerator):
+class JiraResponseGenerator(ResponseGenerator):
     api_url = 'rest/api/2'
     PROJECT_ID = '10000'
     JIRA_ISSUE_TYPES = ["Bug", "New Feature", "Task", "Improvement", "Sub-task"]
@@ -109,7 +109,7 @@ class JiraResponseGenerator(AlmResponseGenerator):
             task_number = task_id.split('-')[1]
 
             if task_number:
-                self.update_alm_task(task_number, 'version', version_name)
+                self.generator_update_task(task_number, 'version', version_name)
 
                 return {
                     "id": "10000",
@@ -158,7 +158,7 @@ class JiraResponseGenerator(AlmResponseGenerator):
         if not flag:
             response = []
 
-            if self.project_version:
+            if self.project_version is not None:
                 response.append(self.generate_project_version())
 
             return response
@@ -191,7 +191,7 @@ class JiraResponseGenerator(AlmResponseGenerator):
                 target = name
 
             task_number = self.extract_task_number_from_title(target)
-            task = self.get_alm_task(task_number)
+            task = self.generator_get_task(task_number)
             if task:
                 status_id = task.get('status')
                 version = task.get('version')
@@ -216,10 +216,10 @@ class JiraResponseGenerator(AlmResponseGenerator):
             transition_id = data['transition']['id']
             task_number = re.search('(?<=%s-)[0-9a-zA-z]+' % self.project_key, target).group(0)
 
-            if not self.get_alm_task(task_number):
+            if not self.generator_get_task(task_number):
                 self.raise_error('404')
 
-            self.update_alm_task(task_number, 'status', int(transition_id) + 1)
+            self.generator_update_task(task_number, 'status', int(transition_id) + 1)
 
             return None
         else:
@@ -236,7 +236,7 @@ class JiraResponseGenerator(AlmResponseGenerator):
 
             if task_name is not None:
                 task_id = self.extract_task_number_from_title(task_name)
-                self.add_alm_task(task_id)
+                self.generator_add_task(task_id)
                 response = {
                     'id': task_id,
                     'key': '%s-%s' % (self.project_key, 1),

@@ -14,6 +14,7 @@ class BaseIntegrationTest(object):
     integrator = None
     config = None
 
+    @classmethod
     def setUpClass(cls):
         cls.mock_sde_response = MOCK_SDE_RESPONSE
 
@@ -29,8 +30,6 @@ class BaseIntegrationTest(object):
         self.config['flaws_only'] = False
 
         self.mock_sde_response.initialize(self.config)
-        self.mock_sde_response.get_response_generator().add_default_tasks()
-
         self.integrator.initialize()
         self.integrator.load_mapping_from_xml()
         self.integrator.parse()

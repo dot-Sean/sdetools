@@ -7,15 +7,9 @@ from datetime import datetime
 from mock import patch
 from functools import partial
 from trac_response_generator import TracResponseGenerator
-
-import sdetools.alm_integration.tests.alm_mock_response
-import sdetools.alm_integration.tests.alm_mock_sde_plugin
+from sdetools.sdelib.testlib.alm_mock_response import MOCK_ALM_RESPONSE
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
-from sdetools.modules.sync_trac.trac_plugin import TracConnector, TracXMLRPCAPI, AlmException
-
-CONF_FILE_LOCATION = 'test_settings.conf'
-MOCK_RESPONSE = sdetools.alm_integration.tests.alm_mock_response
-MOCK_SDE = sdetools.alm_integration.tests.alm_mock_sde_plugin
+from sdetools.modules.sync_trac.trac_plugin import TracConnector, TracXMLRPCAPI
 
 
 class MockProxyMethods():
@@ -24,11 +18,11 @@ class MockProxyMethods():
 
     def __getattr__(self, method_name):
         target = '%s.%s' % (self.cls_name, method_name)
-        return partial(self.get_response, target, MOCK_RESPONSE.get_response_flags())
+        return partial(self.get_response, target, MOCK_ALM_RESPONSE.get_response_flags())
 
     @staticmethod
     def get_response(*args):
-        return MOCK_RESPONSE.get_response_generator().get_proxy_response(args)
+        return MOCK_ALM_RESPONSE.get_response_generator().get_proxy_response(args)
 
 
 class MockXMLRPCProxy():
@@ -41,20 +35,19 @@ class MockXMLRPCProxy():
 
 class TestTracCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
-    def setUpClass(self):
-        path_to_trac_connector = 'sdetools.modules.sync_trac.trac_plugin'
-        current_dir = os.path.dirname(os.path.realpath(__file__))
-        conf_path = os.path.join(current_dir, CONF_FILE_LOCATION)
-        super(TestTracCase, self).setUpClass(path_to_trac_connector, conf_path)
+    def setUpClass(cls):
+        cls.path_to_alm_rest_api = 'sdetools.modules.sync_trac.trac_plugin'
+        cls.current_dir = os.path.dirname(os.path.realpath(__file__))
+        super(TestTracCase, cls).setUpClass()
 
     def init_alm_connector(self):
-        connector = TracConnector(self.config, TracXMLRPCAPI(self.config))
-        super(TestTracCase, self).init_alm_connector(connector)
+        super(TestTracCase, self).init_alm_connector(TracConnector(self.config, TracXMLRPCAPI(self.config)))
+
+    def init_response_generator(self):
+        super(TestTracCase, self).init_response_generator(TracResponseGenerator())
 
     def post_parse_config(self):
-        response_generator = TracResponseGenerator()
-        patch('sdetools.modules.sync_trac.trac_plugin.xmlrpclib.ServerProxy', MockXMLRPCProxy).start()
-        MOCK_RESPONSE.patch_call_rest_api(response_generator, self.path_to_alm_connector)
+        patch('%s.xmlrpclib.ServerProxy' % self.path_to_alm_rest_api, MockXMLRPCProxy).start()
 
     def test_parsing_alm_task(self):
         result = super(TestTracCase, self).test_parsing_alm_task()

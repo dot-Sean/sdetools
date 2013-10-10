@@ -12,7 +12,7 @@ from sdetools.modules.sync_github.github_plugin import GitHubConnector, GitHubAP
 class TestGitHubCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.path_to_alm_connector = 'sdetools.modules.sync_github.github_plugin'
+        cls.path_to_alm_rest_api = 'sdetools.modules.sync_github.github_plugin'
         cls.current_dir = os.path.dirname(os.path.realpath(__file__))
         super(TestGitHubCase, cls).setUpClass()
 

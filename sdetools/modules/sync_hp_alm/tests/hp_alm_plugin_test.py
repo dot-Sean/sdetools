@@ -12,7 +12,7 @@ from sdetools.modules.sync_hp_alm.hp_alm_plugin import HPAlmConnector, HPAlmAPIB
 class TestHPAlmCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.path_to_alm_connector = 'sdetools.modules.sync_hp_alm.hp_alm_plugin'
+        cls.path_to_alm_rest_api = 'sdetools.modules.sync_hp_alm.hp_alm_plugin'
         cls.current_dir = os.path.dirname(os.path.realpath(__file__))
         super(TestHPAlmCase, cls).setUpClass()
 
