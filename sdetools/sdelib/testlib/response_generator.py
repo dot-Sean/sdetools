@@ -1,13 +1,12 @@
 import os
 import json
 import re
-import sys
 
 from mock import MagicMock
 from urllib2 import HTTPError
 from datetime import datetime
 from sdetools.extlib.defusedxml import minidom
-from sdetools.sdelib.commons import abc
+from sdetools.sdelib.commons import abc, get_directory_of_current_module
 abstractmethod = abc.abstractmethod
 
 
@@ -25,8 +24,7 @@ class ResponseGenerator(object):
                                     "regex_pattern_of_api_target": "method_to_call_on_match"
         """
         if test_dir is None:
-            path_of_child_class = sys.modules[self.__module__].__file__
-            test_dir = os.path.dirname(path_of_child_class)
+            test_dir = get_directory_of_current_module(self)
 
         self.statuses = statuses
         self.test_dir = test_dir

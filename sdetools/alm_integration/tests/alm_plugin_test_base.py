@@ -1,11 +1,10 @@
 import re
 import os
-import sys
 
 from datetime import datetime
 from sdetools.sdelib.mod_mgr import ReturnChannel
 from sdetools.sdelib.conf_mgr import Config
-from sdetools.sdelib.commons import abc, Error
+from sdetools.sdelib.commons import abc, Error, get_directory_of_current_module
 from sdetools.sdelib.testlib.mock_response import MOCK_ALM_RESPONSE, MOCK_SDE_RESPONSE
 
 abstractmethod = abc.abstractmethod
@@ -31,8 +30,7 @@ class AlmPluginTestBase(object):
                                         [alm_connector, alm_api, alm_response_generator
         """
         if test_dir is None:
-            path_of_child_class = sys.modules[cls.__module__].__file__
-            test_dir = os.path.dirname(path_of_child_class)
+            test_dir = get_directory_of_current_module(cls)
 
         cls.connector_cls, cls.api_cls, cls.generator_cls = alm_classes
         cls.test_dir = test_dir
