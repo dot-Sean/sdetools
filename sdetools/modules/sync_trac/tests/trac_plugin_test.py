@@ -2,7 +2,6 @@
 #       configuration file
 import unittest
 
-from datetime import datetime
 from mock import patch
 from functools import partial
 from trac_response_generator import TracResponseGenerator
@@ -36,13 +35,8 @@ class MockXMLRPCProxy():
 class TestTracCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        super(TestTracCase, cls).setUpClass(PATH_TO_ALM_REST_API)
-
-    def init_alm_connector(self):
-        super(TestTracCase, self).init_alm_connector(TracConnector(self.config, TracXMLRPCAPI(self.config)))
-
-    def init_response_generator(self):
-        super(TestTracCase, self).init_response_generator(TracResponseGenerator())
+        alm_classes = [TracConnector, TracXMLRPCAPI, TracResponseGenerator]
+        super(TestTracCase, cls).setUpClass(PATH_TO_ALM_REST_API, alm_classes=alm_classes)
 
     def post_parse_config(self):
         patch('%s.xmlrpclib.ServerProxy' % self.path_to_alm_rest_api, MockXMLRPCProxy).start()
@@ -53,11 +47,6 @@ class TestTracCase(AlmPluginTestBase, unittest.TestCase):
         test_task_result = result[1]
 
         alm_id = test_task['id'].split('T')[1]
-        alm_status = test_task['status']
         result_alm_id = test_task_result.get_alm_id()
-        result_status = test_task_result.get_status()
-        result_timestamp = test_task_result.get_timestamp()
 
         self.assertEqual(result_alm_id, alm_id, 'Expected alm_id %s, got %s' % (alm_id, result_alm_id))
-        self.assertEqual(result_status, alm_status, 'Expected %s status, got %s' % (alm_status, result_status))
-        self.assertEqual(type(result_timestamp), datetime, 'Expected a datetime object')

@@ -2,7 +2,6 @@
 #       configuration file
 import unittest
 
-from datetime import datetime
 from mock import patch, MagicMock
 from functools import partial
 from jira_response_generator import JiraResponseGenerator
@@ -18,14 +17,11 @@ PATH_TO_ALM_REST_API = 'sdetools.modules.sync_jira.jira_rest'
 class JiraBaseCase(AlmPluginTestBase):
     @classmethod
     def setUpClass(cls):
-        super(JiraBaseCase, cls).setUpClass(PATH_TO_ALM_REST_API)
+        alm_classes = [JIRAConnector, JIRARestAPI, JiraResponseGenerator]
+        super(JiraBaseCase, cls).setUpClass(PATH_TO_ALM_REST_API, alm_classes=alm_classes)
 
-    def init_alm_connector(self):
+    def pre_parse_config(self):
         self.config.add_custom_option('jira_version', 'Version of JIRA [e.g. 4.3.3, 5, or 6.0]', default='6')
-        super(JiraBaseCase, self).init_alm_connector(JIRAConnector(self.config, JIRARestAPI(self.config)))
-
-    def init_response_generator(self):
-         super(JiraBaseCase, self).init_response_generator(JiraResponseGenerator(self.config, self.test_dir))
 
     def post_parse_config(self):
         api_ver = self.config['jira_version'][:1]
@@ -37,14 +33,9 @@ class JiraBaseCase(AlmPluginTestBase):
         test_task_result = result[1]
 
         alm_id = 'TEST-%s' % test_task['id'].split('T')[1]
-        alm_status = test_task['status']
         result_alm_id = test_task_result.get_alm_id()
-        result_status = test_task_result.get_status()
-        result_timestamp = test_task_result.get_timestamp()
 
         self.assertEqual(result_alm_id, alm_id, 'Expected alm_id %s, got %s' % (alm_id, result_alm_id))
-        self.assertEqual(result_status, alm_status, 'Expected %s status, got %s' % (alm_status, result_status))
-        self.assertEqual(type(result_timestamp), datetime, 'Expected a datetime object')
 
     def test_parse_non_done_status_as_todo(self):
         self.connector.alm_connect()
@@ -58,6 +49,7 @@ class JiraBaseCase(AlmPluginTestBase):
     def test_with_project_version(self):
         self.config['alm_project_version'] = '1.0'
         self.post_parse_config()  # Re-init with project version
+        self.init_response_generator()
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
         self.connector.alm_add_task(test_task)
