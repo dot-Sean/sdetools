@@ -1,25 +1,21 @@
 import re
-import os
 import random
 
-from sdetools.sdelib.testlib.alm_response_generator import ResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator
 from sdetools.sdelib.commons import urlencode_str
+
 
 class PivotalTrackerResponseGenerator(ResponseGenerator):
     PROJECT_ID = '1000'
-    STATUS_NAMES = ['unstarted', 'accepted']
 
-    def __init__(self, project_name, release_marker_name, epic_name):
-        initial_task_status = self.STATUS_NAMES[0]
-        test_dir = os.path.dirname(os.path.abspath(__file__))
-        super(PivotalTrackerResponseGenerator, self).__init__(initial_task_status, test_dir)
-
+    def __init__(self, config, test_dir=None):
         self.project_uri = 'projects/%s' % self.PROJECT_ID
-        self.project_name = project_name
-        self.release_marker_name = release_marker_name
-        self.epic_name = epic_name
+        self.project_name = config['alm_project']
+        self.release_marker_name = config['alm_project_version']
+        self.epic_name = config['pt_group_label']
         self.epics = {}
-        self.rest_api_targets = {
+        statuses = ['unstarted', 'accepted']
+        rest_api_targets = {
             'me': 'get_user',
             'projects$': 'get_projects',
             '%s/stories\?filter="(.*):"&fields=current_state,name,updated_at,id' % self.project_uri: 'get_stories',
@@ -29,6 +25,7 @@ class PivotalTrackerResponseGenerator(ResponseGenerator):
             '%s/stories$' % self.project_uri: 'add_story',
             '%s/stories/[0-9]*' % self.project_uri: 'update_status'
         }
+        super(PivotalTrackerResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
     """
        Response functions 

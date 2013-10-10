@@ -1,5 +1,3 @@
-import random
-
 from mock import patch
 from urllib2 import HTTPError
 from sdetools.sdelib.restclient import URLRequest, APIError
@@ -69,10 +67,7 @@ class MockResponse(object):
 class MockSDEResponse(MockResponse):
     def initialize(self, config):
         path_to_sde_rest_api = 'sdetools.sdelib.sdeapi.restclient'
-        response_generator = SdeResponseGenerator(config['sde_server'],
-                                                  config['sde_application'],
-                                                  config['sde_project'],
-                                                  config['sde_method'])
+        response_generator = SdeResponseGenerator(config)
         super(MockSDEResponse, self).initialize(response_generator, path_to_sde_rest_api)
 
     def generate_sde_task(self, task_number=None, project_id=1000, status='TODO', priority=7):

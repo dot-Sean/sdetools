@@ -1,26 +1,24 @@
 # NOTE: Before running ensure that the options are set properly in the
 #       configuration file
-import os
 import unittest
+
 from datetime import datetime
 from rally_response_generator import RallyResponseGenerator
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_rally.rally_plugin import RallyConnector, RallyAPIBase
+PATH_TO_ALM_REST_API = 'sdetools.modules.sync_rally.rally_plugin'
 
 
 class TestRallyCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.path_to_alm_rest_api = 'sdetools.modules.sync_rally.rally_plugin'
-        cls.current_dir = os.path.dirname(os.path.realpath(__file__))
-        super(TestRallyCase, cls).setUpClass()
+        super(TestRallyCase, cls).setUpClass(PATH_TO_ALM_REST_API)
 
     def init_alm_connector(self):
         super(TestRallyCase, self).init_alm_connector(RallyConnector(self.config, RallyAPIBase(self.config)))
 
     def init_response_generator(self):
-        super(TestRallyCase, self).init_response_generator(RallyResponseGenerator(self.config['alm_server'],
-                                                    self.config['alm_method']))
+        super(TestRallyCase, self).init_response_generator(RallyResponseGenerator(self.config, self.test_dir))
 
     def test_parsing_alm_task(self):
         result = super(TestRallyCase, self).test_parsing_alm_task()

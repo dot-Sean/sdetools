@@ -1,6 +1,7 @@
 import os
 import json
 import re
+import sys
 
 from mock import MagicMock
 from urllib2 import HTTPError
@@ -11,28 +12,29 @@ abstractmethod = abc.abstractmethod
 
 
 class ResponseGenerator(object):
-    def __init__(self, initial_task_status, test_dir):
+    def __init__(self, rest_api_targets, statuses, test_dir=None):
         """
             Initializes commonly used variables.
 
-            initial_task_status - default status to use when creating a task through our mock
-            test_dir            - directory containing current test; used to locate response files
-            alm_tasks           - stores tasks created through our mock
-            rest_api_targets    - dict object containing key-value pairs used in get_response to triage API calls
+            statuses            - List of valid task statuses. First entry will be used as the default status
+            test_dir            - Directory containing current test; used to locate response files
+            alm_tasks           - Stores tasks created through our mock
+            rest_api_targets    - Dict object containing key-value pairs used in get_response to triage API calls
                                   to its corresponding response generating method.
                                   Expected format:
                                     "regex_pattern_of_api_target": "method_to_call_on_match"
         """
-        self.initial_task_status = initial_task_status
+        if test_dir is None:
+            path_of_child_class = sys.modules[self.__module__].__file__
+            test_dir = os.path.dirname(path_of_child_class)
+
+        self.statuses = statuses
         self.test_dir = test_dir
         self.alm_tasks = {}
-        self.rest_api_targets = {}
+        self.rest_api_targets = rest_api_targets
         self.init_with_tasks()
 
     def init_with_tasks(self):
-        """
-            Default tasks
-        """
         pass
 
     def get_response(self, target, flags, data, method):
@@ -81,6 +83,12 @@ class ResponseGenerator(object):
 
         raise HTTPError('', error_code, message, '', fp_mock)
 
+    def generator_get_valid_statuses(self):
+        return self.statuses
+
+    """
+        Task management functions
+    """
     def generator_add_task(self, task_number, task_name=None, status=None):
         """
             Save a task created through our mock. Uses the task number
@@ -89,9 +97,8 @@ class ResponseGenerator(object):
         if not self.alm_tasks.get(task_number):
             if not task_name:
                 task_name = "T%s" % task_number
-            if not status:
-                status = self.initial_task_status
-
+            if status is None:
+                status = self.generator_get_valid_statuses()[0]
             self.alm_tasks[task_number] = {
                 "name": task_name,
                 "id": task_number,
@@ -115,8 +122,12 @@ class ResponseGenerator(object):
         if not full_clear:
             self.init_with_tasks()
 
+    """
+        Response reader functions
+    """
     def _read_response_file(self, file_name):
         file_path = os.path.join(self.test_dir, 'response', file_name)
+
         f = open(file_path)
         response = f.read()
         f.close()
@@ -131,6 +142,9 @@ class ResponseGenerator(object):
         raw_xml = self._read_response_file('%s.xml' % file_name)
         return minidom.parseString(raw_xml)
 
+    """
+        Util functions
+    """
     @staticmethod
     def extract_task_number_from_title(s):
         task_number = re.search("(?<=T)[0-9]+((?=[:'])|$)", s)

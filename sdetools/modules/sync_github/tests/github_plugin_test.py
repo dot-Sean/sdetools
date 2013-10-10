@@ -7,22 +7,19 @@ from datetime import datetime
 from github_response_generator import GitHubResponseGenerator
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_github.github_plugin import GitHubConnector, GitHubAPI, AlmException
+PATH_TO_ALM_REST_API = 'sdetools.modules.sync_github.github_plugin'
 
 
 class TestGitHubCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.path_to_alm_rest_api = 'sdetools.modules.sync_github.github_plugin'
-        cls.current_dir = os.path.dirname(os.path.realpath(__file__))
-        super(TestGitHubCase, cls).setUpClass()
+        super(TestGitHubCase, cls).setUpClass(PATH_TO_ALM_REST_API)
 
     def init_alm_connector(self):
         super(TestGitHubCase, self).init_alm_connector(GitHubConnector(self.config, GitHubAPI(self.config)))
 
     def init_response_generator(self):
-        super(TestGitHubCase, self).init_response_generator(GitHubResponseGenerator(self.config['alm_server'],
-                 self.config['github_repo_owner'], self.config['alm_project'], self.config['alm_project_version'],
-                 self.config['alm_user']))
+        super(TestGitHubCase, self).init_response_generator(GitHubResponseGenerator(self.config, self.test_dir))
 
     def test_parsing_alm_task(self):
         result = super(TestGitHubCase, self).test_parsing_alm_task()

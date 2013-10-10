@@ -1,15 +1,15 @@
 # NOTE: Before running ensure that the options are set properly in the
 #       configuration file
-import os
 import unittest
 
 from datetime import datetime
 from mock import patch
 from functools import partial
 from trac_response_generator import TracResponseGenerator
-from sdetools.sdelib.testlib.alm_mock_response import MOCK_ALM_RESPONSE
+from sdetools.sdelib.testlib.mock_response import MOCK_ALM_RESPONSE
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_trac.trac_plugin import TracConnector, TracXMLRPCAPI
+PATH_TO_ALM_REST_API = 'sdetools.modules.sync_trac.trac_plugin'
 
 
 class MockProxyMethods():
@@ -36,9 +36,7 @@ class MockXMLRPCProxy():
 class TestTracCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.path_to_alm_rest_api = 'sdetools.modules.sync_trac.trac_plugin'
-        cls.current_dir = os.path.dirname(os.path.realpath(__file__))
-        super(TestTracCase, cls).setUpClass()
+        super(TestTracCase, cls).setUpClass(PATH_TO_ALM_REST_API)
 
     def init_alm_connector(self):
         super(TestTracCase, self).init_alm_connector(TracConnector(self.config, TracXMLRPCAPI(self.config)))

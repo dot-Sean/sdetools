@@ -1,23 +1,19 @@
-import os
 import json
 
 from cookielib import Cookie
 from sdetools.sdelib.commons import urlencode_str
-from sdetools.sdelib.testlib.alm_response_generator import ResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator
+
 
 class HPAlmResponseGenerator(ResponseGenerator):
-    STATUS_NAMES = ['Not Completed', 'Passed']
     ISSUE_TYPES = ['Undefined', 'Functional', 'Business', 'Folder', 'Testing', 'Group']
 
-    def __init__(self, hp_alm_domain, alm_project, alm_user):
-        initial_task_status = self.STATUS_NAMES[0]
-        test_dir = os.path.dirname(os.path.abspath(__file__)) 
-        super(HPAlmResponseGenerator, self).__init__(initial_task_status, test_dir)
-
-        hp_alm_domain = urlencode_str(hp_alm_domain)
-        hp_alm_project = urlencode_str(alm_project)
-        self.hp_alm_user = urlencode_str(alm_user)
-        self.rest_api_targets = {
+    def __init__(self, config, test_dir=None):
+        hp_alm_domain = urlencode_str(config['hp_alm_domain'])
+        hp_alm_project = urlencode_str(config['alm_project'])
+        self.hp_alm_user = urlencode_str(config['alm_user'])
+        statuses = ['Not Completed', 'Passed']
+        rest_api_targets = {
             'authentication-point/authenticate': 'authenticate',
             'rest/domains/%s/projects/%s/requirements' % (hp_alm_domain, hp_alm_project): 'call_requirements',
             'rest/domains/%s/projects/%s/customization/users/%s' % (hp_alm_domain, hp_alm_project, self.hp_alm_user):
@@ -26,6 +22,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
                 'get_requirement_types',
             'authentication-point/logout': 'logout'
         }
+        super(HPAlmResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
     """
        Response functions 

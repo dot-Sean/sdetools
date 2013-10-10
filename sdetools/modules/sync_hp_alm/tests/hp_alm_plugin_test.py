@@ -1,27 +1,24 @@
 # NOTE: Before running ensure that the options are set properly in the
 #       configuration file
-import os
 import unittest
 
 from datetime import datetime
 from hp_alm_response_generator import HPAlmResponseGenerator
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_hp_alm.hp_alm_plugin import HPAlmConnector, HPAlmAPIBase
+PATH_TO_ALM_REST_API = 'sdetools.modules.sync_hp_alm.hp_alm_plugin'
 
 
 class TestHPAlmCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.path_to_alm_rest_api = 'sdetools.modules.sync_hp_alm.hp_alm_plugin'
-        cls.current_dir = os.path.dirname(os.path.realpath(__file__))
-        super(TestHPAlmCase, cls).setUpClass()
+        super(TestHPAlmCase, cls).setUpClass(PATH_TO_ALM_REST_API)
 
     def init_alm_connector(self):
         super(TestHPAlmCase, self).init_alm_connector(HPAlmConnector(self.config, HPAlmAPIBase(self.config)))
 
     def init_response_generator(self):
-        super(TestHPAlmCase, self).init_response_generator(HPAlmResponseGenerator(self.config['hp_alm_domain'],
-                self.config['alm_project'], self.config['alm_user']))
+        super(TestHPAlmCase, self).init_response_generator(HPAlmResponseGenerator(self.config, self.test_dir))
 
     def test_parsing_alm_task(self):
         result = super(TestHPAlmCase, self).test_parsing_alm_task()

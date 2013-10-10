@@ -1,27 +1,24 @@
 # NOTE: Before running ensure that the options are set properly in the
 #       configuration file
-import os
 import unittest
+
 from datetime import datetime
 from pt_response_generator import PivotalTrackerResponseGenerator
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_pt.pt_plugin import PivotalTrackerConnector, PivotalTrackerAPI
+PATH_TO_ALM_REST_API = 'sdetools.modules.sync_pt.pt_plugin'
 
 
 class TestPivotalTrackerCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.path_to_alm_rest_api = 'sdetools.modules.sync_pt.pt_plugin'
-        cls.current_dir = os.path.dirname(os.path.realpath(__file__))
-        super(TestPivotalTrackerCase, cls).setUpClass()
+        super(TestPivotalTrackerCase, cls).setUpClass(PATH_TO_ALM_REST_API)
 
     def init_alm_connector(self):
         super(TestPivotalTrackerCase, self).init_alm_connector(PivotalTrackerConnector(self.config, PivotalTrackerAPI(self.config)))
 
     def init_response_generator(self):
-         super(TestPivotalTrackerCase, self).init_response_generator(response_generator = PivotalTrackerResponseGenerator(self.config['alm_project'],
-                 self.config['alm_project_version'],
-                 self.config['pt_group_label']))
+         super(TestPivotalTrackerCase, self).init_response_generator(PivotalTrackerResponseGenerator(self.config, self.test_dir))
 
     def test_parsing_alm_task(self):
         result = super(TestPivotalTrackerCase, self).test_parsing_alm_task()

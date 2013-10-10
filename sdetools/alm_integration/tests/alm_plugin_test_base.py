@@ -1,10 +1,10 @@
 import re
 import os
-
+import sys
 from sdetools.sdelib.mod_mgr import ReturnChannel
 from sdetools.sdelib.conf_mgr import Config
 from sdetools.sdelib.commons import abc, Error
-from sdetools.sdelib.testlib.alm_mock_response import MOCK_ALM_RESPONSE, MOCK_SDE_RESPONSE
+from sdetools.sdelib.testlib.mock_response import MOCK_ALM_RESPONSE, MOCK_SDE_RESPONSE
 
 abstractmethod = abc.abstractmethod
 CONF_FILE_LOCATION = 'test_settings.conf'
@@ -16,11 +16,25 @@ def stdout_callback(obj):
 
 class AlmPluginTestBase(object):
     @classmethod
-    def setUpClass(cls, conf_file_location=CONF_FILE_LOCATION):
+    def setUpClass(cls, path_to_alm_rest_api, test_dir=None, conf_file_location=CONF_FILE_LOCATION):
+        """
+            path_to_alm_rest_api - The import path of the class that extends RestBase
+            test_dir             - The directory where we will look for the test config file.
+                                   Default is the directory of the calling class
+            conf_file_location   - The relative path from the test_dir to the conf file.
+                                   Default is the value of CONF_FILE_LOCATION
+            This is where we will look for the test config settings.
+        """
+        if test_dir is None:
+            path_of_child_class = sys.modules[cls.__module__].__file__
+            test_dir = os.path.dirname(path_of_child_class)
+
+        cls.test_dir = test_dir
+        cls.conf_path = os.path.join(cls.test_dir, conf_file_location)
         cls.mock_sde_response = MOCK_SDE_RESPONSE
         cls.mock_alm_response = MOCK_ALM_RESPONSE
         cls.ret_chn = ReturnChannel(stdout_callback, {})
-        cls.conf_path = os.path.join(cls.current_dir, conf_file_location)
+        cls.path_to_alm_rest_api = path_to_alm_rest_api
 
     @abstractmethod
     def init_alm_connector(self, connector):

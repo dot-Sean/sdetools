@@ -1,21 +1,15 @@
-import os
-
 from urllib2 import HTTPError
 from xmlrpclib import Fault
 
-from sdetools.sdelib.testlib.alm_response_generator import ResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator
 
 
 class TracResponseGenerator(ResponseGenerator):
-    STATUS_NAMES = ['new', 'closed']
     ACTIONS = ['resolve', 'reopen']
 
-    def __init__(self):
-        initial_task_status = self.STATUS_NAMES[0]
-        test_dir = os.path.dirname(os.path.abspath(__file__)) 
-        super(TracResponseGenerator, self).__init__(initial_task_status, test_dir)
-
-        self.rest_api_targets = {
+    def __init__(self, config=None, test_dir=None):
+        statuses = ['new', 'closed']
+        rest_api_targets = {
             'system\.getAPIVersion': 'get_api_version',
             'ticket\.get$': 'get_ticket_by_id',
             'ticket\.query': 'query_ticket',
@@ -23,6 +17,7 @@ class TracResponseGenerator(ResponseGenerator):
             'ticket\.update': 'update_ticket',
             'ticket\.getActions': 'get_ticket_actions',
         }
+        super(TracResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
     def raise_error(self, error_code, return_value=None):
         try:
@@ -113,9 +108,9 @@ class TracResponseGenerator(ResponseGenerator):
                         new_status = None
 
                         if action == self.ACTIONS[0]:
-                            new_status = self.STATUS_NAMES[1]
+                            new_status = self.generator_get_valid_statuses()[1]
                         elif action == self.ACTIONS[1]:
-                            new_status = self.STATUS_NAMES[0]
+                            new_status = self.generator_get_valid_statuses()[0]
                         self.generator_update_task(task_number, 'status', new_status)
 
                     task = self.generator_get_task(task_number)

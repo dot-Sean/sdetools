@@ -1,20 +1,16 @@
-import os
 import re
 
-from sdetools.sdelib.testlib.alm_response_generator import ResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator
+
 
 class RallyResponseGenerator(ResponseGenerator):
     API_VERSION = '1.39'
-    STATUS_NAMES = ['Defined', 'Completed', 'Accepted']
+    BASE_PATH = 'slm/webservice/%s' % API_VERSION
 
-    def __init__(self, host, protocol='http'):
-        initial_task_status = self.STATUS_NAMES[0]
-        test_dir = os.path.dirname(os.path.abspath(__file__)) 
-        super(RallyResponseGenerator, self).__init__(initial_task_status, test_dir)
-
-        base_path = 'slm/webservice/%s' % self.API_VERSION
-        self.api_url = '%s://%s/%s' % (protocol, host, base_path)
-        self.rest_api_targets = {
+    def __init__(self, config, test_dir=None):
+        self.api_url = '%s://%s/%s' % (config['alm_method'], config['alm_server'], self.BASE_PATH)
+        statuses = ['Defined', 'Completed', 'Accepted']
+        rest_api_targets = {
             'task\.js': 'get_tasks',
             'subscription\.js': 'get_subscription',
             'project\.js': 'get_project',
@@ -22,6 +18,7 @@ class RallyResponseGenerator(ResponseGenerator):
             'hierarchicalrequirement/[0-9]+\.js': 'call_card',
             'hierarchicalrequirement/create\.js': 'create_card'
         }
+        super(RallyResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
     """
        Response functions 

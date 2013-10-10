@@ -1,25 +1,22 @@
 import re
-import os
 
-from sdetools.sdelib.testlib.alm_response_generator import ResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator
 from sdetools.sdelib.commons import urlencode_str
 
 
 class MingleResponseGenerator(ResponseGenerator):
     BASE_PATH = 'api/v2'
-    STATUS_NAMES = ['New', 'Done']
 
-    def __init__(self, project_name):
-        initial_task_status = self.STATUS_NAMES[0]
-        test_dir = os.path.dirname(os.path.abspath(__file__)) 
-        super(MingleResponseGenerator, self).__init__(initial_task_status, test_dir)
-
+    def __init__(self, config, test_dir=None):
+        project_name = urlencode_str(config['alm_project'])
+        statuses = ['New', 'Done']
         self.project_uri = 'projects/%s/cards' % urlencode_str(project_name)
-        self.rest_api_targets = {
+        rest_api_targets = {
             'projects.xml': 'get_projects',
             '%s.xml' % self.project_uri: 'project_cards',
             '%s/[0-9]*.xml' % self.project_uri: 'update_card_status'
         }
+        super(MingleResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
     """
        Response functions 

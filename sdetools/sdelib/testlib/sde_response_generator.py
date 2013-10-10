@@ -1,24 +1,19 @@
-import os
 import re
 import random
 
-from sdetools.sdelib.testlib.alm_response_generator import ResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator
 
 
 class SdeResponseGenerator(ResponseGenerator):
-    STATUS_NAMES = ['open', 'closed']
     BASE_PATH = 'api'
     ANALYSIS_TOOLS = ['appscan', 'veracode', 'fortify', 'webinspect']
 
-    def __init__(self, host, app_name, project_name, protocol='http'):
-        initial_task_status = self.STATUS_NAMES[0]
-        test_dir = os.path.dirname(os.path.abspath(__file__)) 
-        super(SdeResponseGenerator, self).__init__(initial_task_status, test_dir)
-
-        self.app_name = app_name
-        self.project_name = project_name
-        self.api_url = '%s://%s/%s' % (protocol, host, self.BASE_PATH)
-        self.rest_api_targets = {
+    def __init__(self, config, test_dir=None):
+        self.app_name = config['sde_application']
+        self.project_name = config['sde_project']
+        self.api_url = '%s://%s/%s' % (config['sde_method'], config['sde_server'], self.BASE_PATH)
+        statuses = ['TODO', 'DONE']
+        rest_api_targets = {
             'applications': 'call_applications',
             'projects': 'get_projects',
             'tasks$': 'get_tasks',
@@ -26,6 +21,7 @@ class SdeResponseGenerator(ResponseGenerator):
             'tasknotes.*': 'call_task_notes',
             'projectnotes/analysis$': 'add_project_analysis_note'
         }
+        super(SdeResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
     def init_with_tasks(self):
         self.generator_add_task('40', 'T40: Task Name')
@@ -36,16 +32,14 @@ class SdeResponseGenerator(ResponseGenerator):
         if not self.generator_get_task(task_number):
             if not task_name:
                 task_name = "T%s" % task_number
-            if not status:
-                status = self.initial_task_status
 
             self.alm_tasks[task_number] = {
                 "name": task_name,
                 "id": task_number,
-                "status": status,
                 "timestamp": self.get_current_timestamp(),
                 "text_notes": [],
                 "ide_notes": [],
+                "status": self.generator_get_valid_statuses()[0],
                 "analysis_notes": [],
                 "task_id": '1000-T%s' % task_number
             }
@@ -263,7 +257,9 @@ class SdeResponseGenerator(ResponseGenerator):
             task['title'] = 'T%s' % task_number
             task['priority'] = priority
 
-        task['status'] = status
+        if status is not None:
+            task['status'] = status
+
         task['id'] = '%s-T%s' % (project_id, task_number)
         task['project'] = project_id
 

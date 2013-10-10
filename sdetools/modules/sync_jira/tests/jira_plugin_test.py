@@ -1,6 +1,5 @@
 # NOTE: Before running ensure that the options are set properly in the
 #       configuration file
-import os
 import unittest
 
 from datetime import datetime
@@ -8,29 +7,25 @@ from mock import patch, MagicMock
 from functools import partial
 from jira_response_generator import JiraResponseGenerator
 from sdetools.sdelib.conf_mgr import Config
-from sdetools.sdelib.testlib.alm_mock_response import MOCK_ALM_RESPONSE
+from sdetools.sdelib.testlib.mock_response import MOCK_ALM_RESPONSE
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_jira.jira_plugin import JIRAConnector, AlmException
 from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
 from sdetools.modules.sync_jira.jira_soap import JIRASoapAPI
+PATH_TO_ALM_REST_API = 'sdetools.modules.sync_jira.jira_rest'
 
 
 class JiraBaseCase(AlmPluginTestBase):
     @classmethod
     def setUpClass(cls):
-        cls.path_to_alm_rest_api = 'sdetools.modules.sync_jira.jira_rest'
-        cls.current_dir = os.path.dirname(os.path.realpath(__file__))
-        super(JiraBaseCase, cls).setUpClass()
+        super(JiraBaseCase, cls).setUpClass(PATH_TO_ALM_REST_API)
 
     def init_alm_connector(self):
         self.config.add_custom_option('jira_version', 'Version of JIRA [e.g. 4.3.3, 5, or 6.0]', default='6')
         super(JiraBaseCase, self).init_alm_connector(JIRAConnector(self.config, JIRARestAPI(self.config)))
 
     def init_response_generator(self):
-         super(JiraBaseCase, self).init_response_generator(JiraResponseGenerator(self.config['alm_server'],
-                self.config['alm_project'],
-                self.config['alm_project_version'],
-                self.config['alm_user']))
+         super(JiraBaseCase, self).init_response_generator(JiraResponseGenerator(self.config, self.test_dir))
 
     def post_parse_config(self):
         api_ver = self.config['jira_version'][:1]

@@ -1,6 +1,6 @@
 from sdetools.sdelib import conf_mgr
 from sdetools.sdelib.mod_mgr import ReturnChannel
-from sdetools.sdelib.testlib.alm_mock_response import MOCK_SDE_RESPONSE
+from sdetools.sdelib.testlib.mock_response import MOCK_SDE_RESPONSE
 from sdetools.sdelib.commons import abc
 abstractmethod = abc.abstractmethod
 
