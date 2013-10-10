@@ -2,37 +2,26 @@
 #       configuration file
 import os
 import unittest
+
 from datetime import datetime
 from hp_alm_response_generator import HPAlmResponseGenerator
-
-import sdetools.alm_integration.tests.alm_mock_response
-import sdetools.alm_integration.tests.alm_mock_sde_plugin
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
-from sdetools.modules.sync_hp_alm.hp_alm_plugin import HPAlmConnector, HPAlmAPIBase, AlmException
-
-CONF_FILE_LOCATION = 'test_settings.conf'
-MOCK_RESPONSE = sdetools.alm_integration.tests.alm_mock_response
-MOCK_SDE = sdetools.alm_integration.tests.alm_mock_sde_plugin
+from sdetools.modules.sync_hp_alm.hp_alm_plugin import HPAlmConnector, HPAlmAPIBase
 
 
 class TestHPAlmCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
-    def setUpClass(self):
-        path_to_hp_alm_connector = 'sdetools.modules.sync_hp_alm.hp_alm_plugin'
-        current_dir = os.path.dirname(os.path.realpath(__file__))
-        conf_path = os.path.join(current_dir, CONF_FILE_LOCATION)
-        super(TestHPAlmCase, self).setUpClass(path_to_hp_alm_connector, conf_path)
+    def setUpClass(cls):
+        cls.path_to_alm_connector = 'sdetools.modules.sync_hp_alm.hp_alm_plugin'
+        cls.current_dir = os.path.dirname(os.path.realpath(__file__))
+        super(TestHPAlmCase, cls).setUpClass()
 
     def init_alm_connector(self):
-        connector = HPAlmConnector(self.config, HPAlmAPIBase(self.config))
-        super(TestHPAlmCase, self).init_alm_connector(connector)
+        super(TestHPAlmCase, self).init_alm_connector(HPAlmConnector(self.config, HPAlmAPIBase(self.config)))
 
-    def post_parse_config(self):
-        response_generator = HPAlmResponseGenerator(self.config['hp_alm_domain'],
-                                                    self.config['alm_project'],
-                                                    self.config['alm_user'])
-
-        MOCK_RESPONSE.patch_call_rest_api(response_generator, self.path_to_alm_connector)
+    def init_response_generator(self):
+        super(TestHPAlmCase, self).init_response_generator(HPAlmResponseGenerator(self.config['hp_alm_domain'],
+                self.config['alm_project'], self.config['alm_user']))
 
     def test_parsing_alm_task(self):
         result = super(TestHPAlmCase, self).test_parsing_alm_task()

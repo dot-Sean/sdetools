@@ -27,7 +27,7 @@ class SdeResponseGenerator(ResponseGenerator):
             'projectnotes/analysis$': 'add_project_analysis_note'
         }
 
-    def add_default_tasks(self):
+    def init_with_tasks(self):
         self.generator_add_task('40', 'T40: Task Name')
         self.generator_add_task('36', 'T36: Task Name')
         self.generator_add_task('38', 'T38: Task Name')

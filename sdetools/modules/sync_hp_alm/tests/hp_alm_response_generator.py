@@ -1,12 +1,11 @@
 import os
 import json
+
 from cookielib import Cookie
-
 from sdetools.sdelib.commons import urlencode_str
+from sdetools.sdelib.testlib.alm_response_generator import ResponseGenerator
 
-from sdetools.alm_integration.tests.alm_response_generator import AlmResponseGenerator
-
-class HPAlmResponseGenerator(AlmResponseGenerator):
+class HPAlmResponseGenerator(ResponseGenerator):
     STATUS_NAMES = ['Not Completed', 'Passed']
     ISSUE_TYPES = ['Undefined', 'Functional', 'Business', 'Folder', 'Testing', 'Group']
 
@@ -47,7 +46,7 @@ class HPAlmResponseGenerator(AlmResponseGenerator):
         query = data['query']
         fields = data['fields'].split(',')
         task_number = self.extract_task_number_from_title(query)
-        task = self.get_alm_task(task_number)
+        task = self.generator_get_task(task_number)
         response = {
             "TotalResults": 0,
             "entities": []
@@ -74,11 +73,11 @@ class HPAlmResponseGenerator(AlmResponseGenerator):
             self.raise_error('405')
 
         task_number = self.extract_task_number_from_title(name)
-        task = self.get_alm_task(task_number)
+        task = self.generator_get_task(task_number)
 
         if not task:
-            self.add_alm_task(task_number, name, status)
-            new_task = self.get_alm_task(task_number)
+            self.generator_add_task(task_number, name, status)
+            new_task = self.generator_get_task(task_number)
             response = self.generate_task_fields(new_task)
 
             return response
@@ -97,10 +96,10 @@ class HPAlmResponseGenerator(AlmResponseGenerator):
         if not task_number or not status:
             self.raise_error('405')
 
-        task = self.get_alm_task(task_number)
+        task = self.generator_get_task(task_number)
 
         if task:
-            self.update_alm_task(task_number, 'status', status)
+            self.generator_update_task(task_number, 'status', status)
         else:
             self.raise_error('404')
 
