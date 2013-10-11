@@ -17,12 +17,11 @@ class Mapping:
         self.checks = []
         self.task_map = {}
 
+        # these are good candidates for CWE mapping
         self.appcheck_group = ['5', '6', '12', '30', '60', '586', '587', '657', '703', '1202', '2039']
-        self.thirdparty_group = ['589', '594','606']
-        self.misc_group = []
+        # these should be considered 3rd party - T186
+        self.thirdparty_group = ['589', '594', '606']
         self.thirdparty_checks = []
-        self.appcheck_checks = []
-        self.misc_checks = []
 
     def load_base_mapping_from_xml(self, mapping_file):
         try:
@@ -50,6 +49,10 @@ class Mapping:
 
         for task in base.getElementsByTagName('task'):
             task_id = task.attributes['id'].value
+
+            if task_id not in self.base_tasks:
+                self.base_tasks[task_id] = task
+
             task_checks = []
             if task_id in self.task_map.keys():
                 task_checks = self.task_map[task_id]
@@ -85,10 +88,7 @@ class Mapping:
                     self.appcheck_group.append(check_group_id)
                 elif parent_check_id in self.thirdparty_group and check_group_id not in self.thirdparty_group:
                     self.thirdparty_group.append(check_group_id)
-                elif parent_check_id in self.misc_group and check_group_id not in self.misc_group:
-                    self.misc_group.append(check_group_id)
 
-        self.misc_group = sorted(self.misc_group)
         self.thirdparty_group = sorted(self.thirdparty_group)
         self.appcheck_group = sorted(self.appcheck_group)
 
@@ -96,8 +96,7 @@ class Mapping:
         fp = open(unmapped_cwe_file_name, "w")
 
         self.task_map['186'].extend(self.thirdparty_checks)
-        self.task_map['193'] = [{'check_id': '*', 'check_name': 'Unmapped Check'}]
-        self.task_map['193'].extend(self.misc_checks)
+        self.task_map['193'].extend([{'check_id': '*', 'check_name': 'Unmapped Check'}])
 
         keys = sorted(self.cwe_checks.iterkeys())
         for cwe in keys:
@@ -107,10 +106,15 @@ class Mapping:
                     task_checks = []
                     if task in self.task_map.keys():
                         task_checks = self.task_map[task]
+
                     for check in self.cwe_checks[cwe]:
 
+                        # If the check is assigned here already skip it
+                        if self.check_mapped(self.task_map, check['check_id'], task):
+                            continue
+
                         # If the check is assigned elsewhere do not put it in the catch-all task
-                        if self.check_mapped(self.task_map, check['check_id']):
+                        if task == '193' and self.check_mapped(self.task_map, check['check_id'], task):
                             continue
 
                         task_checks.append(check)
@@ -163,18 +167,9 @@ class Mapping:
                 continue
             elif self.check_in_list(self.thirdparty_checks, check['check_id']):
                 continue
-            elif check['check_group_id'] in self.appcheck_group:
-                self.appcheck_checks.append(check)
             elif check['check_group_id'] in self.thirdparty_group:
                 self.thirdparty_checks.append(check)
                 continue
-            elif check['check_group_id'] in self.misc_group:
-                self.misc_checks.append(check)
-                continue
-
-            if check['check_group_id'] not in self.appcheck_group:
-                raise Exception('Check found that did not map as appcheck (id=%s name=%s group_id=%s)'
-                                % (check['check_id'], check['check_name'], check['check_group_id']))
 
             cwe = weakness_row.getElementsByTagName('CWE')[0].firstChild.data
             check['cwe_desc'] = weakness_row.getElementsByTagName('CWE_Desc')[0].firstChild.data
@@ -196,10 +191,9 @@ class Mapping:
         fp.write('<mapping weaknesses="%d">\n' % len(self.checks))
         for task_id in keys:
             task_checks = self.task_map[task_id]
-
             fp.write('\t<task id="%s" title="%s" confidence="%s">\n' % (
                 task_id, self.base_tasks[task_id].attributes['title'].value, "low"))
-            task_checks = sorted(task_checks)
+            task_checks = sorted(task_checks, key=lambda x: x['check_name'])
             for weakness in task_checks:
                 fp.write('\t\t<weakness type="check" id="%s" title="%s" />\n' % (weakness['check_id'],
                                                                                  weakness['check_name']))
@@ -213,16 +207,20 @@ class Mapping:
                 return True
         return False
 
-    def check_mapped(self, task_map, check_id):
+    def check_mapped(self, task_map, check_id, selected_task=None):
         keys = task_map.iterkeys()
 
         if self.check_in_list(self.thirdparty_checks, check_id):
             return True
 
         for task_id in keys:
+            if selected_task:
+                if task_id != selected_task:
+                    continue
             task_checks = task_map[task_id]
             if self.check_in_list(task_checks, check_id):
                 return True
+
         return False
 
     def find_missing_checks(self):

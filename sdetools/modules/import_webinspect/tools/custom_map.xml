@@ -29,6 +29,7 @@
 	<task id="182" title="Avoid nested expressions based on unvalidated input" confidence="low">
 	</task>
 	<task id="186" title="Verify that third party libraries do not have any outstanding security patches" confidence="low">
+		<weakness type="check" id="10958" title="FCKeditor 'CurrentFolder' Parameter Directory Traversal" />    
 		<weakness type="check" id="10955" title="Campsite attachments.php 'article_id' Parameter SQL Injection" />
 		<weakness type="check" id="5127" title="getInternet SQL Injection" />
 		<weakness type="check" id="10279" title="HacmeCasino SQL Injection" />
@@ -60,6 +61,7 @@
 	<task id="244" title="Securely delete any unprotected sensitive data" confidence="low">
 	</task>
 	<task id="25" title="Enforce absolute session timeouts" confidence="low">
+        <weakness type="check" id="4728" title="Persistent Cookies" />
 	</task>
 	<task id="29" title="Use anti cross site request forgery (CSRF) tokens" confidence="low">
 		<weakness type="check" id="10963" title="Cross-Site Request Forgery" />
@@ -84,6 +86,14 @@
 	<task id="42" title="Avoid relying on untrusted data for server side page, view, or template selection" confidence="low">
 	</task>
 	<task id="43" title="Avoid unsafe operating system interaction" confidence="low">
+		<weakness type="check" id="10199" title="Universal Arbitrary Command Execution (Backticks)" />
+		<weakness type="check" id="10200" title="Universal Arbitrary Command Execution (NULL)" />
+		<weakness type="check" id="10201" title="Universal Arbitrary Command Execution (Newline)" />
+		<weakness type="check" id="10202" title="Universal Arbitrary Command Execution (Pipe/Ampersand)" />
+		<weakness type="check" id="10203" title="Universal Arbitrary Command Execution (Pipe/Ampersand/Single Quote)" />
+		<weakness type="check" id="10204" title="Universal Arbitrary Command Execution (Pipe/Ampersand/Double Quote)" />
+		<weakness type="check" id="10205" title="Universal Arbitrary Command Execution (Ampersand/Pipe)" />
+		<weakness type="check" id="2152" title="Parameter Manipulation Directory Traversal Command Execution (/../../../../../../../../bin/id%00|)" />        
 	</task>
 	<task id="47" title="Implement a global error handler and generic default error page for end users" confidence="low">
 	</task>
