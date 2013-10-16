@@ -44,6 +44,10 @@ class MingleResponseGenerator(AlmResponseGenerator):
                     if task:
                         card = self.generate_card(card_number, task['name'], task['status'], task['card_type'])
                         cards.documentElement.appendChild(card.documentElement)
+                else:
+                    for task in self.alm_tasks.values():
+                        card = self.generate_card(task['id'], task['name'], task['status'], task['card_type'])
+                        cards.documentElement.appendChild(card.documentElement)
 
                 return cards
             elif method == 'POST':

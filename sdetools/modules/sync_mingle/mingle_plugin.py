@@ -79,9 +79,6 @@ class MingleConnector(AlmConnector):
         config.add_custom_option('mingle_done_statuses', 'Statuses that signify a task is Done in Mingle',
             default='Ready for Testing,In Testing,Ready for Signoff,Accepted')
 
-        # Speed up syncing by re-using search results when checking for existing tasks
-        self.queried_cards = None
-
     def initialize(self):
         super(MingleConnector, self).initialize()
 
@@ -118,19 +115,18 @@ class MingleConnector(AlmConnector):
             raise AlmException('Unable to find Mingle project. Reason: %s' % err)
 
     def _alm_get_task_by_task_id(self, task_id):
-        if not self.queried_cards:
-            try:
-                result = self.alm_plugin.call_api('%s.xml' % self.project_uri)
-            except APIError, err:
-                logger.error(err)
-                raise AlmException('Unable to get task %s from Mingle' % task_id)
+        try:
+            result = self.alm_plugin.call_api('%s.xml' % self.project_uri)
+        except APIError, err:
+            logger.error(err)
+            raise AlmException('Unable to get task %s from Mingle' % task_id)
 
-            if result:
-                self.queried_cards = result.getElementsByTagName('card')
+        if result:
+            card_elements = result.getElementsByTagName('card')
 
-        if self.queried_cards:
-            for i in range(0, self.queried_cards.length):
-                card_item = self.queried_cards.item(i)
+        if card_elements:
+            for i in range(0, card_elements.length):
+                card_item = card_elements.item(i)
 
                 try:
                     card_name = card_item.getElementsByTagName('name').item(0).firstChild.nodeValue
