@@ -114,6 +114,17 @@ class MingleConnector(AlmConnector):
         except APIError, err:
             raise AlmException('Unable to find Mingle project. Reason: %s' % err)
 
+    def _get_value_of_element_with_tag(self, root, tag_name):
+        elements = root.getElementsByTagName(tag_name)
+
+        if elements.length > 0:
+            try:
+                return elements.item(0).firstChild.nodeValue
+            except Exception, err:
+                raise AlmException('Could not get the value of the %s element" %s' % tag_name)
+        else:
+            raise AlmException('Could not find any element with the tag %s' % tag_name)
+
     def _alm_get_task_by_task_id(self, task_id):
         try:
             result = self.alm_plugin.call_api('%s.xml' % self.project_uri)
@@ -127,12 +138,7 @@ class MingleConnector(AlmConnector):
         if card_elements:
             for i in range(0, card_elements.length):
                 card_item = card_elements.item(i)
-
-                try:
-                    card_name = card_item.getElementsByTagName('name').item(0).firstChild.nodeValue
-                except Exception, err:
-                    logger.info(err)
-                    raise AlmException('Unable to get the name property of a Mingle card: %s' % card_item)
+                card_name = self._get_value_of_element_with_tag(card_item, 'name')
 
                 _task_id = re.search('T[0-9]+(?=:)', card_name)
 
@@ -168,25 +174,17 @@ class MingleConnector(AlmConnector):
         if card_item is None:
             return None
 
-        try:
-            card_num = card_item.getElementsByTagName('number').item(0).firstChild.nodeValue
-        except Exception, err:
-            logger.info(err)
-            raise AlmException('Unable to get card # for task '
-                               '%s from Mingle' % task_id)
+        card_num = self._get_value_of_element_with_tag(card_item, 'number')
+
         modified_date = None
         if card_item.getElementsByTagName('modified_on'):
-            modified_date = card_item.getElementsByTagName(
-                    'modified_on').item(0).firstChild.nodeValue
+            modified_date = self._get_value_of_element_with_tag(card_item, 'modified_on')
         status = None
         if card_item.getElementsByTagName('property'):
             properties = card_item.getElementsByTagName('property')
             for prop in properties:
-                if (prop.getElementsByTagName(
-                            'name').item(0).firstChild.nodeValue ==
-                            'Status'):
-                    status_node = prop.getElementsByTagName(
-                            'value').item(0).firstChild
+                if (self._get_value_of_element_with_tag(prop, 'name') == 'Status'):
+                    status_node = prop.getElementsByTagName('value').item(0).firstChild
                     if status_node:
                         status = status_node.nodeValue
                     else:
