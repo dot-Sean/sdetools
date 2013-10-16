@@ -4,7 +4,6 @@
 import unittest
 import os
 
-
 from sdetools.analysis_integration.tests.base_integration_test import BaseIntegrationTest
 from sdetools.modules.import_veracode.veracode_integrator import VeracodeIntegrator
 
@@ -20,7 +19,3 @@ class TestVeracode(BaseIntegrationTest, unittest.TestCase):
 
     def expected_number_of_findings(self):
         return 2
-
-if __name__ == "__main__":
-    unittest.main()
-
