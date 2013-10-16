@@ -95,6 +95,9 @@ class AlmResponseGenerator(object):
     def get_alm_task(self, task_number):
         return self.alm_tasks.get(task_number)
 
+    def get_all_tasks(self):
+        return self.alm_tasks
+
     def update_alm_task(self, task_number, field, value):
         if self.alm_tasks.get(task_number):
             self.alm_tasks[task_number][field] = value
@@ -130,3 +133,13 @@ class AlmResponseGenerator(object):
     @staticmethod
     def get_current_timestamp():
         return datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    @staticmethod
+    def is_data_valid(data, fields=[]):
+        if data is None:
+            return False
+        for field in fields:
+            if not field in data:
+                return False
+
+        return True
