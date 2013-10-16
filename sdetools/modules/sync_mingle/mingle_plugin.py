@@ -136,16 +136,13 @@ class MingleConnector(AlmConnector):
             raise AlmException('Unable to get cards from Mingle')
 
         if result:
-            card_elements = result.getElementsByTagName('card')
+            for card_item in result.getElementsByTagName('card'):
+                card_name = self._get_value_of_element_with_tag(card_item, 'name')
+                _task_id = re.search('T[0-9]+(?=:)', card_name)
 
-            if card_elements.length > 0:
-                for card_item in card_elements:
-                    card_name = self._get_value_of_element_with_tag(card_item, 'name')
-                    _task_id = re.search('T[0-9]+(?=:)', card_name)
-
-                    if _task_id is not None:
-                        card_num = self._get_value_of_element_with_tag(card_item, 'number')
-                        self.cached_cards[_task_id.group(0)] = card_num
+                if _task_id is not None:
+                    card_num = self._get_value_of_element_with_tag(card_item, 'number')
+                    self.cached_cards[_task_id.group(0)] = card_num
 
     def _alm_get_task_by_task_id(self, task_id):
         if self.cached_cards is None:

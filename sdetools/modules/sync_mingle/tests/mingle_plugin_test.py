@@ -9,7 +9,7 @@ from sdetools.modules.sync_mingle.mingle_plugin import MingleConnector, MingleAP
 
 CONF_FILE_LOCATION = 'test_settings.conf'
 MOCK_RESPONSE = sdetools.alm_integration.tests.alm_mock_response
-
+MOCK_SDE = sdetools.alm_integration.tests.alm_mock_sde_plugin
 
 class TestMingleCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
@@ -44,4 +44,20 @@ class TestMingleCase(AlmPluginTestBase, unittest.TestCase):
         self.assertEqual(result_status, alm_status, 'Expected %s status, got %s' % (alm_status, result_status))
         self.assertEqual(type(result_timestamp), datetime, 'Expected a datetime object')
 
+    def test_mingle_cached_cards(self):
+        self.tac.alm_connect()
+        test_task = MOCK_SDE.generate_sde_task()
+        self.tac.alm_add_task(test_task)
+        cached_cards = self.tac.cached_cards
 
+        self.assertEqual(cached_cards, None)
+
+        self.tac._cache_all_sde_mingle_cards()
+        cached_cards = self.tac.cached_cards
+        sde_task_id = self.tac._extract_task_id(test_task['id'])
+        alm_id = int(test_task['id'].split('T')[1])
+
+        self.assertNotNone(cached_cards)
+        self.assertNotNone(cached_cards.get(sde_task_id))
+        self.assertEquals(cached_cards.get(sde_task_id), alm_id)
+        self.assertNotNone(self.tac.alm_get_task(test_task))
