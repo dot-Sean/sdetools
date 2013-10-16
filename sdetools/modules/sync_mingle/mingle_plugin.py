@@ -10,7 +10,6 @@ from sdetools.sdelib.restclient import RESTBase
 from sdetools.sdelib.restclient import URLRequest, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from sdetools.alm_integration.alm_plugin_base import AlmException
-from sdetools.sdelib.conf_mgr import Config
 from sdetools.extlib import markdown
 
 from sdetools.sdelib import log_mgr
@@ -79,6 +78,8 @@ class MingleConnector(AlmConnector):
         config.add_custom_option('mingle_done_statuses', 'Statuses that signify a task is Done in Mingle',
             default='Ready for Testing,In Testing,Ready for Signoff,Accepted')
 
+        self.cached_cards = None
+
     def initialize(self):
         super(MingleConnector, self).initialize()
 
@@ -125,27 +126,40 @@ class MingleConnector(AlmConnector):
         else:
             raise AlmException('Could not find any element with the tag %s' % tag_name)
 
-    def _alm_get_task_by_task_id(self, task_id):
+    def _cache_all_sde_mingle_cards(self):
+        self.cached_cards = {}
+
         try:
             result = self.alm_plugin.call_api('%s.xml' % self.project_uri)
         except APIError, err:
             logger.error(err)
-            raise AlmException('Unable to get task %s from Mingle' % task_id)
+            raise AlmException('Unable to get cards from Mingle')
 
         if result:
             card_elements = result.getElementsByTagName('card')
 
-        if card_elements:
-            for i in range(0, card_elements.length):
-                card_item = card_elements.item(i)
-                card_name = self._get_value_of_element_with_tag(card_item, 'name')
+            if card_elements.length > 0:
+                for card_item in card_elements:
+                    card_name = self._get_value_of_element_with_tag(card_item, 'name')
+                    _task_id = re.search('T[0-9]+(?=:)', card_name)
 
-                _task_id = re.search('T[0-9]+(?=:)', card_name)
+                    if _task_id is not None:
+                        card_num = self._get_value_of_element_with_tag(card_item, 'number')
+                        self.cached_cards[_task_id.group(0)] = card_num
 
-                if _task_id is not None and _task_id.group(0) == task_id:
-                    return card_item
+    def _alm_get_task_by_task_id(self, task_id):
+        if self.cached_cards is None:
+            self._cache_all_sde_mingle_cards()
 
-        return None
+        card_num = self.cached_cards.get(task_id)
+
+        if card_num is None:
+            return None
+
+        try:
+            return self.alm_plugin.call_api('%s/%s.xml' % (self.project_uri, card_num))
+        except APIError, err:
+            raise AlmException('Could not find Mingle card with the card number %s' % card_num)
 
     def _alm_get_task_by_title(self, task_title):
         task_args = {'filters[]': ('[Name][is][%s]' % task_title)}
@@ -158,7 +172,7 @@ class MingleConnector(AlmConnector):
 
         card_elements = result.getElementsByTagName('card')
 
-        if card_elements is not None and card_elements.length > 0:
+        if card_elements.length > 0:
             return card_elements.item(0)
         else:
             return None
@@ -175,21 +189,24 @@ class MingleConnector(AlmConnector):
             return None
 
         card_num = self._get_value_of_element_with_tag(card_item, 'number')
-
         modified_date = None
+        status = None
+
         if card_item.getElementsByTagName('modified_on'):
             modified_date = self._get_value_of_element_with_tag(card_item, 'modified_on')
-        status = None
         if card_item.getElementsByTagName('property'):
             properties = card_item.getElementsByTagName('property')
+
             for prop in properties:
                 if (self._get_value_of_element_with_tag(prop, 'name') == 'Status'):
                     status_node = prop.getElementsByTagName('value').item(0).firstChild
+
                     if status_node:
                         status = status_node.nodeValue
                     else:
                         status = 'TODO'
                     break
+
         return MingleTask(task_id, card_num, status, modified_date,
                           self.sde_plugin.config['mingle_done_statuses'])
 
@@ -217,6 +234,11 @@ class MingleConnector(AlmConnector):
         if not alm_task:
             raise AlmException('Alm task not added sucessfully. Please '
                                'check ALM-specific settings in config file')
+
+        if self.cached_cards is not None:
+            task_id = self._extract_task_id(task['id'])
+            card_num = alm_task.get_alm_id()
+            self.cached_cards[task_id] = card_num
 
         if (self.sde_plugin.config['alm_standard_workflow'] and
                 (task['status']=='DONE' or task['status']=='NA')):
