@@ -80,7 +80,7 @@ class MingleConnector(AlmConnector):
             default='Ready for Testing,In Testing,Ready for Signoff,Accepted')
 
         # Speed up syncing by re-using search results when checking for existing tasks
-        self.search_results = None
+        self.queried_cards = None
 
     def initialize(self):
         super(MingleConnector, self).initialize()
@@ -118,48 +118,48 @@ class MingleConnector(AlmConnector):
             raise AlmException('Unable to find Mingle project. Reason: %s' % err)
 
     def _alm_get_task_by_task_id(self, task_id):
-        task_args = {'filters[]': ('[Type][is][%s]' % self.config['mingle_card_type'])}
-
-        if not self.search_results:
+        if not self.queried_cards:
             try:
-                self.search_results = self.alm_plugin.call_api('%s.xml' % self.project_uri, args=task_args)
+                result = self.alm_plugin.call_api('%s.xml' % self.project_uri)
             except APIError, err:
                 logger.error(err)
-                raise AlmException('Unable to get Mingle %s cards' % self.config['mingle_card_type'])
+                raise AlmException('Unable to get task %s from Mingle' % task_id)
 
-        card_elements = self.search_results.getElementsByTagName('card')
-        if not card_elements.length:
-            return None
+            if result:
+                self.queried_cards = result.getElementsByTagName('card')
 
-        for i in range(0, card_elements.length):
-            card_item = card_elements.item(i)
+        if self.queried_cards:
+            for i in range(0, self.queried_cards.length):
+                card_item = self.queried_cards.item(i)
 
-            try:
-                card_name = card_item.getElementsByTagName('name').item(0).firstChild.nodeValue
-            except Exception, err:
-                logger.info(err)
-                raise AlmException('Unable to get the name property of a Mingle card: %s' % card_item)
+                try:
+                    card_name = card_item.getElementsByTagName('name').item(0).firstChild.nodeValue
+                except Exception, err:
+                    logger.info(err)
+                    raise AlmException('Unable to get the name property of a Mingle card: %s' % card_item)
 
-            _task_id = re.search('T[0-9]+(?=:)', card_name)
+                _task_id = re.search('T[0-9]+(?=:)', card_name)
 
-            if _task_id is not None and _task_id.group(0) == task_id:
-                return card_item
+                if _task_id is not None and _task_id.group(0) == task_id:
+                    return card_item
 
         return None
 
     def _alm_get_task_by_title(self, task_title):
+        task_args = {'filters[]': ('[Name][is][%s]' % task_title)}
+
         try:
-            task_args = {'filters[]': ('[Name][is][%s]' % task_title)}
             result = self.alm_plugin.call_api('%s.xml' % self.project_uri, args=task_args)
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get task %s from Mingle' % task_title)
 
-        card_element = result.getElementsByTagName('card')
-        if not card_element.length:
-            return None
+        card_elements = result.getElementsByTagName('card')
 
-        return card_element.item(0)
+        if card_elements is not None and card_elements.length > 0:
+            return card_elements.item(0)
+        else:
+            return None
 
     def alm_get_task(self, task, title=None):
         task_id = self._extract_task_id(task['id'])
