@@ -22,7 +22,8 @@ GITHUB_DEFAULT_PRIORITY_MAP = {
     }
 PUBLIC_TASK_CONTENT = 'Visit us at http://www.sdelements.com/ to find out how you can easily add project-specific '\
                       'software security requirements to your existing development processes.'
-
+GITHUB_NEW_STATUS = 'open'
+GITHUB_DONE_STATUS = 'closed'
 
 class GitHubAPI(RESTBase):
     """ Base plugin for GitHub """
@@ -43,12 +44,11 @@ class GitHubAPI(RESTBase):
 class GitHubTask(AlmTask):
     """ Representation of a task in GitHub"""
 
-    def __init__(self, task_id, alm_id, status, timestamp, done_statuses):
+    def __init__(self, task_id, alm_id, status, timestamp):
         self.task_id = task_id
         self.alm_id = alm_id
         self.status = status
         self.timestamp = timestamp
-        self.done_statuses = done_statuses  # comma-separated list
         self.priority = None
 
     def get_task_id(self):
@@ -59,7 +59,7 @@ class GitHubTask(AlmTask):
 
     def get_status(self):
         """ Translates GitHub status into SDE status """
-        if self.status in self.done_statuses:
+        if self.status == GITHUB_DONE_STATUS:
             return 'DONE'
         else:
             return 'TODO'
@@ -72,8 +72,6 @@ class GitHubTask(AlmTask):
 class GitHubConnector(AlmConnector):
     alm_name = 'GitHub'
     GITHUB_ISSUE_LABEL = 'github_issue_label'
-    ALM_NEW_STATUS = 'github_new_status'
-    ALM_DONE_STATUSES = 'github_done_statuses'
     GITHUB_DUPLICATE_LABEL = 'github_duplicate_label'
     ALM_PROJECT_VERSION = 'alm_project_version'
     GITHUB_REPO_OWNER = 'github_repo_owner'
@@ -86,11 +84,6 @@ class GitHubConnector(AlmConnector):
 
         config.add_custom_option(self.GITHUB_ISSUE_LABEL, 'Issue type represented'
                                                           'by labels on GitHub', default='')
-        config.add_custom_option(self.ALM_NEW_STATUS, 'Status to set for new'
-                                                      'tasks in GitHub', default='open')
-        config.add_custom_option(self.ALM_DONE_STATUSES, 'Statuses that '
-                                                         'signify a task is Done in GitHub',
-                                 default='closed')
         config.add_custom_option(self.GITHUB_DUPLICATE_LABEL, 'GitHub label'
                                                               'for duplicate issues', default='duplicate')
         config.add_custom_option(self.ALM_PROJECT_VERSION, 'GitHub milestone',
@@ -107,12 +100,10 @@ class GitHubConnector(AlmConnector):
         super(GitHubConnector, self).initialize()
 
         # Verify that the configuration options are set properly
-        for item in [self.ALM_NEW_STATUS, self.ALM_DONE_STATUSES, self.GITHUB_DUPLICATE_LABEL,
-                     self.GITHUB_REPO_OWNER]:
+        for item in [self.GITHUB_DUPLICATE_LABEL, self.GITHUB_REPO_OWNER]:
             if not self.config[item]:
                 raise AlmException('Missing %s in configuration' % item)
 
-        self.config.process_list_config(self.ALM_DONE_STATUSES)
         self.config.process_json_str_dict(self.ALM_PRIORITY_MAP)
 
         if not self.config[self.ALM_PRIORITY_MAP]:
@@ -186,11 +177,11 @@ class GitHubConnector(AlmConnector):
             # We need to perform 2 API calls to search open and closed issues
             open_issues = self.alm_plugin.call_api('legacy/issues/search/%s/%s/%s:' %
                                                    (self.project_uri,
-                                                    self.config[self.ALM_NEW_STATUS],
+                                                    GITHUB_NEW_STATUS,
                                                     urlencode_str(task_id)))
             closed_issues = self.alm_plugin.call_api('legacy/issues/search/%s/%s/%s:' %
                                                      (self.project_uri,
-                                                      self.config[self.ALM_DONE_STATUSES][0],
+                                                      GITHUB_DONE_STATUS,
                                                       urlencode_str(task_id)))
         except APIError, err:
             logger.error(err)
@@ -224,8 +215,7 @@ class GitHubConnector(AlmConnector):
         return GitHubTask(task_id,
                           issues_list[0]['number'],
                           issues_list[0]['state'],
-                          issues_list[0]['updated_at'],
-                          self.config[self.ALM_DONE_STATUSES])
+                          issues_list[0]['updated_at'])
 
     def translate_priority(self, priority):
         """ Translates an SDE priority into a GitHub label """
@@ -297,8 +287,7 @@ class GitHubConnector(AlmConnector):
         alm_task = GitHubTask(task['id'],
                               new_issue['number'],
                               new_issue['state'],
-                              new_issue['updated_at'],
-                              self.config[self.ALM_DONE_STATUSES])
+                              new_issue['updated_at'])
 
         if (self.config['alm_standard_workflow'] and
                 (task['status'] == 'DONE' or task['status'] == 'NA')):
@@ -313,9 +302,9 @@ class GitHubConnector(AlmConnector):
             return
 
         if status == 'DONE' or status == 'NA':
-            alm_state = self.config[self.ALM_DONE_STATUSES][0]
+            alm_state = GITHUB_DONE_STATUS
         elif status == 'TODO':
-            alm_state = self.config[self.ALM_NEW_STATUS]
+            alm_state = GITHUB_NEW_STATUS
 
         update_args = {
             'state': alm_state
