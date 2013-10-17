@@ -16,5 +16,3 @@ class TestVeracodeIntegration(BaseIntegrationTest, unittest.TestCase):
     def expected_number_of_findings(self):
         return 2
 
-if __name__ == "__main__":
-    unittest.main()
