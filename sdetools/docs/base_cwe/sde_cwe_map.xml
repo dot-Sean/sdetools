@@ -207,6 +207,12 @@
 		<weakness type="cwe" id="732" title="Incorrect Permission Assignment for Critical Resource"/>
 		<weakness type="cwe" id="708" title="Incorrect Ownership Assignment"/>
 	</task>
+    <task id="7" title="Salt and hash stored password">
+    </task>
+    <task id="63" title="Disable auto-complete on confidential fields">
+    </task>
+    <task id="219" title="Avoid transmitting confidential data through URL parameters">
+    </task>
 	<task id="33" title="Verify integrity of client-supplied read-only data" >
 		<weakness type="cwe" id="354" title="Improper Validation of Integrity Check Value"/>
 		<weakness type="cwe" id="472" title="External Control of Assumed-Immutable Web Parameter"/>
@@ -215,6 +221,12 @@
 	<task id="54" title="Validate file contents" >
 		<weakness type="cwe" id="434" title="Unrestricted Upload of File with Dangerous Type"/>
 	</task>
+    <task id="68" title="Encrypt credit card PANs in storage">
+    </task>
+    <task id="65" title="Restrict accepted HTTP verbs">
+    </task>
+    <task id="253" title="Lockdown TLS/SSL communication">
+    </task>
 	<task id="16" title="Authorize every page" >
         <weakness type="cwe" id="425" title="Direct Request ('Forced Browsing')"/>
     </task>
