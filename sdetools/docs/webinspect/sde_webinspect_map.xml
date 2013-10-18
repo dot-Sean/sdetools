@@ -6,8 +6,6 @@
 	<task id="15" title="Centralize authorization" confidence="low">
 	</task>
 	<task id="159" title="Avoid sending detailed error messages to remote systems" confidence="low">
-		<weakness type="check" id="3064" title="ASP Runtime Error Message" />
-		<weakness type="check" id="4250" title="VBScript Runtime Error Message" />
 	</task>
 	<task id="16" title="Authorize every page" confidence="low">
 		<weakness type="check" id="1297" title="Account Information Disclosure (pass.asp)" />
@@ -548,7 +546,6 @@
 		<weakness type="check" id="2008" title="ColdFusion Default Web Application (sourcewindow.cfm)" />
 		<weakness type="check" id="2004" title="ColdFusion Default Web Application (viewexample.cfm)" />
 		<weakness type="check" id="2016" title="ColdFusion Default Web Application (zero.cfm)" />
-		<weakness type="check" id="1385" title="ColdFusion Error Message" />
 		<weakness type="check" id="637" title="ColdFusion Example Application Arbitrary File Upload (getfile.cfm)" />
 		<weakness type="check" id="639" title="ColdFusion Example Application Arbitrary File Upload (getfile.cfm)" />
 		<weakness type="check" id="632" title="ColdFusion Expression Evaluator" />
@@ -3877,7 +3874,6 @@
 	<task id="244" title="Securely delete any unprotected sensitive data" confidence="low">
 		<weakness type="check" id="2364" title="ADOVBS Database Configuration Information Disclosure" />
 		<weakness type="check" id="10054" title="ASP .NET Project Conversion Report Found (ConversionReport.txt)" />
-		<weakness type="check" id="3064" title="ASP Runtime Error Message" />
 		<weakness type="check" id="10944" title="ASP.NET Proxy Script Debug Version Detected" />
 		<weakness type="check" id="10736" title="ASP.NET Stack Trace (VB)" />
 		<weakness type="check" id="10729" title="ASP.NET Stack Trace Disclosure" />
@@ -4053,7 +4049,6 @@
 		<weakness type="check" id="454" title="Log Information Disclosure (viewlogs.pl)" />
 		<weakness type="check" id="2233" title="Memory Log Information Disclosure" />
 		<weakness type="check" id="4730" title="Method Allowed Check" />
-		<weakness type="check" id="3051" title="Microsoft JScript Runtime Error Message" />
 		<weakness type="check" id="3381" title="Non-Existent CGI File" />
 		<weakness type="check" id="3852" title="Non-existent filename found in comments" />
 		<weakness type="check" id="10349" title="OLE DB Universal Data Link Files (.udl) " />
@@ -4065,7 +4060,6 @@
 		<weakness type="check" id="826" title="PHP Configuration Information Disclosure" />
 		<weakness type="check" id="5173" title="PHP Configuration Information Disclosure (info.php)" />
 		<weakness type="check" id="827" title="PHP Configuration Information Disclosure (phpinfo.php)" />
-		<weakness type="check" id="10208" title="PHP Error Message" />
 		<weakness type="check" id="10466" title="PHP Password Page" />
 		<weakness type="check" id="10468" title="PHP Test Page" />
 		<weakness type="check" id="10467" title="PHP Users Page" />
@@ -4085,7 +4079,6 @@
 		<weakness type="check" id="810" title="Possible Server Path Disclosure (unix)" />
 		<weakness type="check" id="804" title="Possible Server Path Disclosure (win32)" />
 		<weakness type="check" id="10735" title="Possible Server Path Disclosure (win32)" />
-		<weakness type="check" id="10190" title="Possible VBScript Runtime Error Message" />
 		<weakness type="check" id="10748" title="Potential User Account Information Disclosure" />
 		<weakness type="check" id="3853" title="Potential filename found in comments" />
 		<weakness type="check" id="839" title="Robots.txt Access Control Information Disclosure" />
@@ -4210,7 +4203,6 @@
 		<weakness type="check" id="1476" title="Unix Password File (/etc/passwd)" />
 		<weakness type="check" id="10965" title="User Data in Query or Cookie" />
 		<weakness type="check" id="4729" title="User supplied data without POST" />
-		<weakness type="check" id="4250" title="VBScript Runtime Error Message" />
 		<weakness type="check" id="3636" title="Verity Search97 Error Message" />
 		<weakness type="check" id="4628" title="Webalizer Configuration Disclosure (sort.sh)" />
 		<weakness type="check" id="4626" title="Webalizer Statistics Disclosure (webalizer.current)" />
@@ -4397,11 +4389,15 @@
 		<weakness type="check" id="4939" title=".NET Error Message" />
 		<weakness type="check" id="5555" title="404 Internal IP Disclosure" />
 		<weakness type="check" id="3064" title="ASP Runtime Error Message" />
+		<weakness type="check" id="1385" title="ColdFusion Error Message" />
 		<weakness type="check" id="742" title="Database Server Error Message" />
 		<weakness type="check" id="1498" title="Exception Error Message" />
 		<weakness type="check" id="2077" title="Java Runtime Error Message" />
 		<weakness type="check" id="4823" title="Jrun Server Error Message" />
 		<weakness type="check" id="4423" title="LDAP Error Message" />
+		<weakness type="check" id="3051" title="Microsoft JScript Runtime Error Message" />
+		<weakness type="check" id="10208" title="PHP Error Message" />
+		<weakness type="check" id="10190" title="Possible VBScript Runtime Error Message" />
 		<weakness type="check" id="745" title="Runtime Error Message" />
 		<weakness type="check" id="3186" title="SOAP Exception Error Message" />
 		<weakness type="check" id="10932" title="Server Error Response" />
