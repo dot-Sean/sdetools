@@ -1,25 +1,21 @@
 import re
-import os
 import random
 
-from sdetools.alm_integration.tests.alm_response_generator import AlmResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator
 from sdetools.sdelib.commons import urlencode_str
 
-class PivotalTrackerResponseGenerator(AlmResponseGenerator):
+
+class PivotalTrackerResponseGenerator(ResponseGenerator):
     PROJECT_ID = '1000'
-    STATUS_NAMES = ['unstarted', 'accepted']
 
-    def __init__(self, project_name, release_marker_name, epic_name):
-        initial_task_status = self.STATUS_NAMES[0]
-        test_dir = os.path.dirname(os.path.abspath(__file__))
-        super(PivotalTrackerResponseGenerator, self).__init__(initial_task_status, test_dir)
-
+    def __init__(self, config, test_dir=None):
         self.project_uri = 'projects/%s' % self.PROJECT_ID
-        self.project_name = project_name
-        self.release_marker_name = release_marker_name
-        self.epic_name = epic_name
+        self.project_name = config['alm_project']
+        self.release_marker_name = config['alm_project_version']
+        self.epic_name = config['pt_group_label']
         self.epics = {}
-        self.rest_api_targets = {
+        statuses = ['unstarted', 'accepted']
+        rest_api_targets = {
             'me': 'get_user',
             'projects$': 'get_projects',
             '%s/stories\?filter="(.*):"&fields=current_state,name,updated_at,id' % self.project_uri: 'get_stories',
@@ -29,6 +25,7 @@ class PivotalTrackerResponseGenerator(AlmResponseGenerator):
             '%s/stories$' % self.project_uri: 'add_story',
             '%s/stories/[0-9]*' % self.project_uri: 'update_status'
         }
+        super(PivotalTrackerResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
     """
        Response functions 
@@ -57,7 +54,7 @@ class PivotalTrackerResponseGenerator(AlmResponseGenerator):
         if not flag:
             stories = []
             story_id = re.search('(?<=(filter="T)).*(?=:)', target).group(0)
-            task = self.get_alm_task(story_id)
+            task = self.generator_get_task(story_id)
 
             if task:
                 story = self.get_json_from_file('story')
@@ -127,9 +124,9 @@ class PivotalTrackerResponseGenerator(AlmResponseGenerator):
     def add_story(self, target, flag, data, method):
         if not flag and data:
             story_id = self.extract_task_number_from_title(data['name'])
-            task = self.get_alm_task(story_id)
+            task = self.generator_get_task(story_id)
             if not task:
-                self.add_alm_task(story_id, data['name'], data['current_state'])
+                self.generator_add_task(story_id, data['name'], data['current_state'])
                 response = self.get_json_from_file('post_story')
                 response['project_id'] = self.PROJECT_ID
                 response['current_state'] = data['current_state']
@@ -145,7 +142,7 @@ class PivotalTrackerResponseGenerator(AlmResponseGenerator):
     def update_status(self, target, flag, data, method):
         if not flag and data:
             story_id = re.search('(?<=stories/)[0-9]+', target).group(0)
-            self.update_alm_task(story_id, 'status', data['current_state'])
+            self.generator_update_task(story_id, 'status', data['current_state'])
 
             response = self.get_json_from_file('post_story')
 

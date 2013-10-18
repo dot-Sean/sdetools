@@ -1,12 +1,12 @@
 import re
-import os
 
 from urllib2 import HTTPError
 
-from sdetools.alm_integration.tests.alm_response_generator import AlmResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator
 from sdetools.extlib.SOAPpy.Types import structType, faultType
 
-class JiraResponseGenerator(AlmResponseGenerator):
+
+class JiraResponseGenerator(ResponseGenerator):
     api_url = 'rest/api/2'
     PROJECT_ID = '10000'
     JIRA_ISSUE_TYPES = ["Bug", "New Feature", "Task", "Improvement", "Sub-task"]
@@ -14,28 +14,25 @@ class JiraResponseGenerator(AlmResponseGenerator):
     JIRA_STATUS_NAMES = ['Open', 'In Progress', 'Resolved', 'Closed', 'Open']
     JIRA_TRANSITION_NAMES = ['Start Progress', 'Resolve Issue', 'Close Issue', 'Reopen Issue']
 
-    def __init__(self, host, project_key, project_version, username, protocol='http'):
-        initial_task_status = 1
-        test_dir = os.path.dirname(os.path.abspath(__file__)) 
-        super(JiraResponseGenerator, self).__init__(initial_task_status, test_dir)
-
-        self.base_url = '%s://%s' % (protocol, host)
+    def __init__(self, config, test_dir=None):
+        self.base_url = '%s://%s' % (config['alm_method'], config['alm_server'])
         self.api_url = '%s/%s' % (self.base_url, self.api_url)
-        self.project_key = project_key
-        self.project_version = project_version
-        self.username = username
-        # Override the variable in parent class
-        self.rest_api_targets = {
+        self.project_key = config['alm_project']
+        self.project_version = config['alm_project_version']
+        self.username = config['alm_user']
+        statuses = [1]
+        rest_api_targets = {
             'project$': 'get_projects',
-            'project/%s/versions' % project_key: 'get_project_versions',
+            'project/%s/versions' % self.project_key: 'get_project_versions',
             'issue/createmeta': 'get_create_meta',
             'issuetype': 'get_issue_types',
-            'search\?jql=project%%3D\'%s\'%%20AND%%20summary~.*' % project_key: 'get_issue',
-            'issue/%s-\S.*/remotelink$' % project_key: 'post_remote_link',
+            'search\?jql=project%%3D\'%s\'%%20AND%%20summary~.*' % self.project_key: 'get_issue',
+            'issue/%s-\S.*/remotelink$' % self.project_key: 'post_remote_link',
             'issue$': 'post_issue',
-            'issue/%s-[0-9]*$' % project_key: 'update_version',
-            'issue/%s-\S.*/transitions$' % project_key: 'update_status'
+            'issue/%s-[0-9]*$' % self.project_key: 'update_version',
+            'issue/%s-\S.*/transitions$' % self.project_key: 'update_status'
         }
+        super(JiraResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
     def get_proxy_response(self, args):
         """
@@ -109,7 +106,7 @@ class JiraResponseGenerator(AlmResponseGenerator):
             task_number = task_id.split('-')[1]
 
             if task_number:
-                self.update_alm_task(task_number, 'version', version_name)
+                self.generator_update_task(task_number, 'version', version_name)
 
                 return {
                     "id": "10000",
@@ -158,7 +155,7 @@ class JiraResponseGenerator(AlmResponseGenerator):
         if not flag:
             response = []
 
-            if self.project_version:
+            if self.project_version is not None:
                 response.append(self.generate_project_version())
 
             return response
@@ -191,7 +188,7 @@ class JiraResponseGenerator(AlmResponseGenerator):
                 target = name
 
             task_number = self.extract_task_number_from_title(target)
-            task = self.get_alm_task(task_number)
+            task = self.generator_get_task(task_number)
             if task:
                 status_id = task.get('status')
                 version = task.get('version')
@@ -216,10 +213,10 @@ class JiraResponseGenerator(AlmResponseGenerator):
             transition_id = data['transition']['id']
             task_number = re.search('(?<=%s-)[0-9a-zA-z]+' % self.project_key, target).group(0)
 
-            if not self.get_alm_task(task_number):
+            if not self.generator_get_task(task_number):
                 self.raise_error('404')
 
-            self.update_alm_task(task_number, 'status', int(transition_id) + 1)
+            self.generator_update_task(task_number, 'status', int(transition_id) + 1)
 
             return None
         else:
@@ -236,7 +233,7 @@ class JiraResponseGenerator(AlmResponseGenerator):
 
             if task_name is not None:
                 task_id = self.extract_task_number_from_title(task_name)
-                self.add_alm_task(task_id)
+                self.generator_add_task(task_id)
                 response = {
                     'id': task_id,
                     'key': '%s-%s' % (self.project_key, 1),

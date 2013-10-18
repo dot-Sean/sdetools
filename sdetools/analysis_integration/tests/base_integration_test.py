@@ -1,74 +1,56 @@
+import os
+
 from sdetools.sdelib import conf_mgr
 from sdetools.sdelib.mod_mgr import ReturnChannel
-
-from sdetools.sdelib.commons import abc
+from sdetools.sdelib.testlib.mock_response import MOCK_SDE_RESPONSE
+from sdetools.sdelib.commons import abc, get_directory_of_current_module
 abstractmethod = abc.abstractmethod
+TEST_FILES_DIR = 'files'
 
-import sdetools.alm_integration.tests.alm_mock_response
-from sdetools.sdelib.testlib.sde_response_generator import SdeResponseGenerator
-MOCK_RESPONSE = sdetools.alm_integration.tests.alm_mock_response
 
-def null_callback(obj):
-    pass
+def stdout_callback(obj):
+    print obj
 
-class NullReturnChannel(ReturnChannel):
-    def __init__(self, call_back, call_back_args={}):
-        super(NullReturnChannel, self).__init__(call_back, call_back_args)
-
-    def set_info_container(self, info_cls):
-        pass
-
-    def emit_obj(self, obj):
-        pass
-
-    def emit_it(self, *args, **kwargs):
-        pass
-
-    def queue(self, **kwargs):
-        pass
-
-    def close(self, *args, **kwargs):
-        pass
-
-    def emit_info(self, *args, **kwargs):
-        pass
-
-    def emit_error(self, *args, **kwargs):
-        pass
 
 class BaseIntegrationTest(object):
-    SDE_CMD = ""
+    sde_cmd = ""
     integrator = None
     config = None
 
+    @classmethod
+    def setUpClass(cls, sde_cmd, mapping_file, report_file, integrator_cls, test_files_dir=TEST_FILES_DIR):
+        cls.sde_cmd = sde_cmd
+        cls.mapping_file = mapping_file
+        cls.report_file = report_file
+        cls.integrator_cls = integrator_cls
+        cls.test_file_dir = os.path.join(get_directory_of_current_module(cls), test_files_dir)
+        cls.mock_sde_response = MOCK_SDE_RESPONSE
+
     def setUp(self):
-        self.config = conf_mgr.Config(self.SDE_CMD, [], NullReturnChannel(null_callback), 'shell', {})
+        ret_chn = ReturnChannel(stdout_callback, {})
+        self.config = conf_mgr.Config(self.sde_cmd, [], ret_chn, 'shell', {})
 
         self.init_integrator()
-        self.config['sde_api_token'] = 'apiToken123@sdelements.com'
-        self.config['sde_application'] = 'Test App'
-        self.config['sde_project'] = 'Test Project'
-        self.config['trial_run'] = False
-        self.config['flaws_only'] = False
-        mock_path = 'sdetools.sdelib.sdeapi.restclient'
-        response_generator = SdeResponseGenerator(self.config['sde_api_token'].split('a')[1],
-                                                  self.config['sde_application'],
-                                                  self.config['sde_project'],
-                                                  self.config['sde_method'])
-
-        MOCK_RESPONSE.patch_call_rest_api(response_generator, mock_path)
-
+        self.setup_sde_configs()
+        self.mock_sde_response.initialize(self.config)
         self.integrator.initialize()
         self.integrator.load_mapping_from_xml()
         self.integrator.parse()
 
-    def tearDown(self):
-        MOCK_RESPONSE.response_generator_clear_tasks()
-        MOCK_RESPONSE.set_response_flags({})
+    def setup_sde_configs(self):
+        self.config['sde_server'] = 'sdelements.com'
+        self.config['sde_application'] = 'Test App'
+        self.config['sde_project'] = 'Test Project'
+        self.config['trial_run'] = False
+        self.config['flaws_only'] = False
 
-    @abstractmethod
+    def tearDown(self):
+        self.mock_sde_response.teardown()
+
     def init_integrator(self):
-        pass
+        self.integrator = self.integrator_cls(self.config)
+        self.integrator.config['mapping_file'] = os.path.join(self.test_file_dir, self.mapping_file)
+        self.integrator.config['report_file'] = os.path.join(self.test_file_dir, self.report_file)
 
     def check_analysis_note(self, task_id, expected_status, expected_confidence):
         analysis_task_note = self.integrator.plugin.get_task_notes('T%s' % task_id)['analysis'][0]

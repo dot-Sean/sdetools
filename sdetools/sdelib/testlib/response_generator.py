@@ -6,27 +6,34 @@ from mock import MagicMock
 from urllib2 import HTTPError
 from datetime import datetime
 from sdetools.extlib.defusedxml import minidom
-from sdetools.sdelib.commons import abc
+from sdetools.sdelib.commons import abc, get_directory_of_current_module
 abstractmethod = abc.abstractmethod
 
 
-class AlmResponseGenerator(object):
-    def __init__(self, initial_task_status, test_dir):
+class ResponseGenerator(object):
+    def __init__(self, rest_api_targets, statuses, test_dir=None):
         """
             Initializes commonly used variables.
 
-            initial_task_status - default status to use when creating a task through our mock
-            test_dir            - directory containing current test; used to locate response files
-            alm_tasks           - stores tasks created through our mock
-            rest_api_targets    - dict object containing key-value pairs used in get_response to triage API calls
+            statuses            - List of valid task statuses. First entry will be used as the default status
+            test_dir            - Directory containing current test; used to locate response files
+            alm_tasks           - Stores tasks created through our mock
+            rest_api_targets    - Dict object containing key-value pairs used in get_response to triage API calls
                                   to its corresponding response generating method.
                                   Expected format:
                                     "regex_pattern_of_api_target": "method_to_call_on_match"
         """
-        self.initial_task_status = initial_task_status
+        if test_dir is None:
+            test_dir = get_directory_of_current_module(self)
+
+        self.statuses = statuses
         self.test_dir = test_dir
         self.alm_tasks = {}
-        self.rest_api_targets = {}
+        self.rest_api_targets = rest_api_targets
+        self.init_with_tasks()
+
+    def init_with_tasks(self):
+        pass
 
     def get_response(self, target, flags, data, method):
         """
@@ -74,7 +81,13 @@ class AlmResponseGenerator(object):
 
         raise HTTPError('', error_code, message, '', fp_mock)
 
-    def add_alm_task(self, task_number, task_name=None, status=None):
+    def generator_get_valid_statuses(self):
+        return self.statuses
+
+    """
+        Task management functions
+    """
+    def generator_add_task(self, task_number, task_name=None, status=None):
         """
             Save a task created through our mock. Uses the task number
             as the alm_id
@@ -82,9 +95,8 @@ class AlmResponseGenerator(object):
         if not self.alm_tasks.get(task_number):
             if not task_name:
                 task_name = "T%s" % task_number
-            if not status:
-                status = self.initial_task_status
-
+            if status is None:
+                status = self.generator_get_valid_statuses()[0]
             self.alm_tasks[task_number] = {
                 "name": task_name,
                 "id": task_number,
@@ -92,21 +104,28 @@ class AlmResponseGenerator(object):
                 "timestamp": self.get_current_timestamp()
             }
 
-    def get_alm_task(self, task_number):
+    def generator_get_task(self, task_number):
         return self.alm_tasks.get(task_number)
 
-    def get_all_tasks(self):
+    def generator_get_all_tasks(self):
         return self.alm_tasks
 
-    def update_alm_task(self, task_number, field, value):
+    def generator_update_task(self, task_number, field, value):
         if self.alm_tasks.get(task_number):
             self.alm_tasks[task_number][field] = value
 
-    def clear_alm_tasks(self):
+    def generator_clear_tasks(self, full_clear=False):
         self.alm_tasks = {}
 
+        if not full_clear:
+            self.init_with_tasks()
+
+    """
+        Response reader functions
+    """
     def _read_response_file(self, file_name):
         file_path = os.path.join(self.test_dir, 'response', file_name)
+
         f = open(file_path)
         response = f.read()
         f.close()
@@ -121,12 +140,15 @@ class AlmResponseGenerator(object):
         raw_xml = self._read_response_file('%s.xml' % file_name)
         return minidom.parseString(raw_xml)
 
+    """
+        Util functions
+    """
     @staticmethod
     def extract_task_number_from_title(s):
         task_number = re.search("(?<=T)[0-9]+((?=[:'])|$)", s)
 
         if task_number:
-            return  task_number.group(0)
+            return task_number.group(0)
         else:
             return None
 

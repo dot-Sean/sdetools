@@ -1,25 +1,18 @@
-import os
-
 from urllib2 import HTTPError
 from mock import MagicMock
 
-from sdetools.alm_integration.tests.alm_response_generator import AlmResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator
 from sdetools.sdelib.commons import urlencode_str
 
 
-class GitHubResponseGenerator(AlmResponseGenerator):
-    STATUS_NAMES = ['open', 'closed']
-
-    def __init__(self, host, repo_org, repo_name, project_milestone, username, protocol='http'):
-        initial_task_status = self.STATUS_NAMES[0]
-        test_dir = os.path.dirname(os.path.abspath(__file__)) 
-        super(GitHubResponseGenerator, self).__init__(initial_task_status, test_dir)
-
-        self.project_uri = '%s/%s' % (urlencode_str(repo_org), urlencode_str(repo_name))
-        self.api_url = '%s://%s/%s' % (protocol, host, self.project_uri)
-        self.project_milestone = project_milestone
-        self.username = username
-        self.rest_api_targets = {
+class GitHubResponseGenerator(ResponseGenerator):
+    def __init__(self, config, test_dir=None):
+        self.project_uri = '%s/%s' % (urlencode_str(config['github_repo_owner']), urlencode_str(config['alm_project']))
+        self.api_url = '%s://%s/%s' % (config['alm_method'],  config['alm_server'], self.project_uri)
+        self.project_milestone = config['alm_project_version']
+        self.username = config['alm_user']
+        statuses = ['open', 'closed']
+        rest_api_targets = {
             'user': 'get_user',
             'repos/%s$' % self.project_uri: 'get_repo',
             'repos/%s/milestones' % self.project_uri: 'get_milestones',
@@ -27,6 +20,7 @@ class GitHubResponseGenerator(AlmResponseGenerator):
             'repos/%s/issues$' % self.project_uri: 'post_issue',
             'repos/%s/issues/[0-9]*$' % self.project_uri: 'update_status'
         }
+        super(GitHubResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
     def raise_error(self, error_code, return_value=None):
         fp_mock = MagicMock()
@@ -72,7 +66,8 @@ class GitHubResponseGenerator(AlmResponseGenerator):
         task_name = params[-1]
         task_name = task_name.split(urlencode_str(':'))[0]
         task_number = self.extract_task_number_from_title(task_name)
-        task = self.get_alm_task(task_number)
+        task = self.generator_get_task(task_number)
+
         if not flag and task:
             status = task.get('status')
             if status == state:
@@ -89,7 +84,7 @@ class GitHubResponseGenerator(AlmResponseGenerator):
     def post_issue(self, target, flag, data, method):
         if not flag:
             task_number = self.extract_task_number_from_title(data['title'])
-            self.add_alm_task(task_number)
+            self.generator_add_task(task_number)
             response = self.generate_issue(task_number, 'open')
 
             return response
@@ -100,10 +95,10 @@ class GitHubResponseGenerator(AlmResponseGenerator):
         task_id = target.split('/')[4]
 
         if not flag:
-            if self.get_alm_task(task_id) and data['state']:
+            if self.generator_get_task(task_id) and data['state']:
                 status = data['state']
                 response = self.generate_issue(task_id, status)
-                self.update_alm_task(task_id, 'status', status)
+                self.generator_update_task(task_id, 'status', status)
 
                 return response
             else:

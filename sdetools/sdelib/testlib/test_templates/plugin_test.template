@@ -1,0 +1,15 @@
+# NOTE: Before running ensure that the options are set properly in the
+#       configuration file
+import unittest
+
+from [alm]_response_generator import [alm]ResponseGenerator
+from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
+from sdetools.modules.sync_[alm].[alm]_plugin import [alm]Connector, [alm]API, AlmException
+PATH_TO_ALM_REST_API = 'sdetools.modules.sync_[alm].[alm]_plugin'
+
+
+class Test[alm]Case(AlmPluginTestBase, unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        alm_classes = [[alm]Connector, [alm]API, [alm]ResponseGenerator]
+        super(Test[alm]Case, cls).setUpClass(PATH_TO_ALM_REST_API, alm_classes=alm_classes)
