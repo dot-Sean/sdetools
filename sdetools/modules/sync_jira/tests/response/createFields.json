@@ -1,0 +1,16 @@
+[
+	{"name":"Summary", "id":"summary"},
+	{"name":"Issue Type", "id":"issuetype"},
+	{"name":"Priority", "id":"priority"},
+	{"name":"Due Date", "id":"duedate"},
+	{"name":"Component/s", "id":"components"},
+	{"name":"Affects Version/s", "id":"versions"},
+	{"name":"Fix Version/s", "id":"fixVersions"},
+	{"name":"Assignee", "id":"assignee"},
+	{"name":"Reporter", "id":"reporter"},
+	{"name":"Environment", "id":"environment"},
+	{"name":"Description", "id":"description"},
+	{"name":"Time Tracking", "id":"timetracking"},
+	{"name":"Attachment", "id":"attachment"},
+	{"name":"Labels", "id":"labels"}
+]

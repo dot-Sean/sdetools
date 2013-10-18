@@ -16,6 +16,7 @@ logger = log_mgr.mods.add_mod(__name__)
 RE_CODE_DOWNLOAD = re.compile(r'\{\{ USE_MEDIA_URL \}\}([^\)]+\))\{@class=code-download\}')
 RE_TASK_IDS = re.compile('^C?T\d+$')
 
+
 class AlmException(Error):
     """ Class for ALM Exceptions """
 
@@ -24,6 +25,7 @@ class AlmException(Error):
 
     def __str__(self):
         return str(self.value)
+
 
 class AlmTask(object):
     """
@@ -36,11 +38,6 @@ class AlmTask(object):
     @abstractmethod
     def get_task_id(self):
         """ Returns an ID string compatiable with SD Elements """
-        pass
-
-    @abstractmethod
-    def get_priority(self):
-        """ Returns a priority string compatible with SD Elements """
         pass
 
     @abstractmethod
@@ -57,6 +54,7 @@ class AlmTask(object):
     def get_timestamp(self):
         """ Returns a datetime.datetime object of last modified time """
         pass
+
 
 class AlmConnector(object):
     """
@@ -119,8 +117,7 @@ class AlmConnector(object):
 
         #Note: This will consider space as empty due to strip
         #We do this before checking if the config is non-empty later
-        self.config['selected_tasks'] = [x.strip(' ') 
-            for x in self.config['selected_tasks'].split(',') if x.strip(' ')]
+        self.config.process_list_config('selected_tasks')
         for task in self.config['selected_tasks']:
             if not RE_TASK_IDS.match(task):
                 raise UsageError('Invalid Task ID: %s' % (task))
@@ -129,12 +126,12 @@ class AlmConnector(object):
             if not self.config['alm_phases']:
                 raise AlmException('Missing alm_phases in configuration')
 
-            self.config['alm_phases'] = self.config['alm_phases'].split(',')
+            self.config.process_list_config('alm_phases')
 
             if not self.config['sde_statuses_in_scope']:
                 raise AlmException('Missing the SD Elements statuses in scope')
 
-            self.config['sde_statuses_in_scope'] = self.config['sde_statuses_in_scope'].split(',')
+            self.config.process_list_config('sde_statuses_in_scope')
             for status in self.config['sde_statuses_in_scope']:
                 if status not in('TODO', 'DONE', 'NA'):
                     raise AlmException('Invalid status specified in '
@@ -148,7 +145,7 @@ class AlmConnector(object):
                                'in configuration. Valid values are '
                                'alm, sde, or timestamp.')
 
-        if (self.config['sde_min_priority']):
+        if self.config['sde_min_priority']:
             bad_priority_msg =  'Incorrect sde_min_priority specified in configuration. Valid values are > 0 '
             bad_priority_msg += ' and <= 10'
 
@@ -157,7 +154,7 @@ class AlmConnector(object):
             except:
                 raise AlmException(bad_priority_msg)
 
-            if (self.config['sde_min_priority'] < 1 or self.config['sde_min_priority'] >10):
+            if self.config['sde_min_priority'] < 1 or self.config['sde_min_priority'] > 10:
                 raise AlmException(bad_priority_msg)
         else:
             self.config['sde_min_priority'] = 1
@@ -167,6 +164,8 @@ class AlmConnector(object):
         self.config.process_boolean_config('test_alm_connection')
         self.config.process_boolean_config('alm_standard_workflow')
         self.config.process_json_str_dict('alm_custom_fields')
+
+        self.alm_plugin.post_conf_init()
 
         logger.info('*** AlmConnector initialized ***')
 
@@ -198,7 +197,7 @@ class AlmConnector(object):
     @abstractmethod
     def alm_get_task(self, task):
         """ Returns an AlmTask that represents the value of this
-        SD Elemets task in the ALM, or None if the task doesn't exist
+        SD Elements task in the ALM, or None if the task doesn't exist
 
         Raises an AlmException on encountering an error
 
@@ -211,7 +210,7 @@ class AlmConnector(object):
     def alm_add_task(self, task):
         """ Adds SD Elements task to the ALM tool.
 
-        Returns a string represeting the task in the ALM tool,
+        Returns a string representing the task in the ALM tool,
         or None if that's not possible. This string will be
         added to a note for the task.
 
@@ -262,6 +261,16 @@ class AlmConnector(object):
             return False
         return self.sde_plugin.connected
 
+    def _extract_task_id(self, full_task_id):
+        """
+        Extract the task id e.g. "CT213" from the full project_id-task_id string e.g. "123-CT213"
+        """
+        task_id = None
+        task_search = re.search('^(\d+)-([^\d]+\d+)$', full_task_id)
+        if task_search:
+            task_id = task_search.group(2)
+        return task_id
+
     def sde_get_tasks(self):
         """ Gets all tasks for project in SD Elements
 
@@ -299,9 +308,8 @@ class AlmConnector(object):
             raise AlmException('Requires initialization')
 
         try:
-            self.sde_plugin.api.add_task_ide_note(task_id, note_msg,
-                                             filename, status)
-            logger.debug('Successfuly set note for task %s' % task_id)
+            self.sde_plugin.api.add_task_ide_note(task_id, note_msg, filename, status)
+            logger.debug('Successfully set note for task %s' % task_id)
 
         except APIError, err:
             logger.error(err)
@@ -316,7 +324,7 @@ class AlmConnector(object):
         if self.config['selected_tasks']:
             return (tid in self.config['selected_tasks'])
         return (task['phase'] in self.config['alm_phases'] and
-            task['priority'] >= self.config['sde_min_priority'])
+                task['priority'] >= self.config['sde_min_priority'])
 
     def sde_update_task_status(self, task, status):
         """ Updates the status of the given task in SD Elements
@@ -348,7 +356,7 @@ class AlmConnector(object):
             self._add_note(task['id'], note_msg, '', status)
         except APIError, err:
             logger.error('Unable to set a note to mark status '
-                         'for %s to %s' % (task['id'], status))
+                         'for %s to %s. Reason: %s' % (task['id'], status, str(err)))
 
     def convert_markdown_to_alm(self, content, ref):
         return content
@@ -380,7 +388,7 @@ class AlmConnector(object):
             sys.stdout.flush()
 
     def status_match(self, alm_status, sde_status):
-        if sde_status=="NA" or sde_status=="DONE":
+        if sde_status == "NA" or sde_status == "DONE":
             return alm_status == "DONE"
         else:
             return alm_status == "TODO"
@@ -459,11 +467,11 @@ class AlmConnector(object):
                             alm_time = alm_task.get_timestamp()
                             logger.debug('comparing timestamps for task %s - SDE: %s, ALM: %s' %
                                           (task['id'], str(sde_time), str(alm_time)))
-                            if (sde_time > alm_time):
+                            if sde_time > alm_time:
                                 precedence = 'sde'
 
                         status = alm_task.get_status()
-                        if (precedence == 'alm'):
+                        if precedence == 'alm':
                             self.sde_update_task_status(task, alm_task.get_status())
                         else:
                             self.alm_update_task_status(alm_task, task['status'])

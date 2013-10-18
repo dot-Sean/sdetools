@@ -44,15 +44,13 @@ class MingleTask(AlmTask):
         self.status = status
         self.timestamp = timestamp
         self.done_statuses = done_statuses  # comma-separated list
+        self.priority = None
 
     def get_task_id(self):
         return self.task_id
 
     def get_alm_id(self):
         return self.alm_id
-
-    def get_priority(self):
-        return self.priority
 
     def get_status(self):
         """ Translates Mingle status into SDE status """
@@ -88,8 +86,7 @@ class MingleConnector(AlmConnector):
             len(self.sde_plugin.config['mingle_done_statuses']) < 1):
             raise AlmException('Missing mingle_done_statuses in configuration')
 
-        self.sde_plugin.config['mingle_done_statuses'] =  (
-                self.sde_plugin.config['mingle_done_statuses'].split(','))
+        self.config.process_list_config('mingle_done_statuses')
 
         if not self.sde_plugin.config['mingle_card_type']:
             raise AlmException('Missing mingle_card_type in configuration')
@@ -157,7 +154,7 @@ class MingleConnector(AlmConnector):
                     else:
                         status = 'TODO'
                     break
-        return MingleTask(task_id, card_num, status, modified_date,
+        return MingleTask(self._extract_task_id(task['id']), card_num, status, modified_date,
                           self.sde_plugin.config['mingle_done_statuses'])
 
     def alm_add_task(self, task):

@@ -74,9 +74,6 @@ class RallyTask(AlmTask):
     def get_alm_id(self):
         return self.alm_id
 
-    def get_priority(self):
-        return None
-
     def get_status(self):
         """Translates Rally status into SDE status"""
         if self.status in self.done_statuses:
@@ -86,7 +83,7 @@ class RallyTask(AlmTask):
 
     def get_timestamp(self):
         """ Returns a datetime object """
-        return datetime.strptime(self.timestamp, '%Y-%m-%dT%H:%M:%SZ')
+        return datetime.strptime(self.timestamp, '%Y-%m-%dT%H:%M:%S.%fZ')
 
 class RallyConnector(AlmConnector):
     """Connects SD Elements to Rally"""
@@ -112,8 +109,7 @@ class RallyConnector(AlmConnector):
             if not self.config[item]:
                 raise AlmException('Missing %s in configuration' % item)
 
-        self.config['rally_done_statuses'] = (
-                self.config['rally_done_statuses'].split(','))
+        self.config.process_list_config('rally_done_statuses')
 
         self.project_ref = None
         self.workspace_ref = None
@@ -161,12 +157,12 @@ class RallyConnector(AlmConnector):
         self.project_ref = project_ref
 
     def alm_get_task(self, task):
-        task_id = task['title']
+        task_id = task['title'].split(':', 1)[0]
         result = None
 
         try:
             query_args = {
-                'query': '(Name = \"%s\")' % task_id,
+                'query': '(Name contains \"%s:\")' % task_id,
                 'workspace': self.workspace_ref,
                 'project': self.project_ref,
                 }
@@ -180,7 +176,7 @@ class RallyConnector(AlmConnector):
         if not num_results:
             return None
 
-        task_result_url =  result['QueryResult']['Results'][0]['_ref']
+        task_result_url = result['QueryResult']['Results'][0]['_ref']
         task_result_url = task_result_url.split('/%s/' % API_VERSION)[1]
         try:
             task_data = self.alm_plugin.call_api(task_result_url)

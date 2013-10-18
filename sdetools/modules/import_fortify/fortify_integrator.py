@@ -30,7 +30,7 @@ class FortifyIntegrator(BaseIntegrator):
         if self.config['report_type'] == 'auto': 
             if not isinstance(self.config['report_file'], basestring):
                 raise UsageError("On auto-detect mode, the file name needs to be specified.")
-            fileName, file_extension = os.path.splitext(self.config['report_file'])
+            file_name, file_extension = os.path.splitext(self.config['report_file'])
             self.config['report_type'] = file_extension[1:]
 
         if self.config['report_type'] == 'xml':

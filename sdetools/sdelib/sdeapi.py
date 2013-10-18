@@ -20,26 +20,25 @@ class ExtAPI(restclient.RESTBase):
     """
 
     def __init__(self, config):
-        conf_opts = restclient.CONF_OPTS[:]
-        conf_opts.append(('sde_api_token', 'API Token for SDE', ''))
-        for i in xrange(3):
-            conf_opts[i][-1] = ''
-        super(ExtAPI, self).__init__('sde', 'SD Elements', config, 'api', conf_opts)
+        extra_conf_opts = [('sde_api_token', 'SDE API Token', '')]
+        super(ExtAPI, self).__init__('sde', 'SD Elements', config, 'api', extra_conf_opts)
         self.connected = False
 
     def post_conf_init(self):
-        if self.config['sde_api_token']:
-            self.auth_mode = 'api_token'
-            if '@' not in self.config['sde_api_token']:
+        if self._get_conf('api_token'):
+            if '@' not in self._get_conf('api_token'):
                 raise UsageError('Unable to process API Token')
             self.config['sde_user'] = None
             self.config['sde_pass'], self.config['sde_server'] = (
                 self.config['sde_api_token'].split('@', 1))
+            self.set_auth_mode('api_token')
+
         super(ExtAPI, self).post_conf_init()
 
     def connect(self):
         if self.config['authmode'] == 'session':
-            result = self.start_session()
+            self.set_auth_mode('session')
+            result = True
         else:
             #TODO: Find a better alternative ->
             #In 'basic' mode, we make an extra call just to verify that credentials are correct
@@ -108,7 +107,7 @@ class ExtAPI(restclient.RESTBase):
 
     def get_task_notes(self, task, note_type, options={}, **filters):
         end_point = 'tasknotes'
-        if note_type not in ['', 'ide', 'text']:
+        if note_type not in ['', 'ide', 'text', 'analysis']:
             return
         if note_type:
             end_point += '/%s' % (note_type)

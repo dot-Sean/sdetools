@@ -54,7 +54,7 @@ class JIRAConnector(AlmConnector):
             len(self.config['jira_done_statuses']) < 1):
             raise AlmException('Missing jira_done_statuses in configuration')
 
-        self.config['jira_done_statuses'] = (self.config['jira_done_statuses'].split(','))
+        self.config.process_list_config('jira_done_statuses')
 
         if not self.config['jira_issue_type']:
             raise AlmException('Missing jira_issue_type in configuration')
@@ -153,7 +153,8 @@ class JIRAConnector(AlmConnector):
 
         trans_name = self.config['jira_%s_transition' % new_state]
         if trans_name not in trans_table:
-            raise AlmException('Unable to find transition %s' % trans_name)
+            raise AlmException('Transition %s is invalid for issue %s. Valid entries are: %s' % (
+                trans_name, alm_id, ', '.join(trans_table)))
         trans_id = trans_table[trans_name]
 
         self.alm_plugin.update_task_status(alm_id, trans_id)

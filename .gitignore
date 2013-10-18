@@ -22,6 +22,7 @@ pip-log.txt
 .coverage
 .tox
 
+.idea
 
 #Translations
 *.mo
@@ -38,3 +39,6 @@ test_settings.conf
 
 # Test files
 info.log
+
+#ides
+.idea

@@ -4,6 +4,7 @@ import re
 import xml
 import zipfile
 from datetime import datetime
+from xml.sax.handler import ContentHandler
 from sdetools.extlib.defusedxml import minidom, sax
 
 from sdetools.sdelib.commons import Error, abc
@@ -27,6 +28,12 @@ class IntegrationResult(object):
         self.noflaw_tasks = noflaw_tasks
         self.error_count = error_count
         self.error_weaknesses_unmapped = error_weaknesses_unmapped
+
+class BaseContentHandler(ContentHandler):
+
+    @abstractmethod
+    def valid_content_detected(self):
+        pass
 
 class BaseImporter(object):
 
@@ -115,7 +122,10 @@ class BaseXMLImporter(BaseImporter):
         except (xml.sax.SAXException, xml.sax.SAXParseException, xml.sax.SAXNotSupportedException, 
                 xml.sax.SAXNotRecognizedException), se:
             raise IntegrationError("Could not parse file '%s': %s" % (xml_file, se))
-        
+
+        if not XMLReader.valid_content_detected():
+            raise IntegrationError("Malformed document detected: %s" % xml_file)
+
         self.raw_findings = XMLReader.raw_findings
         if XMLReader.report_id:
             self.report_id = XMLReader.report_id   
@@ -128,6 +138,9 @@ class BaseXMLImporter(BaseImporter):
                 xml.sax.SAXNotRecognizedException), se:
             raise IntegrationError("Could not parse xml source %s" % (se))
         
+        if not XMLReader.valid_content_detected():
+            raise IntegrationError("Malformed document detected")
+
         self.raw_findings = XMLReader.raw_findings
         if XMLReader.report_id:
             self.report_id = XMLReader.report_id   
@@ -260,7 +273,6 @@ class BaseIntegrator(object):
         else:
             ret = self.plugin.add_project_analysis_note(self.report_id, self.TOOL_NAME)
             project_analysis_note_ref = ret['id'] 
-
 
         task_list = self.plugin.get_task_list()
         logger.debug("Retrieved %d tasks from %s/%s" % 
