@@ -1,25 +1,22 @@
 import re
-import os
 
-from sdetools.alm_integration.tests.alm_response_generator import AlmResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator
 from sdetools.sdelib.commons import urlencode_str
 
 
-class MingleResponseGenerator(AlmResponseGenerator):
+class MingleResponseGenerator(ResponseGenerator):
     BASE_PATH = 'api/v2'
-    STATUS_NAMES = ['New', 'Done']
 
-    def __init__(self, project_name):
-        initial_task_status = self.STATUS_NAMES[0]
-        test_dir = os.path.dirname(os.path.abspath(__file__)) 
-        super(MingleResponseGenerator, self).__init__(initial_task_status, test_dir)
-
+    def __init__(self, config, test_dir=None):
+        project_name = urlencode_str(config['alm_project'])
+        statuses = ['New', 'Done']
         self.project_uri = 'projects/%s/cards' % urlencode_str(project_name)
-        self.rest_api_targets = {
+        rest_api_targets = {
             'projects.xml': 'get_projects',
             '%s.xml' % self.project_uri: 'call_cards',
             '%s/[0-9]*.xml' % self.project_uri: 'call_card_by_number'
         }
+        super(MingleResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
     """
        Response functions 
@@ -34,14 +31,14 @@ class MingleResponseGenerator(AlmResponseGenerator):
         if not flag:
             if method == 'GET':
                 cards = self.get_xml_from_file('cards')
-                _mingle_tasks = self.alm_tasks.values()
+                _mingle_tasks = self.generator_get_all_tasks().values()
 
                 if data:
                     _mingle_tasks = []
                     filter_arg = data.get('filters[]')
                     card_name = re.search('(?<=\[Name\]\[is\]\[).*(?=\])', filter_arg).group(0)
                     card_number = self.extract_task_number_from_title(card_name)
-                    task = self.get_alm_task(card_number)
+                    task = self.generator_get_task(card_number)
 
                     if task:
                         _mingle_tasks.append(task)
@@ -56,8 +53,8 @@ class MingleResponseGenerator(AlmResponseGenerator):
                 card_type = data['card[card_type_name]']
                 status = data['card[properties][][value]']
                 card_number = self.extract_task_number_from_title(card_name)
-                self.add_alm_task(card_number, card_name, status)
-                self.update_alm_task(card_number, 'card_type', card_type)
+                self.generator_add_task(card_number, card_name, status)
+                self.generator_update_task(card_number, 'card_type', card_type)
 
                 return None
         else:
@@ -68,15 +65,15 @@ class MingleResponseGenerator(AlmResponseGenerator):
             card_number = re.search('[0-9]+(?=\.xml)', target).group(0)
 
             if method == 'GET':
-                task = self.get_alm_task(card_number)
+                task = self.generator_get_task(card_number)
 
                 if task:
                     return self.generate_card(card_number, task['name'], task['status'], task['card_type'])
             elif method == 'PUT':
                 status = data['card[properties][][value]']
 
-                if self.get_alm_task(card_number):
-                    self.update_alm_task(card_number, 'status', status)
+                if self.generator_get_task(card_number):
+                    self.generator_update_task(card_number, 'status', status)
 
             return None
         else:

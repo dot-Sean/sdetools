@@ -1,16 +1,14 @@
 import re
+import os
 
+from datetime import datetime
 from sdetools.sdelib.mod_mgr import ReturnChannel
 from sdetools.sdelib.conf_mgr import Config
-from sdetools.sdelib.commons import abc
+from sdetools.sdelib.commons import abc, Error, get_directory_of_current_module
+from sdetools.sdelib.testlib.mock_response import MOCK_ALM_RESPONSE, MOCK_SDE_RESPONSE
+
 abstractmethod = abc.abstractmethod
-
-import sdetools.alm_integration.tests.alm_mock_sde_plugin
-import sdetools.alm_integration.tests.alm_mock_response
-from sdetools.sdelib.commons import Error
-
-MOCK_SDE = sdetools.alm_integration.tests.alm_mock_sde_plugin
-MOCK_RESPONSE = sdetools.alm_integration.tests.alm_mock_response
+CONF_FILE_LOCATION = 'test_settings.conf'
 
 
 def stdout_callback(obj):
@@ -19,118 +17,150 @@ def stdout_callback(obj):
 
 class AlmPluginTestBase(object):
     @classmethod
-    def setUpClass(cls, path_to_alm_connector, conf_path):
-        cls.path_to_alm_connector = path_to_alm_connector
-        cls.conf_path = conf_path
-        MOCK_SDE.patch_sde_mocks(path_to_alm_connector)
+    def setUpClass(cls, path_to_alm_rest_api, test_dir=None, conf_file_location=CONF_FILE_LOCATION, alm_classes=[None, None, None]):
+        """
+            path_to_alm_rest_api - The import path of the class that extends RestBase
+            test_dir             - The directory where we will look for the test config file.
+                                   Default is the directory of the calling class
+            conf_file_location   - The relative path from the test_dir to the conf file.
+                                   Default is the value of CONF_FILE_LOCATION
+            classes              - Pass the class name of the connector, api and response generator
+                                   to use the default initializer.
+                                   Expects:
+                                        [alm_connector, alm_api, alm_response_generator
+        """
+        if test_dir is None:
+            test_dir = get_directory_of_current_module(cls)
 
-    @abstractmethod
-    def init_alm_connector(self, alm_connector):
-        self.tac = alm_connector
+        cls.connector_cls, cls.api_cls, cls.generator_cls = alm_classes
+        cls.test_dir = test_dir
+        cls.conf_path = os.path.join(cls.test_dir, conf_file_location)
+        cls.mock_sde_response = MOCK_SDE_RESPONSE
+        cls.mock_alm_response = MOCK_ALM_RESPONSE
+        cls.ret_chn = ReturnChannel(stdout_callback, {})
+        cls.path_to_alm_rest_api = path_to_alm_rest_api
 
-    @abstractmethod
+    def init_alm_connector(self):
+        if self.connector_cls is None:
+            raise Error('No alm connector found')
+        elif self.api_cls is None:
+            raise Error('No alm api found')
+        else:
+            self.connector = self.connector_cls(self.config, self.api_cls(self.config))
+
+    def init_response_generator(self):
+        if self.generator_cls is not None:
+            self.response_generator = self.generator_cls(self.config, self.test_dir)
+        else:
+            raise Error('No response generator found')
+
+    def pre_parse_config(self):
+        pass
+
     def post_parse_config(self):
-        """
-             Setup steps needed after the config file has been parsed;
-             such as setting up the response generator.
-        """
         pass
 
     def setUp(self):
         """
-            Plugin setup mirrors the setup that occurs during a sync_alm call
+            Plugin setup mirrors the setup that occurs during a sync_alm call.
+            Also initializes the mock responses.
         """
-        self.sde_tasks = None
-        self.alm_tasks = None
-        ret_chn = ReturnChannel(stdout_callback, {})
-        self.config = Config('', '', ret_chn, 'import')
-
+        self.config = Config('', '', self.ret_chn, 'import')
         self.init_alm_connector()
+        self.pre_parse_config()
+
         Config.parse_config_file(self.config, self.conf_path)
+
         self.post_parse_config()
-        self.tac.initialize()
+        self.init_response_generator()
+        self.mock_sde_response.initialize(self.config)
+        self.mock_alm_response.initialize(self.response_generator, self.path_to_alm_rest_api)
+        self.connector.initialize()
 
     def tearDown(self):
-        MOCK_RESPONSE.response_generator_clear_tasks()
-        MOCK_RESPONSE.set_response_flags({})
+        self.mock_alm_response.teardown()
+        self.mock_sde_response.teardown()
 
     def test_parsing_alm_task(self):
         # Verify that none of the abstract methods inherited from AlmTask will break.
         # This test can be extended to verify the contents of task.
-        self.tac.alm_connect()
-        test_task = MOCK_SDE.generate_sde_task()
-        self.tac.alm_add_task(test_task)
-        test_task_result = self.tac.alm_get_task(test_task)
-
+        self.connector.alm_connect()
+        test_task = self.mock_sde_response.generate_sde_task()
+        self.connector.alm_add_task(test_task)
+        test_task_result = self.connector.alm_get_task(test_task)
         task_id = test_task_result.get_task_id()
-        regex = 'C?T\d+$'
+        alm_id = test_task_result.get_alm_id()
+        alm_status = test_task_result.get_status()
+        alm_timestamp = test_task_result.get_timestamp()
+        task_id_regex = 'C?T\d+$'
 
-        self.assertMatch(regex, task_id,
-                         'Task id does not match the expected pattern. pattern:%s, task_id:%s' % (regex, task_id))
-        test_task_result.get_alm_id()
-        test_task_result.get_status()
-        test_task_result.get_timestamp()
+        self.assertMatch(task_id_regex, task_id, 'Task id does not match the expected pattern. pattern:%s, task_id:%s' %
+                                                (task_id_regex, task_id))
+        self.assertEqual(type(alm_timestamp), datetime, 'Expected a datetime object')
+        self.assertEqual(test_task['status'], alm_status, 'Expected %s status, got %s' % (test_task['status'], alm_id))
+        self.assertNotNone(alm_id, 'Expected a value for alm_id')
 
         return [test_task, test_task_result]
 
     def test_alm_connect(self):
-        self.tac.alm_connect()
+        self.connector.alm_connect()
 
     def test_add_and_get_task(self):
         # The plugin may initialize variables during alm_connect() so we need
         # to call alm_connect() before proceeding
-        self.tac.alm_connect()
-        test_task = MOCK_SDE.generate_sde_task()
-        self.tac.alm_add_task(test_task)
-        test_task_result = self.tac.alm_get_task(test_task)
+        self.connector.alm_connect()
+        test_task = self.mock_sde_response.generate_sde_task()
+        self.connector.alm_add_task(test_task)
+        test_task_result = self.connector.alm_get_task(test_task)
 
         self.assertNotNone(test_task_result, 'Failed retrieve newly added task')
 
     def test_update_task_status_to_done(self):
-        self.tac.alm_connect()
-        test_task = MOCK_SDE.generate_sde_task()
-        self.tac.alm_add_task(test_task)
-        alm_task = self.tac.alm_get_task(test_task)
+        self.connector.alm_connect()
+        test_task = self.mock_sde_response.generate_sde_task()
+        self.connector.alm_add_task(test_task)
+        alm_task = self.connector.alm_get_task(test_task)
 
         self.assertNotEqual(alm_task.get_status(), 'DONE',
                             'Cannot update task status to DONE because status is already DONE')
 
-        self.tac.alm_update_task_status(alm_task, 'DONE')
-        test_task_result = self.tac.alm_get_task(test_task)
+        self.connector.alm_update_task_status(alm_task, 'DONE')
+        test_task_result = self.connector.alm_get_task(test_task)
 
         self.assertEqual(test_task_result.get_status(), 'DONE', 'Failed to update task status to DONE')
 
     def test_update_task_status_to_na(self):
-        self.tac.alm_connect()
-        test_task = MOCK_SDE.generate_sde_task()
-        self.tac.alm_add_task(test_task)
-        alm_task = self.tac.alm_get_task(test_task)
+        self.connector.alm_connect()
+        test_task = self.mock_sde_response.generate_sde_task()
+        self.connector.alm_add_task(test_task)
+        alm_task = self.connector.alm_get_task(test_task)
 
         self.assertNotEqual(alm_task.get_status(), 'NA', 'Cannot update task status to NA because status is already NA')
 
-        self.tac.alm_update_task_status(alm_task,'NA')
-        test_task_result = self.tac.alm_get_task(test_task)
+        self.connector.alm_update_task_status(alm_task,'NA')
+        test_task_result = self.connector.alm_get_task(test_task)
 
         self.assertIn(test_task_result.get_status(), ['DONE', 'NA'], 'Failed to update task status to NA')
 
     def test_update_task_status_to_todo(self):
-        self.tac.alm_connect()
-        test_task = MOCK_SDE.generate_sde_task()
+        self.connector.alm_connect()
+        test_task = self.mock_sde_response.generate_sde_task()
         test_task['status'] = 'DONE'
-        self.tac.alm_add_task(test_task)
-        alm_task = self.tac.alm_get_task(test_task)
+        print test_task['priority']
+        self.connector.alm_add_task(test_task)
+        alm_task = self.connector.alm_get_task(test_task)
 
         self.assertNotEqual(alm_task.get_status(), 'TODO',
                             'Cannot update task status to TODO because status is already TODO')
 
-        self.tac.alm_update_task_status(alm_task, 'TODO')
-        test_task_result = self.tac.alm_get_task(test_task)
+        self.connector.alm_update_task_status(alm_task, 'TODO')
+        test_task_result = self.connector.alm_get_task(test_task)
 
         self.assertEqual(test_task_result.get_status(), 'TODO', 'Failed to update task status to TODO')
 
     def test_synchronize(self):
         # Verify no exceptions are thrown
-        self.tac.synchronize()
+        self.connector.synchronize()
 
     @staticmethod
     def assertIn(value, expectations, msg=None):
@@ -144,7 +174,7 @@ class AlmPluginTestBase(object):
     def assertNotNone(obj, msg=None):
         if obj is None:
             if not msg:
-                msg = 'Expected None, got %s' % obj
+                msg = 'Expected a value other than None'
 
             raise AssertionError(msg)
 

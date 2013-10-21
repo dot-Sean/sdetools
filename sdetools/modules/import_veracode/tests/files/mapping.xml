@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<mapping>
+    <task id="38" title="Bind variables in SQL statements" confidence="high">
+		<weakness type="cwe" id="89" title="Improper Neutralization of Special Elements used in an SQL Command (SQL Injection)"/>
+		<weakness type="cwe" id="564" title="SQL Injection: Hibernate"/>
+	</task>
+    <task id="36" title="Escape untrusted data in HTML, HTML attributes, Cascading Style Sheets and JavaScript" confidence="low">
+		<weakness type="cwe" id="83" title="Improper Neutralization of Script in Attributes in a Web Page"/>
+		<weakness type="cwe" id="80" title="Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)"/>
+		<weakness type="cwe" id="79" title="Improper Neutralization of Input During Web Page Generation (Cross-site Scripting)"/>
+	</task>
+    <task id="40" title="Use XML encoding when interacting with XML data" confidence="low">
+        <weakness type="cwe" id="XPath Injection" title=""/>
+    </task>
+    <task id="193" title="Review non-categorized/miscellaneous findings from static code analysis" confidence="none">
+        <weakness type="cwe" id="10000" title="Unmapped weakness"/>
+    </task>
+</mapping>

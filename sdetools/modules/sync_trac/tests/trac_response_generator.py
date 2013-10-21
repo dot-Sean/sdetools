@@ -1,21 +1,15 @@
-import os
-
 from urllib2 import HTTPError
 from xmlrpclib import Fault
 
-from sdetools.alm_integration.tests.alm_response_generator import AlmResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator
 
 
-class TracResponseGenerator(AlmResponseGenerator):
-    STATUS_NAMES = ['new', 'closed']
+class TracResponseGenerator(ResponseGenerator):
     ACTIONS = ['resolve', 'reopen']
 
-    def __init__(self):
-        initial_task_status = self.STATUS_NAMES[0]
-        test_dir = os.path.dirname(os.path.abspath(__file__)) 
-        super(TracResponseGenerator, self).__init__(initial_task_status, test_dir)
-
-        self.rest_api_targets = {
+    def __init__(self, config=None, test_dir=None):
+        statuses = ['new', 'closed']
+        rest_api_targets = {
             'system\.getAPIVersion': 'get_api_version',
             'ticket\.get$': 'get_ticket_by_id',
             'ticket\.query': 'query_ticket',
@@ -23,6 +17,7 @@ class TracResponseGenerator(AlmResponseGenerator):
             'ticket\.update': 'update_ticket',
             'ticket\.getActions': 'get_ticket_actions',
         }
+        super(TracResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
     def raise_error(self, error_code, return_value=None):
         try:
@@ -53,7 +48,7 @@ class TracResponseGenerator(AlmResponseGenerator):
         if not flag:
             if data:
                 task_number = data[0]
-                task = self.get_alm_task(task_number)
+                task = self.generator_get_task(task_number)
 
                 if task:
                     return self.generate_task(task['status'], task_number, task.get('milestone'))
@@ -69,7 +64,7 @@ class TracResponseGenerator(AlmResponseGenerator):
                 task_number = self.extract_task_number_from_title(task_id)
                 response = []
 
-                if self.get_alm_task(task_number):
+                if self.generator_get_task(task_number):
                     response.append(task_number)
 
                 return response
@@ -83,12 +78,12 @@ class TracResponseGenerator(AlmResponseGenerator):
             if data:
                 task_title = data[0]
                 task_number = self.extract_task_number_from_title(task_title)
-                alm_task = self.get_alm_task(task_number)
+                alm_task = self.generator_get_task(task_number)
 
                 if not alm_task:
                     task_attributes = data[2]
                     task_status = task_attributes['status']
-                    self.add_alm_task(task_number, task_title, task_status)
+                    self.generator_add_task(task_number, task_title, task_status)
 
                     return task_number
 
@@ -101,24 +96,24 @@ class TracResponseGenerator(AlmResponseGenerator):
             if data:
                 task_number = data[0]
                 update_args = data[2]
-                task = self.get_alm_task(task_number)
+                task = self.generator_get_task(task_number)
 
                 if task:
                     milestone = update_args.get('milestone')
                     action = update_args.get('action')
 
                     if update_args.get('milestone'):
-                        self.update_alm_task(task_number, 'milestone', milestone)
+                        self.generator_update_task(task_number, 'milestone', milestone)
                     if action:
                         new_status = None
 
                         if action == self.ACTIONS[0]:
-                            new_status = self.STATUS_NAMES[1]
+                            new_status = self.generator_get_valid_statuses()[1]
                         elif action == self.ACTIONS[1]:
-                            new_status = self.STATUS_NAMES[0]
-                        self.update_alm_task(task_number, 'status', new_status)
+                            new_status = self.generator_get_valid_statuses()[0]
+                        self.generator_update_task(task_number, 'status', new_status)
 
-                    task = self.get_alm_task(task_number)
+                    task = self.generator_get_task(task_number)
                     return self.generate_task(task['status'], task_number, task.get('milestone'))
                 else:
                     self.raise_error('405')
@@ -130,7 +125,7 @@ class TracResponseGenerator(AlmResponseGenerator):
             if data:
                 task_number = data[0]
                 action_set = []
-                if self.get_alm_task(task_number):
+                if self.generator_get_task(task_number):
                     for transition in self.ACTIONS:
                         action_set.append([transition, 'Label', 'Hints', ['Name', 'Value']])
 

@@ -138,7 +138,7 @@ class MingleConnector(AlmConnector):
         if result:
             for card_item in result.getElementsByTagName('card'):
                 card_name = self._get_value_of_element_with_tag(card_item, 'name')
-                _task_id = re.search('T[0-9]+(?=:)', card_name)
+                _task_id = re.search('T[0-9]+((?=:)|$)', card_name)
 
                 if _task_id is not None:
                     card_num = self._get_value_of_element_with_tag(card_item, 'number')

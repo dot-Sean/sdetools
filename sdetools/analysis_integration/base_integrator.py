@@ -274,7 +274,6 @@ class BaseIntegrator(object):
             ret = self.plugin.add_project_analysis_note(self.report_id, self.TOOL_NAME)
             project_analysis_note_ref = ret['id'] 
 
-
         task_list = self.plugin.get_task_list()
         logger.debug("Retrieved %d tasks from %s/%s" % 
             (len(task_list), self.config['sde_application'], self.config['sde_project']))

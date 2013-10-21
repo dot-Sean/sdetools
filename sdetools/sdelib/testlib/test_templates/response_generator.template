@@ -1,0 +1,19 @@
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator
+
+
+class [alm]ResponseGenerator(ResponseGenerator):
+    def __init__(self, config, test_dir=None):
+        statuses = []
+        rest_api_targets = {
+            "api_target": "method_to_call"
+        }
+        super([alm]ResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
+
+    """
+       Response functions
+    """
+    def method_to_call(self, target, flag, data, method):
+        if not flag:
+            return None
+        else:
+            self.raise_error('401')
