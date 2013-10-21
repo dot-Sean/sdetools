@@ -140,7 +140,7 @@ class MingleConnector(AlmConnector):
                 card_name = self._get_value_of_element_with_tag(card_item, 'name')
                 _task_id = re.search('T[0-9]+((?=:)|$)', card_name)
 
-                if _task_id is not None:
+                if not _task_id:
                     card_num = self._get_value_of_element_with_tag(card_item, 'number')
                     self.cached_cards[_task_id.group(0)] = card_num
 
