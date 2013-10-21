@@ -13,8 +13,8 @@ class MingleResponseGenerator(ResponseGenerator):
         self.project_uri = 'projects/%s/cards' % urlencode_str(project_name)
         rest_api_targets = {
             'projects.xml': 'get_projects',
-            '%s.xml' % self.project_uri: 'project_cards',
-            '%s/[0-9]*.xml' % self.project_uri: 'update_card_status'
+            '%s.xml' % self.project_uri: 'call_cards',
+            '%s/[0-9]*.xml' % self.project_uri: 'call_card_by_number'
         }
         super(MingleResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
@@ -27,20 +27,25 @@ class MingleResponseGenerator(ResponseGenerator):
         else:
             self.raise_error('401')
 
-    def project_cards(self, target, flag, data, method):
+    def call_cards(self, target, flag, data, method):
         if not flag:
             if method == 'GET':
                 cards = self.get_xml_from_file('cards')
+                _mingle_tasks = self.generator_get_all_tasks().values()
 
                 if data:
+                    _mingle_tasks = []
                     filter_arg = data.get('filters[]')
                     card_name = re.search('(?<=\[Name\]\[is\]\[).*(?=\])', filter_arg).group(0)
                     card_number = self.extract_task_number_from_title(card_name)
                     task = self.generator_get_task(card_number)
 
                     if task:
-                        card = self.generate_card(card_number, task['name'], task['status'], task['card_type'])
-                        cards.documentElement.appendChild(card.documentElement)
+                        _mingle_tasks.append(task)
+
+                for task in _mingle_tasks:
+                    card = self.generate_card(task['id'], task['name'], task['status'], task['card_type'])
+                    cards.documentElement.appendChild(card.documentElement)
 
                 return cards
             elif method == 'POST':
@@ -55,13 +60,20 @@ class MingleResponseGenerator(ResponseGenerator):
         else:
             self.raise_error('401')
 
-    def update_card_status(self, target, flag, data, method):
+    def call_card_by_number(self, target, flag, data, method):
         if not flag:
-            status = data['card[properties][][value]']
             card_number = re.search('[0-9]+(?=\.xml)', target).group(0)
 
-            if self.generator_get_task(card_number):
-                self.generator_update_task(card_number, 'status', status)
+            if method == 'GET':
+                task = self.generator_get_task(card_number)
+
+                if task:
+                    return self.generate_card(card_number, task['name'], task['status'], task['card_type'])
+            elif method == 'PUT':
+                status = data['card[properties][][value]']
+
+                if self.generator_get_task(card_number):
+                    self.generator_update_task(card_number, 'status', status)
 
             return None
         else:

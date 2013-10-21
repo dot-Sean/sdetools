@@ -23,4 +23,20 @@ class TestMingleCase(AlmPluginTestBase, unittest.TestCase):
         self.assertEqual(type(result_alm_id), int, 'Expected alm_id to be an integer')
         self.assertEqual(result_alm_id, alm_id, 'Expected alm_id %s, got %s' % (alm_id, result_alm_id))
 
+    def test_mingle_cached_cards(self):
+        self.connector.alm_connect()
+        test_task = self.mock_sde_response.generate_sde_task()
+        self.connector.alm_add_task(test_task)
+        cached_cards = self.connector.cached_cards
 
+        self.assertEqual(cached_cards, None)
+
+        self.connector._cache_all_sde_mingle_cards()
+        cached_cards = self.connector.cached_cards
+        sde_task_id = self.connector._extract_task_id(test_task['id'])
+        alm_id = int(test_task['id'].split('T')[1])
+
+        self.assertNotNone(cached_cards)
+        self.assertNotNone(cached_cards.get(sde_task_id))
+        self.assertEquals(cached_cards.get(sde_task_id), alm_id)
+        self.assertNotNone(self.connector.alm_get_task(test_task))

@@ -106,7 +106,7 @@ class JIRAConnector(AlmConnector):
         self.alm_plugin.setup_fields(self.jira_issue_type_id)
 
     def alm_get_task(self, task):
-        task_id = task['title'].partition(':')[0]
+        task_id = self._extract_task_id(task['id'])
 
         task = self.alm_plugin.get_task(task, task_id)
         if task:

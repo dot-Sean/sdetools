@@ -157,7 +157,7 @@ class RallyConnector(AlmConnector):
         self.project_ref = project_ref
 
     def alm_get_task(self, task):
-        task_id = task['title'].split(':', 1)[0]
+        task_id = self._extract_task_id(task['id'])
         result = None
 
         try:
