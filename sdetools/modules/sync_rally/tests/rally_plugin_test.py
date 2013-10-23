@@ -1,22 +1,25 @@
-#NOTE: Before running ensure that the options are set
-#properly in the configuration file
+# NOTE: Before running ensure that the options are set properly in the
+#       configuration file
+import unittest
 
-import sys, os, unittest
-sys.path.append(os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0])
-
-from sdetools.alm_integration.tests.alm_plugin_test_helper import AlmPluginTestHelper
-from sdetools.sdelib.conf_mgr import config
-from sdetools.sdelib.interactive_plugin import PlugInExperience
+from rally_response_generator import RallyResponseGenerator
+from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_rally.rally_plugin import RallyConnector, RallyAPIBase
+PATH_TO_ALM_REST_API = 'sdetools.modules.sync_rally.rally_plugin'
 
-CONF_FILE_LOCATION = 'test_settings.conf'
 
-class TestRallyCase(AlmPluginTestHelper, unittest.TestCase):
-     def setUp(self):
-        config.parse_config_file(CONF_FILE_LOCATION)
-        self.tac = RallyConnector(PlugInExperience(config), RallyAPIBase(config))
-        super(TestRallyCase, self).setUp()
-        
-if __name__ == "__main__":
-    unittest.main()
+class TestRallyCase(AlmPluginTestBase, unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        alm_classes = [RallyConnector, RallyAPIBase, RallyResponseGenerator]
+        super(TestRallyCase, cls).setUpClass(PATH_TO_ALM_REST_API, alm_classes=alm_classes)
 
+    def test_parsing_alm_task(self):
+        result = super(TestRallyCase, self).test_parsing_alm_task()
+        test_task = result[0]
+        test_task_result = result[1]
+
+        alm_id = test_task['id'].split('T')[1]
+        result_alm_id = test_task_result.get_alm_id()
+
+        self.assertEqual(result_alm_id, alm_id, 'Expected alm_id %s, got %s' % (alm_id, result_alm_id))

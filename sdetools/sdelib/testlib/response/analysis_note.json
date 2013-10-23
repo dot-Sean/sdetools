@@ -1,0 +1,15 @@
+{
+    "status": "failed",
+    "confidence": "low",
+    "findings": [],
+    "task": "1296-T40",
+    "project_analysis_note": 68,
+    "status_label": "Partial Pass",
+    "updater_full": "SD Elements Support",
+    "finding_ref": "",
+    "created": 1381180290,
+    "updated": 1381180290,
+    "updater": "test+user@sdelements.com",
+    "status_message": "The scanning tool did not find any instances of this vulnerability. The scanning tool can normally detect some instances of this vulnerability, but not all, for a number of possible reasons. For example, the scanning tool only detects this vulnerability in some of the supported languages/frameworks but not all, or it can only detect certain aspects of the vulnerability but not all. Note that a partial pass does not guarantee the absence of false negatives, and SD Elements recommends additional manual testing for high risk applications.",
+    "id": 1845
+}

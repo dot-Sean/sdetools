@@ -106,7 +106,7 @@ class JIRAConnector(AlmConnector):
         self.alm_plugin.setup_fields(self.jira_issue_type_id)
 
     def alm_get_task(self, task):
-        task_id = task['title'].partition(':')[0]
+        task_id = self._extract_task_id(task['id'])
 
         task = self.alm_plugin.get_task(task, task_id)
         if task:
@@ -153,7 +153,8 @@ class JIRAConnector(AlmConnector):
 
         trans_name = self.config['jira_%s_transition' % new_state]
         if trans_name not in trans_table:
-            raise AlmException('Unable to find transition %s' % trans_name)
+            raise AlmException('Transition %s is invalid for issue %s. Valid entries are: %s' % (
+                trans_name, alm_id, ', '.join(trans_table)))
         trans_id = trans_table[trans_name]
 
         self.alm_plugin.update_task_status(alm_id, trans_id)

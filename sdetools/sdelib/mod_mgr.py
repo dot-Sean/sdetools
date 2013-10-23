@@ -42,7 +42,7 @@ class EmitShortCut:
     def __call__(self, *args, **kwargs):
         self.ret_chn.emit_it(*args, **kwargs)
 
-class ReturnChannel:
+class ReturnChannel(object):
     def __init__(self, call_back, call_back_args={}):
         self.is_open = True
         self.call_back = call_back

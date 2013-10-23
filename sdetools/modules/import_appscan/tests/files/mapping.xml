@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<mapping>
+    <task id="38" title="Bind variables in SQL statements" confidence="high">
+        <weakness type="check" id="attSqlInjectionChecks" category="catSQLInjection" title="New_SQLi" />   
+    </task>
+    <task id="36" title="Escape untrusted data in HTML" confidence="low">
+        <weakness type="check" id="attUserAgentXSS" category="catCrossSiteScripting" title="New_XSS" />
+    </task>
+    <task id="40" title="Use XML encoding when interacting with XML data" confidence="low">
+        <weakness type="check" id="attXPathInjection" category="catXPathInjection" title="New_Xpath_Inj" />
+    </task>
+    <task id="193" title="Review non-categorized/miscellaneous findings from static code analysis" confidence="low">
+        <weakness type="check" id="unknown" title="Unmapped weakness"/>
+    </task>
+</mapping>

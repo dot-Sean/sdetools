@@ -1,0 +1,91 @@
+{
+   "HierarchicalRequirement":{
+      "_rallyAPIMajor":"1",
+      "_rallyAPIMinor":"39",
+      "_ref":"https://rally1.rallydev.com/slm/webservice/1.39/hierarchicalrequirement/14411137668.js",
+      "_objectVersion":"1",
+      "_refObjectName":"Task Name",
+      "CreationDate":"2013-10-02T20:27:27.620Z",
+      "_CreatedAt":"yesterday at 2:27 pm",
+      "ObjectID":14411137668,
+      "Subscription":{
+         "_rallyAPIMajor":"1",
+         "_rallyAPIMinor":"39",
+         "_ref":"https://rally1.rallydev.com/slm/webservice/1.39/subscription/14409159535.js",
+         "_refObjectName":"Test Project",
+         "_type":"Subscription"
+      },
+      "Workspace":{
+         "_rallyAPIMajor":"1",
+         "_rallyAPIMinor":"39",
+         "_ref":"https://rally1.rallydev.com/slm/webservice/1.39/workspace/14409159690.js",
+         "_refObjectName":"Workspace 1",
+         "_type":"Workspace"
+      },
+      "Changesets":[
+
+      ],
+      "Description":"Task Description: <a>link</a><br><br>End Task",
+      "Discussion":[
+
+      ],
+      "FormattedID":"US2",
+      "LastUpdateDate":"2013-10-02T20:27:27.682Z",
+      "Name":"Task Name",
+      "Owner":null,
+      "Project":{
+         "_rallyAPIMajor":"1",
+         "_rallyAPIMinor":"39",
+         "_ref":"https://rally1.rallydev.com/slm/webservice/1.39/project/14409159780.js",
+         "_refObjectName":"Test Project",
+         "_type":"Project"
+      },
+      "Ready":false,
+      "RevisionHistory":{
+         "_rallyAPIMajor":"1",
+         "_rallyAPIMinor":"39",
+         "_ref":"https://rally1.rallydev.com/slm/webservice/1.39/revisionhistory/14411137669.js",
+         "_type":"RevisionHistory"
+      },
+      "Tags":[
+
+      ],
+      "Attachments":[
+
+      ],
+      "Package":null,
+      "AcceptedDate":null,
+      "Blocked":false,
+      "BlockedReason":null,
+      "Blocker":null,
+      "Children":[
+
+      ],
+      "DefectStatus":"NONE",
+      "Defects":[
+
+      ],
+      "DirectChildrenCount":0,
+      "Rank":344934890433.000,
+      "HasParent":false,
+      "InProgressDate":null,
+      "Iteration":null,
+      "Parent":null,
+      "PlanEstimate":null,
+      "Recycled":false,
+      "ScheduleState":"Defined",
+      "TaskActualTotal":0.0,
+      "TaskEstimateTotal":0.0,
+      "TaskRemainingTotal":0.0,
+      "TaskStatus":"NONE",
+      "Tasks":[
+
+      ],
+      "Errors":[
+
+      ],
+      "Warnings":[
+         "API status is Deprecated and will become Not Supported on 2013-12-05"
+      ]
+   }
+}

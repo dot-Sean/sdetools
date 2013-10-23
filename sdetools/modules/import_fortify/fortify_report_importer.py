@@ -24,7 +24,7 @@ class FortifyReportImporter(BaseImporter):
         try:
             base = minidom.parse(report_xml)
         except Exception, e:
-            raise FortifyIntegrationError("Error opening report xml %s Reason: %s" % report_xml, str(e))
+            raise FortifyIntegrationError("Error opening report xml %s Reason: %s" % (report_xml, str(e)))
 
         self.report_id = ""
         root = base.documentElement
