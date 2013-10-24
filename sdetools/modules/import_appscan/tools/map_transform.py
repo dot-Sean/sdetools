@@ -1,5 +1,7 @@
 #!/usr/bin/python
-import sys, os
+import sys
+import os
+from xml.sax.saxutils import escape, quoteattr
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -13,11 +15,24 @@ class MappingError(Exception):
 class Mapping:
     def __init__(self):
         self.check_causes = {}
-        self.task_cause_map = {'186': ['insecureThirdPartySoftware', 'missingPatchesForThirdPartyProds'],
-                            '49': ['sampleScriptsFound', 'backDoorLeftBehind'],
+        self.task_cause_map = {'186': ['insecureThirdPartySoftware',
+                                       'missingPatchesForThirdPartyProds'],
+                            '49': ['sampleScriptsFound', 'backDoorLeftBehind', 'debugInfoInHtmlSource'],
                             '157': ['tempFilesLeftBehind'],
                             '23': ['nonHttpOnlySessionCookie'],
-                            '33': ['hiddenParameterUsed']
+                            '33': ['hiddenParameterUsed'],
+                            '42': ['remoteFileInclusion'],
+                            '203': ['formatStringsVulnerability'],
+                            '47': ['errorMessagesReturned'],
+                            '50': ['dotDotNotSanitized'],
+                            '21': ['sensitiveDataNotSSL'],
+                            '11': ['redirectionFromWithinSite'],
+                            '22': ['nonSecureCookiesSentOverSSL'],
+                            '60': ['WB_InsecureCryptoStorage'],
+                            '38': ['WB_DBAccess'],
+                            '196':['WB_TaintPropHazardousAPI'],
+                            '64': ['SensitiveCache'],
+                            '40': ['XPath Injection'],
                             }
         self.mapping = {}
         self.third_party_checks = []
@@ -26,7 +41,7 @@ class Mapping:
         self.checks = []
         self.task_map = {}
         self.task_map['186'] = []
-        self.task_map['193'] = [{'check_id': '*', 'category_id': '', 'check_name': 'Unmapped Check'}]
+        self.task_map['193'] = [{'check_id': '*', 'cause_id': '','category_id': '', 'check_name': 'Unmapped Check'}]
 
     def load_causes_from_xml(self, third_party_map):
         try:
@@ -78,13 +93,12 @@ class Mapping:
             for check_row in task.getElementsByTagName('weakness'):
                 check = {}
                 check['check_id'] = check_row.attributes['id'].value
-                check['category_id'] = check_row.attributes['category'].value
+                check['cause_id'] = check_row.attributes['cause'].value
                 check['check_name'] = check_row.attributes['title'].value
-                check['check_name'] = check['check_name'].replace('"', '&quot;')
-                check['check_name'] = check['check_name'].replace('&', '&amp;')
-
-                if not self.check_in_list(task_checks, check['check_id']):
-                    task_checks.append(check)
+                debug = 'GD_CreditCardDinersClub' == check['check_id'] and False
+                if debug:
+                    print "Adding %s to T%s" % (check['check_id'], task_id)
+                task_checks.append(check)
 
             self.task_map[task_id] = task_checks
 
@@ -94,42 +108,53 @@ class Mapping:
         except Exception, e:
             raise MappingError("An error occurred opening checks file '%s': %s" % (checks_file, e))
 
-        category_checks = {}
+        # Map to tasks if possible
         for check_row in base.getElementsByTagName('ROW'):
             check = {}
             check['check_id'] = check_row.attributes['ID'].value
-            check['category_id'] = check_row.attributes['THREATCLASSID'].value
-            check['check_name'] = check_row.attributes['ADVISORYID'].value
-            check['third_party'] = check_row.attributes['THIRDPARTY'].value == '1'
+            check['cwe_id'] = check_row.attributes['CWEID'].value
+            check['cause_id'] = check_row.attributes['CAUSEID'].value
+            check['check_name'] = check_row.attributes['STRING'].value
 
-            if check['third_party']:
-                self.task_map['186'].append(check)
+            if check['check_name'].find('#') > 0:
+                check['check_name'] = check['check_name'][(check['check_name'].index("#")+2):]
+
+            if self.check_mapped(self.task_map, check['check_id']):
                 continue
 
-            task_id = self.get_task_based_cause(check['check_id'])
+            debug = 'GD_CreditCardDinersClub' == check['check_id'] and False
+            added = False
+            task_id = self.get_task_based_cause(check['cause_id'])
             if task_id:
-                self.task_map[task_id].append(check)
-                continue
+                if debug:
+                    print "Cause %s maps to task %s" % (check['cause_id'], task_id)
+                if not self.task_map.has_key(task_id):
+                    self.task_map[task_id] = []
+                if not self.check_in_list(self.task_map[task_id], check['check_id']):
+                    self.task_map[task_id].append(check)
+                    added = True
+                    if debug:
+                        print ">> added to %s " % task_id
 
-            checks = []
-            if category_checks.has_key(check['category_id']):
-                checks = category_checks[check['category_id']]
-            checks.append(check)
+        # Try to map to 193
+        for check_row in base.getElementsByTagName('ROW'):
+            check = {}
+            check['check_id'] = check_row.attributes['ID'].value
+            check['cwe_id'] = check_row.attributes['CWEID'].value
+            check['cause_id'] = check_row.attributes['CAUSEID'].value
+            check['check_name'] = check_row.attributes['STRING'].value
 
-            category_checks[check['category_id']] = checks
+            if not self.check_mapped(self.task_map, check['check_id']) and \
+                    not self.check_in_list(self.task_map['193'], check['check_id']):
+                self.task_map['193'].append(check)
+                if debug:
+                    print "added to 193"
 
-            if not check['check_id'] in self.checks:
-                self.checks.append(check['check_id'])
-
-        self.category_checks = category_checks
-
-    def get_task_based_cause(self, check_id):
-        if check_id in self.check_causes:
-            for check_cause in self.check_causes[check_id]:
-                for task_id in self.task_cause_map.keys():
-                    for task_cause in self.task_cause_map[task_id]:
-                        if task_cause == check_cause:
-                            return task_id
+    def get_task_based_cause(self, check_cause):
+        for task_id in self.task_cause_map.keys():
+            for task_cause in self.task_cause_map[task_id]:
+                if task_cause == check_cause:
+                    return task_id
         return None
 
     def remap(self):
@@ -204,8 +229,12 @@ class Mapping:
                      (task_id, self.base_tasks[task_id].attributes['title'].value, confidence))
             task_checks = sorted(task_checks)
             for check in task_checks:
-                fp.write('\t\t<weakness type="check" id="%s" category="%s" title="%s" />\n' % (
-                    check['check_id'], check['category_id'], check['check_name']))
+                if task_id == '193':
+                    print '\t\t<weakness type="check" id="%s" cause="%s" title=%s />\n' % (
+                            check['check_id'], check['cause_id'], quoteattr(escape(check['check_name'])))
+
+                fp.write('\t\t<weakness type="check" id="%s" cause="%s" title=%s />\n' % (
+                    check['check_id'], check['cause_id'], quoteattr(escape(check['check_name']))))
             fp.write('\t</task>\n')
         fp.write('</mapping>\n')
         fp.close()
@@ -248,8 +277,8 @@ def main(argv):
     print "Loading AppScan Checks..."
     base.load_weaknesses_from_xml(argv[4])
 
-    print "Re-mapping Checks..."
-    base.remap()
+    #print "Re-mapping Checks..."
+    #base.remap()
 
     print "Validating..."
     if False and base.find_missing_checks():
