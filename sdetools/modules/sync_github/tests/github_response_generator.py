@@ -57,6 +57,8 @@ class GitHubResponseGenerator(ResponseGenerator):
     def get_milestones(self, target, flag, data, method):
         if not flag:
             return self.get_json_from_file('milestones')
+        elif flag == '401':
+            self.raise_error('401')
         else:
             return []
 

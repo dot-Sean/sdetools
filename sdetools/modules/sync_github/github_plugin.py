@@ -120,7 +120,7 @@ class GitHubConnector(AlmConnector):
         try:
             user_info = self.alm_plugin.call_api('user')
         except APIError, err:
-            if self.alm_plugin._get_conf('api_token'):
+            if self.config.get('alm_api_token'):
                 auth_field_check = 'api token'
             else:
                 auth_field_check = 'user, pass'
