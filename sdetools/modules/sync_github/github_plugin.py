@@ -150,7 +150,7 @@ class GitHubConnector(AlmConnector):
         try:
             milestone_list = self.alm_plugin.call_api('repos/%s/milestones' % self.project_uri)
         except APIError, err:
-            raise AlmException('Unable to get milestones from GitHub. Reason: %s' % err)
+            raise AlmException('Unable to get milestones from GitHub. Reason: %s' % str(err))
 
         for milestone in milestone_list:
             if milestone['title'] == milestone_name:
@@ -174,7 +174,7 @@ class GitHubConnector(AlmConnector):
                                                       GITHUB_DONE_STATUS,
                                                       urlencode_str(task_id)))
         except APIError, err:
-            raise AlmException('Unable to get task %s from GitHub. Reason: %s' % (task_id, err))
+            raise AlmException('Unable to get task %s from GitHub. Reason: %s' % (task_id, str(err)))
 
         issues_list = open_issues['issues']
         issues_list.extend(closed_issues['issues'])
@@ -264,7 +264,7 @@ class GitHubConnector(AlmConnector):
             logger.debug('Task %s added to GitHub Project', task['id'])
         except APIError, err:
             raise AlmException('Unable to add task %s to GitHub. Reason: %s'
-                               % (task['id'], err))
+                               % (task['id'], str(err)))
 
         # API returns JSON of the new issue
         alm_task = GitHubTask(task['id'],
@@ -298,7 +298,7 @@ class GitHubConnector(AlmConnector):
                                               args=update_args, method=URLRequest.POST)
         except APIError, err:
             raise AlmException('Unable to update task status to %s for GitHub issue %s. Reason: %s' %
-                               (status, task.get_alm_id(), err))
+                               (status, task.get_alm_id(), str(err)))
 
         logger.debug('Status changed to %s for task %s in GitHub' % (status, task.get_alm_id()))
 
