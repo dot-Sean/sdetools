@@ -16,9 +16,8 @@ class Mapping:
     def __init__(self):
         self.check_causes = {}
         self.task_cause_map = {'186': ['insecureThirdPartySoftware',
-                                       'missingPatchesForThirdPartyProds'],
+                                       'missingPatchesForThirdPartyProds','vulnActiveX','vulnSOAPserializer'],
                             '49': ['sampleScriptsFound', 'backDoorLeftBehind', 'debugInfoInHtmlSource'],
-                            '157': ['tempFilesLeftBehind'],
                             '23': ['nonHttpOnlySessionCookie'],
                             '33': ['hiddenParameterUsed'],
                             '42': ['remoteFileInclusion'],
@@ -29,10 +28,12 @@ class Mapping:
                             '11': ['redirectionFromWithinSite'],
                             '22': ['nonSecureCookiesSentOverSSL'],
                             '60': ['WB_InsecureCryptoStorage'],
-                            '38': ['WB_DBAccess'],
+                            '38': [],
                             '196':['WB_TaintPropHazardousAPI'],
                             '64': ['SensitiveCache'],
                             '40': ['XPath Injection'],
+                            '193': ['tempFilesLeftBehind'],
+                            '219': ['GETParamOverSSL']
                             }
         self.mapping = {}
         self.third_party_checks = []
