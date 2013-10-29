@@ -151,7 +151,7 @@ class RESTBase(object):
         return result
 
     def parse_error(self, result):
-        return json.loads(err_msg)['error']
+        return json.loads(result)['error']
 
     def set_content_type(self, req, method):
         if (method != URLRequest.GET):

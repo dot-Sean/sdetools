@@ -2,6 +2,7 @@
 # Extensible two way integration with GitHub
 
 import re
+import json
 from datetime import datetime
 
 from sdetools.sdelib.commons import urlencode_str
@@ -39,6 +40,38 @@ class GitHubAPI(RESTBase):
             self.config['alm_pass'] = 'token %s' % self._get_conf('api_token')
 
         super(GitHubAPI, self).post_conf_init()
+
+    def parse_error(self, result):
+        error_msg = result.get('message')
+
+        if not error_msg:
+            logger.error('Could not parse error message')
+            raise AlmException('Could not parse error message')
+
+        errors = result.get('errors')
+
+        if errors:
+            additional_info = ''
+            for error in errors:
+                code = error['code']
+                field = error['field']
+                resource = error['resource']
+
+                if code == 'missing':
+                    additional_info += 'The resource "%s" does not exist.' % resource
+                elif code == 'missing_field':
+                    additional_info += 'The field "%s" is required for the resource "%s"' % (field, resource)
+                elif code == 'invalid':
+                    additional_info += 'The field "%s" is not properly formatted' % field
+                elif code == 'already_exists':
+                    additional_info += 'The value for the field "%s" already exists in another "%s" resource' % \
+                                         (field, resource)
+                else:
+                    # Generic error formatting
+                    additional_info += 'Resource: %s Code: %s Field: %s' % (resource, code, field)
+            if additional_info:
+                error_msg += '. Additional Info - %s' % additional_info
+        return error_msg
 
 
 class GitHubTask(AlmTask):
