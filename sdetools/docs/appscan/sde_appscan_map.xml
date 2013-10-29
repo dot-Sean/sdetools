@@ -1852,7 +1852,7 @@
 	</task>
 	<task id="204" title="Follow security best practices when dealing with pointers" confidence="low">
 	</task>
-	<task id="21" title="Ensure confidential data is sent over secure channel" confidence="low">
+	<task id="21" title="Ensure confidential data is sent over an encrypted channel" confidence="low">
 		<weakness type="check" id="TPHidden_OWB_Authentication_Credentials_Unprotected" cause="InsufficientAuthentication" title="Authentication Credentials Unprotected" />
 		<weakness type="check" id="TPHidden_OWB_Authentication_Credentials_Unprotected_Transport" cause="InsufficientAuthentication" title="Authentication Credentials Unprotected Transport" />
 		<weakness type="check" id="GD_CreditCardAmericanExpressNotSSL" cause="insecureWebAppConfiguration" title="Global Detection: Credit Cards" />

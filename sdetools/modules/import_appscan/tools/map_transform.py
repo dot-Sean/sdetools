@@ -158,48 +158,6 @@ class Mapping:
                     return task_id
         return None
 
-    def remap(self):
-
-        keys = sorted(self.category_checks.iterkeys())
-        for cwe in keys:
-            if self.mapping.has_key(cwe):
-                tasks = self.mapping[cwe]
-                for task in tasks:
-                    task_checks = []
-                    if self.task_map.has_key(task):
-                        task_checks = self.task_map[task]
-                    for check in self.category_checks[cwe]:
-
-                        # If the check is assigned elsewhere - move on
-                        if self.check_mapped(self.task_map, check['check_id']):
-                            continue
-
-                        task_mapping_found = False
-                        for task_check in task_checks:
-                            if task_check['check_id'] == check['check_id']:
-                                task_mapping_found = True
-                        if not task_mapping_found:
-                            task_checks.append(check)
-                    self.task_map[task] = task_checks
-            else:  # map to 193
-                task_mapping_found = False
-                task_checks = []
-                task = '193'
-                if task in self.task_map.keys():
-                    task_checks = self.task_map[task]
-                for check in self.category_checks[cwe]:
-
-                    # If the check is assigned elsewhere do not put it in the catch-all task
-                    if self.check_mapped(self.task_map, check['check_id']):
-                        continue
-
-                    for chk in task_checks:
-                        if chk['check_id'] == check['check_id']:
-                            task_mapping_found = True
-                    if not task_mapping_found:
-                        task_checks.append(check)
-                self.task_map[task] = task_checks
-
     def check_in_list(self, a_list, check_id):
         for item in a_list:
             if item['check_id'] == check_id:
@@ -230,10 +188,6 @@ class Mapping:
                      (task_id, self.base_tasks[task_id].attributes['title'].value, confidence))
             task_checks = sorted(task_checks)
             for check in task_checks:
-                if task_id == '193':
-                    print '\t\t<weakness type="check" id="%s" cause="%s" title=%s />\n' % (
-                            check['check_id'], check['cause_id'], quoteattr(escape(check['check_name'])))
-
                 fp.write('\t\t<weakness type="check" id="%s" cause="%s" title=%s />\n' % (
                     check['check_id'], check['cause_id'], quoteattr(escape(check['check_name']))))
             fp.write('\t</task>\n')
@@ -250,12 +204,11 @@ class Mapping:
 
 
 def main(argv):
-    usage = "Usage: %s <check causes> <category mapping> <custom map> <appscan checks> <appscan map>\n" % (argv[0])
+    usage = "Usage: %s <check causes> <custom map> <appscan checks> <appscan map>\n" % (argv[0])
 
     if len(argv) == 2 and argv[1] == 'help':
         print usage
         print "check causes: (input) list of checks/causes (i.e. issuetypecauses.xml)"
-        print "category mapping: (input) docs/appscan/sde_appscan_standard_category_map.xml"
         print "custom map: (input) Task->WebInspect check mapping in xml format [i.e. custom_webinspect_map.xml]"
         print "appscan checks: (input) AppScan checks in xml format [i.e. appscan_checks.xml]"
         print "appscan map: (output) AppScan map file"
@@ -269,25 +222,19 @@ def main(argv):
     print "Loading third party map..."
     base.load_causes_from_xml(argv[1])
 
-    print "Loading category map..."
-    base.load_base_mapping_from_xml(argv[2])
-
     print "Loading custom map..."
-    base.load_custom_mapping_from_xml(argv[3])
+    base.load_custom_mapping_from_xml(argv[2])
 
     print "Loading AppScan Checks..."
-    base.load_weaknesses_from_xml(argv[4])
-
-    #print "Re-mapping Checks..."
-    #base.remap()
+    base.load_weaknesses_from_xml(argv[3])
 
     print "Validating..."
-    if False and base.find_missing_checks():
+    if base.find_missing_checks():
         print "Aborted"
         sys.exit(1)
 
-    print "Outputting AppScan map to %s..." % argv[5]
-    base.output_mapping(argv[5])
+    print "Outputting AppScan map to %s..." % argv[4]
+    base.output_mapping(argv[4])
 
     print "Done."
 
