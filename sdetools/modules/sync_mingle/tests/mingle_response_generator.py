@@ -9,21 +9,66 @@ class MingleResponseGenerator(ResponseGenerator):
 
     def __init__(self, config, test_dir=None):
         project_name = urlencode_str(config['alm_project'])
-        statuses = ['New', 'Done']
-        self.project_uri = 'projects/%s/cards' % urlencode_str(project_name)
+        statuses = ['New', 'Closed', 'Open']
+        self.project_uri = 'projects/%s' % urlencode_str(project_name)
         rest_api_targets = {
             'projects.xml': 'get_projects',
-            '%s.xml' % self.project_uri: 'call_cards',
-            '%s/[0-9]*.xml' % self.project_uri: 'call_card_by_number'
+            '%s.xml' % self.project_uri: 'get_project',
+            '%s/cards.xml' % self.project_uri: 'call_cards',
+            '%s/cards/[0-9]+.xml' % self.project_uri: 'call_card_by_number',
+            '%s/card_types.xml' % self.project_uri: 'get_card_types',
+            '%s/property_definitions.xml' % self.project_uri: 'get_property_definitions',
+            '%s/property_definitions/[0-9]+.xml' % self.project_uri: 'get_property_definition_by_id'
         }
         super(MingleResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
     """
        Response functions 
     """
+    def get_property_definition_by_id(self, target, flag, data, method):
+        property_id = re.search('[0-9]+(?=\.xml)', target).group(0)
+
+        if not flag:
+            if property_id == '114':
+                return self.get_xml_from_file('status_definition')
+            else:
+                self.raise_error('404')
+        else:
+            self.raise_error('401')
+
+    def get_property_definitions(self, target, flag, data, method):
+        if not flag:
+            return self.get_xml_from_file('property_definitions')
+        else:
+            self.raise_error('401')
+
+    def get_card_types(self, target, flag, data, method):
+        if not flag:
+            return self.get_xml_from_file('card_types')
+        else:
+            self.raise_error('401')
+
+    def get_project(self, target, flag, data, method):
+        if not flag:
+            return self.get_xml_from_file('project')
+        elif flag == 'anonymous_accessible':
+            xml = self.get_xml_from_file('project')
+            element = xml.getElementsByTagName('anonymous_accessible')[0]
+            element.firstChild.nodeValue = 'true'
+
+            return xml
+        else:
+            self.raise_error('401')
+
     def get_projects(self, target, flag, data, method):
         if not flag:
             return self.get_xml_from_file('projects')
+        elif flag == 'anonymous_accessible':
+            xml = self.get_xml_from_file('projects')
+            element = xml.getElementsByTagName('anonymous_accessible')[0]
+            element.firstChild.nodeValue = 'true'
+
+            return xml
         else:
             self.raise_error('401')
 
@@ -44,18 +89,19 @@ class MingleResponseGenerator(ResponseGenerator):
                         _mingle_tasks.append(task)
 
                 for task in _mingle_tasks:
-                    card = self.generate_card(task['id'], task['name'], task['status'], task['card_type'])
+                    card = self.generate_card(task['id'], task['name'], task['status'], task['card_type'], task['description'])
                     cards.documentElement.appendChild(card.documentElement)
 
                 return cards
             elif method == 'POST':
                 card_name = data['card[name]']
                 card_type = data['card[card_type_name]']
+                description = data['card[description]']
                 status = data['card[properties][][value]']
                 card_number = self.extract_task_number_from_title(card_name)
                 self.generator_add_task(card_number, card_name, status)
                 self.generator_update_task(card_number, 'card_type', card_type)
-
+                self.generator_update_task(card_number, 'description', description)
                 return None
         else:
             self.raise_error('401')
@@ -68,7 +114,7 @@ class MingleResponseGenerator(ResponseGenerator):
                 task = self.generator_get_task(card_number)
 
                 if task:
-                    return self.generate_card(card_number, task['name'], task['status'], task['card_type'])
+                    return self.generate_card(card_number, task['name'], task['status'], task['card_type'], task['description'])
             elif method == 'PUT':
                 status = data['card[properties][][value]']
 
@@ -83,13 +129,16 @@ class MingleResponseGenerator(ResponseGenerator):
 
        XML Generator
     """
-    def generate_card(self, card_id, card_name, status, card_type):
+    def generate_card(self, card_id, card_name, status, card_type, description):
         card = self.get_xml_from_file('card')
         name_node = card.getElementsByTagName('name').item(0)
         name_node.firstChild.nodeValue = card_name
 
         number_node = card.getElementsByTagName('number').item(0)
         number_node.firstChild.nodeValue = int(card_id)
+
+        description_node = card.getElementsByTagName('description').item(0)
+        description_node.firstChild.nodeValue = description
 
         id_node = card.getElementsByTagName('id').item(0)
         id_node.firstChild.nodeValue = int(card_id)

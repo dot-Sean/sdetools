@@ -26,7 +26,7 @@
   <properties type="array">
     <property type_description="Managed text list" hidden="false">
       <name>Status</name>
-      <value>Closed</value>
+      <value>New</value>
     </property>
     <property type_description="Managed number list" hidden="false">
       <name>Estimate</name>

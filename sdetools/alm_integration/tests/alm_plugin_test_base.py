@@ -97,7 +97,7 @@ class AlmPluginTestBase(object):
         self.assertMatch(task_id_regex, task_id, 'Task id does not match the expected pattern. pattern:%s, task_id:%s' %
                                                 (task_id_regex, task_id))
         self.assertEqual(type(alm_timestamp), datetime, 'Expected a datetime object')
-        self.assertEqual(test_task['status'], alm_status, 'Expected %s status, got %s' % (test_task['status'], alm_id))
+        self.assertEqual(test_task['status'], alm_status, 'Expected %s status, got %s' % (test_task['status'], alm_status))
         self.assertNotNone(alm_id, 'Expected a value for alm_id')
 
         return [test_task, test_task_result]
@@ -146,7 +146,6 @@ class AlmPluginTestBase(object):
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
         test_task['status'] = 'DONE'
-        print test_task['priority']
         self.connector.alm_add_task(test_task)
         alm_task = self.connector.alm_get_task(test_task)
 

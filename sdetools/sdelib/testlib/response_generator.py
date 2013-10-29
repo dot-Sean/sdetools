@@ -78,6 +78,7 @@ class ResponseGenerator(object):
             fp_mock.read.return_value = message
         else:
             fp_mock.read.return_value = return_value
+            message = return_value
 
         raise HTTPError('', error_code, message, '', fp_mock)
 

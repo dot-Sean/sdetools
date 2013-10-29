@@ -2,7 +2,7 @@ import unittest
 
 from mingle_response_generator import MingleResponseGenerator
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
-from sdetools.modules.sync_mingle.mingle_plugin import MingleConnector, MingleAPIBase
+from sdetools.modules.sync_mingle.mingle_plugin import MingleConnector, MingleAPIBase, AlmException
 PATH_TO_ALM_REST_API = 'sdetools.modules.sync_mingle.mingle_plugin'
 
 
@@ -40,3 +40,40 @@ class TestMingleCase(AlmPluginTestBase, unittest.TestCase):
         self.assertNotNone(cached_cards.get(sde_task_id))
         self.assertEquals(cached_cards.get(sde_task_id), alm_id)
         self.assertNotNone(self.connector.alm_get_task(test_task))
+
+    def test_invalid_config_card_type(self):
+        self.connector.config['mingle_card_type'] = 'INVALID-CARD-TYPE'
+        exception_msg = "The given mingle card type 'INVALID-CARD-TYPE' is not one of the valid card types: " \
+                        "[u'Story', u'Bug']"
+
+        self.assert_exception(AlmException, '', exception_msg, self.connector.synchronize)
+
+    def test_invalid_config_new_status(self):
+        self.connector.config['mingle_new_status'] = 'BAD_NEW_STATUS'
+        exception_msg = "The following statuses, ['BAD_NEW_STATUS'], are invalid. Expected one of" \
+                        " ['New', 'Open', 'Closed']"
+
+        self.assert_exception(AlmException, '', exception_msg, self.connector.synchronize)
+
+    def test_invalid_config_done_statuses(self):
+        self.connector.config['mingle_new_status'] = 'BAD_DONE_STATUS_1,BAD_DONE_STATUS2'
+        exception_msg = "The following statuses, ['BAD_DONE_STATUS_1,BAD_DONE_STATUS2'], are invalid. Expected one of" \
+                        " ['New', 'Open', 'Closed']"
+
+        self.assert_exception(AlmException, '', exception_msg, self.connector.synchronize)
+
+    def test_content_on_public_repo(self):
+        PUBLIC_TASK_CONTENT = 'Visit us at http://www.sdelements.com/ to find out how you can easily add' \
+                              ' project-specific software security requirements to your existing development processes.'
+
+        self.mock_alm_response.set_response_flags({'get_project': 'anonymous_accessible'})
+        self.connector.alm_connect()
+        test_task = self.mock_sde_response.generate_sde_task()
+        self.connector.alm_add_task(test_task)
+        alm_id = int(test_task['id'].split('T')[1])
+        card = self.connector.alm_plugin.call_api('%s/cards/%s.xml' % (self.connector.project_uri, alm_id))
+
+        self.assertNotNone(card.getElementsByTagName('description'), 'Failed to find the description field')
+        description = self.connector._get_value_of_element_with_tag(card, 'description')
+        self.assertEqual(description, PUBLIC_TASK_CONTENT, 'Expected description to be %s, got %s' %
+                                                           (PUBLIC_TASK_CONTENT, description))
