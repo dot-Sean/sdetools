@@ -2,6 +2,7 @@
 # Extensible two way integration with GitHub
 
 import re
+import json
 from datetime import datetime
 
 from sdetools.sdelib.commons import urlencode_str
@@ -19,7 +20,7 @@ GITHUB_DEFAULT_PRIORITY_MAP = {
     '7-10': 'High',
     '4-6': 'Medium',
     '1-3': 'Low',
-    }
+}
 PUBLIC_TASK_CONTENT = 'Visit us at http://www.sdelements.com/ to find out how you can easily add project-specific '\
                       'software security requirements to your existing development processes.'
 GITHUB_NEW_STATUS = 'open'
@@ -39,6 +40,38 @@ class GitHubAPI(RESTBase):
             self.config['alm_pass'] = 'token %s' % self._get_conf('api_token')
 
         super(GitHubAPI, self).post_conf_init()
+
+    def parse_error(self, result):
+        error_msg = result.get('message')
+
+        if not error_msg:
+            logger.error('Could not parse error message')
+            raise AlmException('Could not parse error message')
+
+        errors = result.get('errors')
+
+        if errors:
+            additional_info = ''
+            for error in errors:
+                code = error['code']
+                field = error['field']
+                resource = error['resource']
+
+                if code == 'missing':
+                    additional_info += 'The resource "%s" does not exist.' % resource
+                elif code == 'missing_field':
+                    additional_info += 'The field "%s" is required for the resource "%s"' % (field, resource)
+                elif code == 'invalid':
+                    additional_info += 'The field "%s" is not properly formatted' % field
+                elif code == 'already_exists':
+                    additional_info += 'The value for the field "%s" already exists in another "%s" resource' % \
+                                         (field, resource)
+                else:
+                    # Generic error formatting
+                    additional_info += 'Resource: %s Code: %s Field: %s' % (resource, code, field)
+            if additional_info:
+                error_msg += '. Additional Info - %s' % additional_info
+        return error_msg
 
 
 class GitHubTask(AlmTask):
@@ -120,13 +153,12 @@ class GitHubConnector(AlmConnector):
         try:
             user_info = self.alm_plugin.call_api('user')
         except APIError, err:
-            raise AlmException('Unable to connect to GitHub service (Check'
-                               'server URL, user, pass). Reason: %s' %
-                               str(err))
-
-        if user_info.get('message'):
-            raise AlmException('Could not authenticate GitHub user %s: %s' %
-                               (self.config['alm_user'], user_info['message']))
+            if self.config.get('alm_api_token'):
+                auth_field_check = 'api token'
+            else:
+                auth_field_check = 'user, pass'
+            raise AlmException('Unable to connect to GitHub service (Check server URL, %s). Reason: %s' %
+                               (auth_field_check, str(err)))
 
     def alm_connect_project(self):
         """ Verifies that the GitHub repo exists """
@@ -137,36 +169,27 @@ class GitHubConnector(AlmConnector):
         try:
             repo_info = self.alm_plugin.call_api('repos/%s' % self.project_uri)
         except APIError, err:
-            raise AlmException('Unable to find GitHub repo. Reason: %s' % err)
-
-        if repo_info.get('message'):
-            raise AlmException('Error accessing GitHub repository %s: %s' %
-                               self.project_uri, repo_info['message'])
+            raise AlmException('Unable to find GitHub repo. Reason: %s' % str(err))
 
         self.sync_titles_only = not repo_info.get('private')
 
         """ Validate project configurations """
-        milestone_name = self.config[self.ALM_PROJECT_VERSION]
-        self.milestone_id = self.github_get_milestone_id(milestone_name)
+        self.milestone_id = self.github_get_milestone_id(self.config[self.ALM_PROJECT_VERSION])
 
     def github_get_milestone_id(self, milestone_name):
         if not milestone_name:
             return None
 
         try:
-            milestone_list = self.alm_plugin.call_api('repos/%s/milestones' %
-                                                      self.project_uri)
+            milestone_list = self.alm_plugin.call_api('repos/%s/milestones' % self.project_uri)
         except APIError, err:
-            logger.error(err)
-            raise AlmException('Unable to get milestone %s from GitHub' %
-                               milestone_name)
+            raise AlmException('Unable to get milestones from GitHub. Reason: %s' % str(err))
 
         for milestone in milestone_list:
             if milestone['title'] == milestone_name:
                 return milestone['number']
 
-        raise AlmException('Unable to find milestone %s from GitHub' %
-                           milestone_name)
+        raise AlmException('Unable to find milestone %s from GitHub' % milestone_name)
 
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])
@@ -184,8 +207,7 @@ class GitHubConnector(AlmConnector):
                                                       GITHUB_DONE_STATUS,
                                                       urlencode_str(task_id)))
         except APIError, err:
-            logger.error(err)
-            raise AlmException('Unable to get task %s from GitHub' % task_id)
+            raise AlmException('Unable to get task %s from GitHub. Reason: %s' % (task_id, str(err)))
 
         issues_list = open_issues['issues']
         issues_list.extend(closed_issues['issues'])
@@ -207,7 +229,7 @@ class GitHubConnector(AlmConnector):
 
         if len(issues_list) > 1:
             logger.warning('Found multiple issues with the title %s that are not labeled as duplicates.'
-                           'Selecting the first task found with id %s' % (task_id, issue['number']))
+                           'Selecting the first task found with id %s' % (task_id, issues_list[0]['number']))
         elif not issues_list:
             return None
 
@@ -227,7 +249,6 @@ class GitHubConnector(AlmConnector):
         try:
             priority = int(priority)
         except TypeError:
-            logger.error('Could not coerce %s into an integer' % priority)
             raise AlmException("Error in translating SDE priority to GitHub label: "
                                "%s is not an integer priority" % priority)
 
@@ -275,13 +296,8 @@ class GitHubConnector(AlmConnector):
                                                  args=create_args)
             logger.debug('Task %s added to GitHub Project', task['id'])
         except APIError, err:
-            raise AlmException('Unable to add task %s to GitHub because of %s'
-                               % (task['id'], err))
-
-        if new_issue.get('errors'):
-            raise AlmException('Unable to add task GitHub to %s. Reason: %s - %s'
-                               % (task['id'], str(new_issue['errors']['code']),
-                                  str(new_issue['errors']['field'])))
+            raise AlmException('Unable to add task %s to GitHub. Reason: %s'
+                               % (task['id'], str(err)))
 
         # API returns JSON of the new issue
         alm_task = GitHubTask(task['id'],
@@ -289,12 +305,10 @@ class GitHubConnector(AlmConnector):
                               new_issue['state'],
                               new_issue['updated_at'])
 
-        if (self.config['alm_standard_workflow'] and
-                (task['status'] == 'DONE' or task['status'] == 'NA')):
+        if self.config['alm_standard_workflow'] and (task['status'] == 'DONE' or task['status'] == 'NA'):
             self.alm_update_task_status(alm_task, task['status'])
 
-        return 'Repository: %s, Issue: %s' % (self.config['alm_project'],
-                                              alm_task.get_alm_id())
+        return 'Repository: %s, Issue: %s' % (self.config['alm_project'], alm_task.get_alm_id())
 
     def alm_update_task_status(self, task, status):
         if not task or not self.config['alm_standard_workflow']:
@@ -305,28 +319,21 @@ class GitHubConnector(AlmConnector):
             alm_state = GITHUB_DONE_STATUS
         elif status == 'TODO':
             alm_state = GITHUB_NEW_STATUS
+        else:
+            raise AlmException('Unknown status %s' % status)
 
         update_args = {
             'state': alm_state
         }
 
         try:
-            result = self.alm_plugin.call_api('repos/%s/issues/%s' % (self.project_uri, task.get_alm_id()),
+            self.alm_plugin.call_api('repos/%s/issues/%s' % (self.project_uri, task.get_alm_id()),
                                               args=update_args, method=URLRequest.POST)
         except APIError, err:
-            raise AlmException('Unable to update task status to %s '
-                               'for issue: %s in GitHub because of %s' %
-                               (status, task.get_alm_id(), err))
+            raise AlmException('Unable to update task status to %s for GitHub issue %s. Reason: %s' %
+                               (status, task.get_alm_id(), str(err)))
 
-        if result and result.get('errors'):
-            raise AlmException('Unable to update status of task %s to %s.'
-                               'Reason: %s - %s' %
-                               (task['id'], status,
-                                str(result['errors']['code']),
-                                str(result['errors']['field'])))
-
-        logger.debug('Status changed to %s for task %s in GitHub' %
-                     (status, task.get_alm_id()))
+        logger.debug('Status changed to %s for task %s in GitHub' % (status, task.get_alm_id()))
 
     def alm_disconnect(self):
         pass

@@ -25,14 +25,31 @@ class GitHubResponseGenerator(ResponseGenerator):
     def raise_error(self, error_code, return_value=None):
         fp_mock = MagicMock()
         if error_code == '401':
-            fp_mock.read.return_value = '{"message":"Requires authentication","documentation_url":"http://developer.github.com/v3"}'
-            raise HTTPError('%s' % self.api_url, '401', 'Unauthorized user', '', fp_mock)
+            msg = {
+                "message":"Requires authentication",
+                "documentation_url":"http://developer.github.com/v3"
+            }
         elif error_code == '404':
-            fp_mock.read.return_value = '{"message":"Not found","documentation_url":"http://developer.github.com/v3"}'
-            raise HTTPError('%s' % self.api_url, '404', 'Not found', '', fp_mock)
+            msg = {
+                "message":"Not found",
+                "documentation_url":"http://developer.github.com/v3"
+            }
+        elif error_code == '422':
+            msg = {
+                "message":"Validation Failed",
+                "errors": [{
+                    "resource": "Issue",
+                    "field": "title",
+                    "code": "missing_field"
+                }]
+            }
         else:
-            fp_mock.read.return_value = 'Error'
-            raise HTTPError('%s' % self.api_url, error_code, 'Error', '', fp_mock)
+            error_code = '400'
+            msg = {
+                "message":"Error",
+            }
+        fp_mock.read.return_value = msg
+        raise HTTPError('%s' % self.api_url, error_code, msg, '', fp_mock)
 
     """
        Response functions 
@@ -57,6 +74,8 @@ class GitHubResponseGenerator(ResponseGenerator):
     def get_milestones(self, target, flag, data, method):
         if not flag:
             return self.get_json_from_file('milestones')
+        elif flag == '401':
+            self.raise_error('401')
         else:
             return []
 
@@ -88,6 +107,8 @@ class GitHubResponseGenerator(ResponseGenerator):
             response = self.generate_issue(task_number, 'open')
 
             return response
+        elif flag == '422':
+            self.raise_error('422')
         else:
             self.raise_error('404')
 

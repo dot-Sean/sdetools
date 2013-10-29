@@ -61,6 +61,11 @@ class MockResponse(object):
             # Re-raise with more info
             err.url = '%s/%s' % (err.url, target)
             err.headers = call_headers
+            try:
+                err.msg = api_instance.parse_error(err.msg)
+            except:
+                # We fall back to unparsed version of the error
+                pass
             raise APIError(err)
 
 

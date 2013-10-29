@@ -32,8 +32,41 @@ class TestGitHubCase(AlmPluginTestBase, unittest.TestCase):
 
         self.assertEqual(test_task_result.get_status(), "TODO", 'Expected status to default to TODO')
 
-    def test_connecting_to_invalid_repo(self):
-         self.mock_alm_response.set_response_flags({'get_repo': '404'})
-         exception_msg = 'Unable to find GitHub repo. Reason: FATAL ERROR: HTTP Error 404: Not found'
+    def test_invalid_api_token(self):
+        self.mock_alm_response.set_response_flags({'get_user': '401'})
+        self.connector.config['alm_api_token'] = 'testApiToken'
 
-         self.assert_exception(AlmException, '', exception_msg, self.connector.alm_connect_project)
+        exception_msg = 'Unable to connect to GitHub service (Check server URL, api token). Reason: FATAL ERROR: '\
+                        'HTTP Error 401: Requires authentication'
+
+        self.assert_exception(AlmException, '', exception_msg, self.connector.synchronize)
+
+    def test_invalid_user_pass(self):
+        self.mock_alm_response.set_response_flags({'get_user': '401'})
+        self.connector.config['alm_api_token'] = ''
+        exception_msg = 'Unable to connect to GitHub service (Check server URL, user, pass). Reason: FATAL ERROR: '\
+                        'HTTP Error 401: Requires authentication'
+
+        self.assert_exception(AlmException, '', exception_msg, self.connector.synchronize)
+
+    def test_connecting_to_invalid_repo(self):
+        self.mock_alm_response.set_response_flags({'get_repo': '404'})
+        exception_msg = 'Unable to find GitHub repo. Reason: FATAL ERROR: HTTP Error 404: Not found'
+
+        self.assert_exception(AlmException, '', exception_msg, self.connector.synchronize)
+
+    def test_nonexistant_milestone(self):
+        self.mock_alm_response.set_response_flags({'get_milestones': 'nomilestone'})
+        self.connector.config['alm_project_version'] = 'non-existant milestone'
+        exception_msg = 'Unable to find milestone non-existant milestone from GitHub'
+
+        self.assert_exception(AlmException, '', exception_msg, self.connector.synchronize)
+
+    def test_invalid_field(self):
+        self.mock_alm_response.set_response_flags({'post_issue': '422'})
+        self.connector.alm_connect()
+        test_task = self.mock_sde_response.generate_sde_task()
+        exception_msg = 'Unable to add task %s to GitHub. Reason: FATAL ERROR: HTTP Error 422: Validation Failed. ' \
+                        'Additional Info - The field "title" is required for the resource "Issue"' % test_task['id']
+
+        self.assert_exception(AlmException, '', exception_msg, self.connector.alm_add_task, test_task)
