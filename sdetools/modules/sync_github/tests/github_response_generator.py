@@ -29,15 +29,11 @@ class GitHubResponseGenerator(ResponseGenerator):
                 "message":"Requires authentication",
                 "documentation_url":"http://developer.github.com/v3"
             }
-            fp_mock.read.return_value = msg
-            raise HTTPError('%s' % self.api_url, '401', msg, '', fp_mock)
         elif error_code == '404':
             msg = {
                 "message":"Not found",
                 "documentation_url":"http://developer.github.com/v3"
             }
-            fp_mock.read.return_value = msg
-            raise HTTPError('%s' % self.api_url, '404', msg, '', fp_mock)
         elif error_code == '422':
             msg = {
                 "message":"Validation Failed",
@@ -47,14 +43,13 @@ class GitHubResponseGenerator(ResponseGenerator):
                     "code": "missing_field"
                 }]
             }
-            fp_mock.read.return_value = msg
-            raise HTTPError('%s' % self.api_url, '422', msg, '', fp_mock)
         else:
+            error_code = '400'
             msg = {
                 "message":"Error",
             }
-            fp_mock.read.return_value = msg
-            raise HTTPError('%s' % self.api_url, error_code, msg, '', fp_mock)
+        fp_mock.read.return_value = msg
+        raise HTTPError('%s' % self.api_url, error_code, msg, '', fp_mock)
 
     """
        Response functions 
