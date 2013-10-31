@@ -14,6 +14,9 @@ from sdetools.extlib import markdown
 
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
+PUBLIC_TASK_CONTENT = 'Visit us at http://www.sdelements.com/ to find out how you can easily add project-specific '\
+              'software security requirements to your existing development processes.'
+
 
 class MingleAPIBase(RESTBase):
     def __init__(self, config):
@@ -79,6 +82,7 @@ class MingleConnector(AlmConnector):
             default='Ready for Testing,In Testing,Ready for Signoff,Accepted')
 
         self.cached_cards = None
+        self.sync_titles_only = True
 
     def initialize(self):
         super(MingleConnector, self).initialize()
@@ -101,19 +105,63 @@ class MingleConnector(AlmConnector):
         try:
             self.alm_plugin.call_api('projects.xml')
         except APIError, err:
-            raise AlmException('Unable to connect to Mingle. Please '
-                               'check server URL, ID, password. Reason: %s' % err)
+            raise AlmException('Unable to connect to Mingle. Please check server URL, ID, password. Reason: %s' % err)
 
     def alm_connect_project(self):
         """ Verifies that Mingle connection works """
-        self.project_uri = 'projects/%s/cards' % (
-                self.alm_plugin.urlencode_str(self.config['alm_project']))
+        self.project_uri = 'projects/%s' % (self.alm_plugin.urlencode_str(self.config['alm_project']))
 
         #Check to make sure that we can do a simple API call
         try:
-            self.alm_plugin.call_api('%s.xml' % self.project_uri)
+            project = self.alm_plugin.call_api('%s.xml' % self.project_uri)
         except APIError, err:
             raise AlmException('Unable to find Mingle project. Reason: %s' % err)
+
+        if self._get_value_of_element_with_tag(project, 'anonymous_accessible') == 'false':
+            self.sync_titles_only = False
+
+        self.validate_custom_configs()
+
+    def validate_custom_configs(self):
+        # Check if card type is valid
+        try:
+            result = self.alm_plugin.call_api('%s/card_types.xml' % self.project_uri)
+        except APIError, err:
+            raise AlmException('Unable to find Mingle card types. Reason: %s' % err)
+
+        types = [self._get_value_of_element_with_tag(t, 'name') for t in result.getElementsByTagName('card_type')]
+
+        if self.config['mingle_card_type'] not in types:
+            raise AlmException("The given mingle card type '%s' is not one of the valid card types: %s" %
+                    (self.config['mingle_card_type'], types))
+
+        # Check if new and done statuses are valid
+        try:
+            result = self.alm_plugin.call_api('%s/property_definitions.xml' % self.project_uri)
+        except APIError, err:
+            raise AlmException('Unable to retrieve Mingle property definitions. Reason: %s' % err)
+
+        definitions = result.getElementsByTagName('property_definition')
+        for definition in definitions:
+            if self._get_value_of_element_with_tag(definition, 'name') == 'Status':
+                property_id = self._get_value_of_element_with_tag(definition, 'id')
+
+                try:
+                    result = self.alm_plugin.call_api('%s/property_definitions/%s.xml' % (self.project_uri, property_id))
+                except APIError, err:
+                    raise AlmException('Unable to retrieve the Status property definition. Reason: %s' % err)
+
+                property_values = result.getElementsByTagName('property_value')
+                statuses = [str(self._get_value_of_element_with_tag(status, 'value')) for status in property_values]
+                configured_statuses = list(self.config['mingle_done_statuses'])
+                configured_statuses.append(self.config['mingle_new_status'])
+                invalid_statuses = [status for status in configured_statuses if status not in statuses]
+
+                if invalid_statuses:
+                    raise AlmException('The following statuses, %s, are invalid. Expected one of %s' %
+                                       (invalid_statuses, statuses))
+                return
+        raise AlmException('Could not find the property definition for Status to validate configured statuses')
 
     def _get_value_of_element_with_tag(self, root, tag_name):
         elements = root.getElementsByTagName(tag_name)
@@ -122,15 +170,15 @@ class MingleConnector(AlmConnector):
             try:
                 return elements.item(0).firstChild.nodeValue
             except Exception, err:
-                raise AlmException('Could not get the value of the %s element" %s' % tag_name)
+                raise AlmException('Could not get the value of the "%s" element" %s' % tag_name)
         else:
-            raise AlmException('Could not find any element with the tag %s' % tag_name)
+            raise AlmException('Could not find any element with the tag "%s"' % tag_name)
 
     def _cache_all_sde_mingle_cards(self):
         self.cached_cards = {}
 
         try:
-            result = self.alm_plugin.call_api('%s.xml' % self.project_uri)
+            result = self.alm_plugin.call_api('%s/cards.xml' % self.project_uri)
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get cards from Mingle')
@@ -154,7 +202,7 @@ class MingleConnector(AlmConnector):
             return None
 
         try:
-            return self.alm_plugin.call_api('%s/%s.xml' % (self.project_uri, card_num))
+            return self.alm_plugin.call_api('%s/cards/%s.xml' % (self.project_uri, card_num))
         except APIError, err:
             raise AlmException('Could not find Mingle card with the card number %s' % card_num)
 
@@ -162,7 +210,7 @@ class MingleConnector(AlmConnector):
         task_args = {'filters[]': ('[Name][is][%s]' % task_title)}
 
         try:
-            result = self.alm_plugin.call_api('%s.xml' % self.project_uri, args=task_args)
+            result = self.alm_plugin.call_api('%s/cards.xml' % self.project_uri, args=task_args)
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get task %s from Mingle' % task_title)
@@ -209,16 +257,20 @@ class MingleConnector(AlmConnector):
 
     def alm_add_task(self, task):
         card_name = task['title']
+        description = PUBLIC_TASK_CONTENT
+
+        if not self.sync_titles_only:
+            description = self.sde_get_task_content(task)
 
         try:
             status_args = {
                 'card[name]': card_name,
                 'card[card_type_name]': self.sde_plugin.config['mingle_card_type'],
-                'card[description]': self.sde_get_task_content(task),
+                'card[description]': description,
                 'card[properties][][name]': 'status',
                 'card[properties][][value]': self.sde_plugin.config['mingle_new_status']
             }
-            self.alm_plugin.call_api('%s.xml' % self.project_uri, args=status_args,
+            self.alm_plugin.call_api('%s/cards.xml' % self.project_uri, args=status_args,
                     method=URLRequest.POST)
             logger.debug('Task %s added to Mingle Project' % task['id'])
         except APIError, err:
@@ -249,30 +301,22 @@ class MingleConnector(AlmConnector):
             logger.debug('Status synchronization disabled')
             return
 
+        status_args = {'card[properties][][name]':'status'}
+
         if status == 'DONE' or status=='NA':
-            try:
-                status_args = {
-                    'card[properties][][name]':'status',
-                    'card[properties][][value]': self.sde_plugin.config['mingle_done_statuses'][0]
-                }
-                self.alm_plugin.call_api('%s/%s.xml' % (self.project_uri, task.get_alm_id()),
-                        args=status_args, method=URLRequest.PUT)
-            except APIError, err:
-                raise AlmException('Unable to update task status to DONE '
-                                   'for card: %s in Mingle because of %s' %
-                                   (task.get_alm_id(),err))
-        elif status== 'TODO':
-            try:
-                status_args = {
-                    'card[properties][][name]':'status',
-                    'card[properties][][value]': self.sde_plugin.config['mingle_new_status']
-                }
-                self.alm_plugin.call_api('%s/%s.xml' % (self.project_uri, task.get_alm_id()),
-                        args=status_args, method=URLRequest.PUT)
-            except APIError, err:
-                raise AlmException('Unable to update task status to TODO for '
-                                   'card: %s in Mingle because of %s' %
-                                   (task.get_alm_id(), err))
+            status_args['card[properties][][value]'] = self.sde_plugin.config['mingle_done_statuses'][0]
+        elif status == 'TODO':
+            status_args['card[properties][][value]'] = self.sde_plugin.config['mingle_new_status']
+        else:
+            raise AlmException('Invalid status %s' % status)
+
+        try:
+            self.alm_plugin.call_api('%s/cards/%s.xml' % (self.project_uri, task.get_alm_id()),
+                    args=status_args, method=URLRequest.PUT)
+        except APIError, err:
+            raise AlmException('Unable to update task status to %s for card: %s in Mingle because of %s' %
+                               (status, task.get_alm_id(),err))
+
         logger.debug('Status changed to %s for task %s in Mingle' %
                 (status, task.get_alm_id()))
 

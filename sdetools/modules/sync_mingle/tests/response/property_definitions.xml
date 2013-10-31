@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<property_definitions type="array">
+  <property_definition>
+    <id type="integer">114</id>
+    <name>Status</name>
+    <description>
+    </description>
+    <data_type>string</data_type>
+    <is_numeric type="boolean">false</is_numeric>
+    <hidden type="boolean">false</hidden>
+    <restricted type="boolean">false</restricted>
+    <transition_only type="boolean">false</transition_only>
+    <project url="http://localhost:8080/api/v2/projects/test_project.xml">
+      <name>test project</name>
+      <identifier>test_project</identifier>
+    </project>
+    <column_name>cp_owner_user_id</column_name>
+    <position nil="true"></position>
+    <property_values_description>Story status</property_values_description>
+  </property_definition>
+  <property_definition>
+    <id type="integer">111</id>
+    <name>Release</name>
+    <description nil="true"></description>
+    <data_type>card</data_type>
+    <is_numeric type="boolean">false</is_numeric>
+    <hidden type="boolean">false</hidden>
+    <restricted type="boolean">false</restricted>
+    <transition_only type="boolean">false</transition_only>
+    <project url="http://localhost:8080/api/v2/projects/test_project.xml">
+      <name>test project</name>
+      <identifier>test_project</identifier>
+    </project>
+    <column_name>cp_release_card_id</column_name>
+    <position type="integer">1</position>
+    <property_values_description>Any card used in tree</property_values_description>
+  </property_definition>
+</property_definitions>
