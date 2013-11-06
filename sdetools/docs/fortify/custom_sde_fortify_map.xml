@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<mapping type="override">
-    <task id="CT7" title="Bind variables in SQL statements" confidence="high">
-        <weakness type="category" id="SQL Injection" title=""/>    
-    </task>
-</mapping>

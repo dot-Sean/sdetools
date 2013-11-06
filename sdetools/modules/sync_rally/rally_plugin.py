@@ -23,7 +23,7 @@ RALLY_HEADERS = [
     ('X-RallyIntegrationVendor', 'SD Elements'),
     ('X-RallyIntegrationVersion', '1.0'),
     ('X-RallyIntegrationOS', sys.platform),
-    ('X-RallyIntegrationPlatform', 'Python %s' % sys.version.split(' ', 1)[0].replace('\n', '')),
+    ('X-RallyIntegrationPlatform', 'Python %s' % sys.version.split(' ',1)[0].replace('\n', '')),
     ('X-RallyIntegrationLibrary', 'Rally REST API'),
 ]
 
@@ -41,7 +41,6 @@ RALLY_HTML_CONVERT = [
     ('</code></pre>', '</code></pre></span>'),
 ]
 
-
 class RallyAPIBase(RESTBase):
     """ Base plugin for Rally """
 
@@ -51,7 +50,6 @@ class RallyAPIBase(RESTBase):
 
     def get_custom_headers(self, target, method):
         return RALLY_HEADERS
-
 
 class RallyTask(AlmTask):
     """ Representation of a task in Rally """
@@ -134,11 +132,7 @@ class RallyConnector(AlmConnector):
         workspace_ref = None
 
         #Now try to get workspace ID
-        try:
-            subscription_ref = self.alm_plugin.call_api('subscription.js')
-        except APIError, err:
-            raise AlmException('Unable to retrieve subscription from Rally. Reason: %s' % err)
-
+        subscription_ref = self.alm_plugin.call_api('subscription.js')
         for workspace in subscription_ref['Subscription']['Workspaces']:
             if workspace['_refObjectName'] == self.config['rally_workspace']:
                 workspace_ref = workspace['_ref']
@@ -171,7 +165,7 @@ class RallyConnector(AlmConnector):
                 'query': '(Name contains \"%s:\")' % task_id,
                 'workspace': self.workspace_ref,
                 'project': self.project_ref,
-            }
+                }
             result = self.alm_plugin.call_api('hierarchicalrequirement.js',
                                                args = query_args)
         except APIError, err:
