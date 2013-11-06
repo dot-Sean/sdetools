@@ -1,0 +1,2813 @@
+<NewDataSet>
+  <Table1>
+    <CheckGroupID>1</CheckGroupID>
+    <Name>Policy Groups</Name>
+    <Description />
+    <CheckGroupTypeID>1</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2</CheckGroupID>
+    <Name>Attack Groups</Name>
+    <Description />
+    <ParentCheckGroupID>1</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>3</CheckGroupID>
+    <Name>Severity</Name>
+    <Description />
+    <ParentCheckGroupID>1</ParentCheckGroupID>
+    <CheckGroupTypeID>11</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>4</CheckGroupID>
+    <Name>Server Types</Name>
+    <Description />
+    <ParentCheckGroupID>1</ParentCheckGroupID>
+    <CheckGroupTypeID>9</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>5</CheckGroupID>
+    <Name>Audit Engines</Name>
+    <Description>Audit Engines are groupings of similar agents into expanded methodologies.  Click on an individual audit engine for a complete description of its components.</Description>
+    <ParentCheckGroupID>2</ParentCheckGroupID>
+    <CheckGroupTypeID>6</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>6</CheckGroupID>
+    <Name>Custom Agents</Name>
+    <Description>Even though WebInspect launches thousands of agents to assess your web application during a normal scan, you may want check for a specific condition that is unique to your environment or program. If so, then develop your own agent. You can then integrate your custom agent into one or more policies using the Policy Manager.</Description>
+    <ParentCheckGroupID>2</ParentCheckGroupID>
+    <CheckGroupTypeID>7</CheckGroupTypeID>
+    <DisplaySequence>1</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>7</CheckGroupID>
+    <Name>Critical</Name>
+    <Description />
+    <ParentCheckGroupID>3</ParentCheckGroupID>
+    <CheckGroupTypeID>12</CheckGroupTypeID>
+    <DisplaySequence>1</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>8</CheckGroupID>
+    <Name>High</Name>
+    <Description />
+    <ParentCheckGroupID>3</ParentCheckGroupID>
+    <CheckGroupTypeID>13</CheckGroupTypeID>
+    <DisplaySequence>2</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>9</CheckGroupID>
+    <Name>Medium</Name>
+    <Description />
+    <ParentCheckGroupID>3</ParentCheckGroupID>
+    <CheckGroupTypeID>14</CheckGroupTypeID>
+    <DisplaySequence>3</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>10</CheckGroupID>
+    <Name>Low</Name>
+    <Description />
+    <ParentCheckGroupID>3</ParentCheckGroupID>
+    <CheckGroupTypeID>15</CheckGroupTypeID>
+    <DisplaySequence>4</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>11</CheckGroupID>
+    <Name>Info</Name>
+    <Description />
+    <ParentCheckGroupID>3</ParentCheckGroupID>
+    <CheckGroupTypeID>16</CheckGroupTypeID>
+    <DisplaySequence>5</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>12</CheckGroupID>
+    <Name>Custom Checks</Name>
+    <Description />
+    <ParentCheckGroupID>2</ParentCheckGroupID>
+    <CheckGroupTypeID>17</CheckGroupTypeID>
+    <DisplaySequence>2</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>13</CheckGroupID>
+    <Name>Reserved</Name>
+    <Description />
+    <CheckGroupTypeID>0</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>14</CheckGroupID>
+    <Name>Reserved</Name>
+    <Description />
+    <CheckGroupTypeID>0</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>15</CheckGroupID>
+    <Name>Reserved</Name>
+    <Description />
+    <CheckGroupTypeID>0</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>16</CheckGroupID>
+    <Name>Reserved</Name>
+    <Description />
+    <CheckGroupTypeID>0</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>17</CheckGroupID>
+    <Name>Reserved</Name>
+    <Description />
+    <CheckGroupTypeID>0</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>18</CheckGroupID>
+    <Name>Reserved</Name>
+    <Description />
+    <CheckGroupTypeID>0</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>19</CheckGroupID>
+    <Name>Reserved</Name>
+    <Description />
+    <CheckGroupTypeID>0</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>20</CheckGroupID>
+    <Name>Reserved</Name>
+    <Description />
+    <CheckGroupTypeID>0</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>30</CheckGroupID>
+    <Name>WebInspect Internal</Name>
+    <Description />
+    <ParentCheckGroupID>2</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>586</CheckGroupID>
+    <Name>General Application Testing</Name>
+    <Description>This group of agents, used mainly by the Directory Enumeration engine, searches the site's tree structure for commonly occurring directories. Individual checks are grouped alphabetically from A (which begins with the search for a directory named Accounting) to Z (which ends with the search for a directory named Zips). This group also includes checks for other types of commonly occurring directories, such as those associated with Microsoft FrontPage and Microsoft Internet Information Server log files (W3SVCnn).</Description>
+    <ParentCheckGroupID>2</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-03T15:51:29.373-05:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>587</CheckGroupID>
+    <Name>Directory Enumeration</Name>
+    <Description>Directory enumeration utilizes agents that search the site's tree structure for all directory paths and possibilities on the application server, including hidden directories that could possibly contain sensitive information. WebInspect uses a database of known folders (such as admin, test, logs, etc.) and hidden areas discovered during a crawl when composing a directory enumeration listing. </Description>
+    <ParentCheckGroupID>2039</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.047-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>588</CheckGroupID>
+    <Name>Alphabetical (B)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>589</CheckGroupID>
+    <Name>Web Servers</Name>
+    <Description>This group of agents looks for known vulnerabilities associated with the following web servers:
+
+Apache
+IIS
+Lotus Domino
+Minor (a collection of servers including ATPhttpd, 4D, Abyss, Alibaba, BadBlue, and others)
+Netscape/iPlanet
+Novell
+Secure IIS
+Sun
+Website Pro
+WebSphere Proxy
+
+For detailed information about all the possible agents, simply expand the Web Servers node and click on any agent.
+</Description>
+    <ParentCheckGroupID>2</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>590</CheckGroupID>
+    <Name>Netscape/iPlanet/Sun</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>591</CheckGroupID>
+    <Name>IIS</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>592</CheckGroupID>
+    <Name>Alphabetical (M)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>593</CheckGroupID>
+    <Name>Frontpage Directories</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>594</CheckGroupID>
+    <Name>Third-Party Web Applications</Name>
+    <Description>This group of checks looks for known vulnerabilities associated with third-party web applications.
+</Description>
+    <ParentCheckGroupID>2</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-03T15:54:56.297-05:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>595</CheckGroupID>
+    <Name>Frontpage</Name>
+    <Description />
+    <ParentCheckGroupID>741</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.2-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>596</CheckGroupID>
+    <Name>_vti_pvt Files</Name>
+    <Description />
+    <ParentCheckGroupID>595</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>597</CheckGroupID>
+    <Name>Sample/Default Files</Name>
+    <Description />
+    <ParentCheckGroupID>591</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>598</CheckGroupID>
+    <Name>Common Files</Name>
+    <Description />
+    <ParentCheckGroupID>2039</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.123-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>599</CheckGroupID>
+    <Name>Backup Files</Name>
+    <Description />
+    <ParentCheckGroupID>598</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>600</CheckGroupID>
+    <Name>Audit Options</Name>
+    <Description>WebInspect uses the following audit options.
+
+Robots.txt Parser: This engine parses any robots.txt files found within the scan for links to add to the Webinspect crawler engine.
+
+WebInspect Scan Signature: The webinspect scan signature is a request that webinspect sends to the server with the text SCANNED-BY-SPI-DYNAMICS-WEBINSPECT-WWW.SPIDYNAMICS.COM. This will be found in the webserver logs, identifying that a scan has taken place.
+
+Ws_ftp.log Parser: This engine parses any Ws_ftp.log files it finds and will add links to the site directory tree.</Description>
+    <ParentCheckGroupID>5</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.03-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>601</CheckGroupID>
+    <Name>Minor</Name>
+    <Description />
+    <ParentCheckGroupID>594</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2008-03-26T12:01:07.937-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>602</CheckGroupID>
+    <Name>Unsorted</Name>
+    <Description />
+    <ParentCheckGroupID>601</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2008-03-26T11:59:44.357-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>603</CheckGroupID>
+    <Name>ALL</Name>
+    <Description />
+    <ParentCheckGroupID>602</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2008-03-26T11:58:39.467-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>604</CheckGroupID>
+    <Name>Apache</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>605</CheckGroupID>
+    <Name>Alphabetical (A)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>606</CheckGroupID>
+    <Name>Web Frameworks/Languages</Name>
+    <Description>This group of agents looks for known vulnerabilities associated with web application servers. It also determines if known flaws in certain scripting languages can be exploited on the target system. </Description>
+    <ParentCheckGroupID>2</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>607</CheckGroupID>
+    <Name>ColdFusion</Name>
+    <Description />
+    <ParentCheckGroupID>606</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>608</CheckGroupID>
+    <Name>Cache Disclosure</Name>
+    <Description />
+    <ParentCheckGroupID>607</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>609</CheckGroupID>
+    <Name>Index Server</Name>
+    <Description />
+    <ParentCheckGroupID>591</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>610</CheckGroupID>
+    <Name>Alphabetical (C)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>611</CheckGroupID>
+    <Name>Forte</Name>
+    <Description />
+    <ParentCheckGroupID>606</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>612</CheckGroupID>
+    <Name>ISM.dll Issues</Name>
+    <Description />
+    <ParentCheckGroupID>591</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>613</CheckGroupID>
+    <Name>CVS</Name>
+    <Description />
+    <ParentCheckGroupID>598</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>614</CheckGroupID>
+    <Name>Alphabetical (D)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>615</CheckGroupID>
+    <Name>Alphabetical (E)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>616</CheckGroupID>
+    <Name>Alphabetical (F)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>617</CheckGroupID>
+    <Name>Alphabetical (G)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>618</CheckGroupID>
+    <Name>Global.asa</Name>
+    <Description />
+    <ParentCheckGroupID>591</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>619</CheckGroupID>
+    <Name>Alphabetical (H)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>620</CheckGroupID>
+    <Name>Alphabetical (I)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>621</CheckGroupID>
+    <Name>Minor</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2008-03-26T12:03:39.327-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>622</CheckGroupID>
+    <Name>Tektronix</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.687-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>623</CheckGroupID>
+    <Name>Alphabetical (J)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>624</CheckGroupID>
+    <Name>Alphabetical (K)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>625</CheckGroupID>
+    <Name>Alphabetical (L)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>626</CheckGroupID>
+    <Name>Logs</Name>
+    <Description />
+    <ParentCheckGroupID>598</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>627</CheckGroupID>
+    <Name>Alphabetical (N)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>628</CheckGroupID>
+    <Name>Alphabetical (O)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>629</CheckGroupID>
+    <Name>Alphabetical (P)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>630</CheckGroupID>
+    <Name>Alphabetical (R)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>631</CheckGroupID>
+    <Name>Alphabetical (S)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>632</CheckGroupID>
+    <Name>Stats</Name>
+    <Description />
+    <ParentCheckGroupID>598</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>633</CheckGroupID>
+    <Name>Alphabetical (T)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>634</CheckGroupID>
+    <Name>Alphabetical (U)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>635</CheckGroupID>
+    <Name>Alphabetical (W)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>636</CheckGroupID>
+    <Name>Alphabetical (Z)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>637</CheckGroupID>
+    <Name>Alibaba</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.687-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>638</CheckGroupID>
+    <Name>Sambar</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.687-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>639</CheckGroupID>
+    <Name>Weblogic</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.56-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>640</CheckGroupID>
+    <Name>Lotus Domino</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>641</CheckGroupID>
+    <Name>.nsf Traversal</Name>
+    <Description />
+    <ParentCheckGroupID>640</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>642</CheckGroupID>
+    <Name>IIS 4 Only</Name>
+    <Description />
+    <ParentCheckGroupID>591</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>643</CheckGroupID>
+    <Name>Forums/Bulletin Boards</Name>
+    <Description />
+    <ParentCheckGroupID>594</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.187-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>644</CheckGroupID>
+    <Name>Minor</Name>
+    <Description />
+    <ParentCheckGroupID>606</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2008-03-26T12:02:39.45-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>645</CheckGroupID>
+    <Name>PHP-Nuke</Name>
+    <Description />
+    <ParentCheckGroupID>741</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.2-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>646</CheckGroupID>
+    <Name>WebSite Pro</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>647</CheckGroupID>
+    <Name>PHP</Name>
+    <Description />
+    <ParentCheckGroupID>606</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>648</CheckGroupID>
+    <Name>Novell</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.56-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>649</CheckGroupID>
+    <Name>E-Commerce/Auction</Name>
+    <Description />
+    <ParentCheckGroupID>594</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.187-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>650</CheckGroupID>
+    <Name>OmniHTTPD</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.687-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>651</CheckGroupID>
+    <Name>Default/Sample</Name>
+    <Description />
+    <ParentCheckGroupID>607</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>652</CheckGroupID>
+    <Name>Alphabetical (Non-alphanumeric)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>653</CheckGroupID>
+    <Name>htDig</Name>
+    <Description />
+    <ParentCheckGroupID>705</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.2-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>654</CheckGroupID>
+    <Name>CERN</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.687-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>655</CheckGroupID>
+    <Name>DoNotRun</Name>
+    <Description />
+    <ParentCheckGroupID>30</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>656</CheckGroupID>
+    <Name>Tomcat</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.56-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>657</CheckGroupID>
+    <Name>General Text Searching</Name>
+    <Description />
+    <ParentCheckGroupID>2</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.123-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>658</CheckGroupID>
+    <Name>Error Messages</Name>
+    <Description />
+    <ParentCheckGroupID>657</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>659</CheckGroupID>
+    <Name>Directory Listings</Name>
+    <Description />
+    <ParentCheckGroupID>657</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>660</CheckGroupID>
+    <Name>Trojans/Backdoor Applications</Name>
+    <Description />
+    <ParentCheckGroupID>598</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>661</CheckGroupID>
+    <Name>Login Forms</Name>
+    <Description />
+    <ParentCheckGroupID>657</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>662</CheckGroupID>
+    <Name>Path Disclosure</Name>
+    <Description />
+    <ParentCheckGroupID>657</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>663</CheckGroupID>
+    <Name>JRun</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.56-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>664</CheckGroupID>
+    <Name>Bug Tracking/Ticket Tracking/Help Desk</Name>
+    <Description />
+    <ParentCheckGroupID>594</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.187-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>665</CheckGroupID>
+    <Name>Bugzilla</Name>
+    <Description />
+    <ParentCheckGroupID>664</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>666</CheckGroupID>
+    <Name>Check Engine Data</Name>
+    <Description />
+    <ParentCheckGroupID>30</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>667</CheckGroupID>
+    <Name>IIS Unicode</Name>
+    <Description />
+    <ParentCheckGroupID>666</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>668</CheckGroupID>
+    <Name>Double</Name>
+    <Description />
+    <ParentCheckGroupID>667</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>669</CheckGroupID>
+    <Name>Folder</Name>
+    <Description />
+    <ParentCheckGroupID>667</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>671</CheckGroupID>
+    <Name>SilverStream</Name>
+    <Description />
+    <ParentCheckGroupID>606</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>672</CheckGroupID>
+    <Name>Alphabetical (X)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>673</CheckGroupID>
+    <Name>Test/Debug Apps</Name>
+    <Description />
+    <ParentCheckGroupID>598</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>674</CheckGroupID>
+    <Name>Environmental Variable Scripts</Name>
+    <Description />
+    <ParentCheckGroupID>598</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>675</CheckGroupID>
+    <Name>Account Information</Name>
+    <Description />
+    <ParentCheckGroupID>598</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>676</CheckGroupID>
+    <Name>Administrative Interfaces</Name>
+    <Description />
+    <ParentCheckGroupID>598</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>677</CheckGroupID>
+    <Name>NeoWebScript</Name>
+    <Description />
+    <ParentCheckGroupID>606</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.56-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>678</CheckGroupID>
+    <Name>Source Disclosure</Name>
+    <Description />
+    <ParentCheckGroupID>657</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>679</CheckGroupID>
+    <Name>WebTrends</Name>
+    <Description />
+    <ParentCheckGroupID>705</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.2-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>680</CheckGroupID>
+    <Name>Directory Traversal</Name>
+    <Description />
+    <ParentCheckGroupID>586</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>682</CheckGroupID>
+    <Name>Oracle</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.56-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>683</CheckGroupID>
+    <Name>Intershop</Name>
+    <Description />
+    <ParentCheckGroupID>649</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.217-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>684</CheckGroupID>
+    <Name>Alphabetical (/)</Name>
+    <Description />
+    <ParentCheckGroupID>587</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>685</CheckGroupID>
+    <Name>Big Brother</Name>
+    <Description />
+    <ParentCheckGroupID>705</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.2-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>686</CheckGroupID>
+    <Name>Documentation</Name>
+    <Description />
+    <ParentCheckGroupID>598</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>687</CheckGroupID>
+    <Name>Parameter Manipulation</Name>
+    <Description />
+    <ParentCheckGroupID>586</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2008-03-26T12:44:09.623-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>688</CheckGroupID>
+    <Name>Command Execution</Name>
+    <Description />
+    <ParentCheckGroupID>586</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2008-03-26T11:39:13.31-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>689</CheckGroupID>
+    <Name>Database Brute Force</Name>
+    <Description />
+    <ParentCheckGroupID>640</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>690</CheckGroupID>
+    <Name>WebSphere</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.56-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>691</CheckGroupID>
+    <Name>GoAhead</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.687-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>692</CheckGroupID>
+    <Name>Logfiles</Name>
+    <Description />
+    <ParentCheckGroupID>604</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>693</CheckGroupID>
+    <Name>Hosting Controller</Name>
+    <Description />
+    <ParentCheckGroupID>742</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.2-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>694</CheckGroupID>
+    <Name>Applications</Name>
+    <Description />
+    <ParentCheckGroupID>639</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>695</CheckGroupID>
+    <Name>Directory Traversal (Unix)</Name>
+    <Description />
+    <ParentCheckGroupID>687</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2008-03-26T11:40:31.577-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>696</CheckGroupID>
+    <Name>Directory Traversal (Windows)</Name>
+    <Description />
+    <ParentCheckGroupID>687</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2008-03-26T11:43:09.467-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>697</CheckGroupID>
+    <Name>Command Shells</Name>
+    <Description />
+    <ParentCheckGroupID>598</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>698</CheckGroupID>
+    <Name>Cross-Site Scripting</Name>
+    <Description />
+    <ParentCheckGroupID>586</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>699</CheckGroupID>
+    <Name>ChiliSoft ASP</Name>
+    <Description />
+    <ParentCheckGroupID>606</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>700</CheckGroupID>
+    <Name>phpBB</Name>
+    <Description />
+    <ParentCheckGroupID>643</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>701</CheckGroupID>
+    <Name>Cobalt RaQ</Name>
+    <Description />
+    <ParentCheckGroupID>742</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.217-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>702</CheckGroupID>
+    <Name>Includes</Name>
+    <Description />
+    <ParentCheckGroupID>598</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>703</CheckGroupID>
+    <Name>.NET</Name>
+    <Description />
+    <ParentCheckGroupID>606</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>704</CheckGroupID>
+    <Name>SGDynamo</Name>
+    <Description />
+    <ParentCheckGroupID>606</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.56-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>705</CheckGroupID>
+    <Name>Statistics/Logging</Name>
+    <Description />
+    <ParentCheckGroupID>594</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.2-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>706</CheckGroupID>
+    <Name>CSS</Name>
+    <Description />
+    <ParentCheckGroupID>657</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>707</CheckGroupID>
+    <Name>Ultimate Bulletin Board</Name>
+    <Description />
+    <ParentCheckGroupID>643</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>708</CheckGroupID>
+    <Name>phpMyAdmin</Name>
+    <Description />
+    <ParentCheckGroupID>742</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.217-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>709</CheckGroupID>
+    <Name>Sambar</Name>
+    <Description />
+    <ParentCheckGroupID>601</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2008-03-26T11:57:37.827-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>710</CheckGroupID>
+    <Name>GetAccess</Name>
+    <Description />
+    <ParentCheckGroupID>601</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2008-03-26T11:55:37.297-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>711</CheckGroupID>
+    <Name>Novell</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>712</CheckGroupID>
+    <Name>Directory Manager</Name>
+    <Description />
+    <ParentCheckGroupID>742</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.217-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>713</CheckGroupID>
+    <Name>ATPhttpd</Name>
+    <Description />
+    <ParentCheckGroupID>621</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>714</CheckGroupID>
+    <Name>Check Engines</Name>
+    <Description />
+    <ParentCheckGroupID>30</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>715</CheckGroupID>
+    <Name>SQL Injection</Name>
+    <Description />
+    <ParentCheckGroupID>687</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2008-03-26T12:43:36.28-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>716</CheckGroupID>
+    <Name>Default/Sample</Name>
+    <Description />
+    <ParentCheckGroupID>682</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>717</CheckGroupID>
+    <Name>Default Macros</Name>
+    <Description />
+    <ParentCheckGroupID>690</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>718</CheckGroupID>
+    <Name>mcNews</Name>
+    <Description />
+    <ParentCheckGroupID>643</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>719</CheckGroupID>
+    <Name>Webmail/Email/HTML Form Processing</Name>
+    <Description />
+    <ParentCheckGroupID>594</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>720</CheckGroupID>
+    <Name>Image Galleries/Multimedia</Name>
+    <Description />
+    <ParentCheckGroupID>594</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.2-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>721</CheckGroupID>
+    <Name>BadBlue</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.687-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>722</CheckGroupID>
+    <Name>Abyss</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.687-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>723</CheckGroupID>
+    <Name>4D</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.687-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>724</CheckGroupID>
+    <Name>Cisco</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.687-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>725</CheckGroupID>
+    <Name>BannerWheel</Name>
+    <Description />
+    <ParentCheckGroupID>601</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>726</CheckGroupID>
+    <Name>NewAtlanta ServletExec ISAPI</Name>
+    <Description />
+    <ParentCheckGroupID>606</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.56-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>727</CheckGroupID>
+    <Name>Metacart</Name>
+    <Description />
+    <ParentCheckGroupID>649</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>728</CheckGroupID>
+    <Name>VP-ASP</Name>
+    <Description />
+    <ParentCheckGroupID>649</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.217-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>729</CheckGroupID>
+    <Name>phpMyNewsletter</Name>
+    <Description />
+    <ParentCheckGroupID>741</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.217-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>730</CheckGroupID>
+    <Name>W-Agora</Name>
+    <Description />
+    <ParentCheckGroupID>643</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>731</CheckGroupID>
+    <Name>GeekLog</Name>
+    <Description />
+    <ParentCheckGroupID>643</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>732</CheckGroupID>
+    <Name>Mewsoft</Name>
+    <Description />
+    <ParentCheckGroupID>649</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>733</CheckGroupID>
+    <Name>Resin</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.687-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>734</CheckGroupID>
+    <Name>Modules</Name>
+    <Description />
+    <ParentCheckGroupID>604</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>735</CheckGroupID>
+    <Name>Macromedia</Name>
+    <Description />
+    <ParentCheckGroupID>606</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>736</CheckGroupID>
+    <Name>Sitespring</Name>
+    <Description />
+    <ParentCheckGroupID>735</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>737</CheckGroupID>
+    <Name>Informix Web Datablade</Name>
+    <Description />
+    <ParentCheckGroupID>606</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>738</CheckGroupID>
+    <Name>SecureIIS</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2008-03-26T15:18:53.467-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>739</CheckGroupID>
+    <Name>Sun</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>740</CheckGroupID>
+    <Name>Sun AnswerBook2</Name>
+    <Description />
+    <ParentCheckGroupID>739</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>741</CheckGroupID>
+    <Name>Content Management/Blogs/News/Guestbooks/Wikis</Name>
+    <Description />
+    <ParentCheckGroupID>594</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>742</CheckGroupID>
+    <Name>System/File Management</Name>
+    <Description />
+    <ParentCheckGroupID>594</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.2-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>743</CheckGroupID>
+    <Name>Aestiva</Name>
+    <Description />
+    <ParentCheckGroupID>606</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:15.56-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>744</CheckGroupID>
+    <Name>Remote Application Hosting/Access</Name>
+    <Description />
+    <ParentCheckGroupID>594</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>745</CheckGroupID>
+    <Name>phpWebSite</Name>
+    <Description />
+    <ParentCheckGroupID>741</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>746</CheckGroupID>
+    <Name>Zope</Name>
+    <Description />
+    <ParentCheckGroupID>606</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>747</CheckGroupID>
+    <Name>Xerox Docushare</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.217-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>748</CheckGroupID>
+    <Name>Microsoft Terminal Services</Name>
+    <Description />
+    <ParentCheckGroupID>744</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.217-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>749</CheckGroupID>
+    <Name>WebSphere Proxy</Name>
+    <Description />
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>750</CheckGroupID>
+    <Name>Citrix</Name>
+    <Description />
+    <ParentCheckGroupID>744</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T19:38:11.45-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>752</CheckGroupID>
+    <Name>Command Execution</Name>
+    <Description />
+    <ParentCheckGroupID>687</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2007-02-12T18:49:45.827-05:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>753</CheckGroupID>
+    <Name>Directory Traversal</Name>
+    <Description />
+    <ParentCheckGroupID>666</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>822</CheckGroupID>
+    <Name>Obsolete</Name>
+    <ParentCheckGroupID>30</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>823</CheckGroupID>
+    <Name>Directory Enumeration</Name>
+    <ParentCheckGroupID>666</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>825</CheckGroupID>
+    <Name>Client Side Includes</Name>
+    <ParentCheckGroupID>657</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>827</CheckGroupID>
+    <Name>Zeus</Name>
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>828</CheckGroupID>
+    <Name>SPIAuditComments</Name>
+    <ParentCheckGroupID>666</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>872</CheckGroupID>
+    <Name>Obsolete</Name>
+    <ParentCheckGroupID>2</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>873</CheckGroupID>
+    <Name>Obsolete</Name>
+    <ParentCheckGroupID>872</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>874</CheckGroupID>
+    <Name>Obsolete</Name>
+    <ParentCheckGroupID>2</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>875</CheckGroupID>
+    <Name>Obsolete</Name>
+    <ParentCheckGroupID>874</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>877</CheckGroupID>
+    <Name>Web Connection</Name>
+    <ParentCheckGroupID>606</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.2-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>878</CheckGroupID>
+    <Name>SPIAuditXSS</Name>
+    <ParentCheckGroupID>666</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>879</CheckGroupID>
+    <Name>e107</Name>
+    <ParentCheckGroupID>741</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:13:13.2-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>880</CheckGroupID>
+    <Name>AuditTest</Name>
+    <ParentCheckGroupID>30</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>881</CheckGroupID>
+    <Name>AuditInclude</Name>
+    <ParentCheckGroupID>880</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>997</CheckGroupID>
+    <Name>AuditEngines</Name>
+    <ParentCheckGroupID>30</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>998</CheckGroupID>
+    <Name>ServerInclude</Name>
+    <ParentCheckGroupID>997</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>999</CheckGroupID>
+    <Name>ASP</Name>
+    <ParentCheckGroupID>594</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>1000</CheckGroupID>
+    <Name>Sybase</Name>
+    <ParentCheckGroupID>606</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>1001</CheckGroupID>
+    <Name>Tomcat</Name>
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>1002</CheckGroupID>
+    <Name>MyBB</Name>
+    <ParentCheckGroupID>643</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>1138</CheckGroupID>
+    <Name>Comment</Name>
+    <ParentCheckGroupID>997</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>1200</CheckGroupID>
+    <Name>SAP</Name>
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2009-07-08T16:08:48.53-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>1201</CheckGroupID>
+    <Name>XSS</Name>
+    <ParentCheckGroupID>997</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>1202</CheckGroupID>
+    <Name>WebInspect</Name>
+    <ParentCheckGroupID>2</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>false</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>1203</CheckGroupID>
+    <Name>Obsolete</Name>
+    <ParentCheckGroupID>1202</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-25T14:57:57.867-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2038</CheckGroupID>
+    <Name>Database</Name>
+    <ParentCheckGroupID>657</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2007-07-31T19:32:56.92-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2039</CheckGroupID>
+    <Name>Web Site Discovery</Name>
+    <ParentCheckGroupID>2</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T21:06:46.14-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2040</CheckGroupID>
+    <Name>Dangerous Checks</Name>
+    <ParentCheckGroupID>594</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T11:53:18.483-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2041</CheckGroupID>
+    <Name>Dangerous Checks</Name>
+    <ParentCheckGroupID>606</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T12:03:08.467-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2042</CheckGroupID>
+    <Name>Dangerous Checks</Name>
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T12:04:10.187-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2043</CheckGroupID>
+    <Name>JBoss</Name>
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T12:58:05.59-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2044</CheckGroupID>
+    <Name>Lighttpd</Name>
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T12:58:29.89-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2045</CheckGroupID>
+    <Name>Novell GroupWise</Name>
+    <ParentCheckGroupID>719</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T13:17:52.95-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2046</CheckGroupID>
+    <Name>SquirrelMail</Name>
+    <ParentCheckGroupID>719</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T13:22:41.077-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2047</CheckGroupID>
+    <Name>Open Webmail</Name>
+    <ParentCheckGroupID>719</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T13:23:06.14-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2048</CheckGroupID>
+    <Name>IlohaMail</Name>
+    <ParentCheckGroupID>719</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T13:24:12.793-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2049</CheckGroupID>
+    <Name>CAPTCHAs</Name>
+    <ParentCheckGroupID>594</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T13:29:29.687-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2050</CheckGroupID>
+    <Name>An-HTTPD</Name>
+    <ParentCheckGroupID>589</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T15:20:06.357-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2051</CheckGroupID>
+    <Name>Authentication/Single Sign On</Name>
+    <ParentCheckGroupID>594</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T15:26:06.187-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2052</CheckGroupID>
+    <Name>CRM/ERP/Sales</Name>
+    <ParentCheckGroupID>594</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T15:29:05.293-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2053</CheckGroupID>
+    <Name>Advertising/Classifieds</Name>
+    <ParentCheckGroupID>594</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T15:29:42.857-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2054</CheckGroupID>
+    <Name>Search</Name>
+    <ParentCheckGroupID>594</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T16:11:12.64-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2055</CheckGroupID>
+    <Name>SiteMinder</Name>
+    <ParentCheckGroupID>2051</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T17:13:18.5-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2056</CheckGroupID>
+    <Name>Crafty Syntax</Name>
+    <ParentCheckGroupID>664</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T17:15:46.123-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2057</CheckGroupID>
+    <Name>Xoops</Name>
+    <ParentCheckGroupID>741</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T17:18:25.623-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2058</CheckGroupID>
+    <Name>WordPress</Name>
+    <ParentCheckGroupID>741</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T17:18:37.043-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2059</CheckGroupID>
+    <Name>PostNuke</Name>
+    <ParentCheckGroupID>741</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T17:18:49.5-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2060</CheckGroupID>
+    <Name>Mambo</Name>
+    <ParentCheckGroupID>741</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T17:19:01.903-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2061</CheckGroupID>
+    <Name>Drupal</Name>
+    <ParentCheckGroupID>741</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T17:19:15.077-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2062</CheckGroupID>
+    <Name>eZ Publish</Name>
+    <ParentCheckGroupID>741</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T17:19:28.793-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2063</CheckGroupID>
+    <Name>CuteNews</Name>
+    <ParentCheckGroupID>741</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T17:19:41.89-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2064</CheckGroupID>
+    <Name>SugarCRM</Name>
+    <ParentCheckGroupID>2052</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T17:42:20.64-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2065</CheckGroupID>
+    <Name>QuikStore</Name>
+    <ParentCheckGroupID>649</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T17:48:00.967-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2066</CheckGroupID>
+    <Name>OneWorldStore</Name>
+    <ParentCheckGroupID>649</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T17:48:17.2-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2067</CheckGroupID>
+    <Name>EZShopper</Name>
+    <ParentCheckGroupID>649</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T17:49:03.357-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2068</CheckGroupID>
+    <Name>Comersus</Name>
+    <ParentCheckGroupID>649</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T17:49:18.42-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2069</CheckGroupID>
+    <Name>Cart32</Name>
+    <ParentCheckGroupID>649</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T17:49:33.497-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2070</CheckGroupID>
+    <Name>DCForum</Name>
+    <ParentCheckGroupID>643</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T18:55:43.343-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2071</CheckGroupID>
+    <Name>XMB</Name>
+    <ParentCheckGroupID>643</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T18:51:51.89-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2072</CheckGroupID>
+    <Name>vBulletin</Name>
+    <ParentCheckGroupID>643</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T18:52:03.98-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2073</CheckGroupID>
+    <Name>Phorum</Name>
+    <ParentCheckGroupID>643</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T18:54:54.843-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2074</CheckGroupID>
+    <Name>OpenBB</Name>
+    <ParentCheckGroupID>643</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T18:55:08.343-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2075</CheckGroupID>
+    <Name>Invision Power Board</Name>
+    <ParentCheckGroupID>643</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T18:55:21.483-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2076</CheckGroupID>
+    <Name>IkonBoard</Name>
+    <ParentCheckGroupID>643</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T18:55:34.5-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2077</CheckGroupID>
+    <Name>PhotoPost</Name>
+    <ParentCheckGroupID>720</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T19:09:24.653-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2078</CheckGroupID>
+    <Name>ImageFolio</Name>
+    <ParentCheckGroupID>720</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T19:09:38.56-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2079</CheckGroupID>
+    <Name>Coppermine Photo Gallery</Name>
+    <ParentCheckGroupID>720</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T19:09:51.73-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2080</CheckGroupID>
+    <Name>Cacti</Name>
+    <ParentCheckGroupID>705</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T19:41:22.857-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2081</CheckGroupID>
+    <Name>AXS</Name>
+    <ParentCheckGroupID>705</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T19:41:37.687-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2082</CheckGroupID>
+    <Name>A1-Stats</Name>
+    <ParentCheckGroupID>705</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T19:41:54.717-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2083</CheckGroupID>
+    <Name>cPanel</Name>
+    <ParentCheckGroupID>742</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T19:48:53.437-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2084</CheckGroupID>
+    <Name>Dangerous Checks</Name>
+    <ParentCheckGroupID>586</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-03-26T19:57:14.437-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2085</CheckGroupID>
+    <Name>EasyNews</Name>
+    <ParentCheckGroupID>741</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2008-04-03T17:02:27.34-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2007</CheckGroupID>
+    <Name>Authentication</Name>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.893-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2008</CheckGroupID>
+    <Name>Brute Force</Name>
+    <ParentCheckGroupID>2007</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.923-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2009</CheckGroupID>
+    <Name>Insufficient Authentication</Name>
+    <ParentCheckGroupID>2007</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.923-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2010</CheckGroupID>
+    <Name>Weak Password Recovery Validation</Name>
+    <ParentCheckGroupID>2007</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.923-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2011</CheckGroupID>
+    <Name>Authorization</Name>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2012</CheckGroupID>
+    <Name>Credential/Session Prediction</Name>
+    <ParentCheckGroupID>2011</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2013</CheckGroupID>
+    <Name>Insufficient Authorization</Name>
+    <ParentCheckGroupID>2011</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2014</CheckGroupID>
+    <Name>Insufficient Session Expiration</Name>
+    <ParentCheckGroupID>2011</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2015</CheckGroupID>
+    <Name>Session Fixation</Name>
+    <ParentCheckGroupID>2011</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2016</CheckGroupID>
+    <Name>Client-side Attacks</Name>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2017</CheckGroupID>
+    <Name>Content Spoofing</Name>
+    <ParentCheckGroupID>2016</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2018</CheckGroupID>
+    <Name>Cross-site Scripting</Name>
+    <ParentCheckGroupID>2016</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2019</CheckGroupID>
+    <Name>Command Execution</Name>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2020</CheckGroupID>
+    <Name>Buffer Overflow</Name>
+    <ParentCheckGroupID>2019</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2021</CheckGroupID>
+    <Name>Format String Attack</Name>
+    <ParentCheckGroupID>2019</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2022</CheckGroupID>
+    <Name>LDAP Injection</Name>
+    <ParentCheckGroupID>2019</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2023</CheckGroupID>
+    <Name>OS Commanding</Name>
+    <ParentCheckGroupID>2019</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2024</CheckGroupID>
+    <Name>SQL Injection</Name>
+    <ParentCheckGroupID>2019</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2025</CheckGroupID>
+    <Name>SSI Injection</Name>
+    <ParentCheckGroupID>2019</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2026</CheckGroupID>
+    <Name>XPath Injection</Name>
+    <ParentCheckGroupID>2019</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2027</CheckGroupID>
+    <Name>Information Disclosure</Name>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2028</CheckGroupID>
+    <Name>Directory Indexing</Name>
+    <ParentCheckGroupID>2027</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2029</CheckGroupID>
+    <Name>Information Leakage</Name>
+    <ParentCheckGroupID>2027</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2030</CheckGroupID>
+    <Name>Path Traversal</Name>
+    <ParentCheckGroupID>2027</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2031</CheckGroupID>
+    <Name>Predictable Resource Location</Name>
+    <ParentCheckGroupID>2027</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2032</CheckGroupID>
+    <Name>Logical Attacks</Name>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2033</CheckGroupID>
+    <Name>Abuse of Functionality</Name>
+    <ParentCheckGroupID>2032</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2034</CheckGroupID>
+    <Name>Denial of Service</Name>
+    <ParentCheckGroupID>2032</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2035</CheckGroupID>
+    <Name>Insufficient Anti-automation</Name>
+    <ParentCheckGroupID>2032</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2036</CheckGroupID>
+    <Name>Insufficient Process Validation</Name>
+    <ParentCheckGroupID>2032</ParentCheckGroupID>
+    <CheckGroupTypeID>20</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2006-08-17T12:24:20.957-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2086</CheckGroupID>
+    <Name>SAP</Name>
+    <ParentCheckGroupID>594</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2009-07-08T15:00:24.677-04:00</LastUpdatedDate>
+  </Table1>
+  <Table1>
+    <CheckGroupID>2087</CheckGroupID>
+    <Name>AWStats</Name>
+    <ParentCheckGroupID>705</ParentCheckGroupID>
+    <CheckGroupTypeID>5</CheckGroupTypeID>
+    <DisplaySequence>0</DisplaySequence>
+    <Visible>true</Visible>
+    <LastUpdatedDate>2009-07-23T18:17:09.533-04:00</LastUpdatedDate>
+  </Table1>
+</NewDataSet>

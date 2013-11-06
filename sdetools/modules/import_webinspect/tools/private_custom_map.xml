@@ -1,0 +1,604 @@
+<mapping weaknesses="4542">
+	<task id="11" title="Disallow external redirects" confidence="low">
+	</task>
+	<task id="15" title="Centralize authorization" confidence="low">
+	</task>
+	<task id="159" title="Avoid sending detailed error messages to remote systems" confidence="low">
+	</task>
+	<task id="21" title="Ensure confidential data is sent over an encrypted channel" confidence="low">
+        <weakness type="check" id="4722" title="Logins Sent Over Unencrypted Connection" />
+		<weakness type="check" id="3777" title="SSL Policy Enforcement Issue" />
+		<weakness type="check" id="4726" title="Secure Section Must Require SSL Access" />
+		<weakness type="check" id="10512" title="HTTP Basic Logins Sent Over Unencrypted Connection" />
+		<weakness type="check" id="10595" title="Unencrypted Login Form" />
+		<weakness type="check" id="4723" title="Logins Sent Over Query" />
+        <weakness type="check" id="10691" title="Encrypted Page Includes Insecure Content" />        
+	</task>
+    <task id="68" title="Encrypt credit card PANs in storage">
+		<weakness type="check" id="10720" title="Credit Card Numbers Disclosed" />
+		<weakness type="check" id="10825" title="Credit Card Numbers Disclosed" />
+        <weakness type="check" id="10040" title="Credit Card Numbers Disclosed" />
+		<weakness type="check" id="10237" title="Possible Credit Card Numbers In Cookie(s)" />
+        <weakness type="check" id="11313" title="Privacy Violation: Credit Card Number" />
+    </task>
+    <task id="7" title="Salt and hash stored password">
+        <weakness type="check" id="10551" title="Possible Username or Password Disclosure" />
+        <weakness type="check" id="10167" title="Password in Query or Cookie Data" />
+    </task>
+    <task id="219" title="Avoid transmitting confidential data through URL parameters">
+        <weakness type="check" id="10655" title="POST Parameters Accepted as GET Parameters" />
+		<weakness type="check" id="10846" title="Username and Password Embedded in a URL Scheme" />    
+    </task>
+    <task id="65" title="Restrict accepted HTTP verbs">
+        <weakness type="check" id="3345" title="CONNECT Anonymous Proxy Access" />
+		<weakness type="check" id="3427" title="PUT Method Arbitrary File Upload" />
+        <weakness type="check" id="10282" title="OPTIONS Method Supported" />        
+    </task>
+    <task id="253" title="Lockdown TLS/SSL communication">
+        <weakness type="check" id="4725" title="Certificate Hostname Discrepency" />    
+    </task>    
+	<task id="22" title="Set secure flag on session cookies" confidence="high">
+		<weakness type="check" id="4720" title="SSL Cookie Not Used" />        
+	</task>
+    <task id="23" title="Set HttpOnly flag on session cookies" confidence="high">
+		<weakness type="check" id="10543" title="Set-Cookie does not use HTTPOnly Keyword" />    
+		<weakness type="check" id="5449" title="Set-Cookie does not use HTTPOnly Keyword" />
+    </task>
+	<task id="16" title="Authorize every page" confidence="low">
+		<weakness type="check" id="4721" title="Admin Section Must Require Authentication" />
+		<weakness type="check" id="1254" title="Account Information Disclosure (passwd)" />
+		<weakness type="check" id="1255" title="Account Information Disclosure (passwd.txt)" />
+		<weakness type="check" id="1256" title="Account Information Disclosure (password)" />
+		<weakness type="check" id="1258" title="Account Information Disclosure (password.htm)" />
+		<weakness type="check" id="1259" title="Account Information Disclosure (password.html)" />
+		<weakness type="check" id="1260" title="Account Information Disclosure (password.dat)" />
+		<weakness type="check" id="1261" title="Account Information Disclosure (password.data)" />
+		<weakness type="check" id="1262" title="Account Information Disclosure (password.txt)" />
+		<weakness type="check" id="1263" title="Account Information Disclosure (password.asp)" />
+		<weakness type="check" id="1264" title="Account Information Disclosure (password.dbf)" />
+		<weakness type="check" id="1265" title="Account Information Disclosure (password.ini)" />
+		<weakness type="check" id="1266" title="Account Information Disclosure (password.db)" />
+		<weakness type="check" id="1267" title="Account Information Disclosure (password.cfg)" />
+		<weakness type="check" id="1268" title="Account Information Disclosure (password.exe)" />
+		<weakness type="check" id="1269" title="Account Information Disclosure (password.htx)" />
+		<weakness type="check" id="1270" title="Account Information Disclosure (password.lst)" />
+		<weakness type="check" id="1271" title="Account Information Disclosure (password.php)" />
+		<weakness type="check" id="1272" title="Account Information Disclosure (password.cgi)" />
+		<weakness type="check" id="1273" title="Account Information Disclosure (password.pl)" />
+		<weakness type="check" id="1274" title="Account Information Disclosure (password.php3)" />
+		<weakness type="check" id="1275" title="Account Information Disclosure (passwords.htm)" />
+		<weakness type="check" id="1276" title="Account Information Disclosure (passwords.html)" />
+		<weakness type="check" id="1277" title="Account Information Disclosure (passwords.dat)" />
+		<weakness type="check" id="1278" title="Account Information Disclosure (passwords.data)" />
+		<weakness type="check" id="1279" title="Account Information Disclosure (passwords.txt)" />
+		<weakness type="check" id="1280" title="Account Information Disclosure (passwords.asp)" />
+		<weakness type="check" id="1281" title="Account Information Disclosure (passwords.dbf)" />
+		<weakness type="check" id="1282" title="Account Information Disclosure (passwords.ini)" />
+		<weakness type="check" id="1283" title="Account Information Disclosure (passwords.db)" />
+		<weakness type="check" id="1284" title="Account Information Disclosure (passwords.cfg)" />
+		<weakness type="check" id="1285" title="Account Information Disclosure (passwords.exe)" />
+		<weakness type="check" id="1286" title="Account Information Disclosure (passwords.htx)" />
+		<weakness type="check" id="1287" title="Account Information Disclosure (passwords.php)" />
+		<weakness type="check" id="1288" title="Account Information Disclosure (passwords.lst)" />
+		<weakness type="check" id="1289" title="Account Information Disclosure (passwords.cgi)" />
+		<weakness type="check" id="1290" title="Account Information Disclosure (passwords.pl)" />
+		<weakness type="check" id="1291" title="Account Information Disclosure (passwords.php3)" />
+		<weakness type="check" id="1292" title="Account Information Disclosure (pass.htm)" />
+		<weakness type="check" id="1293" title="Account Information Disclosure (pass.html)" />
+		<weakness type="check" id="1294" title="Account Information Disclosure (pass.dat)" />
+		<weakness type="check" id="1295" title="Account Information Disclosure (pass.data)" />
+		<weakness type="check" id="1296" title="Account Information Disclosure (pass.txt)" />
+		<weakness type="check" id="1297" title="Account Information Disclosure (pass.asp)" />
+		<weakness type="check" id="1298" title="Account Information Disclosure (pass.dbf)" />
+		<weakness type="check" id="1299" title="Account Information Disclosure (pass.php)" />
+		<weakness type="check" id="1300" title="Account Information Disclosure (pass.ini)" />
+		<weakness type="check" id="1301" title="Account Information Disclosure (pass.db)" />
+		<weakness type="check" id="1302" title="Account Information Disclosure (pass.cfg)" />
+		<weakness type="check" id="1303" title="Account Information Disclosure (pass.exe)" />
+		<weakness type="check" id="1304" title="Account Information Disclosure (pass.htx)" />
+		<weakness type="check" id="1305" title="Account Information Disclosure (pass.lst)" />
+		<weakness type="check" id="1306" title="Account Information Disclosure (pass.cgi)" />
+		<weakness type="check" id="1307" title="Account Information Disclosure (pass.pl)" />
+		<weakness type="check" id="1308" title="Account Information Disclosure (pass.php3)" />
+        <weakness type="check" id="3403" title="Basic Auth Evasion" />
+		<weakness type="check" id="10243" title="Basic Auth Evasion" />        
+	</task>
+	<task id="176" title="Apply principles of privacy when handling personal information" confidence="low">
+		<weakness type="check" id="10834" title="Social Security Number Disclosure" />
+		<weakness type="check" id="10050" title="Personal Identification Number Disclosed" />
+		<weakness type="check" id="10049" title="California Driver's License Number Disclosed" />
+		<weakness type="check" id="10039" title="Social Security Numbers Disclosed" />
+        <weakness type="check" id="11312" title="Privacy Violation: Social Security Number" />        
+	</task>
+	<task id="182" title="Avoid nested expressions based on unvalidated input" confidence="low">
+	</task>
+	<task id="186" title="Verify that third party libraries do not have any outstanding security patches" confidence="low">
+        <weakness type="check" id="10988" title="Java Double-precision Parsing Denial of Service" />
+		<weakness type="check" id="10958" title="FCKeditor 'CurrentFolder' Parameter Directory Traversal" />    
+		<weakness type="check" id="10955" title="Campsite attachments.php 'article_id' Parameter SQL Injection" />
+		<weakness type="check" id="5127" title="getInternet SQL Injection" />
+		<weakness type="check" id="10279" title="HacmeCasino SQL Injection" />
+		<weakness type="check" id="2961" title="Backdoor - root.exe" />
+		<weakness type="check" id="10948" title="phpMyAdmin unserialize() Remote Code Execution" />
+		<weakness type="check" id="5182" title="Multiple Full Path Disclosures in Php-Nuke" />
+        <weakness type="check" id="5238" title="WebConnect File Disclosure Vulnerability" />
+		<weakness type="check" id="3424" title="Multiple Vendor WEB-INF File Disclosure" />
+		<weakness type="check" id="2237" title="AdCycle build.cgi Reconfiguration" />
+		<weakness type="check" id="10656" title="BitTorrent File Found" />
+		<weakness type="check" id="10806" title="ADOVBS Username/Password Information Disclosure" />
+		<weakness type="check" id="5517" title="CA Unicenter Common Services Database Password Disclosure" />
+		<weakness type="check" id="5128" title="Microsoft ASP.NET URI Canonicalization Remote Information Disclosure Vulnerability" />        
+	</task>
+    <task id="63" title="Disable auto-complete on confidential fields">
+        <weakness type="check" id="5597" title="Form Auto Complete Active" />
+        <weakness type="check" id="11276" title="Password Field Auto Complete Active" />
+        <weakness type="check" id="4724" title="Password Field Masked" />
+    </task>
+	<task id="193" title="Review non-categorized/miscellaneous findings from static code analysis" confidence="low">
+        <weakness type="check" id="11298" title="MongoDB PHP Request Injection Attack" />
+		<weakness type="check" id="5" title="WebInspect Internal Check" />
+		<weakness type="check" id="10242" title="Flash Cross-Domain Policy File" />
+		<weakness type="check" id="10436" title="Flash Object Detected" />
+        <weakness type="check" id="3257" title="JSP/JHTML Extension Case Change Source Disclosure" />
+		<weakness type="check" id="3679" title="User Mail Forward File Discovery" />        
+        <weakness type="check" id="11316" title="SecurityScope Findings Configuration" />
+		<weakness type="check" id="10343" title="Additional Common Documentation Text Files" />
+		<weakness type="check" id="10687" title="Application Probing: General PHP" />
+		<weakness type="check" id="10700" title="Application Probing: vBulletin" />
+		<weakness type="check" id="10423" title="Common Application Test Files" />
+		<weakness type="check" id="10347" title="Common Documentation HTML Files" />
+		<weakness type="check" id="10342" title="Common Documentation Text Files" />
+		<weakness type="check" id="10884" title="Directory Probing: /cgi-bin" />
+		<weakness type="check" id="10879" title="Directory Probing: /temp" />
+		<weakness type="check" id="10876" title="Directory Probing: /tmp" />
+		<weakness type="check" id="10885" title="Directory Probing: /wiki/" />
+		<weakness type="check" id="10888" title="Directory Probing: Admin Directories" />
+		<weakness type="check" id="10877" title="Directory Probing: Index File Names" />
+		<weakness type="check" id="10887" title="Directory Probing: Multiple" />
+		<weakness type="check" id="10889" title="Directory Probing: Statistics Directories" />
+		<weakness type="check" id="10886" title="Directory Probing: Years" />
+		<weakness type="check" id="10177" title="Test Application (wm.cgi)" />
+		<weakness type="check" id="877" title="Unicode Folder (_mem_bin)" />
+		<weakness type="check" id="873" title="Unicode Folder (_vti_bin)" />
+		<weakness type="check" id="908" title="Unicode Folder (cgi-bin)" />
+		<weakness type="check" id="874" title="Unicode Folder (printers)" />
+		<weakness type="check" id="888" title="Unicode Folder (scripts)" />
+		<weakness type="check" id="876" title="Unicode Folder (sites)" />
+		<weakness type="check" id="875" title="Unicode Folder (siteserver)" />
+        <weakness type="check" id="5567" title="GET Open Proxy Access Allowed" />
+		<weakness type="check" id="1349" title="Administration Application (admin.asp)" />
+		<weakness type="check" id="1353" title="Administration Application (admin.cfg)" />
+		<weakness type="check" id="1357" title="Administration Application (admin.cgi)" />
+		<weakness type="check" id="1345" title="Administration Application (admin.dat)" />
+		<weakness type="check" id="1346" title="Administration Application (admin.data)" />
+		<weakness type="check" id="1352" title="Administration Application (admin.db)" />
+		<weakness type="check" id="1350" title="Administration Application (admin.dbf)" />
+		<weakness type="check" id="1354" title="Administration Application (admin.exe)" />
+		<weakness type="check" id="1343" title="Administration Application (admin.htm)" />
+		<weakness type="check" id="1344" title="Administration Application (admin.html)" />
+		<weakness type="check" id="1355" title="Administration Application (admin.htx)" />
+		<weakness type="check" id="1351" title="Administration Application (admin.ini)" />
+		<weakness type="check" id="1356" title="Administration Application (admin.lst)" />
+		<weakness type="check" id="1348" title="Administration Application (admin.php)" />
+		<weakness type="check" id="1359" title="Administration Application (admin.php3)" />
+		<weakness type="check" id="1358" title="Administration Application (admin.pl)" />
+		<weakness type="check" id="1347" title="Administration Application (admin.txt)" />
+		<weakness type="check" id="2288" title="Administrative Interface (accounts.asp)" />
+		<weakness type="check" id="2272" title="Administrative Interface (add_category.asp)" />
+		<weakness type="check" id="2282" title="Administrative Interface (admin.asp)" />
+		<weakness type="check" id="2281" title="Administrative Interface (admin.cfg)" />
+		<weakness type="check" id="2283" title="Administrative Interface (admin.cgi)" />
+		<weakness type="check" id="2285" title="Administrative Interface (admin.htm)" />
+		<weakness type="check" id="2284" title="Administrative Interface (admin.html)" />
+		<weakness type="check" id="2286" title="Administrative Interface (admin.php)" />
+		<weakness type="check" id="2273" title="Administrative Interface (batch_add.asp)" />
+		<weakness type="check" id="2274" title="Administrative Interface (batch_manage.asp)" />
+		<weakness type="check" id="3594" title="Administrative Interface (user_adm.html)" />
+		<weakness type="check" id="3617" title="Administrative Interface (webauthor.htm)" />
+		<weakness type="check" id="785" title="Backdoor - rwwwshell.pl" />
+		<weakness type="check" id="3618" title="Database Access Page" />
+        <weakness type="check" id="646" title="Directory (.cobalt)" />
+		<weakness type="check" id="1508" title="Directory (_passwords)" />
+		<weakness type="check" id="674" title="Directory (banner01)" />
+		<weakness type="check" id="3169" title="Directory (boadmin)" />
+		<weakness type="check" id="113" title="Directory (buy)" />
+		<weakness type="check" id="2061" title="Directory (cgi-bin/.cobalt)" />
+		<weakness type="check" id="166" title="Directory (conf)" />
+		<weakness type="check" id="167" title="Directory (config)" />
+		<weakness type="check" id="840" title="Directory (formsmgr)" />
+		<weakness type="check" id="258" title="Directory (info)" />
+		<weakness type="check" id="259" title="Directory (information)" />
+		<weakness type="check" id="331" title="Directory (passwords)" />
+		<weakness type="check" id="842" title="Directory (storage)" />
+		<weakness type="check" id="464" title="Directory (webalizer)" />
+		<weakness type="check" id="2189" title="Directory (~nobody)" />
+		<weakness type="check" id="3609" title="Download File" />
+		<weakness type="check" id="3867" title="Dynamic Script Folder Engine" />
+		<weakness type="check" id="3608" title="Email Template File" />
+		<weakness type="check" id="3605" title="File (content-space)" />
+		<weakness type="check" id="3607" title="File (email.txt)" />
+		<weakness type="check" id="2287" title="File (menu.asp)" />
+		<weakness type="check" id="1413" title="File (orders.asp)" />
+		<weakness type="check" id="1412" title="File (orders.html)" />
+		<weakness type="check" id="3606" title="File (sitelist.txt)" />
+		<weakness type="check" id="3598" title="File (tmp)" />
+		<weakness type="check" id="2275" title="Login Interface (login.asp)" />
+		<weakness type="check" id="5668" title="Login Interface (login.aspx)" />
+		<weakness type="check" id="2276" title="Login Interface (login.cgi)" />
+		<weakness type="check" id="5669" title="Login Interface (login.do)" />
+		<weakness type="check" id="2278" title="Login Interface (login.htm)" />
+		<weakness type="check" id="2279" title="Login Interface (login.html)" />
+		<weakness type="check" id="2277" title="Login Interface (login.php)" />
+		<weakness type="check" id="3612" title="Login Interface (logon.asp)" />
+		<weakness type="check" id="3615" title="Login Interface (logon.cgi)" />
+		<weakness type="check" id="3611" title="Login Interface (logon.htm)" />
+		<weakness type="check" id="3610" title="Login Interface (logon.html)" />
+		<weakness type="check" id="3613" title="Login Interface (logon.php)" />
+		<weakness type="check" id="3614" title="Login Interface (logon.pl)" />
+		<weakness type="check" id="2280" title="Login Interface (logout.asp)" />
+		<weakness type="check" id="3648" title="OSX Content File (FBCIndex)" />
+		<weakness type="check" id="10462" title="PHP Admin Application" />
+		<weakness type="check" id="10461" title="PHP Debug Application" />
+		<weakness type="check" id="11213" title="PHP Debug Application (debug.php3)" />
+		<weakness type="check" id="11214" title="PHP Debug Application (debug.php4)" />
+		<weakness type="check" id="11215" title="PHP Debug Application (debug.php5)" />
+		<weakness type="check" id="11224" title="PHP Password Page (password.php)" />
+		<weakness type="check" id="10628" title="Possible Authentication Misconfiguration (Status Code)" />
+		<weakness type="check" id="10629" title="Possible Authentication Misconfiguration (WWW-Authenticate)" />
+		<weakness type="check" id="909" title="Possible File Upload Capability" />
+		<weakness type="check" id="3623" title="Possible Intranet Access" />
+		<weakness type="check" id="4306" title="Possible Login Form" />
+		<weakness type="check" id="3861" title="Script Directory (cgi)" />
+		<weakness type="check" id="3860" title="Script Directory (cgi-bin)" />
+		<weakness type="check" id="3863" title="Script Directory (cgi-local)" />
+		<weakness type="check" id="3866" title="Script Directory (cgi-win)" />
+		<weakness type="check" id="3864" title="Script Directory (cgibin)" />
+		<weakness type="check" id="3865" title="Script Directory (htbin)" />
+		<weakness type="check" id="3862" title="Script Directory (script)" />
+		<weakness type="check" id="3854" title="Script Directory (scripts)" />
+		<weakness type="check" id="4731" title="Script Directory Check" />
+		<weakness type="check" id="4732" title="Script File Extension Disclosure" />
+		<weakness type="check" id="5670" title="Default Page (default.asp)" />
+		<weakness type="check" id="5671" title="Default Page (default.aspx)" />
+		<weakness type="check" id="10168" title="Default Page (localstart.asp)" />
+		<weakness type="check" id="2235" title="Error Log Information Disclosure" />
+		<weakness type="check" id="872" title="Unicode Folder (msadc)" />
+		<weakness type="check" id="936" title="WS_FTP Configuration (WS_FTP.ini)" />
+		<weakness type="check" id="937" title="WS_FTP Configuration (ws_ftp.ini)" />
+		<weakness type="check" id="764" title="WS_FTP Log (ws_ftp.log)" />
+		<weakness type="check" id="3276" title="WebDAV Support Enabled" />
+		<weakness type="check" id="10068" title="WebDAV Support Enabled" />
+        <weakness type="check" id="3002" title="Backdoor - AckCmd (ackcmdc.exe)" />
+		<weakness type="check" id="3004" title="Backdoor - NTRoot (_root_.sys)" />
+		<weakness type="check" id="3003" title="Backdoor - NTRoot (deploy.exe)" />
+		<weakness type="check" id="3005" title="Backdoor - NTRoot (root_readme.txt)" />
+		<weakness type="check" id="2998" title="Backdoor - Netcat (doexec.c)" />
+		<weakness type="check" id="2997" title="Backdoor - Netcat (hobbit.txt)" />
+		<weakness type="check" id="2994" title="Backdoor - Netcat (nc.exe)" />
+		<weakness type="check" id="2999" title="Backdoor - Netcat (netcat)" />
+		<weakness type="check" id="2995" title="Backdoor - Netcat (netcat.c)" />
+		<weakness type="check" id="3000" title="Backdoor - Netcat (netcat.exe)" />
+		<weakness type="check" id="3041" title="Backdoor - fuck.exe" />
+		<weakness type="check" id="4340" title="Backdoor - shell.pl (nobody.cgi)" />
+		<weakness type="check" id="10365" title="Common Include Files (.inc)" />
+		<weakness type="check" id="2410" title="Include Source Code Information Disclosure (config.inc)" />
+		<weakness type="check" id="1911" title="Perl.exe Arbitrary Command Execution" />
+		<weakness type="check" id="2191" title="Possible Command Shell (bash)" />
+		<weakness type="check" id="2193" title="Possible Command Shell (csh)" />
+		<weakness type="check" id="2192" title="Possible Command Shell (ksh)" />
+		<weakness type="check" id="2190" title="Possible Command Shell (sh)" />
+		<weakness type="check" id="10186" title="Possible MPack Infection" />
+		<weakness type="check" id="10181" title="Invoker Servlet Unauthorized Code Execution" />     
+        <weakness type="check" id="2067" title="comments.txt Multiple Possible Vulnerabilities" />
+		<weakness type="check" id="10936" title="Unsafe Flash Embed Settings - AllowScriptAccess" />
+        <weakness type="check" id="3836" title="HTTP TRACE Method Cross-Site Scripting" />
+		<weakness type="check" id="10069" title="HTTP TRACE Method Cross-Site Scripting" />
+		<weakness type="check" id="5152" title="HTTP TRACK Method Cross-Site Scripting" />
+		<weakness type="check" id="10071" title="HTTP TRACK Method Cross-Site Scripting" />
+		<weakness type="check" id="5057" title="Possible Parameter Based Buffer Overflow (2100 bytes)" />
+		<weakness type="check" id="10254" title="Possible Parameter Based Buffer Overflow (270 bytes)" />
+		<weakness type="check" id="10253" title="Possible Parameter Based Buffer Overflow (70 bytes)" />            
+	</task>
+    <task id="56" title="Restrict access to WSDL">
+        <weakness type="check" id="10541" title="WSDL File Discovered (asmx)" />		
+        <weakness type="check" id="10542" title="WSDL File Discovered " />
+    </task>    
+	<task id="20" title="Invalidate old session ID after authentication" confidence="low">
+	</task>
+	<task id="202" title="Prevent buffer overflow/underflow" confidence="low">
+	</task>
+	<task id="203" title="Avoid uncontrolled format string" confidence="low">
+	</task>
+	<task id="204" title="Follow security best practices when dealing with pointers" confidence="low">
+	</task>
+	<task id="244" title="Securely delete any unprotected sensitive data" confidence="low">
+	</task>
+	<task id="25" title="Enforce absolute session timeouts" confidence="low">
+        <weakness type="check" id="4728" title="Persistent Cookies" />
+	</task>
+	<task id="29" title="Use anti cross site request forgery (CSRF) tokens" confidence="low">
+		<weakness type="check" id="10963" title="Cross-Site Request Forgery" />
+		<weakness type="check" id="10977" title="Cross-Site Request Forgery (High)" />    
+	</task>
+	<task id="31" title="Perform input validation on all forms of input" confidence="low">
+        <weakness type="check" id="2299" title="Parameter Manipulation (%ENV)" />
+		<weakness type="check" id="2159" title="Parameter Manipulation (/Asterisk)" />
+		<weakness type="check" id="2219" title="Parameter Manipulation (Asterisk)" />
+		<weakness type="check" id="2169" title="Parameter Manipulation (Asterisk/Quote)" />
+		<weakness type="check" id="2164" title="Parameter Manipulation (At/Quote)" />
+		<weakness type="check" id="2145" title="Parameter Manipulation (Backquote)" />
+		<weakness type="check" id="3449" title="Parameter Manipulation (Backslash FQP Injection Boot.ini)" />
+		<weakness type="check" id="3447" title="Parameter Manipulation (Backslash FQP Injection Globals.asa)" />
+		<weakness type="check" id="2166" title="Parameter Manipulation (Backslash/Quote)" />
+		<weakness type="check" id="2170" title="Parameter Manipulation (Brackets/Quote)" />
+		<weakness type="check" id="2165" title="Parameter Manipulation (Carat/Quote)" />
+		<weakness type="check" id="2160" title="Parameter Manipulation (Comma)" />
+		<weakness type="check" id="2171" title="Parameter Manipulation (Curly Braces/Quote)" />
+		<weakness type="check" id="2150" title="Parameter Manipulation (Double Encode Line Break)" />
+		<weakness type="check" id="2149" title="Parameter Manipulation (Double Encode Null Byte)" />
+		<weakness type="check" id="10246" title="Parameter Manipulation (Double Quote)" />
+		<weakness type="check" id="3450" title="Parameter Manipulation (Forwardslash FQP Injection Boot.ini)" />
+		<weakness type="check" id="3448" title="Parameter Manipulation (Forwardslash FQP Injection Globals.asa)" />
+		<weakness type="check" id="2148" title="Parameter Manipulation (Line Break)" />
+		<weakness type="check" id="2134" title="Parameter Manipulation (Null Byte)" />
+		<weakness type="check" id="2168" title="Parameter Manipulation (Pound/Quote)" />
+		<weakness type="check" id="2161" title="Parameter Manipulation (Semicolon)" />
+		<weakness type="check" id="10247" title="Parameter Manipulation (Single Quote)" />
+		<weakness type="check" id="2220" title="Parameter Manipulation (Slash)" />
+		<weakness type="check" id="2167" title="Parameter Manipulation (Slash/Quote)" />
+		<weakness type="check" id="10191" title="Parameter Manipulation (Various Grouping Characters)" />
+		<weakness type="check" id="10245" title="Parameter Manipulation (Various Metacharacters)" />
+    </task>
+	<task id="33" title="Verify integrity of client-supplied read-only data" confidence="low">
+        <weakness type="check" id="4727" title="Hidden Form Value" /> 
+        <weakness type="check" id="10280" title="Price-Related Form Fields" />        
+	</task>
+	<task id="35" title="Specify HTTP protocol limits in the server settings" confidence="low">
+	</task>
+	<task id="36" title="Escape untrusted data in HTML, HTML attributes, Cascading Style Sheets and JavaScript" confidence="low">
+		<weakness type="check" id="11205" title="Third Party Undisclosed Cross-Site Scripting" />    
+	</task>
+	<task id="38" title="Bind variables in SQL statements" confidence="low">
+	</task>
+	<task id="39" title="Disallow carriage returns and line feeds when adding data to HTTP response headers" confidence="low">
+	</task>
+	<task id="40" title="Use XML encoding when interacting with XML data" confidence="low">
+	</task>
+	<task id="41" title="Use Lightweight Directory Access Protocol (LDAP) encoding when interacting with LDAP data" confidence="low">
+	</task>
+	<task id="42" title="Avoid relying on untrusted data for server side page, view, or template selection" confidence="low">
+        <weakness type="check" id="10985" title="Local File Inclusion" />
+		<weakness type="check" id="10986" title="Local File Inclusion" />
+		<weakness type="check" id="10271" title="Local File Inclusion/Reading Vulnerability" />
+        <weakness type="check" id="10272" title="Possible Local File Inclusion/Reading Vulnerability" />
+        <weakness type="check" id="2174" title="Server Side Include Directive" />
+		<weakness type="check" id="4919" title="Unexecuted Server Side Include" />
+        <weakness type="check" id="5151" title="Arbitrary Remote File Include" />
+		<weakness type="check" id="5150" title="Arbitrary Remote File Include" />
+		<weakness type="check" id="10207" title="Arbitrary Remote File Include (Host Only)" />
+		<weakness type="check" id="10206" title="Arbitrary Remote File Include (Scheme/Host)" />
+		<weakness type="check" id="2309" title="Arbitrary Server Side Include Execution" />
+		<weakness type="check" id="10287" title="Local File Include" />        
+	</task>
+	<task id="43" title="Avoid unsafe operating system interaction" confidence="low">
+		<weakness type="check" id="10199" title="Universal Arbitrary Command Execution (Backticks)" />
+		<weakness type="check" id="10200" title="Universal Arbitrary Command Execution (NULL)" />
+		<weakness type="check" id="10201" title="Universal Arbitrary Command Execution (Newline)" />
+		<weakness type="check" id="10202" title="Universal Arbitrary Command Execution (Pipe/Ampersand)" />
+		<weakness type="check" id="10203" title="Universal Arbitrary Command Execution (Pipe/Ampersand/Single Quote)" />
+		<weakness type="check" id="10204" title="Universal Arbitrary Command Execution (Pipe/Ampersand/Double Quote)" />
+		<weakness type="check" id="10205" title="Universal Arbitrary Command Execution (Ampersand/Pipe)" />
+		<weakness type="check" id="2152" title="Parameter Manipulation Directory Traversal Command Execution (/../../../../../../../../bin/id%00|)" />        
+	</task>
+	<task id="47" title="Implement a global error handler and generic default error page for end users" confidence="low">
+		<weakness type="check" id="4939" title=".NET Error Message" />
+		<weakness type="check" id="5555" title="404 Internal IP Disclosure" />
+        <weakness type="check" id="3186" title="SOAP Exception Error Message" />
+		<weakness type="check" id="10932" title="Server Error Response" />
+		<weakness type="check" id="2256" title="Servlet Runtime Error Message" />
+		<weakness type="check" id="1435" title="Shell Error Message" />
+		<weakness type="check" id="1436" title="Shell Error Message" />
+		<weakness type="check" id="1451" title="Shell Error Message" />
+		<weakness type="check" id="742" title="Database Server Error Message" />
+        <weakness type="check" id="1498" title="Exception Error Message" />
+        <weakness type="check" id="2077" title="Java Runtime Error Message" />
+		<weakness type="check" id="4823" title="Jrun Server Error Message" />
+		<weakness type="check" id="4423" title="LDAP Error Message" />
+		<weakness type="check" id="745" title="Runtime Error Message" />    
+		<weakness type="check" id="3064" title="ASP Runtime Error Message" />
+        <weakness type="check" id="3051" title="Microsoft JScript Runtime Error Message" />   
+        <weakness type="check" id="10208" title="PHP Error Message" />
+        <weakness type="check" id="10190" title="Possible VBScript Runtime Error Message" /> 
+        <weakness type="check" id="4250" title="VBScript Runtime Error Message" /> 
+        <weakness type="check" id="1385" title="ColdFusion Error Message" />        
+	</task>
+	<task id="49" title="Remove/disable unused, test or debug code and data" confidence="low">
+        <weakness type="check" id="3619" title="Database Test Page" />
+		<weakness type="check" id="1369" title="Debug Application (debug.asp)" />
+		<weakness type="check" id="1373" title="Debug Application (debug.cfg)" />
+		<weakness type="check" id="1370" title="Debug Application (debug.cgi)" />
+		<weakness type="check" id="1374" title="Debug Application (debug.dat)" />
+		<weakness type="check" id="1371" title="Debug Application (debug.htm)" />
+		<weakness type="check" id="1372" title="Debug Application (debug.html)" />
+		<weakness type="check" id="1376" title="Debug Application (debug.php)" />
+		<weakness type="check" id="1377" title="Debug Application (debug.php3)" />
+		<weakness type="check" id="1375" title="Debug Application (debug.pl)" />
+		<weakness type="check" id="1368" title="Debug Application (debug.txt)" />
+        <weakness type="check" id="2100" title="Backup File (Appended .BKUP)" />
+		<weakness type="check" id="10211" title="Backup-Related Directories" />
+		<weakness type="check" id="4756" title="Backup File (.)" />
+		<weakness type="check" id="2086" title="Backup File (.-OLD)" />
+		<weakness type="check" id="26" title="Backup File (.-old)" />
+		<weakness type="check" id="520" title="Backup File (.000)" />
+		<weakness type="check" id="2085" title="Backup File (.ARC)" />
+		<weakness type="check" id="2082" title="Backup File (.BAC)" />
+		<weakness type="check" id="2087" title="Backup File (.BAK)" />
+		<weakness type="check" id="2083" title="Backup File (.OLD)" />
+		<weakness type="check" id="27" title="Backup File (.arc)" />
+		<weakness type="check" id="516" title="Backup File (.bac)" />
+		<weakness type="check" id="517" title="Backup File (.backup)" />
+		<weakness type="check" id="25" title="Backup File (.bak)" />
+		<weakness type="check" id="4995" title="Backup File (.inc)" />
+		<weakness type="check" id="2294" title="Backup File (.lst)" />
+		<weakness type="check" id="24" title="Backup File (.old)" />
+		<weakness type="check" id="3629" title="Backup File (.old2)" />
+		<weakness type="check" id="515" title="Backup File (.orig)" />
+		<weakness type="check" id="3194" title="Backup File (.sav)" />
+		<weakness type="check" id="3211" title="Backup File (.save)" />
+		<weakness type="check" id="2105" title="Backup File (.temp)" />
+		<weakness type="check" id="518" title="Backup File (.tmp)" />
+		<weakness type="check" id="4800" title="Backup File (.vsss.tmp)" />
+		<weakness type="check" id="2104" title="Backup File (Appended .ARC)" />
+		<weakness type="check" id="2102" title="Backup File (Appended .BAC)" />
+		<weakness type="check" id="2081" title="Backup File (Appended .BACKUP)" />
+		<weakness type="check" id="2101" title="Backup File (Appended .BACKUP)" />
+		<weakness type="check" id="2103" title="Backup File (Appended .BAK)" />
+		<weakness type="check" id="2100" title="Backup File (Appended .BKUP)" />
+		<weakness type="check" id="4997" title="Backup File (Appended .INC)" />
+		<weakness type="check" id="2096" title="Backup File (Appended .OLD)" />
+		<weakness type="check" id="2078" title="Backup File (Appended .ORIG)" />
+		<weakness type="check" id="2097" title="Backup File (Appended .ORIG)" />
+		<weakness type="check" id="2098" title="Backup File (Appended .TEMP)" />
+		<weakness type="check" id="2080" title="Backup File (Appended .TMP)" />
+		<weakness type="check" id="2099" title="Backup File (Appended .TMP)" />
+		<weakness type="check" id="708" title="Backup File (Appended .bak)" />
+		<weakness type="check" id="1466" title="Backup File (Appended .bkup)" />
+		<weakness type="check" id="4996" title="Backup File (Appended .inc)" />
+		<weakness type="check" id="709" title="Backup File (Appended .old)" />
+		<weakness type="check" id="3630" title="Backup File (Appended .old2)" />
+		<weakness type="check" id="710" title="Backup File (Appended .orig)" />
+		<weakness type="check" id="3195" title="Backup File (Appended .sav)" />
+		<weakness type="check" id="3210" title="Backup File (Appended .save)" />
+		<weakness type="check" id="711" title="Backup File (Appended .temp)" />
+		<weakness type="check" id="712" title="Backup File (Appended 1)" />
+		<weakness type="check" id="2075" title="Backup File (Appended BAK)" />
+		<weakness type="check" id="2076" title="Backup File (Appended OLD)" />
+		<weakness type="check" id="4748" title="Backup File (Copy of)" />
+		<weakness type="check" id="4826" title="Backup File (Old%20)" />
+		<weakness type="check" id="4825" title="Backup File (Old)" />
+		<weakness type="check" id="4754" title="Backup File (Shortcut to)" />
+		<weakness type="check" id="4755" title="Backup File (_)" />
+		<weakness type="check" id="2121" title="Backup File (cgi.tar)" />
+		<weakness type="check" id="2123" title="Backup File (cgi.tar.gz)" />
+		<weakness type="check" id="2122" title="Backup File (cgi.zip)" />
+		<weakness type="check" id="4757" title="Backup File (~)" />
+		<weakness type="check" id="519" title="Backup File (~1)" />
+		<weakness type="check" id="10941" title="Backup File Found" />
+		<weakness type="check" id="2293" title="Backup file search (.~bk)" />
+		<weakness type="check" id="1369" title="Debug Application (debug.asp)" />
+		<weakness type="check" id="1373" title="Debug Application (debug.cfg)" />
+		<weakness type="check" id="1370" title="Debug Application (debug.cgi)" />
+		<weakness type="check" id="1374" title="Debug Application (debug.dat)" />
+		<weakness type="check" id="1371" title="Debug Application (debug.htm)" />
+		<weakness type="check" id="1372" title="Debug Application (debug.html)" />
+		<weakness type="check" id="1376" title="Debug Application (debug.php)" />
+		<weakness type="check" id="1377" title="Debug Application (debug.php3)" />
+		<weakness type="check" id="1375" title="Debug Application (debug.pl)" />
+		<weakness type="check" id="1368" title="Debug Application (debug.txt)" />
+		<weakness type="check" id="2232" title="Debug Information Disclosure" />
+		<weakness type="check" id="1429" title="Possible Debug Application" />
+		<weakness type="check" id="5654" title="Test Application (dbsamp.htm)" />
+		<weakness type="check" id="5653" title="Test Application (mkilog.exe)" />
+		<weakness type="check" id="1244" title="Test Application (nph-test-cgi)" />
+		<weakness type="check" id="1826" title="Test Application (test)" />
+		<weakness type="check" id="1242" title="Test Application (test-cgi)" />
+		<weakness type="check" id="1827" title="Test Application (test-cgi)" />
+		<weakness type="check" id="1834" title="Test Application (test-cgi)" />
+		<weakness type="check" id="949" title="Test Application (test-cgi.exe)" />
+		<weakness type="check" id="1243" title="Test Application (test-cgi.tcl)" />
+		<weakness type="check" id="1828" title="Test Application (test-cgi.tcl)" />
+		<weakness type="check" id="950" title="Test Application (test-win.exe)" />
+		<weakness type="check" id="2360" title="Test Application (test.asp)" />
+		<weakness type="check" id="4490" title="Test Application (test.aspx)" />
+		<weakness type="check" id="1249" title="Test Application (test.bat)" />
+		<weakness type="check" id="1814" title="Test Application (test.bat)" />
+		<weakness type="check" id="1815" title="Test Application (test.cgi)" />
+		<weakness type="check" id="2361" title="Test Application (test.cgi)" />
+		<weakness type="check" id="1416" title="Test Application (test.dbf)" />
+		<weakness type="check" id="1816" title="Test Application (test.dbf)" />
+		<weakness type="check" id="1248" title="Test Application (test.exe)" />
+		<weakness type="check" id="1817" title="Test Application (test.exe)" />
+		<weakness type="check" id="1818" title="Test Application (test.htm)" />
+		<weakness type="check" id="2359" title="Test Application (test.htm)" />
+		<weakness type="check" id="1819" title="Test Application (test.html)" />
+		<weakness type="check" id="2358" title="Test Application (test.html)" />
+		<weakness type="check" id="1252" title="Test Application (test.php)" />
+		<weakness type="check" id="1253" title="Test Application (test.php3)" />
+		<weakness type="check" id="1821" title="Test Application (test.php3)" />
+		<weakness type="check" id="1247" title="Test Application (test.pl)" />
+		<weakness type="check" id="1822" title="Test Application (test.pl)" />
+		<weakness type="check" id="948" title="Test Application (test.shtml)" />
+		<weakness type="check" id="1823" title="Test Application (test.shtml)" />
+		<weakness type="check" id="1366" title="Test Application (test.txt)" />
+		<weakness type="check" id="1824" title="Test Application (test.txt)" />
+		<weakness type="check" id="1396" title="Test Application (test.udl)" />
+		<weakness type="check" id="1825" title="Test Application (test.udl)" />
+		<weakness type="check" id="3601" title="Test Application (testin)" />
+		<weakness type="check" id="1379" title="Test Application (testing.asp)" />
+		<weakness type="check" id="1378" title="Test Application (testing.cgi)" />
+		<weakness type="check" id="1381" title="Test Application (testing.htm)" />
+		<weakness type="check" id="1838" title="Test Application (testing.htm)" />
+		<weakness type="check" id="1382" title="Test Application (testing.html)" />
+		<weakness type="check" id="1839" title="Test Application (testing.html)" />
+		<weakness type="check" id="1380" title="Test Application (testing.txt)" />
+		<weakness type="check" id="1840" title="Test Application (testing.txt)" />
+		<weakness type="check" id="3616" title="Test Application (testit.pl)" />        
+	</task>
+	<task id="5" title="Minimum password standards" confidence="low">
+	</task>
+	<task id="50" title="Use indirect object reference maps if accessing files" confidence="low">
+	</task>
+	<task id="54" title="Validate file contents" confidence="low">
+	</task>
+	<task id="62" title="Lockdown passwords in property and configuration files (e.g. database connection strings)" confidence="low">
+		<weakness type="check" id="5587" title="Username or Password Disclosure" />
+		<weakness type="check" id="5588" title="Username or Password Disclosure" />
+		<weakness type="check" id="5589" title="Username and Password Disclosure" />
+		<weakness type="check" id="5590" title="Possible Username or Password Disclosure" />
+		<weakness type="check" id="5612" title="Possible Database Connection String (MSSQL ODBC Standard Connection or ODBC Informix-CLI 2.5 ODBC Driver)" />
+		<weakness type="check" id="5614" title="Possible Database Connection String (MSSQL OleDb Standard Connection)" />
+		<weakness type="check" id="5620" title="Possible Database Connection String (Access ODBC DSN)" />
+		<weakness type="check" id="5624" title="Possible Database Connection String (Access OleDb with MS Jet Standard Security)" />
+		<weakness type="check" id="5638" title="Possible Database Connection String (MySQL ODBC MySQL ODBC 3.51 Driver)" />
+		<weakness type="check" id="5639" title="Possible Database Connection String (MySQL OleDb)" />
+		<weakness type="check" id="5645" title="Possible Database Connection String (Interbase ODBC)" />
+		<weakness type="check" id="817" title="Username and Password Disclosure" />        
+		<weakness type="check" id="3185" title="Possible Database Connection String (Credential Needed)" />
+		<weakness type="check" id="5613" title="Possible Database Connection String (MSSQL ODBC Trusted Connection)" />
+		<weakness type="check" id="5615" title="Possible Database Connection String (MSSQL OleDb Trusted Connection)" />
+		<weakness type="check" id="5616" title="Possible Database Connection String (MSSQL OleDb via IP Address)" />
+		<weakness type="check" id="5617" title="Possible Database Connection String (MSSQL .NET DataProvider Standard Connection or Sybase .NET DataProvider)" />
+		<weakness type="check" id="5618" title="Possible Database Connection String (MSSQL .NET DataProvider Trusted Connection)" />
+		<weakness type="check" id="5619" title="Possible Database Connection String (MSSQL .NET DataProvider via IP Address)" />
+		<weakness type="check" id="5621" title="Possible Database Connection String (Access and Oracle ODBC)" />
+		<weakness type="check" id="5622" title="Possible Database Connection String (Access ODBC Workgroup - System Database)" />
+		<weakness type="check" id="5623" title="Possible Database Connection String (Access ODBC Exclusive Use)" />
+		<weakness type="check" id="5625" title="Possible Database Connection String (Access OleDb with MS Jet Workgroup - System Database)" />
+		<weakness type="check" id="5626" title="Possible Database Connection String (Access OleDb with MS Jet With Password)" />
+		<weakness type="check" id="5627" title="Possible Database Connection String (Oracle ODBC New Microsoft Driver)" />
+		<weakness type="check" id="5628" title="Possible Database Connection String (Oracle ODBC Old Microsoft Driver)" />
+		<weakness type="check" id="5629" title="Possible Database Connection String (Oracle OleDb Microsoft Driver and Oracle Driver - possible trusted connection)" />
+		<weakness type="check" id="5630" title="Possible Database Connection String (Oracle OleDb Oracle Driver - Trusted Connection)" />
+		<weakness type="check" id="5631" title="Possible Database Connection String (Oracle .NET DataProvider from Microsoft and Oracle - Standard Connection)" />
+		<weakness type="check" id="5632" title="Possible Database Connection String (Oracle .NET DataProvider from Microsoft and Oracle - Trusted Connection)" />
+		<weakness type="check" id="5633" title="Possible Database Connection String (IBM DB2 ODBC without DSN and OleDb IBM Driver)" />
+		<weakness type="check" id="5634" title="Possible Database Connection String (IBM DB2 OleDb Microsoft Driver)" />
+		<weakness type="check" id="5635" title="Possible Database Connection String (IBM DB2 .NET DataProvider from IBM)" />
+		<weakness type="check" id="5636" title="Possible Database Connection String (MySQL ODBC MyODBC Driver - local database)" />
+		<weakness type="check" id="5637" title="Possible Database Connection String (MySQL ODBC MyODBC Driver - remote database)" />
+		<weakness type="check" id="5640" title="Possible Database Connection String (MySQL .NET DataProvider from CoreLab)" />
+		<weakness type="check" id="5641" title="Possible Database Connection String (Sybase ODBC Sybase System 12 (12.5) ODBC Driver)" />
+		<weakness type="check" id="5642" title="Possible Database Connection String (Sybase ODBC Sybase System 11 ODBC Driver or Intersolv 3.10 ODBC Driver)" />
+		<weakness type="check" id="5643" title="Possible Database Connection String (Sybase ODBC SQL Anywhere)" />
+		<weakness type="check" id="5644" title="Possible Database Connection String (Sybase OleDb Sybase Adaptive Server Enterprise (ASE))" />
+		<weakness type="check" id="5646" title="Possible Database Connection String (Informix ODBC DSN INFORMIX 3.30 ODBC Driver)" />
+		<weakness type="check" id="5647" title="Possible Database Connection String (Informix ODBC without DSN INFORMIX 3.30 ODBC Driver)" />
+		<weakness type="check" id="5648" title="Possible Database Connection String (Informix OleDb IBM Informix OleDb Provider)" />    
+	</task>
+	<task id="76" title="Do not hard code passwords" confidence="low">
+	</task>
+    <task id="60" title="Only use approved cryptographic algorithms and key lengths" >
+		<weakness type="check" id="10344" title="Possible Insecure Cryptographic Hash (MD Family)" />
+		<weakness type="check" id="10346" title="Possible Insecure Cryptographic Hash (SHA-0/SHA-1)" />
+    </task>
+</mapping>
