@@ -134,7 +134,7 @@ class HPAlmConnector(AlmConnector):
         self.mark_down_converter = markdown.Markdown(safe_mode="escape")
         self.project_uri = 'rest/domains/%s/projects/%s' % (urlencode_str(self.config['hp_alm_domain']),
                                                             urlencode_str(self.config['alm_project']))
-        #We will map the requirement to the tests based on the cwe_id
+        #We will map the requirement its test based on the cwe_id
         self.requirement_to_test_mapping = {}
 
     def alm_connect_server(self):
@@ -177,12 +177,10 @@ class HPAlmConnector(AlmConnector):
 
         if user['Name'] != self.config['alm_user']:
             raise AlmException('Unable to verify user access to domain and project')
-        logger.info(user)
+
         # Get all the requirement types
         self.validate_configurations()
         self.test_plan_folder_id = self._fetch_test_plan_folder_id("{name['%s']}" % self.config['hp_alm_test_plan_folder'])
-        if not self.test_plan_folder_id:
-            raise Exception('expected')
 
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])
@@ -190,7 +188,6 @@ class HPAlmConnector(AlmConnector):
         if not task_id:
             return None
         if task['phase'] != 'testing':
-            logger.info(task['weakness'])
             entity_type = 'requirements'
             entity_status_field = 'status'
         else:
@@ -210,8 +207,7 @@ class HPAlmConnector(AlmConnector):
         if not result['TotalResults'] > 0:
             return None
 
-        if entity_status_field == 'exec-status':
-            logger.debug(result['entities'][0]['fields'][entity_status_field][0])
+        self.save_requirement_to_test_mapping(task, result['entities'][0])
 
         return HPAlmTask(task_id,
                          result['entities'][0]['fields']['id'][0],
@@ -219,63 +215,56 @@ class HPAlmConnector(AlmConnector):
                          result['entities'][0]['fields']['last-modified'][0],
                          self.config['hp_alm_done_statuses'])
 
+    def save_requirement_to_test_mapping(self, task, alm_task):
+        if 'testing' in self.config['alm_phases']:
+            task_type = 'requirement'
+
+            if task['phase'] == 'testing':
+                task_type = 'testing'
+            if not self.requirement_to_test_mapping.get(task['weakness']['id']):
+                self.requirement_to_test_mapping[task['weakness']['id']] = {}
+            if not self.requirement_to_test_mapping[task['weakness']['id']].get(task_type):
+                self.requirement_to_test_mapping[task['weakness']['id']][task_type] = []
+            if task_type != 'testing':
+                self.requirement_to_test_mapping[task['weakness']['id']][task_type].append(alm_task['fields']['id'][0])
+            else:
+                self.requirement_to_test_mapping[task['weakness']['id']][task_type].append(alm_task['fields'])
+
     def alm_add_task(self, task):
         task_id = self._extract_task_id(task['id'])
         if not task_id:
             return None
 
+        field_data = [
+            ('name', task['title'].replace(':', '-')),
+            ('description', self.sde_get_task_content(task))
+        ]
+
         if task['phase'] != "testing":
-            return self._alm_add_requirement(task, task_id)
+            field_data.extend([
+                ('type-id', self.issue_type),
+                ('status', self.config['hp_alm_new_status']),
+                ('req-priority', self.translate_priority(task['priority']))
+            ])
+            entity_status = 'status'
+            entity_type = 'requirements'
         else:
-            return self._alm_add_test(task, task_id)
-
-    def _alm_add_test(self, task, task_id):
-        if self.test_plan_folder_id is None:
-            self.test_plan_folder_id = self._create_test_plan_folder()
-
-        field_data = [
-            ('name', task['title'].replace(':', '-')),
-            ('description', self.sde_get_task_content(task)),
-            ('parent-id', self.test_plan_folder_id),
-            ('subtype-id', self.config['hp_alm_test_type']),
-            ('owner', self.config['alm_user']),
-            ('status', 'Imported')
-        ]
-        json_data = """%s""" % self._build_json_args(field_data, 'test')
-
-        try:
-            result = self._call_test_api(json_data, self.alm_plugin.URLRequest.POST)
-        except APIError, err:
-            raise AlmException('Unable to add task to HP Alm %s because of %s' %
-                               (task['id'], err))
-
-        logger.debug('Task %s added to HP Alm Project', task['id'])
-
-        alm_task = HPAlmTask(task_id,
-                             result['fields']['id'][0],
-                             result['fields']['status'][0],
-                             result['fields']['last-modified'][0],
-                             self.config['hp_alm_done_statuses'])
-
-        if (self.config['alm_standard_workflow'] and (task['status'] == 'DONE' or task['status'] == 'NA')):
-            self.alm_update_task_status(alm_task, task['status'])
-
-        return "Test ID %s" % alm_task.get_alm_id()
-
-
-    def _alm_add_requirement(self, task, task_id):
-        # HP Alm is very particular about JSON ordering - we must hand-craft it
-        field_data = [
-            ('type-id', self.issue_type),
-            ('status', self.config['hp_alm_new_status']),
-            ('name', task['title'].replace(':', '-')),
-            ('description', self.sde_get_task_content(task)),
-            ('req-priority', self.translate_priority(task['priority']))
-        ]
+            if self.test_plan_folder_id is None:
+                self.test_plan_folder_id = self._create_test_plan_folder()
+            field_data.extend([
+                ('name', task['title'].replace(':', '-')),
+                ('description', self.sde_get_task_content(task)),
+                ('parent-id', self.test_plan_folder_id),
+                ('subtype-id', self.config['hp_alm_test_type']),
+                ('owner', self.config['alm_user']),
+                ('status', 'Imported')
+            ])
+            entity_status = 'exec-status'
+            entity_type = 'testing'
         json_data = """%s""" % self._build_json_args(field_data, 'requirement')
 
         try:
-            result = self._call_reqs_api(json_data, self.alm_plugin.URLRequest.POST)
+            result = self._call_api('%s/%s' % (self.project_uri, entity_type), query_args=json_data)
         except APIError, err:
             raise AlmException('Unable to add task to HP Alm %s because of %s' %
                                (task['id'], err))
@@ -284,57 +273,77 @@ class HPAlmConnector(AlmConnector):
 
         alm_task = HPAlmTask(task_id,
                              result['fields']['id'][0],
-                             result['fields']['status'][0],
+                             result['fields'][entity_status][0],
                              result['fields']['last-modified'][0],
                              self.config['hp_alm_done_statuses'])
 
         if (self.config['alm_standard_workflow'] and (task['status'] == 'DONE' or task['status'] == 'NA')):
             self.alm_update_task_status(alm_task, task['status'])
 
-        return "Req ID %s" % alm_task.get_alm_id()
+        return "Alm ID %s" % alm_task.get_alm_id()
 
-    def _add_requirement_coverage_to_test(self, test, requirement_id):
-        field_data = [
-            ('requirement-id', requirement_id),
-            ('status', self.config['hp_alm_test_status']),
-            ('entity-name', 'Test'),
-            ('test-id', '1'),
-            ('entity-type', 'test'),
-            ('coverage-mode', 'All Configurations')
-        ]
-        json_data = """%s""" % self._build_json_args(field_data, 'requirement-coverage')
+    def _get_requirement_coverage(self, requirement_id, test_id):
+        query = self._hp_query_encoder('{requirement-id[%s];test-id[%s]}' % (requirement_id, test_id))
 
         try:
-            self._call_api('%s/requirement-coverages' % self.project_uri,
-                           method=self.alm_plugin.URLRequest.POST,
-                           query_args=json_data)
+            return self._call_api('%s/requirement-coverages?query=%s' % (self.project_uri, query))
         except APIError, error:
-            raise AlmException('Unable to set requirement coverage for test plan: %s' % error)
+            raise AlmException('Unable to get requirement coverage for test plan: %s' % error)
+
+    def _add_requirement_coverage(self, tests, requirement_id):
+        for test in tests:
+            if (self._get_requirement_coverage(requirement_id,  test['id'][0])['TotalResults'] > 0):
+                continue
+
+            field_data = [
+                ('requirement-id', requirement_id),
+                ('entity-name', test['name'][0]),
+                ('test-id', test['id'][0]),
+                ('entity-type', 'test'),
+                ('coverage-mode', 'All Configurations')
+            ]
+            json_data = """%s""" % self._build_json_args(field_data, 'requirement-coverage')
+
+            try:
+                self._call_api('%s/requirement-coverages' % self.project_uri,
+                               method=self.alm_plugin.URLRequest.POST,
+                               query_args=json_data)
+            except APIError, error:
+                raise AlmException('Unable to set requirement coverage for test plan: %s' % error)
 
     def alm_update_task_status(self, task, status):
-        if not task or not self.config['alm_standard_workflow']:
-            logger.debug('Status synchronization disabled')
-            return
+        if task['phase'] != 'testing':
+            if not task or not self.config['alm_standard_workflow']:
+                logger.debug('Status synchronization disabled')
+                return
 
-        if status == 'DONE' or status == 'NA':
-            field_data = [('status', json.dumps(self.config['hp_alm_close_status']))]
-        elif status == 'TODO':
-            field_data = [('status', json.dumps(self.config['hp_alm_reopen_status']))]
+            if status == 'DONE' or status == 'NA':
+                field_data = [('status', json.dumps(self.config['hp_alm_close_status']))]
+            elif status == 'TODO':
+                field_data = [('status', json.dumps(self.config['hp_alm_reopen_status']))]
+            else:
+                raise AlmException('Unexpected status %s: valid values are DONE, NA, or TODO' % status)
+
+            field_data.append(('id', task.get_alm_id()))
+            json_data = """{"entities": %s}""" % self._build_json_args(field_data)
+
+            try:
+                self._call_reqs_api(json_data, self.alm_plugin.URLRequest.PUT)
+            except APIError, err:
+                raise AlmException('Unable to update task status to %s '
+                                   'for requirement: '
+                                   '%s in HP Alm because of %s' %
+                                   (status, task.get_alm_id(), err))
+
+            logger.debug('Status changed to %s for task %s in HP Alm', status, task.get_alm_id())
         else:
-            raise AlmException('Unexpected status %s: valid values are DONE, NA, or TODO' % status)
+            logger.debug("The task is a test plan, don't update the status")
 
-        field_data.append(('id', task.get_alm_id()))
-        json_data = """{"entities": %s}""" % self._build_json_args(field_data)
-
-        try:
-            result = self._call_reqs_api(json_data, self.alm_plugin.URLRequest.PUT)
-        except APIError, err:
-            raise AlmException('Unable to update task status to %s '
-                               'for requirement: '
-                               '%s in HP Alm because of %s' %
-                               (status, task.get_alm_id(), err))
-
-        logger.debug('Status changed to %s for task %s in HP Alm', status, task.get_alm_id())
+    def post_synchronize(self):
+        for _, data in self.requirement_to_test_mapping.items():
+            if len(data.keys()) == 2:
+                for req_id in data['requirement']:
+                    self._add_requirement_coverage(data['testing'], req_id)
 
     def alm_disconnect(self):
         try:
@@ -414,6 +423,7 @@ class HPAlmConnector(AlmConnector):
 
     @staticmethod
     def _build_json_args(field_data=None, entity_type=None):
+        # HP Alm is very particular about JSON ordering - we must craft it in a specific way
         args = []
 
         if field_data:
