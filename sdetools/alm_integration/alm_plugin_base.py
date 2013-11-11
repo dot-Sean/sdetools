@@ -393,6 +393,12 @@ class AlmConnector(object):
         else:
             return alm_status == "TODO"
 
+    def post_synchronize(self):
+        """ Steps to perform after the all tasks and statuses have been synchronized but before we
+        disconnect from the ALM
+        """
+        pass
+
     def synchronize(self):
         """ Synchronizes SDE project with ALM project.
 
@@ -490,6 +496,7 @@ class AlmConnector(object):
                     logger.debug(note_msg)
 
             logger.info('Synchronization complete')
+            self.post_synchronize()
             self.alm_disconnect()
 
         except AlmException, err:
