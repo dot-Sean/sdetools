@@ -166,6 +166,7 @@ class AlmConnector(object):
         self.config.process_json_str_dict('alm_custom_fields')
 
         self.alm_plugin.post_conf_init()
+        self.ignored_tasks = []
 
         logger.info('*** AlmConnector initialized ***')
 
@@ -393,11 +394,10 @@ class AlmConnector(object):
         else:
             return alm_status == "TODO"
 
-    def post_synchronize(self):
-        """ Steps to perform after the all tasks and statuses have been synchronized but before we
-        disconnect from the ALM
-        """
-        pass
+    def prune_tasks(self, tasks):
+        tasks = [task for task in tasks if self.in_scope(task)]
+
+        return tasks
 
     def synchronize(self):
         """ Synchronizes SDE project with ALM project.
@@ -443,7 +443,7 @@ class AlmConnector(object):
             logger.info('Retrieved all tasks from SDE')
 
             #Prune unnecessary tasks - progress must match reality
-            tasks = [task for task in tasks if self.in_scope(task)]
+            tasks = self.prune_tasks(tasks)
 
             logger.info('Pruned tasks out of scope')
 
@@ -487,7 +487,8 @@ class AlmConnector(object):
                 else:
                     # Only exists in SD Elements
                     # Skip if this task should not be added to ALM
-                    if not self.config['selected_tasks'] and task['status'] not in self.config['sde_statuses_in_scope']:
+                    if ((not self.config['selected_tasks'] and task['status'] not in self.config['sde_statuses_in_scope'])
+                    or task['id'] in self.ignored_tasks):
                         continue
                     ref = self.alm_add_task(task)
                     self.emit.info('Added task %s to %s' % (tid, self.alm_name))
@@ -496,7 +497,7 @@ class AlmConnector(object):
                     logger.debug(note_msg)
 
             logger.info('Synchronization complete')
-            self.post_synchronize()
+
             self.alm_disconnect()
 
         except AlmException, err:
