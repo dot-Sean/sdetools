@@ -16,7 +16,7 @@ from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
 RE_MAP_RANGE_KEY = re.compile('^\d+(-\d+)?$')
-GITHUB_DEFAULT_PRIORITY_MAP = {
+RATIONAL_DEFAULT_PRIORITY_MAP = {
     '7-10': 'High',
     '4-6': 'Medium',
     '1-3': 'Low',
@@ -79,9 +79,11 @@ class RationalConnector(AlmConnector):
     alm_name = 'Rational'
     cm_service_provider = None
     resource_url = None
+    priorities = None
     ALM_NEW_STATUS = 'rational_new_status'
     ALM_DONE_STATUSES = 'rational_done_statuses'
-    
+    ALM_PRIORITY_MAP = 'alm_priority_map'
+
     def __init__(self, config, alm_plugin):
         """ Initializes connection to Rational """
         super(RationalConnector, self).__init__(config, alm_plugin)
@@ -91,6 +93,8 @@ class RationalConnector(AlmConnector):
         config.add_custom_option(self.ALM_DONE_STATUSES, 'Statuses that '
                                  'signify a task is Done in Rational',
                                  default='Complete,Done')
+        config.add_custom_option(self.ALM_PRIORITY_MAP, 'Customized map from priority in SDE to RTC '
+                                 '(JSON encoded dictionary of strings)', default='')
 
     def initialize(self):
         super(RationalConnector, self).initialize()
@@ -101,6 +105,16 @@ class RationalConnector(AlmConnector):
                 raise AlmException('Missing %s in configuration' % item)
 
         self.config[self.ALM_DONE_STATUSES] = self.config[self.ALM_DONE_STATUSES].split(',')
+
+        self.config.process_json_str_dict(self.ALM_PRIORITY_MAP)
+
+        if not self.config[self.ALM_PRIORITY_MAP]:
+            self.config[self.ALM_PRIORITY_MAP] = RATIONAL_DEFAULT_PRIORITY_MAP
+
+        for key in self.config[self.ALM_PRIORITY_MAP]:
+            if not RE_MAP_RANGE_KEY.match(key):
+                raise AlmException('Unable to process %s (not a JSON dictionary). Reason: Invalid range key %s'
+                                   % (self.ALM_PRIORITY_MAP, key))
 
     def process_rdf_url(self, url):
         """ Remove the base url so we can pass the new url into call api """
@@ -149,6 +163,7 @@ class RationalConnector(AlmConnector):
         self.services = self.alm_plugin.call_api(self.cm_resource_service, call_headers=headers)
         #print json.dumps(self.services,indent=4)
         query_url = self.services['oslc:service'][0]['oslc:queryCapability'][0]['oslc:queryBase']['rdf:resource']
+
         self.query_url = query_url.replace(self.alm_plugin.base_uri+'/', '')
         for service in self.services['oslc:service']:
             if 'oslc:creationFactory' in service:
@@ -158,7 +173,48 @@ class RationalConnector(AlmConnector):
                         for resource in factory['oslc:usage']:
                             if resource['rdf:resource'] == OSLC_CR_TYPE:
                                 creation_url = factory['oslc:creation']['rdf:resource']
+                                resource_shape_url = factory['oslc:resourceShape']['rdf:resource']
                                 self.creation_url = creation_url.replace(self.alm_plugin.base_uri+'/', '')
+                                self.resource_shape_url = resource_shape_url.replace(self.alm_plugin.base_uri+'/', '')
+
+        self.priorities = self._rtc_get_priorities()
+
+    def _rtc_get_priorities(self):
+
+        headers = {'Accept': 'application/json', 'OSLC-Core-Version': '2.0'}
+        try:
+            resource_shapes = self.alm_plugin.call_api(self.resource_shape_url, call_headers=headers)
+        except APIError, err:
+            logger.error(err)
+            raise AlmException('Unable to get resource shapes from Rational')
+
+        priorities = []
+        for rs in resource_shapes['oslc:property']:
+            if rs['oslc:name'] == 'priority':
+                #print json.dumps(rs,indent=4)
+                for p in rs['oslc:allowedValues']['oslc:allowedValue']:
+                    priorities.append(self._rtc_get_priority_details(p['rdf:resource']))
+
+        return priorities
+
+    def _rtc_get_priority_details(self, priority_resource_url):
+
+        priority_resource_url = priority_resource_url.replace(self.alm_plugin.base_uri+'/', '')
+        headers = {'Accept': 'application/json', 'OSLC-Core-Version': '2.0'}
+        try:
+            priority_details = self.alm_plugin.call_api(priority_resource_url, call_headers=headers)
+        except APIError, err:
+            logger.error(err)
+            raise AlmException('Unable to get priority details from Rational' % priority_resource_url)
+
+        #print json.dumps(priority_details,indent=4)
+        return priority_details
+
+    def _get_priority_literal(self, priority_name):
+        for priority in self.priorities:
+            if priority['dcterms:title'] == priority_name:
+                return priority['rdf:about']
+        return None
 
     def alm_connect_project(self):
         """ Verifies that the Rational project exists """
@@ -176,7 +232,7 @@ class RationalConnector(AlmConnector):
             return None
 
         target = '%s/workitems?oslc.where=dcterms:title="%s:*"' % (self.query_url, task_id)
-        headers = {'Accept':'application/json', 'OSLC-Core-Version':'2.0'}
+        headers = {'Accept': 'application/json', 'OSLC-Core-Version': '2.0'}
         
         try:
             # Fields parameter will filter response data to only contain story status, name, timestamp and id
@@ -208,13 +264,17 @@ class RationalConnector(AlmConnector):
 
     def alm_add_task(self, task):
 
-        headers = {'Accept':'application/json', 'OSLC-Core-Version':'2.0'}
+        headers = {'Accept': 'application/json', 'OSLC-Core-Version': '2.0'}
+
+        priority_name = self.translate_priority(task['priority'])
+        priority_literal_resource = self._get_priority_literal(priority_name)
 
         create_args = {
             'dcterms:title': task['title'],
-            'dcterms:description': "This is content"
+            'dcterms:description': "This is content",
+            'oslc_cmx:priority': priority_literal_resource,
         }
-
+        print json.dumps(create_args,indent=4)
         try:
             work_item = self.alm_plugin.call_api(self.creation_url,
                                                  method=self.alm_plugin.URLRequest.POST,
@@ -269,3 +329,28 @@ class RationalConnector(AlmConnector):
 
     def alm_disconnect(self):
         pass
+
+    def translate_priority(self, priority):
+        """ Translates an SDE priority into a GitHub label """
+        pmap = self.config[self.ALM_PRIORITY_MAP]
+
+        if not pmap:
+            return None
+
+        try:
+            priority = int(priority)
+        except TypeError:
+            logger.error('Could not coerce %s into an integer' % priority)
+            raise AlmException("Error in translating SDE priority to GitHub label: "
+                               "%s is not an integer priority" % priority)
+
+        for key in pmap:
+            if '-' in key:
+                lrange, hrange = key.split('-')
+                lrange = int(lrange)
+                hrange = int(hrange)
+                if lrange <= priority <= hrange:
+                    return pmap[key]
+            else:
+                if int(key) == priority:
+                    return pmap[key]
