@@ -115,7 +115,7 @@ class HPAlmConnector(AlmConnector):
                                  default=None)
         config.add_custom_option('hp_alm_test_plan_folder', 'Test plan folder where we import our test tasks',
                                  default='SD Elements')
-        config.add_custom_option('hp_alm_test_type', 'Default type for new test tasks',
+        config.add_custom_option('hp_alm_test_type', 'Default type for new test plans',
                                  default='MANUAL')
 
     def initialize(self):
@@ -200,9 +200,7 @@ class HPAlmConnector(AlmConnector):
         if user['Name'] != self.config['alm_user']:
             raise AlmException('Unable to verify user access to domain and project')
 
-        # Get all the requirement types
         self.validate_configurations()
-
         self.test_plan_folder_id = self._fetch_test_plan_folder_id("{name['%s']}" % self.config['hp_alm_test_plan_folder'])
 
     def alm_get_task(self, task):
@@ -266,7 +264,7 @@ class HPAlmConnector(AlmConnector):
             ('status', self.config['hp_alm_new_status']),
             ('req-priority', self.translate_priority(task['priority']))
         ])
-        json_data = """%s""" % self._build_json_args(field_data, 'requirement')
+        json_data = self._build_json_args(field_data, 'requirement')
         result = self._call_api_collection('requirements', json_data, URLRequest.POST)
         self.requirement_to_test_mapping[task['weakness']['id']].append(result['fields']['id'][0])
 
@@ -287,7 +285,7 @@ class HPAlmConnector(AlmConnector):
             ('owner', self.config['alm_user']),
             ('status', 'Imported')
         ])
-        json_data = """%s""" % self._build_json_args(field_data, 'test')
+        json_data = self._build_json_args(field_data, 'test')
         result = self._call_api_collection('tests', json_data, URLRequest.POST)
         req_ids = self.requirement_to_test_mapping.get(task['weakness']['id'])
 
@@ -337,14 +335,13 @@ class HPAlmConnector(AlmConnector):
             if req_id in req_ids:
                 continue
 
-            field_data = [
+            json_data = self._build_json_args([
                 ('requirement-id', req_id),
                 ('entity-name', test_name),
                 ('test-id', test_id),
                 ('entity-type', 'test'),
                 ('coverage-mode', 'All Configurations')
-            ]
-            json_data = """%s""" % self._build_json_args(field_data, 'requirement-coverage')
+            ], 'requirement-coverage')
 
             self._call_api_collection('requirement-coverages', json_data, URLRequest.POST)
 
@@ -405,20 +402,39 @@ class HPAlmConnector(AlmConnector):
                 if int(key) == priority:
                     return pmap[key]
 
-
     def validate_configurations(self):
         # Check requirement type
+        self.issue_type = self._validate_entity_type('requirement', self.config['hp_alm_issue_type'])
+
+        # Check test plan type
+        self.config['hp_alm_test_type'] = self._validate_entity_type('test', self.config['hp_alm_test_type'])
+
+        # Check statuses
         try:
-            req_types = self._call_api('%s/customization/entities/requirement/types/' % self.project_uri)
+            requirement_lists = self._call_api('%s/customization/used-lists?name=Status' % self.project_uri)
         except APIError, err:
-            raise AlmException('Unable to retrieve requirement types: %s' % (err))
-        for req_type in req_types['types']:
-            if req_type['name'] == self.config['hp_alm_issue_type']:
-                self.issue_type = req_type['id']
-                return
+            raise AlmException('Unable to retrieve statuses: %s' % err)
 
-        raise AlmException('Requirement type %s not found in project' % (self.config['hp_alm_issue_type']))
+        requirement_statuses = set([item['value'] for item in requirement_lists['lists'][0]['Items']])
 
+        for config in ['hp_alm_new_status', 'hp_alm_reopen_status', 'hp_alm_close_status', 'hp_alm_done_statuses']:
+            status = self.config[config]
+
+            if type(status) is not ListType:
+                status = [status]
+            if not set(status).intersection(requirement_statuses):
+                raise AlmException('Invalid configuration: %s. Expected [%s], got %s' %
+                                   (config, requirement_statuses, status))
+
+    def _validate_entity_type(self, type, check_value):
+        try:
+            entity_types = self._call_api('%s/customization/entities/%s/types/' % (self.project_uri, type))
+        except APIError, err:
+            raise AlmException('Unable to retrieve %s types: %s' % (type, err))
+        for entity_type in entity_types['types']:
+            if entity_type['name'] == check_value:
+                return entity_type['id']
+        raise AlmException('%s type %s not found in project' % (type, check_value))
 
     def _fetch_test_plan_folder_id(self, query_args="{}"):
         try:
