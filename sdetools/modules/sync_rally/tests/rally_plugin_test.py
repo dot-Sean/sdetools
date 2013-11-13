@@ -4,7 +4,7 @@ import unittest
 
 from rally_response_generator import RallyResponseGenerator
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
-from sdetools.modules.sync_rally.rally_plugin import RallyConnector, RallyAPIBase
+from sdetools.modules.sync_rally.rally_plugin import RallyConnector, RallyAPIBase, AlmException
 PATH_TO_ALM_REST_API = 'sdetools.modules.sync_rally.rally_plugin'
 
 
@@ -23,3 +23,12 @@ class TestRallyCase(AlmPluginTestBase, unittest.TestCase):
         result_alm_id = test_task_result.get_alm_id()
 
         self.assertEqual(result_alm_id, alm_id, 'Expected alm_id %s, got %s' % (alm_id, result_alm_id))
+
+    def test_subscription_error(self):
+        self.mock_alm_response.set_response_flags({'get_subscription': '401'})
+
+        self.assert_exception(AlmException, '', 'Unable to retrieve subscription from Rally.',
+                              self.connector.alm_connect_project)
+
+
+
