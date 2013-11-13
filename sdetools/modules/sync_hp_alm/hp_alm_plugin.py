@@ -148,11 +148,11 @@ class HPAlmConnector(AlmConnector):
                 else:
                     self.requirement_to_test_mapping[task['weakness']['id']] = []
 
-                    if super(HPAlmConnector, self).in_scope(task):
+                    if self.in_scope(task):
                         _tasks.insert(0, task)
             return _tasks
         else:
-            return super(HPAlmConnector.prune_tasks(tasks))
+            return super(HPAlmConnector, self).prune_tasks(tasks)
 
     def alm_connect_server(self):
         """ Verifies that HP Alm connection works """
@@ -310,8 +310,10 @@ class HPAlmConnector(AlmConnector):
         ]
 
         if task['phase'] != "testing":
+            task_type = 'Requirement'
             alm_task = self._alm_add_requirement(task_id, field_data, task)
         else:
+            task_type = 'Test'
             alm_task = self._alm_add_test_plan(task_id, field_data, task)
 
         logger.debug('Task %s added to HP Alm Project', task['id'])
@@ -319,7 +321,7 @@ class HPAlmConnector(AlmConnector):
         if self.config['alm_standard_workflow'] and (task['status'] == 'DONE' or task['status'] == 'NA'):
             self.alm_update_task_status(alm_task, task['status'])
 
-        return "Alm ID %s" % alm_task.get_alm_id()
+        return "HP Alm %s ID: %s" % (task_type, alm_task.get_alm_id())
 
     def _get_requirement_coverage_by_test_id(self, test_id):
         query_args = {
@@ -348,30 +350,31 @@ class HPAlmConnector(AlmConnector):
             logger.info('Added test %s as a requirement coverage for %s' % (test_id, req_id))
 
     def alm_update_task_status(self, task, status):
-        if task['phase'] != 'testing':
-            if not task or not self.config['alm_standard_workflow']:
-                logger.debug('Status synchronization disabled')
-                return
+        if not task or not self.config['alm_standard_workflow']:
+            logger.debug('Status synchronization disabled')
+            return
 
-            if status == 'DONE' or status == 'NA':
-                field_data = [('status', self.config['hp_alm_close_status'])]
-            elif status == 'TODO':
-                field_data = [('status', self.config['hp_alm_reopen_status'])]
-            else:
-                raise AlmException('Unexpected status %s: valid values are DONE, NA, or TODO' % status)
+        if task['phase'] == 'testing':
+            logger.debug("Status synchronization disabled for test plans")
+            return
 
-            field_data.append(('id', task.get_alm_id()))
-            json_data = """{"entities": %s}""" % self._build_json_args(field_data)
-
-            try:
-                self._call_api('%s/requirements' % self.project_uri, json_data, self.alm_plugin.URLRequest.PUT)
-            except APIError, err:
-                raise AlmException('Unable to update task status to %s for requirement: %s in HP Alm because of %s' %
-                                   (status, task.get_alm_id(), err))
-
-            logger.debug('Status changed to %s for task %s in HP Alm', status, task.get_alm_id())
+        if status == 'DONE' or status == 'NA':
+            field_data = [('status', self.config['hp_alm_close_status'])]
+        elif status == 'TODO':
+            field_data = [('status', self.config['hp_alm_reopen_status'])]
         else:
-            logger.debug("The task is a test plan, don't update the status")
+            raise AlmException('Unexpected status %s: valid values are DONE, NA, or TODO' % status)
+
+        field_data.append(('id', task.get_alm_id()))
+        json_data = """{"entities": %s}""" % self._build_json_args(field_data)
+
+        try:
+            self._call_api('%s/requirements' % self.project_uri, json_data, self.alm_plugin.URLRequest.PUT)
+        except APIError, err:
+            raise AlmException('Unable to update task status to %s for requirement: %s in HP Alm because of %s' %
+                               (status, task.get_alm_id(), err))
+
+        logger.debug('Status changed to %s for task %s in HP Alm', status, task.get_alm_id())
 
     def alm_disconnect(self):
         try:
@@ -496,11 +499,4 @@ class HPAlmConnector(AlmConnector):
 
     @staticmethod
     def _hp_query_encoder(query):
-        new_query = []
-
-        for section in query.split(' '):
-            if section == '':
-                new_query.append('%20')
-            else:
-                new_query.append(urlencode_str(section))
-        return '%20'.join(new_query)
+        return urlencode_str(query).replace('+', '%20')
