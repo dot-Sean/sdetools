@@ -7,7 +7,9 @@ from urllib2 import HTTPError
 from datetime import datetime
 from sdetools.extlib.defusedxml import minidom
 from sdetools.sdelib.commons import abc, get_directory_of_current_module
+from sdetools.sdelib import log_mgr
 abstractmethod = abc.abstractmethod
+logger = log_mgr.mods.add_mod(__name__)
 
 
 class ResponseGenerator(object):
@@ -35,7 +37,10 @@ class ResponseGenerator(object):
     def init_with_tasks(self):
         pass
 
-    def get_response(self, target, flags, data, method):
+    def encode_response(self, response):
+        return response
+
+    def get_response(self, target, flags, data, method, headers):
         """
             Triage get_response calls to the correct response generator method based on the specified target.
             Response generator methods must accept the following parameters: [target, flag, data, method]
@@ -47,7 +52,11 @@ class ResponseGenerator(object):
             data   - data passed along with the API call
             method - HTTP Verb, specified by the URLRequest class
         """
+        print 'Generating %s response for target: %s' % (method, target)
+        print 'With flags: %s\n With data: ' % flags
+        print data
         for api_target in self.rest_api_targets:
+            print api_target
             if re.match(api_target, target):
                 func_name = self.rest_api_targets.get(api_target)
 
@@ -55,9 +64,10 @@ class ResponseGenerator(object):
                     func = getattr(self, func_name)
 
                     if callable(func):
-                        return func(target, flags.get(func_name), data, method)
+                        return self.encode_response(func(target, flags.get(func_name), data, method))
 
                 self.raise_error('500', 'Response generator error: Could not find method %s' % func_name)
+        print re.match('/qcbin/authentication-point/authenticate', target)
         self.raise_error('404')
 
     def raise_error(self, error_code, return_value=None):

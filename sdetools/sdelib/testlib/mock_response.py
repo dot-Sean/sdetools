@@ -16,6 +16,40 @@ def mock_response_call_api(self, target, method=URLRequest.GET, args=None, call_
         return MOCK_ALM_RESPONSE.call_api(self, target, method, args, call_headers, auth_mode)
 
 
+class MockRequest(object):
+    def __init__(self, req):
+        self.method = req.get_method()
+        self.data = req.get_data()
+        self.host = req.get_host()
+        self.selector = req.get_selector()
+        self.headers = req.header_items()
+        self.code = None
+
+    def read(self):
+        if self.host == 'sde-server':
+            return MOCK_SDE_RESPONSE.get_response(self.selector, self.data, self.method, self.headers)
+        else:
+            return MOCK_ALM_RESPONSE.get_response(self.selector, self.data, self.method, self.headers)
+    def close(self):
+        pass
+
+
+class MockOpener(object):
+    def __init__(self, method, server, proxy, debuglevel):
+        self.method = method
+        self.server = server
+        self.proxy = proxy
+        self.debuglevel = debuglevel
+        self.handles = []
+
+    def add_handler(self, handle):
+        self.handles.append(handle)
+        print handle
+
+    def open(self, req):
+        return MockRequest(req)
+
+
 class MockResponse(object):
     def __init__(self):
         self.response_generator = None
@@ -24,8 +58,14 @@ class MockResponse(object):
 
     def initialize(self, response_generator, path_to_rest_api):
         self.response_generator = response_generator
-        self.call_api_patch = patch('%s.RESTBase.call_api' % path_to_rest_api, mock_response_call_api)
-        self.call_api_patch.start()
+        #self.call_api_patch = patch('%s.RESTBase.call_api' % path_to_rest_api, mock_response_call_api)
+        self.call_api_patch2 = patch('sdetools.extlib.http_req.get_opener', self.mock_get_opener)
+        self.call_api_patch2.start()
+        #self.call_api_patch.start()
+
+    @staticmethod
+    def mock_get_opener(method, server, proxy=None, debuglevel=0):
+        return MockOpener(method, server, proxy, debuglevel)
 
     def set_response_flags(self, _response_flags):
         if type(_response_flags) == dict:
@@ -45,6 +85,9 @@ class MockResponse(object):
 
         if self.call_api_patch is not None:
             self.call_api_patch.stop()
+
+    def get_response(self, target, data, method, headers):
+        return self.get_response_generator().get_response(target, self.get_response_flags(), data, method, headers)
 
     def call_api(self, api_instance, target, method, args, call_headers, auth_mode):
         try:

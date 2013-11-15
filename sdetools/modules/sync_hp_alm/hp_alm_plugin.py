@@ -29,6 +29,7 @@ class HPAlmAPIBase(RESTBase):
         super(HPAlmAPIBase, self).__init__('alm', 'HP Alm', config, 'qcbin')
 
     def parse_response(self, result):
+        print result
         if result == "":
             return "{}"
         else:
@@ -131,7 +132,7 @@ class HPAlmConnector(AlmConnector):
         self.mark_down_converter = markdown.Markdown(safe_mode="escape")
         self.project_uri = 'rest/domains/%s/projects/%s' % (urlencode_str(self.config['hp_alm_domain']),
                                                             urlencode_str(self.config['alm_project']))
-        #We will map the requirement its test based on the problem id
+        #We will map requirements its associated tests based on the problem id
         self.requirement_to_test_mapping = {}
 
     def prune_tasks(self, tasks):
