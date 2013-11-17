@@ -8,15 +8,15 @@ class RallyResponseGenerator(ResponseGenerator):
     BASE_PATH = 'slm/webservice/%s' % API_VERSION
 
     def __init__(self, config, test_dir=None):
-        self.api_url = '%s://%s/%s' % (config['alm_method'], config['alm_server'], self.BASE_PATH)
+        base_path = 'slm/webservice/1.39'
         statuses = ['Defined', 'Completed', 'Accepted']
         rest_api_targets = {
-            'task\.js': 'get_tasks',
-            'subscription\.js': 'get_subscription',
-            'project\.js': 'get_project',
-            'hierarchicalrequirement\.js': 'get_requirements',
-            'hierarchicalrequirement/[0-9]+\.js': 'call_card',
-            'hierarchicalrequirement/create\.js': 'create_card'
+            '/%s/task\.js' % base_path: 'get_tasks',
+            '/%s/subscription\.js' % base_path: 'get_subscription',
+            '/%s/project\.js' % base_path: 'get_project',
+            '/%s/hierarchicalrequirement\.js' % base_path: 'get_requirements',
+            '/%s/hierarchicalrequirement/[0-9]+\.js' % base_path: 'call_card',
+            '/%s/hierarchicalrequirement/create\.js' % base_path: 'create_card'
         }
         super(RallyResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
@@ -43,8 +43,8 @@ class RallyResponseGenerator(ResponseGenerator):
 
     def get_requirements(self, target, flag, data, method):
         if not flag:
-            task_name = data['query']
-            task_number = self.extract_task_number_from_title(task_name)
+            params = self.get_url_parameters(target)
+            task_number = self.extract_task_number_from_title(params['query'])
             task = self.generator_get_task(task_number)
             requirements = self.get_json_from_file('hierarchical_requirements')
 

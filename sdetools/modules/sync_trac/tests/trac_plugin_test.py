@@ -36,10 +36,10 @@ class TestTracCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         alm_classes = [TracConnector, TracXMLRPCAPI, TracResponseGenerator]
-        super(TestTracCase, cls).setUpClass(PATH_TO_ALM_REST_API, alm_classes=alm_classes)
+        super(TestTracCase, cls).setUpClass(alm_classes=alm_classes)
 
     def post_parse_config(self):
-        patch('%s.xmlrpclib.ServerProxy' % self.path_to_alm_rest_api, MockXMLRPCProxy).start()
+        patch('%s.xmlrpclib.ServerProxy' % PATH_TO_ALM_REST_API, MockXMLRPCProxy).start()
 
     def test_parsing_alm_task(self):
         result = super(TestTracCase, self).test_parsing_alm_task()

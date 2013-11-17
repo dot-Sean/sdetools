@@ -1,3 +1,4 @@
+import json
 from urllib2 import HTTPError
 from xmlrpclib import Fault
 
@@ -19,6 +20,14 @@ class TracResponseGenerator(ResponseGenerator):
         }
         super(TracResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
+    @staticmethod
+    def decode_data(data):
+        return data
+
+    @staticmethod
+    def encode_response(result):
+        return result
+
     def raise_error(self, error_code, return_value=None):
         try:
             super(TracResponseGenerator, self).raise_error(error_code, return_value)
@@ -33,7 +42,9 @@ class TracResponseGenerator(ResponseGenerator):
         if len(args) > 2:
             data = args[2:]
 
-        return super(TracResponseGenerator, self).get_response(target, flags, data, None)
+        success_code, response = super(TracResponseGenerator, self).get_response(target, flags, data, None)
+
+        return response
 
     """
         Response functions

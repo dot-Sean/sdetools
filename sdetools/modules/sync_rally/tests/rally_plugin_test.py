@@ -5,14 +5,13 @@ import unittest
 from rally_response_generator import RallyResponseGenerator
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_rally.rally_plugin import RallyConnector, RallyAPIBase
-PATH_TO_ALM_REST_API = 'sdetools.modules.sync_rally.rally_plugin'
 
 
 class TestRallyCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         alm_classes = [RallyConnector, RallyAPIBase, RallyResponseGenerator]
-        super(TestRallyCase, cls).setUpClass(PATH_TO_ALM_REST_API, alm_classes=alm_classes)
+        super(TestRallyCase, cls).setUpClass(alm_classes=alm_classes)
 
     def test_parsing_alm_task(self):
         result = super(TestRallyCase, self).test_parsing_alm_task()

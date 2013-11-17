@@ -17,9 +17,8 @@ def stdout_callback(obj):
 
 class AlmPluginTestBase(object):
     @classmethod
-    def setUpClass(cls, path_to_alm_rest_api, test_dir=None, conf_file_location=CONF_FILE_LOCATION, alm_classes=[None, None, None]):
+    def setUpClass(cls, test_dir=None, conf_file_location=CONF_FILE_LOCATION, alm_classes=[None, None, None]):
         """
-            path_to_alm_rest_api - The import path of the class that extends RestBase
             test_dir             - The directory where we will look for the test config file.
                                    Default is the directory of the calling class
             conf_file_location   - The relative path from the test_dir to the conf file.
@@ -38,7 +37,6 @@ class AlmPluginTestBase(object):
         cls.mock_sde_response = MOCK_SDE_RESPONSE
         cls.mock_alm_response = MOCK_ALM_RESPONSE
         cls.ret_chn = ReturnChannel(stdout_callback, {})
-        cls.path_to_alm_rest_api = path_to_alm_rest_api
 
     def init_alm_connector(self):
         if self.connector_cls is None:
@@ -74,7 +72,7 @@ class AlmPluginTestBase(object):
         self.post_parse_config()
         self.init_response_generator()
         self.mock_sde_response.initialize(self.config)
-        self.mock_alm_response.initialize(self.response_generator, self.path_to_alm_rest_api)
+        self.mock_alm_response.initialize(self.response_generator)
         self.connector.initialize()
 
     def tearDown(self):

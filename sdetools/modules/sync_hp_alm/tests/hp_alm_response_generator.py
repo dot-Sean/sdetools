@@ -1,7 +1,5 @@
 import json
 import re
-import urllib
-from urlparse import urlparse
 
 from cookielib import Cookie
 from sdetools.sdelib.commons import urlencode_str
@@ -27,58 +25,71 @@ class HPAlmResponseGenerator(ResponseGenerator):
             '%s/customization/entities/test/types/' % project_uri: 'get_test_types',
             '%s/customization/used-lists\?name=Status' % project_uri: 'get_status_types',
             '%s/test-folders' % project_uri: 'call_test_folders',
-            'authentication-point/logout': 'logout'
+            '%s/tests' % project_uri: 'call_tests',
+            '/%s/authentication-point/logout' % base_path: 'logout'
         }
 
         self.test_folders = [{'name': 'Subject', 'parent-id': '0', 'id': '1'}]
-
+        self.tests = []
+        self.requirements = []
         super(HPAlmResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
     """
        Response functions 
     """
+    def call_tests(self, target, flag, data, method):
+        if not flag:
+            if method == 'GET':
+                response = self.generate_collection_entity()
+                queries, fields = self.get_url_params(target)
+                test = self.get_entity('test', queries, fields)
+
+                if test:
+                    response['TotalResults'] = 1
+                    response['entities'] = [test]
+
+                return response
+            elif method == 'POST':
+                response = self.generate_entity('test')
+                task_number = self.extract_task_number_from_title(data['name'].replace('-', ':'))
+                data['id'] = task_number
+                data['exec-status'] = self.statuses[0]
+                data['last-modified'] = self.get_current_timestamp()
+                self.tests.append(data)
+                for key, value in data.items():
+                    response['Fields'].append(self.generate_requirement_field(key, value))
+                return response
+            else:
+                self.raise_error('403')
+        else:
+            self.raise_error('401')
+
     def call_test_folders(self, target, flag, data, method):
         if not flag:
             if method == 'GET':
-                response = {
-                    "TotalResults": 0,
-                    "entities": []
-                }
-                query, fields = [q.split('=')[1] for q in urlparse(urllib.unquote(target)).query.split('&')]
-                queries = [re.findall('[-\w ]+', q) for q in query.split(';')]
-                fields = fields.split(',')
+                response = self.generate_collection_entity()
+                queries, fields = self.get_url_params(target)
+                folder = self.get_entity('test-folders', queries, fields)
 
-                for folder in self.test_folders:
-                    for param, value in queries:
-                        if folder[param] != value:
-                            found = False
-                            break
-                        else:
-                            found = True
-                    if found:
-                        response['TotalResults'] = 1
-                        entity = {'Fields': []}
-                        for param in fields:
-                            entity['Fields'].append(self.generate_requirement_field(param, folder[param]))
-                        response['entities'] = [entity]
-                        break
-                print response
+                if folder:
+                    response['TotalResults'] = 1
+                    response['entities'] = [folder]
+
                 return response
             elif method == 'POST':
-                data_fields = self.read_data_fields(data)
                 valid_parent_id = False
                 for folder in self.test_folders:
-                    if not valid_parent_id and folder['id'] == data_fields['parent-id']:
+                    if not valid_parent_id and folder['id'] == data['parent-id']:
                         valid_parent_id = True
-                    if folder['name'] == data_fields['name']:
+                    if folder['name'] == data['name']:
                         self.raise_error('500')
                 if not valid_parent_id:
                     self.raise_error('405')
 
-                data_fields['id'] = len(self.test_folders) + 1
-                self.test_folders.append(data_fields)
-                response = {"Fields": []}
-                for key, value in data_fields.items():
+                data['id'] = len(self.test_folders) + 1
+                self.test_folders.append(data)
+                response = {"Fields": [], 'Type': 'test-folder'}
+                for key, value in data.items():
                     response['Fields'].append(self.generate_requirement_field(key, value))
 
                 return response
@@ -89,85 +100,56 @@ class HPAlmResponseGenerator(ResponseGenerator):
         if not flag:
             c = Cookie(None, 'LWSSO_COOKIE_KEY', 'cookieValue', '80', '80', 'www.foo.bar', None, None, '/',
                        None, False, False, 'TestCookie', None, None, None)
-            response = {
-                "cookiejar": c
-            }
 
-            return response
+            return c
         else:
             self.raise_error('401')
 
-    def get_requirements(self, flag, data):
-        query = data['query']
-        fields = data['fields'].split(',')
-        task_number = self.extract_task_number_from_title(query)
-        task = self.generator_get_task(task_number)
-        response = {
-            "TotalResults": 0,
-            "entities": []
-        }
+    def get_requirements(self, target, flag, data):
+        queries, fields = self.get_url_params(target)
+        response = self.generate_collection_entity()
+        req = self.get_entity('requirement', queries, fields)
 
-        if task:
-            entity = self.generate_task_fields(task)
+        if req:
             response['TotalResults'] = 1
-            response['entities'] = [entity]
+            response['entities'] = [req]
 
-        return json.dumps(response)
+        return response
 
     def post_requirements(self, flag, data):
-        fields = data['Fields']
+        if not flag:
+            response = self.generate_entity('requirement')
 
-        for field in fields:
-            if field['Name'] == 'status':
-                status = field['values'][0]['value']
-            elif field['Name'] == 'name':
-                name = field['values'][0]['value']
+            if self.get_entity('requirement', [['name', data['name']]], []):
+                self.raise_error('405')
 
-        if not status or not name:
-            self.raise_error('405')
-
-        task_number = self.extract_task_number_from_title(name)
-        task = self.generator_get_task(task_number)
-
-        if not task:
-            self.generator_add_task(task_number, name, status)
-            new_task = self.generator_get_task(task_number)
-            response = self.generate_task_fields(new_task)
-
-            return json.dumps(response)
+            task_number = self.extract_task_number_from_title(data['name'].replace('-', ':'))
+            data['id'] = task_number
+            data['status'] = self.statuses[0]
+            data['last-modified'] = self.get_current_timestamp()
+            self.requirements.append(data)
+            for key, value in data.items():
+                response['Fields'].append(self.generate_requirement_field(key, value))
+            return response
         else:
             self.raise_error('500')
 
     def update_requirement_status(self, flag, data):
-        fields = data['entities'][0]['Fields']
-
-        for field in fields:
-            if field['Name'] == 'status':
-                status = field['values'][0]['value']
-            elif field['Name'] == 'id':
-                task_number = field['values'][0]['value']
-
-        if not task_number or not status:
+        if not data['id'] or not data['status']:
             self.raise_error('405')
-
-        task = self.generator_get_task(task_number)
-
-        if task:
-            self.generator_update_task(task_number, 'status', status)
+        if self.update_entity('requirement', [['id', data['id']]], {'status': data['status']}):
+            return ''
         else:
-            self.raise_error('404')
+            self.raise_error('405')
 
     def call_requirements(self, target, flag, data, method):
         if not flag:
-            if data:
-                if method == 'GET':
-                    return self.get_requirements(flag, data)
-                elif method == 'POST':
-                    data = json.loads(data)
-                    return self.post_requirements(flag, data)
-                elif method == 'PUT':
-                    data = json.loads(data)
-                    return self.update_requirement_status(flag, data)
+            if method == 'GET':
+                return self.get_requirements(target, flag, data)
+            elif method == 'POST':
+                return self.post_requirements(flag, data)
+            elif method == 'PUT':
+                return self.update_requirement_status(flag, data)
             self.raise_error('405')
         else:
             self.raise_error('401')
@@ -177,7 +159,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
             user = self.get_json_from_file('user')
             user['Name'] = self.hp_alm_user
 
-            return json.dumps(user)
+            return user
         else:
             self.raise_error('401')
 
@@ -217,13 +199,69 @@ class HPAlmResponseGenerator(ResponseGenerator):
 
     def logout(self, target, flag, data, method):
         if not flag:
-            return ""
+            return ''
         else:
             self.raise_error('500')
 
-    """
-        Generate JSON
-    """
+    # Response helpers
+    @staticmethod
+    def decode_data(data):
+        try:
+            data = json.loads(data)
+            data_fields = {}
+
+            for field in data['Fields']:
+                data_fields[field['Name']] = field['values'][0]['value']
+
+            return data_fields
+        except:
+            return data
+
+    def update_entity(self, type, queries, update):
+        return self.get_entity(type, queries, [], update)
+
+    def get_entity(self, type, queries, fields, update={}):
+        if type == 'test':
+            entity_list = self.tests
+        elif type == 'test-folder':
+            entity_list = self.test_folders
+        else:
+            entity_list = self.requirements
+
+        for entity in entity_list:
+            for param, value in queries:
+                if not re.match(value, entity.get(param)):
+                    found = False
+                    break
+                else:
+                    found = True
+            if found:
+                if update:
+                    for key, value in update.items():
+                        entity[key] = value
+
+                _entity = self.generate_entity(type)
+                for param in fields:
+                    _entity['Fields'].append(self.generate_requirement_field(param, entity[param]))
+                return _entity
+        return ''
+
+    def get_url_params(self, url):
+        query, fields = [q for q in self.get_url_parameters(url).values()]
+        queries = [re.findall('[-\w ]+', q) for q in query.split(';')]
+        fields = fields.split(',')
+
+        return queries, fields
+
+    @staticmethod
+    def encode_response(result):
+        """ Convert response into a string """
+        if result:
+            return json.dumps(result)
+        else:
+            return ""
+
+    # Generate JSON
     @staticmethod
     def generate_task_types(task_types):
         types = []
@@ -238,7 +276,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
 
     @staticmethod
     def generate_requirement_field(name, value):
-        return  {
+        return {
             "Name": name,
             "values": [
                 {
@@ -258,9 +296,15 @@ class HPAlmResponseGenerator(ResponseGenerator):
         return response
 
     @staticmethod
-    def read_data_fields(data):
-        data_fields = {}
-        for field in data['Fields']:
-            data_fields[field['Name']] = field['values'][0]['value']
+    def generate_collection_entity():
+        return {
+            "TotalResults": 0,
+            "entities": []
+        }
 
-        return data_fields
+    @staticmethod
+    def generate_entity(type):
+        return {
+            "Fields": [],
+            "Type": type
+        }
