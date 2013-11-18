@@ -64,7 +64,7 @@ class ResponseGenerator(object):
             Keywords:
             target - the path of the API call (without host name)
             flags  - dict object containing response modifier flags in the form of
-                     {target: keyword}.
+                     {response_func_name: keyword}.
             data   - data passed along with the API call
             method - HTTP Verb, specified by the URLRequest class
         """

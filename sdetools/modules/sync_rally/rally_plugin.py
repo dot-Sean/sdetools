@@ -132,7 +132,11 @@ class RallyConnector(AlmConnector):
         workspace_ref = None
 
         #Now try to get workspace ID
-        subscription_ref = self.alm_plugin.call_api('subscription.js')
+        try:
+            subscription_ref = self.alm_plugin.call_api('subscription.js')
+        except APIError, err:
+            raise AlmException('Unable to retrieve subscription from Rally. Reason: %s' % err)
+
         for workspace in subscription_ref['Subscription']['Workspaces']:
             if workspace['_refObjectName'] == self.config['rally_workspace']:
                 workspace_ref = workspace['_ref']
