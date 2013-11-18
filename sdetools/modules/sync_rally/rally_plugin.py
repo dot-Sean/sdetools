@@ -160,21 +160,26 @@ class RallyConnector(AlmConnector):
         project_ref = project_ref['QueryResult']['Results'][0]['_ref']
         self.project_ref = project_ref
 
+        self.validate_configs()
+
+    def validate_configs(self):
+        try:
+            print self.alm_plugin.call_api('typedefinition?query=(Name = Defect)&fetch=true')
+        except APIError, err:
+            raise AlmException('Error retrieving thigns')
+
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])
-        result = None
+        query_args = {
+            'query': '(Name contains \"%s:\")' % task_id,
+            'workspace': self.workspace_ref,
+            'project': self.project_ref,
+        }
 
         try:
-            query_args = {
-                'query': '(Name contains \"%s:\")' % task_id,
-                'workspace': self.workspace_ref,
-                'project': self.project_ref,
-                }
-            result = self.alm_plugin.call_api('hierarchicalrequirement.js',
-                                               args = query_args)
+            result = self.alm_plugin.call_api('hierarchicalrequirement.js',args=query_args)
         except APIError, err:
-            raise AlmException('Unable to get task %s from Rally. '
-                    'Reason: %s' % (task_id, str(err)))
+            raise AlmException('Unable to get task %s from Rally. Reason: %s' % (task_id, str(err)))
         num_results = result['QueryResult']['TotalResultCount']
 
         if not num_results:
@@ -185,9 +190,9 @@ class RallyConnector(AlmConnector):
         try:
             task_data = self.alm_plugin.call_api(task_result_url)
         except APIError, err:
-            raise AlmException('Unable to get card # for task %s from Rally. '
-                    'Reason: %s' % (task_id, str(err)))
+            raise AlmException('Unable to get card # for task %s from Rally. Reason: %s' % (task_id, str(err)))
         task_data = task_data['HierarchicalRequirement']
+
         return RallyTask(task_id,
                          task_data['FormattedID'],
                          task_data['_ref'].split('/%s/' % API_VERSION)[1],
@@ -232,46 +237,30 @@ class RallyConnector(AlmConnector):
 
 
     def alm_update_task_status(self, task, status):
-
         if not task or not self.config['alm_standard_workflow']:
             logger.debug('Status synchronization disabled')
             return
-
         if status == 'DONE' or status == 'NA':
-            try:
-                trans_args = {
-                        'HierarchicalRequirement' : {
-                                'ScheduleState':
-                                        self.config['rally_done_statuses'][0]
-                        }
-                }
-                self.alm_plugin.call_api(task.get_alm_task_ref(),
-                                          args = trans_args,
-                                          method=self.alm_plugin.URLRequest.POST)
-            except APIError, err:
-                raise AlmException('Unable to update task status to DONE '
-                                   'for card: %s in Rally because of %s' % 
-                                   (task.get_alm_id(), err))
-
+            schedule_state = self.config['rally_done_statuses'][0]
+            status = 'DONE'
         elif status == 'TODO':
-            try:
-                trans_args = {
-                    'HierarchicalRequirement' : {
-                        'ScheduleState': 
-                            self.config['rally_new_status']
-                    }
-                }
-                self.alm_plugin.call_api(task.get_alm_task_ref(),
-                                          args = trans_args,
-                                          method=self.alm_plugin.URLRequest.POST)
-            except APIError, err:
-                raise AlmException('Unable to update task status to TODO '
-                                   'for card: '
-                                   '%s in Rally because of %s' %
-                                   (task.get_alm_id(), err))
+            schedule_state = self.config['rally_new_status']
+        else:
+            raise AlmException('Invalid status %s' % status)
 
-        logger.debug('Status changed to %s for task %s in Rally',
-                      status, task.get_alm_id())
+        trans_args = {
+            'HierarchicalRequirement': {
+                'ScheduleState': schedule_state
+            }
+        }
+
+        try:
+            self.alm_plugin.call_api(task.get_alm_task_ref(), args=trans_args, method=self.alm_plugin.URLRequest.POST)
+        except APIError, err:
+            raise AlmException('Unable to update task status to %s for card: %s in Rally because of %s' %
+                               (status, task.get_alm_id(), err))
+
+        logger.debug('Status changed to %s for task %s in Rally' % (status, task.get_alm_id()))
 
     def alm_disconnect(self):
         pass
