@@ -133,7 +133,6 @@ class TracConnector(AlmConnector):
             trac_ver = '0.10'
         elif (api_version[0] == 1):
             trac_ver = '0.11 or higher'
-        print api_version
         logger.debug('Connected to Trac API %s v%s.%s' % (trac_ver, api_version[1], api_version[2]))
 
     def alm_connect_project(self):
@@ -147,7 +146,6 @@ class TracConnector(AlmConnector):
 
     def _get_trac_task_by_id(self, sde_id, alm_id):
         trac_task = self.alm_plugin.proxy.ticket.get(alm_id)
-        print trac_task[3]
         return TracTask(sde_id, alm_id, trac_task[3]['status'], trac_task[3]['changetime'],
                           self.config['alm_done_statuses'], trac_task[3]['milestone'])
 

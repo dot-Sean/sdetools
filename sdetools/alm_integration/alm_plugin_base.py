@@ -487,8 +487,8 @@ class AlmConnector(object):
                 else:
                     # Only exists in SD Elements
                     # Skip if this task should not be added to ALM
-                    if ((not self.config['selected_tasks'] and task['status'] not in self.config['sde_statuses_in_scope'])
-                    or task['id'] in self.ignored_tasks):
+                    if ((not self.config['selected_tasks'] and task['status'] not in self.config['sde_statuses_in_scope']) or
+                            task['id'] in self.ignored_tasks):
                         continue
                     ref = self.alm_add_task(task)
                     self.emit.info('Added task %s to %s' % (tid, self.alm_name))
