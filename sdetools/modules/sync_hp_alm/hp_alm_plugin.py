@@ -29,10 +29,10 @@ class HPAlmAPIBase(RESTBase):
         super(HPAlmAPIBase, self).__init__('alm', 'HP Alm', config, 'qcbin')
 
     def parse_response(self, result):
-        if result == "":
-            return "{}"
+        if not result or result.strip() == "":
+            return {}
         else:
-            parsed_response = super(HPAlmAPIBase, self).parse_response(result)
+            parsed_response = json.loads(result)
 
             if parsed_response.get('entities'):
                 # Entity collection
@@ -68,12 +68,13 @@ class HPAlmAPIBase(RESTBase):
 class HPAlmTask(AlmTask):
     """ Representation of a task in HP Alm """
 
-    def __init__(self, task_id, alm_id, status, last_modified, done_statuses):
+    def __init__(self, task_id, alm_id, status, last_modified, done_statuses, alm_task_type):
         self.task_id = task_id
         self.alm_id = alm_id
         self.timestamp = last_modified
         self.status = status
         self.done_statuses = done_statuses  # comma-separated list
+        self.alm_task_type = alm_task_type
 
     def get_task_id(self):
         return self.task_id
@@ -91,6 +92,9 @@ class HPAlmTask(AlmTask):
     def get_timestamp(self):
         """ Returns a datetime object """
         return datetime.strptime(self.timestamp, '%Y-%m-%dT%H:%M:%SZ')
+
+    def get_alm_task_type(self):
+        return self.alm_task_type
 
 
 class HPAlmConnector(AlmConnector):
@@ -131,7 +135,7 @@ class HPAlmConnector(AlmConnector):
         self.mark_down_converter = markdown.Markdown(safe_mode="escape")
         self.project_uri = 'rest/domains/%s/projects/%s' % (urlencode_str(self.config['hp_alm_domain']),
                                                             urlencode_str(self.config['alm_project']))
-        #We will map the requirement its test based on the problem id
+        #We will map requirements its associated tests based on the problem id
         self.requirement_to_test_mapping = {}
 
     def prune_tasks(self, tasks):
@@ -240,7 +244,8 @@ class HPAlmConnector(AlmConnector):
                              field_data['id'][0],
                              field_data['exec-status'][0],
                              field_data['last-modified'][0],
-                             self.config['hp_alm_done_statuses'])
+                             self.config['hp_alm_done_statuses'],
+                             result['entities'][0]['type'])
 
     def _alm_call_requirement(self, task_id, query_args, task, method=URLRequest.GET):
         if method == URLRequest.GET:
@@ -257,17 +262,16 @@ class HPAlmConnector(AlmConnector):
         if result is None:
             return None
         if result.get('entities'):
-            field_data = result['entities'][0]['fields']
-        else:
-            field_data = result['fields']
+            result = result['entities'][0]
         if self.requirement_to_test_mapping:
-            self.requirement_to_test_mapping[task['weakness']['id']].append(field_data['id'][0])
+            self.requirement_to_test_mapping[task['weakness']['id']].append(result['fields']['id'][0])
 
         return HPAlmTask(task_id,
-                         field_data['id'][0],
-                         field_data['status'][0],
-                         field_data['last-modified'][0],
-                         self.config['hp_alm_done_statuses'])
+                         result['fields']['id'][0],
+                         result['fields']['status'][0],
+                         result['fields']['last-modified'][0],
+                         self.config['hp_alm_done_statuses'],
+                         result['type'])
 
     def _alm_add_test_plan(self, task_id, field_data, task):
         if self.test_plan_folder_id is None:
@@ -290,7 +294,8 @@ class HPAlmConnector(AlmConnector):
                          result['fields']['id'][0],
                          result['fields']['exec-status'][0],
                          result['fields']['last-modified'][0],
-                         self.config['hp_alm_done_statuses'])
+                         self.config['hp_alm_done_statuses'],
+                         result['type'])
 
     def alm_add_task(self, task):
         task_id = self._extract_task_id(task['id'])
@@ -349,7 +354,7 @@ class HPAlmConnector(AlmConnector):
             logger.debug('Status synchronization disabled')
             return
 
-        if task['phase'] == 'testing':
+        if task.get_alm_task_type() == 'test':
             logger.debug("Status synchronization disabled for test plans")
             return
 
@@ -361,7 +366,7 @@ class HPAlmConnector(AlmConnector):
             raise AlmException('Unexpected status %s: valid values are DONE, NA, or TODO' % status)
 
         field_data.append(('id', task.get_alm_id()))
-        json_data = """{"entities": %s}""" % self._build_json_args(field_data)
+        json_data = """%s""" % self._build_json_args(field_data, 'requirement')
 
         try:
             self._call_api('%s/requirements' % self.project_uri, json_data, self.alm_plugin.URLRequest.PUT)

@@ -1,5 +1,7 @@
 import re
+import urllib
 
+from urlparse import parse_qsl
 from sdetools.sdelib.testlib.response_generator import ResponseGenerator
 from sdetools.sdelib.commons import urlencode_str
 
@@ -10,9 +12,10 @@ class MingleResponseGenerator(ResponseGenerator):
     def __init__(self, config, test_dir=None):
         project_name = urlencode_str(config['alm_project'])
         statuses = ['New', 'Closed', 'Open']
-        self.project_uri = 'projects/%s' % urlencode_str(project_name)
+        base_path = 'org_name/api/v2'
+        self.project_uri = '/%s/projects/%s' % (base_path, urlencode_str(project_name))
         rest_api_targets = {
-            'projects.xml': 'get_projects',
+            '/%s/projects.xml' % base_path: 'get_projects',
             '%s.xml' % self.project_uri: 'get_project',
             '%s/cards.xml' % self.project_uri: 'call_cards',
             '%s/cards/[0-9]+.xml' % self.project_uri: 'call_card_by_number',
@@ -21,6 +24,22 @@ class MingleResponseGenerator(ResponseGenerator):
             '%s/property_definitions/[0-9]+.xml' % self.project_uri: 'get_property_definition_by_id'
         }
         super(MingleResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
+
+    @staticmethod
+    def encode_response(result):
+        if result:
+            return result.toxml()
+        else:
+            return ''
+
+    @staticmethod
+    def decode_data(data):
+        try:
+            qs = urllib.unquote_plus(data).decode('utf-8')
+
+            return dict(parse_qsl(qs))
+        except:
+            return data
 
     """
        Response functions 

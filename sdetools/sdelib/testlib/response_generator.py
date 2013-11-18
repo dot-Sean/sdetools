@@ -1,13 +1,17 @@
 import os
 import json
 import re
+import urllib
 
 from mock import MagicMock
 from urllib2 import HTTPError
+from urlparse import urlparse
 from datetime import datetime
 from sdetools.extlib.defusedxml import minidom
 from sdetools.sdelib.commons import abc, get_directory_of_current_module
+from sdetools.sdelib import log_mgr
 abstractmethod = abc.abstractmethod
+logger = log_mgr.mods.add_mod(__name__)
 
 
 class ResponseGenerator(object):
@@ -35,7 +39,24 @@ class ResponseGenerator(object):
     def init_with_tasks(self):
         pass
 
-    def get_response(self, target, flags, data, method):
+    @staticmethod
+    def encode_response(result):
+        """ Convert response into a string """
+        if result is not None:
+            return json.dumps(result)
+        else:
+            return "{}"
+
+    @staticmethod
+    def decode_data(data):
+        """ Convert request data into a python object """
+        try:
+            return json.loads(data)
+        except:
+            # Return the original data
+            return data
+
+    def get_response(self, target, flags, data, method, headers=None):
         """
             Triage get_response calls to the correct response generator method based on the specified target.
             Response generator methods must accept the following parameters: [target, flag, data, method]
@@ -47,6 +68,12 @@ class ResponseGenerator(object):
             data   - data passed along with the API call
             method - HTTP Verb, specified by the URLRequest class
         """
+        self.target = target
+        data = self.decode_data(data)
+        print 'Generating %s response for target: %s' % (method, target)
+        #print 'With flags: %s\n With data: ' % flags
+        #print data
+
         for api_target in self.rest_api_targets:
             if re.match(api_target, target):
                 func_name = self.rest_api_targets.get(api_target)
@@ -55,32 +82,37 @@ class ResponseGenerator(object):
                     func = getattr(self, func_name)
 
                     if callable(func):
-                        return func(target, flags.get(func_name), data, method)
+                        response = func(target, flags.get(func_name), data, method)
+                        try:
+                            response = self.encode_response(response)
+                        except:
+                            # Do not encode the response
+                            pass
+                        return 200, response
 
                 self.raise_error('500', 'Response generator error: Could not find method %s' % func_name)
         self.raise_error('404')
 
-    def raise_error(self, error_code, return_value=None):
+    def raise_error(self, error_code, message=None):
         fp_mock = MagicMock()
 
-        if error_code == '400':
-            message = 'Invalid parameters'
-        elif error_code == '403':
-            message = 'No permission'
-        elif error_code == '404':
-            message = 'Not found'
-        elif error_code == '500':
-            message = 'Server error'
+        if message is None:
+            if error_code == '400':
+                message = 'Invalid parameters'
+            elif error_code == '403':
+                message = 'No permission'
+            elif error_code == '404':
+                message = 'Not found'
+            elif error_code == '500':
+                message = 'Server error'
+            else:
+                message = 'Unknown error'
         else:
-            message = 'Unknown error'
+            message
+        message = json.dumps(message)
+        fp_mock.read.return_value = message
 
-        if not return_value:
-            fp_mock.read.return_value = message
-        else:
-            fp_mock.read.return_value = return_value
-            message = return_value
-
-        raise HTTPError('', error_code, message, '', fp_mock)
+        raise HTTPError('%s' % self.target, error_code, message, '', fp_mock)
 
     def generator_get_valid_statuses(self):
         return self.statuses
@@ -146,7 +178,7 @@ class ResponseGenerator(object):
     """
     @staticmethod
     def extract_task_number_from_title(s):
-        task_number = re.search("(?<=T)[0-9]+((?=[:'])|$)", s)
+        task_number = re.search("(?<=T)[0-9]+", s)
 
         if task_number:
             return task_number.group(0)
@@ -166,3 +198,8 @@ class ResponseGenerator(object):
                 return False
 
         return True
+
+    @staticmethod
+    def get_url_parameters(url):
+        return dict([q.split('=') for q in urlparse(urllib.unquote_plus(url)).query.split('&') if q])
+

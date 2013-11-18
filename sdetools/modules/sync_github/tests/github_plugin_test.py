@@ -5,14 +5,13 @@ import unittest
 from github_response_generator import GitHubResponseGenerator
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_github.github_plugin import GitHubConnector, GitHubAPI, AlmException
-PATH_TO_ALM_REST_API = 'sdetools.modules.sync_github.github_plugin'
 
 
 class TestGitHubCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         alm_classes = [GitHubConnector, GitHubAPI, GitHubResponseGenerator]
-        super(TestGitHubCase, cls).setUpClass(PATH_TO_ALM_REST_API, alm_classes=alm_classes)
+        super(TestGitHubCase, cls).setUpClass(alm_classes=alm_classes)
 
     def test_parsing_alm_task(self):
         result = super(TestGitHubCase, self).test_parsing_alm_task()
@@ -36,22 +35,22 @@ class TestGitHubCase(AlmPluginTestBase, unittest.TestCase):
         self.mock_alm_response.set_response_flags({'get_user': '401'})
         self.connector.config['alm_api_token'] = 'testApiToken'
 
-        exception_msg = 'Unable to connect to GitHub service (Check server URL, api token). Reason: FATAL ERROR: '\
-                        'HTTP Error 401: Requires authentication'
+        exception_msg = 'Unable to connect to GitHub service (Check server URL, api token). Reason: '\
+                        'HTTP Error 401. Explanation returned: FATAL ERROR: Requires authentication'
 
-        self.assert_exception(AlmException, '', exception_msg, self.connector.synchronize)
+        self.assert_exception(AlmException, '', exception_msg, self.connector.alm_connect_server)
 
     def test_invalid_user_pass(self):
         self.mock_alm_response.set_response_flags({'get_user': '401'})
         self.connector.config['alm_api_token'] = ''
-        exception_msg = 'Unable to connect to GitHub service (Check server URL, user, pass). Reason: FATAL ERROR: '\
-                        'HTTP Error 401: Requires authentication'
+        exception_msg = 'Unable to connect to GitHub service (Check server URL, user, pass). Reason: '\
+                        'HTTP Error 401. Explanation returned: FATAL ERROR: Requires authentication'
 
-        self.assert_exception(AlmException, '', exception_msg, self.connector.synchronize)
+        self.assert_exception(AlmException, '', exception_msg, self.connector.alm_connect_server)
 
     def test_connecting_to_invalid_repo(self):
         self.mock_alm_response.set_response_flags({'get_repo': '404'})
-        exception_msg = 'Unable to find GitHub repo. Reason: FATAL ERROR: HTTP Error 404: Not found'
+        exception_msg = 'Unable to find GitHub repo. Reason: HTTP Error 404. Explanation returned: FATAL ERROR: Not found'
 
         self.assert_exception(AlmException, '', exception_msg, self.connector.synchronize)
 
@@ -66,7 +65,7 @@ class TestGitHubCase(AlmPluginTestBase, unittest.TestCase):
         self.mock_alm_response.set_response_flags({'post_issue': '422'})
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
-        exception_msg = 'Unable to add task %s to GitHub. Reason: FATAL ERROR: HTTP Error 422: Validation Failed. ' \
+        exception_msg = 'Unable to add task %s to GitHub. Reason: HTTP Error 422. Explanation returned: FATAL ERROR: Validation Failed. ' \
                         'Additional Info - The field "title" is required for the resource "Issue"' % test_task['id']
 
         self.assert_exception(AlmException, '', exception_msg, self.connector.alm_add_task, test_task)

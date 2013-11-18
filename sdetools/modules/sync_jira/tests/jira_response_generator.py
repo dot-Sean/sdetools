@@ -1,7 +1,6 @@
 import re
 
 from urllib2 import HTTPError
-
 from sdetools.sdelib.testlib.response_generator import ResponseGenerator
 from sdetools.extlib.SOAPpy.Types import structType, faultType
 
@@ -17,22 +16,27 @@ class JiraResponseGenerator(ResponseGenerator):
     def __init__(self, config, test_dir=None):
         self.base_url = '%s://%s' % (config['alm_method'], config['alm_server'])
         self.api_url = '%s/%s' % (self.base_url, self.api_url)
+        base_url = 'rest/api/2'
         self.project_key = config['alm_project']
         self.project_version = config['alm_project_version']
         self.username = config['alm_user']
         statuses = [1]
         rest_api_targets = {
-            'project$': 'get_projects',
-            'project/%s/versions' % self.project_key: 'get_project_versions',
-            'issue/createmeta': 'get_create_meta',
-            'issuetype': 'get_issue_types',
-            'search\?jql=project%%3D\'%s\'%%20AND%%20summary~.*' % self.project_key: 'get_issue',
-            'issue/%s-\S.*/remotelink$' % self.project_key: 'post_remote_link',
-            'issue$': 'post_issue',
-            'issue/%s-[0-9]*$' % self.project_key: 'update_version',
-            'issue/%s-\S.*/transitions$' % self.project_key: 'update_status'
+            '/%s/project$' % base_url: 'get_projects',
+            '/%s/project/%s/versions' % (base_url, self.project_key): 'get_project_versions',
+            '/%s/issue/createmeta' % base_url: 'get_create_meta',
+            '/%s/issuetype' % base_url: 'get_issue_types',
+            '/%s/search\?jql=project%%3D\'%s\'%%20AND%%20summary~.*' % (base_url, self.project_key): 'get_issue',
+            '/%s/issue/%s-\S.*/remotelink$' % (base_url, self.project_key): 'post_remote_link',
+            '/%s/issue$' % base_url: 'post_issue',
+            '/%s/issue/%s-[0-9]*$' % (base_url, self.project_key): 'update_version',
+            '/%s/issue/%s-\S.*/transitions$' % (base_url, self.project_key): 'update_status',
+            'https://jira-server:5000/rpc/soap/jirasoapservice-v2': 'jira_soap_service'
         }
         super(JiraResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
+
+    def jira_soap_service(self, target, flag, data, method):
+        return ''
 
     def get_proxy_response(self, args):
         """
@@ -43,13 +47,14 @@ class JiraResponseGenerator(ResponseGenerator):
         flags = args[1]
         flag = flags.get(method_name)
         token = args[2]
+
         try:
             if not token:
                 self.raise_error('401')
             if method_name == 'getProjectByKey':
-                return self.get_projects(flag, None, None, None)[0]
+                return self.get_projects('', flag, None, None)[0]
             elif method_name == 'getIssueTypes':
-                return self.get_issue_types(flag, None, None, None)
+                return self.get_issue_types('', flag, None, None)
             elif method_name == 'login':
                 return self.get_auth_token(flag)
             elif method_name == 'getStatuses':
@@ -57,12 +62,12 @@ class JiraResponseGenerator(ResponseGenerator):
             elif method_name == 'getPriorities':
                 return self.get_priorities(flag)
             elif method_name == 'getVersions':
-                return self.get_project_versions(flag, None, None, None)
+                return self.get_project_versions('', flag, None, None)
             elif method_name == 'getFieldsForCreate':
                 return self.get_fields_for_create(flag)
             elif method_name == 'getIssuesFromJqlSearch':
                 task_name = re.sub(r".*summary~", '', args[3])
-                rest_response = self.get_issue(flag, None, None, None, task_name)
+                rest_response = self.get_issue('', flag, None, 'GET', task_name)
                 issues = rest_response.get('issues')
 
                 if not issues:
@@ -74,19 +79,16 @@ class JiraResponseGenerator(ResponseGenerator):
 
                     return [structType(data=issue)]
             elif method_name == 'createIssue':
-                return self.post_issue(flag, None, args[3], None)
+                return self.post_issue('', flag, args[3], 'GET')
             elif method_name == 'updateIssue':
                 if not flag:
                     pass
                 else:
                     self.raise_error('401')
             elif method_name == 'getAvailableActions':
-
-                task_id = args[3]
-                return self.update_status(task_id, flag, None, 'GET').get('transitions')
+                return self.update_status(args[3], flag, '{}', 'GET').get('transitions')
             elif method_name == 'progressWorkflowAction':
                 transition_data = {"transition": {"id": args[4]}}
-
                 return self.update_status(args[3], flag, transition_data, 'POST')
             elif method_name == 'getFieldsForEdit':
                 return self.get_fields_for_edit(flag)
@@ -101,7 +103,7 @@ class JiraResponseGenerator(ResponseGenerator):
     """
     def update_version(self, target, flag, data, method):
         if not flag:
-            task_id = target.split('/')[1]
+            task_id = target.split('/')[5]
             version_name = data['update']['versions'][0]['add']['name']
             task_number = task_id.split('-')[1]
 
@@ -225,7 +227,6 @@ class JiraResponseGenerator(ResponseGenerator):
     def post_issue(self, target, flag, data, method):
         if not flag and data:
             task_name = None
-
             if data.get('fields') and data.get('fields').get('summary'):
                 task_name = data.get('fields').get('summary')
             elif data.get('summary'):
@@ -246,11 +247,11 @@ class JiraResponseGenerator(ResponseGenerator):
 
     def post_remote_link(self, target, flag, data, method):
         if not flag:
-            task_id = target.split('/')[1]
+            task_id = target.split('/')[5]
+
             if data and data.get('object') and data.get('object').get('title'):
                 task_number = task_id.split('-')[1]
                 response = {
-
                     'id': task_number,
                     'self': ('%s/rest/api/issue/%s/remotelink/%s' % (self.base_url, task_id, task_number))
                 }

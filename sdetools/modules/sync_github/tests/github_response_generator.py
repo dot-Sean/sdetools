@@ -1,6 +1,3 @@
-from urllib2 import HTTPError
-from mock import MagicMock
-
 from sdetools.sdelib.testlib.response_generator import ResponseGenerator
 from sdetools.sdelib.commons import urlencode_str
 
@@ -8,48 +5,45 @@ from sdetools.sdelib.commons import urlencode_str
 class GitHubResponseGenerator(ResponseGenerator):
     def __init__(self, config, test_dir=None):
         self.project_uri = '%s/%s' % (urlencode_str(config['github_repo_owner']), urlencode_str(config['alm_project']))
-        self.api_url = '%s://%s/%s' % (config['alm_method'],  config['alm_server'], self.project_uri)
         self.project_milestone = config['alm_project_version']
         self.username = config['alm_user']
         statuses = ['open', 'closed']
         rest_api_targets = {
-            'user': 'get_user',
-            'repos/%s$' % self.project_uri: 'get_repo',
-            'repos/%s/milestones' % self.project_uri: 'get_milestones',
-            'legacy/issues/search/%s' % self.project_uri: 'get_task',
-            'repos/%s/issues$' % self.project_uri: 'post_issue',
-            'repos/%s/issues/[0-9]*$' % self.project_uri: 'update_status'
+            '/user': 'get_user',
+            '/repos/%s$' % self.project_uri: 'get_repo',
+            '/repos/%s/milestones' % self.project_uri: 'get_milestones',
+            '/legacy/issues/search/%s' % self.project_uri: 'get_task',
+            '/repos/%s/issues$' % self.project_uri: 'post_issue',
+            '/repos/%s/issues/[0-9]*$' % self.project_uri: 'update_status'
         }
         super(GitHubResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
-    def raise_error(self, error_code, return_value=None):
-        fp_mock = MagicMock()
-        if error_code == '401':
-            msg = {
-                "message":"Requires authentication",
-                "documentation_url":"http://developer.github.com/v3"
-            }
-        elif error_code == '404':
-            msg = {
-                "message":"Not found",
-                "documentation_url":"http://developer.github.com/v3"
-            }
-        elif error_code == '422':
-            msg = {
-                "message":"Validation Failed",
-                "errors": [{
-                    "resource": "Issue",
-                    "field": "title",
-                    "code": "missing_field"
-                }]
-            }
-        else:
-            error_code = '400'
-            msg = {
-                "message":"Error",
-            }
-        fp_mock.read.return_value = msg
-        raise HTTPError('%s' % self.api_url, error_code, msg, '', fp_mock)
+    def raise_error(self, error_code, message=None):
+        if message is None:
+            if error_code == '401':
+                message = {
+                    "message":"Requires authentication",
+                    "documentation_url":"http://developer.github.com/v3"
+                }
+            elif error_code == '404':
+                message = {
+                    "message":"Not found",
+                    "documentation_url":"http://developer.github.com/v3"
+                }
+            elif error_code == '422':
+                message = {
+                    "message":"Validation Failed",
+                    "errors": [{
+                        "resource": "Issue",
+                        "field": "title",
+                        "code": "missing_field"
+                    }]
+                }
+            else:
+                message = {
+                    "message":"Error",
+                }
+        super(GitHubResponseGenerator, self).raise_error(error_code, message)
 
     """
        Response functions 
@@ -113,7 +107,7 @@ class GitHubResponseGenerator(ResponseGenerator):
             self.raise_error('404')
 
     def update_status(self, target, flag, data, method):
-        task_id = target.split('/')[4]
+        task_id = target.split('/')[5]
 
         if not flag:
             if self.generator_get_task(task_id) and data['state']:

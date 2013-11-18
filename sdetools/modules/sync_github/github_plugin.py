@@ -42,6 +42,7 @@ class GitHubAPI(RESTBase):
         super(GitHubAPI, self).post_conf_init()
 
     def parse_error(self, result):
+        result = json.loads(result)
         error_msg = result.get('message')
 
         if not error_msg:

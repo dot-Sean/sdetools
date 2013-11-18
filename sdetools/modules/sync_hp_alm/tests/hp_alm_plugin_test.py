@@ -5,14 +5,13 @@ import unittest
 from hp_alm_response_generator import HPAlmResponseGenerator
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_hp_alm.hp_alm_plugin import HPAlmConnector, HPAlmAPIBase
-PATH_TO_ALM_REST_API = 'sdetools.modules.sync_hp_alm.hp_alm_plugin'
 
 
 class TestHPAlmCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         alm_classes = [HPAlmConnector, HPAlmAPIBase, HPAlmResponseGenerator]
-        super(TestHPAlmCase, cls).setUpClass(PATH_TO_ALM_REST_API, alm_classes=alm_classes)
+        super(TestHPAlmCase, cls).setUpClass(alm_classes=alm_classes)
 
     def test_parsing_alm_task(self):
         result = super(TestHPAlmCase, self).test_parsing_alm_task()

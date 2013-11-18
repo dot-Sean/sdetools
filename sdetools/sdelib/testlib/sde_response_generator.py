@@ -13,13 +13,14 @@ class SdeResponseGenerator(ResponseGenerator):
         self.project_name = config['sde_project']
         self.api_url = '%s://%s/%s' % (config['sde_method'], config['sde_server'], self.BASE_PATH)
         statuses = ['TODO', 'DONE']
+        base_path = 'api'
         rest_api_targets = {
-            'applications': 'call_applications',
-            'projects': 'get_projects',
-            'tasks$': 'get_tasks',
-            'tasks/[0-9]+-[0-9a-zA-z]+': 'call_task',
-            'tasknotes.*': 'call_task_notes',
-            'projectnotes/analysis$': 'add_project_analysis_note'
+            '/%s/applications' % base_path: 'call_applications',
+            '/%s/projects' % base_path: 'get_projects',
+            '/%s/tasks/[0-9]+-[0-9a-zA-z]+' % base_path: 'call_task',
+            '/%s/tasks' % base_path: 'get_tasks',
+            '/%s/tasknotes.*' % base_path: 'call_task_notes',
+            '/%s/projectnotes/analysis$' % base_path: 'add_project_analysis_note'
         }
         super(SdeResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
@@ -59,22 +60,18 @@ class SdeResponseGenerator(ResponseGenerator):
         if not flag:
             if method == 'GET':
                 response = {'applications': []}
-
-                if self.is_data_valid(data, ['name']):
-                    app_name = data['name']
-                    if app_name != self.app_name:
-                        return response
-
                 application = self.get_json_from_file('application')
                 application['name'] = self.app_name
+                params = self.get_url_parameters(target)
+
+                if params.get('name'):
+                    application['name'] = params['name']
                 response['applications'].append(application)
 
                 return response
             elif method == 'POST':
-                # Create application
                 if data:
-                    return None
-
+                    return ''
             self.raise_error('405')
         else:
             self.raise_error('401')
@@ -82,12 +79,12 @@ class SdeResponseGenerator(ResponseGenerator):
     def get_projects(self, target, flag, data, method):
         if not flag:
             response = {'projects': []}
+            params = self.get_url_parameters(target)
+            project = self.get_json_from_file('project')
 
-            if self.is_data_valid(data, ['name']):
-                project_name = data['name']
-                project = self.get_json_from_file('project')
-                project['name'] = project_name
-                response['projects'].append(project)
+            if params.get('name'):
+                project['name'] = params['name']
+            response['projects'].append(project)
 
             return response
         else:
@@ -95,23 +92,21 @@ class SdeResponseGenerator(ResponseGenerator):
 
     def get_tasks(self, target, flag, data, method):
         if not flag:
-            if data and data['project']:
-                project_id = data['project']
-                tasks = []
+            params = self.get_url_parameters(target)
 
+            if params.get('project'):
+                tasks = []
                 for task_number in self.generator_get_all_tasks():
                     task = self.generator_get_task(task_number)
-                    _task = self._generate_task(task_number, project_id, task['status'])
+                    _task = self._generate_task(task_number, params.get('project'), task['status'])
                     _task['text_notes'] = task['text_notes']
                     _task['ide_notes'] = task['ide_notes']
                     _task['analysis_notes'] = task['analysis_notes']
                     tasks.append(_task)
-
                 return {'tasks': tasks}
-            else:
-                self.raise_error('500', {
-                    "error": "A GET request on the Tasks resource must be filtered by project."
-                })
+            self.raise_error('500', {
+                "error": "A GET request on the Tasks resource must be filtered by project."
+            })
         else:
             self.raise_error('401')
 
@@ -140,10 +135,12 @@ class SdeResponseGenerator(ResponseGenerator):
 
     def call_task_notes(self, target, flag, data, method):
         if not flag:
-            if target == 'tasknotes':
-                note_type = ''
+            target = target.split('/')
+            if len(target) == 4:
+                note_type = target[3]
             else:
-                note_type = target.split('/')[1]
+                note_type = ''
+                data = self.get_url_parameters(target[2])
 
             if note_type not in ['', 'ide', 'text', 'analysis']:
                 self.raise_error('500')
@@ -254,7 +251,7 @@ class SdeResponseGenerator(ResponseGenerator):
             task = self.get_json_from_file('T%s' % task_number)
         else:
             task = self.get_json_from_file('task')
-            task['title'] = 'T%s' % task_number
+            task['title'] = 'T%s: Test Task' % task_number
             task['priority'] = priority
 
         if status is not None:

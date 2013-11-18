@@ -5,14 +5,13 @@ import unittest
 from pt_response_generator import PivotalTrackerResponseGenerator
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_pt.pt_plugin import PivotalTrackerConnector, PivotalTrackerAPI
-PATH_TO_ALM_REST_API = 'sdetools.modules.sync_pt.pt_plugin'
 
 
 class TestPivotalTrackerCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         alm_classes = [PivotalTrackerConnector, PivotalTrackerAPI, PivotalTrackerResponseGenerator]
-        super(TestPivotalTrackerCase, cls).setUpClass(PATH_TO_ALM_REST_API, alm_classes=alm_classes)
+        super(TestPivotalTrackerCase, cls).setUpClass(alm_classes=alm_classes)
 
     def test_parsing_alm_task(self):
         result = super(TestPivotalTrackerCase, self).test_parsing_alm_task()
