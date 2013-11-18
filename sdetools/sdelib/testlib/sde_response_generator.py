@@ -32,7 +32,7 @@ class SdeResponseGenerator(ResponseGenerator):
     def generator_add_task(self, task_number, task_name=None, project_id=1000, status=None, priority=7, phase='requirement'):
         if not self.generator_get_task(task_number):
             if not task_name:
-                task_name = "T%s: Task Task" % task_number
+                task_name = "T%s: Task Title" % task_number
 
             self.alm_tasks[task_number] = {
                 "title": task_name,
@@ -244,7 +244,7 @@ class SdeResponseGenerator(ResponseGenerator):
     """
         JSON Generator
     """
-    def _generate_task(self, task): #task_number, project_id=1000, status='TODO', priority=7, phase='requirement'):
+    def _generate_task(self, task):
         if task.get('id') in ['36', '38', '40']:
             _task = self.get_json_from_file('T%s' % task['id'])
         else:
