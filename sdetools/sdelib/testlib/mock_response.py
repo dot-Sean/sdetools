@@ -1,19 +1,65 @@
 from mock import patch
-from urllib2 import HTTPError
-from sdetools.sdelib.restclient import URLRequest, APIError
+from urllib2 import HTTPCookieProcessor
+from cookielib import Cookie
+from types import StringType
+from sdetools.sdelib.restclient import APIError
 from sdetools.sdelib.testlib.sde_response_generator import SdeResponseGenerator
-from sdetools.sdelib.sdeapi import ExtAPI
+
+SDE_SERVER = None
 
 
-def mock_response_call_api(self, target, method=URLRequest.GET, args=None, call_headers={}, auth_mode=None):
-    """
-        If calling instance is ExtApi, use the sde response generator,
-        else use alm response generator
-    """
-    if type(self) == ExtAPI:
-        return MOCK_SDE_RESPONSE.call_api(self, target, method, args, call_headers, auth_mode)
-    else:
-        return MOCK_ALM_RESPONSE.call_api(self, target, method, args, call_headers, auth_mode)
+class MockRequest(object):
+    """ Mock Request object """
+    def __init__(self, req, handles):
+        if type(req) == StringType:
+            self.method = 'GET'
+            self.data = '{}'
+            self.host = ''
+            self.selector = req
+            self.headers = []
+        else:
+            self.method = req.get_method()
+            self.data = req.get_data()
+            self.host = req.get_host()
+            self.selector = req.get_selector()
+            self.headers = req.header_items()
+        self.handles = handles
+
+        if self.host == SDE_SERVER:
+            self.code, self.msg = MOCK_SDE_RESPONSE.get_response(self.selector, self.data, self.method, self.headers)
+        else:
+            self.code, self.msg = MOCK_ALM_RESPONSE.get_response(self.selector, self.data, self.method, self.headers)
+        if isinstance(self.msg, Cookie) and self.handles['cookiehandle']:
+            self.handles['cookiehandle'].cookiejar.set_cookie(self.msg)
+            self.msg = ''
+
+    def read(self):
+        msg = self.msg
+        self.msg = ''
+
+        return msg
+
+    def close(self):
+        pass
+
+
+class MockOpener(object):
+    """ Mock http_req.get_opener """
+    def __init__(self, method, server, proxy, debuglevel):
+        self.method = method
+        self.server = server
+        self.proxy = proxy
+        self.debuglevel = debuglevel
+        self.handles = {'cookiehandle': None, 'handles': []}
+
+    def add_handler(self, handle):
+        if isinstance(handle, HTTPCookieProcessor):
+            self.handles['cookiehandle'] = handle
+        else:
+            self.handles['handles'].append(handle)
+
+    def open(self, req):
+        return MockRequest(req, self.handles)
 
 
 class MockResponse(object):
@@ -22,10 +68,14 @@ class MockResponse(object):
         self.response_flags = {}
         self.call_api_patch = None
 
-    def initialize(self, response_generator, path_to_rest_api):
+    def initialize(self, response_generator):
         self.response_generator = response_generator
-        self.call_api_patch = patch('%s.RESTBase.call_api' % path_to_rest_api, mock_response_call_api)
+        self.call_api_patch = patch('sdetools.extlib.http_req.get_opener', self.mock_get_opener)
         self.call_api_patch.start()
+
+    @staticmethod
+    def mock_get_opener(method, server, proxy=None, debuglevel=0):
+        return MockOpener(method, server, proxy, debuglevel)
 
     def set_response_flags(self, _response_flags):
         if type(_response_flags) == dict:
@@ -46,34 +96,16 @@ class MockResponse(object):
         if self.call_api_patch is not None:
             self.call_api_patch.stop()
 
-    def call_api(self, api_instance, target, method, args, call_headers, auth_mode):
-        try:
-            if self.get_response_generator() is None:
-                raise APIError('Mock response has not been initialized yet')
-
-            response = self.get_response_generator().get_response(target, self.get_response_flags(), args, method)
-
-            if response and type(response) == dict and response.get('cookiejar'):
-                api_instance.cookiejar.set_cookie(response.get('cookiejar'))
-
-            return response
-        except HTTPError, err:
-            # Re-raise with more info
-            err.url = '%s/%s' % (err.url, target)
-            err.headers = call_headers
-            try:
-                err.msg = api_instance.parse_error(err.msg)
-            except:
-                # We fall back to unparsed version of the error
-                pass
-            raise APIError(err)
+    def get_response(self, target, data, method, headers):
+        return self.get_response_generator().get_response(target, self.get_response_flags(), data, method, headers)
 
 
 class MockSDEResponse(MockResponse):
     def initialize(self, config):
-        path_to_sde_rest_api = 'sdetools.sdelib.sdeapi.restclient'
+        global SDE_SERVER
+        SDE_SERVER = config['sde_server']
         response_generator = SdeResponseGenerator(config)
-        super(MockSDEResponse, self).initialize(response_generator, path_to_sde_rest_api)
+        super(MockSDEResponse, self).initialize(response_generator)
 
     def generate_sde_task(self, task_number=None, project_id=1000, status='TODO', priority=7):
         return self.get_response_generator().generate_sde_task(task_number, project_id, status, priority)

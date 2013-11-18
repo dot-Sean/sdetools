@@ -5,6 +5,7 @@ from restclient import APIError, APIHTTPError, APICallError, APIAuthError, Serve
 import logging
 logger = logging.getLogger(__name__)
 
+
 def _encode_options(options):
     headers = {'Accept': 'application/json;'}
     for item in options:

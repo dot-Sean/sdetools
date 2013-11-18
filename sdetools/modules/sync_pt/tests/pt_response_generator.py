@@ -6,18 +6,18 @@ from sdetools.sdelib.commons import urlencode_str
 
 
 class PivotalTrackerResponseGenerator(ResponseGenerator):
-    PROJECT_ID = '1000'
-
     def __init__(self, config, test_dir=None):
-        self.project_uri = 'projects/%s' % self.PROJECT_ID
+        base_path = 'services/v5'
+        self.PROJECT_ID = 1000
+        self.project_uri = '/%s/projects/%s' % (base_path, self.PROJECT_ID)
         self.project_name = config['alm_project']
         self.release_marker_name = config['alm_project_version']
         self.epic_name = config['pt_group_label']
         self.epics = {}
         statuses = ['unstarted', 'accepted']
         rest_api_targets = {
-            'me': 'get_user',
-            'projects$': 'get_projects',
+            '/%s/me' % base_path: 'get_user',
+            '/%s/projects$' % base_path: 'get_projects',
             '%s/stories\?filter="(.*):"&fields=current_state,name,updated_at,id' % self.project_uri: 'get_stories',
             '%s/stories\?filter=type:release,(.*)&fields=id' % self.project_uri: 'get_release_marker',
             '%s/epics\?filter=(.*)&fields=id' % self.project_uri: 'get_epic',
@@ -125,6 +125,7 @@ class PivotalTrackerResponseGenerator(ResponseGenerator):
         if not flag and data:
             story_id = self.extract_task_number_from_title(data['name'])
             task = self.generator_get_task(story_id)
+
             if not task:
                 self.generator_add_task(story_id, data['name'], data['current_state'])
                 response = self.get_json_from_file('post_story')

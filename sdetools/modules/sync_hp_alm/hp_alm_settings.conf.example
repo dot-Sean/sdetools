@@ -108,6 +108,12 @@ conflict_policy = alm
 #Valid values: True, False
 alm_standard_workflow = True
 
+#Test plan folder for SDE generated tests
+hp_alm_test_plan_folder = SD Elements
+
+#Default type for new test plans
+hp_alm_test_type = MANUAL
+
 #Issue type for new requirements created by SD Elements
 hp_alm_issue_type = Functional
 

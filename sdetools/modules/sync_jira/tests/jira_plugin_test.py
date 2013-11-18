@@ -11,14 +11,13 @@ from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBas
 from sdetools.modules.sync_jira.jira_plugin import JIRAConnector, AlmException
 from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
 from sdetools.modules.sync_jira.jira_soap import JIRASoapAPI
-PATH_TO_ALM_REST_API = 'sdetools.modules.sync_jira.jira_rest'
 
 
 class JiraBaseCase(AlmPluginTestBase):
     @classmethod
     def setUpClass(cls):
         alm_classes = [JIRAConnector, JIRARestAPI, JiraResponseGenerator]
-        super(JiraBaseCase, cls).setUpClass(PATH_TO_ALM_REST_API, alm_classes=alm_classes)
+        super(JiraBaseCase, cls).setUpClass(alm_classes=alm_classes)
 
     def pre_parse_config(self):
         self.config.add_custom_option('jira_version', 'Version of JIRA [e.g. 4.3.3, 5, or 6.0]', default='6')
@@ -62,7 +61,7 @@ class TestJiraAPI6Case(JiraBaseCase, unittest.TestCase):
     def test_fail_connect_server(self):
         self.mock_alm_response.set_response_flags({'get_projects': '500'})
 
-        self.assert_exception(AlmException, '', 'HTTP Error 500: Server error', self.connector.alm_plugin.connect_server)
+        self.assert_exception(AlmException, '', 'HTTP Error 500. Explanation returned: FATAL ERROR: "Server error"', self.connector.alm_plugin.connect_server)
 
     def test_convert_markdown_for_links(self):
         content = '[https://m1.sdelements.com/library/tasks/T21/](https://m1.sdelements.com/library/tasks/T21/)'
