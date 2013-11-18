@@ -330,9 +330,8 @@ class HPAlmConnector(AlmConnector):
         coverages = self._call_api_collection('requirement-coverages', query_args)
 
         if coverages and req_ids:
-            req_ids = [c['fields']['requirement-id'][0]
-                       for c in coverages['entities']
-                       if c['fields']['requirement-id'][0] not in req_ids]
+            covered_req_ids = [c['fields']['requirement-id'][0] for c in coverages['entities']]
+            req_ids = [r for r in req_ids if r not in covered_req_ids]
         return req_ids
 
     def _add_requirement_coverage(self, test_id, test_name, req_ids):
