@@ -247,7 +247,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
         return ''
 
     def get_url_params(self, url):
-        query, fields = [q for q in self.get_url_parameters(url).values()]
+        query, fields = [q[0] for q in self.get_url_parameters(url).values()]
         queries = [re.findall('[-\w ]+', q) for q in query.split(';')]
         fields = fields.split(',')
 

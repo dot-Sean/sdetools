@@ -8,7 +8,6 @@ from datetime import datetime
 from sdetools.sdelib.restclient import RESTBase, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from sdetools.alm_integration.alm_plugin_base import AlmException
-from sdetools.sdelib.conf_mgr import Config
 from sdetools.extlib import markdown
 
 from sdetools.sdelib import log_mgr
@@ -164,9 +163,33 @@ class RallyConnector(AlmConnector):
 
     def validate_configs(self):
         try:
-            print self.alm_plugin.call_api('typedefinition?query=(Name = Defect)&fetch=true')
+            query_args = {
+                'query': '(Name = \"Hierarchical Requirement\")',
+                'workspace': self.workspace_ref,
+            }
+            requirement_def = self.alm_plugin.call_api('typedefinition.js', args=query_args)['QueryResult']['Results'][0]['_ref']
         except APIError, err:
-            raise AlmException('Error retrieving thigns')
+            raise AlmException('Error while querying type definition for "Hierarchical Requirement": %s' % err)
+        except (KeyError, IndexError):
+            raise AlmException('Failed to retrieve type definition for "Hierarchical Requirement"')
+
+        try:
+            requirement_attrs = self.alm_plugin.call_api(self._split_ref_link(requirement_def))
+        except APIError, err:
+            raise AlmException('Error while retrieving attribute definitions for "Hierarchical Requirement": %s' % err)
+
+        for attribute in requirement_attrs['TypeDefinition']['Attributes']:
+            if attribute['Name'] == 'Schedule State':
+                allowed_values = [v['StringValue'] for v in attribute['AllowedValues']]
+
+                if self.config['rally_new_status'] not in allowed_values:
+                    raise AlmException('Invalid rally_new_status "%s". Expected one of %s' %
+                                       (self.config['rally_new_status'], allowed_values))
+                if not set(self.config['rally_done_statuses']).intersection(set(allowed_values)):
+                    raise AlmException('Invalid rally_done_statuses %s. Expected one of %s' %
+                                       (self.config['rally_done_statuses'], allowed_values))
+                return
+        raise AlmException('Unable to retrieve allowed values for the "Schedule State" attribute')
 
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])
@@ -185,8 +208,8 @@ class RallyConnector(AlmConnector):
         if not num_results:
             return None
 
-        task_result_url = result['QueryResult']['Results'][0]['_ref']
-        task_result_url = task_result_url.split('/%s/' % API_VERSION)[1]
+        task_result_url = self._split_ref_link(result['QueryResult']['Results'][0]['_ref'])
+
         try:
             task_data = self.alm_plugin.call_api(task_result_url)
         except APIError, err:
@@ -195,7 +218,7 @@ class RallyConnector(AlmConnector):
 
         return RallyTask(task_id,
                          task_data['FormattedID'],
-                         task_data['_ref'].split('/%s/' % API_VERSION)[1],
+                         self._split_ref_link(task_data['_ref']),
                          task_data['ScheduleState'],
                          task_data['LastUpdateDate'],
                          self.config['rally_done_statuses'])
@@ -290,3 +313,6 @@ class RallyConnector(AlmConnector):
 
         return s
 
+    @staticmethod
+    def _split_ref_link(ref):
+        return ref.split('/%s/' % API_VERSION)[1]

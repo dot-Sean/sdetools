@@ -5,7 +5,7 @@ import urllib
 
 from mock import MagicMock
 from urllib2 import HTTPError
-from urlparse import urlparse
+from urlparse import urlparse, parse_qs
 from datetime import datetime
 from sdetools.extlib.defusedxml import minidom
 from sdetools.sdelib.commons import abc, get_directory_of_current_module
@@ -200,6 +200,14 @@ class ResponseGenerator(object):
         return True
 
     @staticmethod
-    def get_url_parameters(url):
-        return dict([q.split('=') for q in urlparse(urllib.unquote_plus(url)).query.split('&') if q])
+    def get_url_parameters(url, quote_plus=True):
+        """ Returns a dictionary containing the url parameters
+            quote_plus : true if spaces in the url are encoded as '+', false if spaces are '%20'
+        """
+        if quote_plus:
+            url = urllib.unquote_plus(url)
+        else:
+            url = urllib.unquote(url)
+
+        return parse_qs(urlparse(url).query)
 

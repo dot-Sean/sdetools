@@ -30,5 +30,21 @@ class TestRallyCase(AlmPluginTestBase, unittest.TestCase):
         self.assert_exception(AlmException, '', 'Unable to retrieve subscription from Rally.',
                               self.connector.alm_connect_project)
 
+    def test_invalid_new_status(self):
+        bad_status = 'INVALID_NEW_STATUS'
+        allowed_statuses = [u'Defined', u'In-Progress', u'Completed', u'Accepted']
+        self.config['rally_new_status'] = bad_status
+
+        self.assert_exception(AlmException, '', 'Invalid rally_new_status "%s". Expected one of %s' %
+                                                (bad_status, allowed_statuses), self.connector.alm_connect_project)
+
+    def test_invalid_done_statuses(self):
+        bad_status = ['INVALID_DONE_STATUS']
+        allowed_statuses = [u'Defined', u'In-Progress', u'Completed', u'Accepted']
+        self.config['rally_done_statuses'] = bad_status
+
+        self.assert_exception(AlmException, '', 'Invalid rally_done_statuses %s. Expected one of %s' %
+                                                (bad_status, allowed_statuses), self.connector.alm_connect_project)
+
 
 

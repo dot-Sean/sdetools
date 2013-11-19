@@ -65,7 +65,7 @@ class SdeResponseGenerator(ResponseGenerator):
                 params = self.get_url_parameters(target)
 
                 if params.get('name'):
-                    application['name'] = params['name']
+                    application['name'] = params['name'][0]
                 response['applications'].append(application)
 
                 return response
@@ -83,7 +83,7 @@ class SdeResponseGenerator(ResponseGenerator):
             project = self.get_json_from_file('project')
 
             if params.get('name'):
-                project['name'] = params['name']
+                project['name'] = params['name'][0]
             response['projects'].append(project)
 
             return response
@@ -98,7 +98,7 @@ class SdeResponseGenerator(ResponseGenerator):
                 tasks = []
                 for task_number in self.generator_get_all_tasks():
                     task = self.generator_get_task(task_number)
-                    _task = self._generate_task(task_number, params.get('project'), task['status'])
+                    _task = self._generate_task(task_number, params['project'][0], task['status'])
                     _task['text_notes'] = task['text_notes']
                     _task['ide_notes'] = task['ide_notes']
                     _task['analysis_notes'] = task['analysis_notes']
@@ -156,7 +156,7 @@ class SdeResponseGenerator(ResponseGenerator):
         ide_notes = []
         analysis_notes = []
         if self.is_data_valid(data, ['task']):
-            tasks = [self.extract_task_number_from_title(data['task'])]
+            tasks = [self.extract_task_number_from_title(data['task'][0])]
         else:
             tasks = self.generator_get_all_tasks
 
