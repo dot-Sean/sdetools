@@ -40,21 +40,21 @@ RALLY_HTML_CONVERT = [
     ('</code></pre>', '</code></pre></span>'),
 ]
 
+
 class RallyAPIBase(RESTBase):
     """ Base plugin for Rally """
 
     def __init__(self, config):
-        super(RallyAPIBase, self).__init__('alm', 'Rally', config, 
-                'slm/webservice/%s' % (API_VERSION))
+        super(RallyAPIBase, self).__init__('alm', 'Rally', config, 'slm/webservice/%s' % API_VERSION)
 
     def get_custom_headers(self, target, method):
         return RALLY_HEADERS
 
+
 class RallyTask(AlmTask):
     """ Representation of a task in Rally """
 
-    def __init__(self, task_id, alm_id, alm_task_ref,
-                 status, timestamp, done_statuses):
+    def __init__(self, task_id, alm_id, alm_task_ref, status, timestamp, done_statuses):
         self.task_id = task_id
         self.alm_id = alm_id
 
@@ -84,6 +84,7 @@ class RallyTask(AlmTask):
         """ Returns a datetime object """
         return datetime.strptime(self.timestamp, '%Y-%m-%dT%H:%M:%S.%fZ')
 
+
 class RallyConnector(AlmConnector):
     """Connects SD Elements to Rally"""
     alm_name = 'Rally'
@@ -92,8 +93,6 @@ class RallyConnector(AlmConnector):
         super(RallyConnector, self).__init__(config, alm_plugin)
 
         """ Adds Rally specific config options to the config file"""
-        config.add_custom_option('rally_card_type', 'IDs for issues raised in Rally',
-            default='Story')
         config.add_custom_option('rally_new_status', 'status to set for new tasks in Rally',
             default='Defined')
         config.add_custom_option('rally_done_statuses', 'Statuses that signify a task is Done in Rally',
@@ -104,7 +103,7 @@ class RallyConnector(AlmConnector):
         super(RallyConnector, self).initialize()
 
         #Verify that the configuration options are set properly
-        for item in ['rally_done_statuses', 'rally_card_type', 'rally_new_status', 'rally_workspace']:
+        for item in ['rally_done_statuses', 'rally_new_status', 'rally_workspace']:
             if not self.config[item]:
                 raise AlmException('Missing %s in configuration' % item)
 
@@ -124,8 +123,7 @@ class RallyConnector(AlmConnector):
         try:
             self.alm_plugin.call_api('task.js')
         except APIError, err:
-            raise AlmException('Unable to connect to Rally service (Check server URL, '
-                    'user, pass). Reason: %s' % str(err))
+            raise AlmException('Unable to connect to Rally service (Check server URL, user, pass). Reason: %s' % str(err))
 
     def alm_connect_project(self):
         workspace_ref = None
@@ -142,8 +140,7 @@ class RallyConnector(AlmConnector):
                 break
 
         if not workspace_ref:
-            raise AlmException('Workspace is not valid, please check config value: '
-                    '%s' % self.config['rally_workspace'])
+            raise AlmException('Workspace is not valid, please check config value: %s' % self.config['rally_workspace'])
         self.workspace_ref = workspace_ref
 
         #Now get project ID
@@ -151,30 +148,31 @@ class RallyConnector(AlmConnector):
             'query': '(Name = \"%s\")' % self.config['alm_project'],
             'workspace': self.workspace_ref,
         }
-        project_ref = self.alm_plugin.call_api('project.js',
-                                                args = query_args)
+        project_ref = self.alm_plugin.call_api('project.js', args = query_args)
         num_results = project_ref['QueryResult']['TotalResultCount']
         if not num_results:
             raise AlmException('Rally project not found: %s' % self.config['alm_project'])
-        project_ref = project_ref['QueryResult']['Results'][0]['_ref']
-        self.project_ref = project_ref
+        self.project_ref = project_ref['QueryResult']['Results'][0]['_ref']
 
         self.validate_configs()
 
     def validate_configs(self):
+        query_args = {
+            'query': '(Name = \"Hierarchical Requirement\")',
+            'workspace': self.workspace_ref,
+        }
+
         try:
-            query_args = {
-                'query': '(Name = \"Hierarchical Requirement\")',
-                'workspace': self.workspace_ref,
-            }
-            requirement_def = self.alm_plugin.call_api('typedefinition.js', args=query_args)['QueryResult']['Results'][0]['_ref']
+            requirement_definition = self.alm_plugin.call_api('typedefinition.js', args=query_args)
         except APIError, err:
             raise AlmException('Error while querying type definition for "Hierarchical Requirement": %s' % err)
         except (KeyError, IndexError):
             raise AlmException('Failed to retrieve type definition for "Hierarchical Requirement"')
 
+        requirement_definition_ref = requirement_definition['QueryResult']['Results'][0]['_ref']
+
         try:
-            requirement_attrs = self.alm_plugin.call_api(self._split_ref_link(requirement_def))
+            requirement_attrs = self.alm_plugin.call_api(self._split_ref_link(requirement_definition_ref))
         except APIError, err:
             raise AlmException('Error while retrieving attribute definitions for "Hierarchical Requirement": %s' % err)
 
@@ -213,7 +211,7 @@ class RallyConnector(AlmConnector):
         try:
             task_data = self.alm_plugin.call_api(task_result_url)
         except APIError, err:
-            raise AlmException('Unable to get card # for task %s from Rally. Reason: %s' % (task_id, str(err)))
+            raise AlmException('Unable to get user story %s from Rally. Reason: %s' % (task_id, str(err)))
         task_data = task_data['HierarchicalRequirement']
 
         return RallyTask(task_id,
@@ -280,7 +278,7 @@ class RallyConnector(AlmConnector):
         try:
             self.alm_plugin.call_api(task.get_alm_task_ref(), args=trans_args, method=self.alm_plugin.URLRequest.POST)
         except APIError, err:
-            raise AlmException('Unable to update task status to %s for card: %s in Rally because of %s' %
+            raise AlmException('Unable to update task status to %s for user story %s in Rally because of %s' %
                                (status, task.get_alm_id(), err))
 
         logger.debug('Status changed to %s for task %s in Rally' % (status, task.get_alm_id()))
