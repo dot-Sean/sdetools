@@ -77,7 +77,7 @@ class JIRARestAPI(RESTBase):
 
     def get_task(self, task, task_id):
         try:
-            url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s:\'' % (
+            url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s%%5C%%5C:\'' % (
                     self.config['alm_project'], task_id)
             result = self.call_api(url)
         except APIError, err:
