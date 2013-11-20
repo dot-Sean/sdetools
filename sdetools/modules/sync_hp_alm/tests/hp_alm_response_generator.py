@@ -26,27 +26,56 @@ class HPAlmResponseGenerator(ResponseGenerator):
             '%s/customization/used-lists\?name=Status' % project_uri: 'get_status_types',
             '%s/test-folders' % project_uri: 'call_test_folders',
             '%s/tests' % project_uri: 'call_tests',
-            '/%s/authentication-point/logout' % base_path: 'logout'
+            '/%s/authentication-point/logout' % base_path: 'logout',
+            '%s/requirement\-coverages' % project_uri: 'call_requirement_coverage'
         }
 
         self.test_folders = [{'name': 'Subject', 'parent-id': '0', 'id': '1'}]
         self.tests = []
         self.requirements = []
+        self.requirement_coverages = []
         super(HPAlmResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
     """
        Response functions 
     """
+    def call_requirement_coverage(self, target, flag, data, method):
+        if not flag:
+            if method == 'GET':
+                response = self.generate_collection_entity()
+                queries, fields = self.get_url_parameters(target)
+                coverages = self.get_entities('requirement-coverage', queries, fields)
+
+                if coverages:
+                    response['TotalResults'] = len(coverages)
+                    response['entities'] = coverages
+                return response
+            elif method == 'POST':
+                if not self.is_data_valid(data, ['test-id', 'requirement-id']):
+                    self.raise_error('405')
+
+                query = [['test-id', data.get('test-id')], ['requirement-id', data.get('requirement-id')]]
+                if not self.get_entities('requirement-coverage', query, ['requirement-id']):
+                    self.requirement_coverages.append(data)
+                    response = self.generate_entity('requirement-coverage')
+                    for key, value in data.items():
+                        response['Fields'].append(self.generate_requirement_field(key, value))
+                    return response
+                else:
+                    self.raise_error('405', 'Duplicate requirement-coverage')
+        else:
+            self.raise_error('401')
+
     def call_tests(self, target, flag, data, method):
         if not flag:
             if method == 'GET':
                 response = self.generate_collection_entity()
-                queries, fields = self.get_url_params(target)
-                test = self.get_entity('test', queries, fields)
+                queries, fields = self.get_url_parameters(target)
+                tests = self.get_entities('test', queries, fields)
 
-                if test:
-                    response['TotalResults'] = 1
-                    response['entities'] = [test]
+                if tests:
+                    response['TotalResults'] = len(tests)
+                    response['entities'] = tests
 
                 return response
             elif method == 'POST':
@@ -68,12 +97,12 @@ class HPAlmResponseGenerator(ResponseGenerator):
         if not flag:
             if method == 'GET':
                 response = self.generate_collection_entity()
-                queries, fields = self.get_url_params(target)
-                folder = self.get_entity('test-folders', queries, fields)
+                queries, fields = self.get_url_parameters(target)
+                folders = self.get_entities('test-folder', queries, fields)
 
-                if folder:
-                    response['TotalResults'] = 1
-                    response['entities'] = [folder]
+                if folders:
+                    response['TotalResults'] = len(folders)
+                    response['entities'] = folders
 
                 return response
             elif method == 'POST':
@@ -106,13 +135,13 @@ class HPAlmResponseGenerator(ResponseGenerator):
             self.raise_error('401')
 
     def get_requirements(self, target, flag, data):
-        queries, fields = self.get_url_params(target)
+        queries, fields = self.get_url_parameters(target)
         response = self.generate_collection_entity()
-        req = self.get_entity('requirement', queries, fields)
+        reqs = self.get_entities('requirement', queries, fields)
 
-        if req:
-            response['TotalResults'] = 1
-            response['entities'] = [req]
+        if reqs:
+            response['TotalResults'] = len(reqs)
+            response['entities'] = reqs
 
         return response
 
@@ -120,7 +149,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
         if not flag:
             response = self.generate_entity('requirement')
 
-            if self.get_entity('requirement', [['name', data['name']]], []):
+            if self.get_entities('requirement', [['name', data['name']]], []):
                 self.raise_error('405')
 
             task_number = self.extract_task_number_from_title(data['name'].replace('-', ':'))
@@ -218,15 +247,18 @@ class HPAlmResponseGenerator(ResponseGenerator):
             return data
 
     def update_entity(self, type, queries, update):
-        return self.get_entity(type, queries, [], update)
+        return self.get_entities(type, queries, [], update)[0]
 
-    def get_entity(self, type, queries, fields, update={}):
-        if type == 'test':
+    def get_entities(self, _type, queries, fields, update={}):
+        if _type == 'test':
             entity_list = self.tests
-        elif type == 'test-folder':
+        elif _type == 'test-folder':
             entity_list = self.test_folders
+        elif _type == 'requirement-coverage':
+            entity_list = self.requirement_coverages
         else:
             entity_list = self.requirements
+        entities = []
 
         for entity in entity_list:
             for param, value in queries:
@@ -240,14 +272,15 @@ class HPAlmResponseGenerator(ResponseGenerator):
                     for key, value in update.items():
                         entity[key] = value
 
-                _entity = self.generate_entity(type)
+                _entity = self.generate_entity(_type)
                 for param in fields:
                     _entity['Fields'].append(self.generate_requirement_field(param, entity[param]))
-                return _entity
-        return ''
+                entities.append(_entity)
 
-    def get_url_params(self, url):
-        query, fields = [q for q in self.get_url_parameters(url).values()]
+        return entities
+
+    def get_url_parameters(self, url):
+        query, fields = [q for q in super(HPAlmResponseGenerator, self).get_url_parameters(url).values()]
         queries = [re.findall('[-\w ]+', q) for q in query.split(';')]
         fields = fields.split(',')
 

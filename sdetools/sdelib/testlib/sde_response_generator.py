@@ -25,33 +25,35 @@ class SdeResponseGenerator(ResponseGenerator):
         super(SdeResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
     def init_with_tasks(self):
-        self.generator_add_task('40', 'T40: Task Name')
-        self.generator_add_task('36', 'T36: Task Name')
-        self.generator_add_task('38', 'T38: Task Name')
+        self.generator_add_task('40')
+        self.generator_add_task('36')
+        self.generator_add_task('38')
 
-    def generator_add_task(self, task_number, task_name=None, status=None):
+    def generator_add_task(self, task_number, task_name=None, project_id=1000, status=None, priority=7, phase='requirement'):
         if not self.generator_get_task(task_number):
             if not task_name:
-                task_name = "T%s" % task_number
+                task_name = "T%s: Task Title" % task_number
 
             self.alm_tasks[task_number] = {
-                "name": task_name,
-                "id": task_number,
+                "title": task_name,
                 "timestamp": self.get_current_timestamp(),
                 "text_notes": [],
                 "ide_notes": [],
+                "priority": priority,
+                "project": project_id,
+                "phase": phase,
                 "status": self.generator_get_valid_statuses()[0],
                 "analysis_notes": [],
-                "task_id": '1000-T%s' % task_number
+                "id": '%d-T%s' % (project_id, task_number)
             }
 
-    def generate_sde_task(self, task_number=None, project_id=1000, status='TODO', priority=7):
+    def generate_sde_task(self, task_number=None, project_id=1000, status='TODO', priority=7, phase='requirement'):
         if task_number is None:
-            task_number = random.randint(50, 999999999)
+            task_number = '%d' % random.randint(50, 999999999)
 
-        self.generator_add_task(task_number, status=status)
+        self.generator_add_task(task_number, status=status, project_id=project_id, priority=priority, phase=phase)
 
-        return self._generate_task(task_number, project_id, status, priority)
+        return self._generate_task(self.generator_get_task(task_number))
 
     """
        Response functions 
@@ -97,11 +99,7 @@ class SdeResponseGenerator(ResponseGenerator):
             if params.get('project'):
                 tasks = []
                 for task_number in self.generator_get_all_tasks():
-                    task = self.generator_get_task(task_number)
-                    _task = self._generate_task(task_number, params.get('project'), task['status'])
-                    _task['text_notes'] = task['text_notes']
-                    _task['ide_notes'] = task['ide_notes']
-                    _task['analysis_notes'] = task['analysis_notes']
+                    _task = self._generate_task(self.generator_get_task(task_number))
                     tasks.append(_task)
                 return {'tasks': tasks}
             self.raise_error('500', {
@@ -119,7 +117,7 @@ class SdeResponseGenerator(ResponseGenerator):
 
             if method == 'GET':
                 if task:
-                    return self._generate_task(task_number, project_id)
+                    return self._generate_task(task)
                 else:
                     self.raise_error('500', {'error': 'Not Found'})
             elif method == 'PUT':
@@ -127,7 +125,7 @@ class SdeResponseGenerator(ResponseGenerator):
                     status = data['status']
                     self.generator_update_task(task_number, 'status', status)
 
-                    return self._generate_task(task_number, project_id)
+                    return self._generate_task(self.generator_get_task(task_number))
                 else:
                     self.raise_error('500', {'error': 'Not Found'})
         else:
@@ -246,21 +244,15 @@ class SdeResponseGenerator(ResponseGenerator):
     """
         JSON Generator
     """
-    def _generate_task(self, task_number, project_id=1000, status='TODO', priority=7):
-        if task_number in ['36', '38', '40']:
-            task = self.get_json_from_file('T%s' % task_number)
+    def _generate_task(self, task):
+        if task.get('id') in ['36', '38', '40']:
+            _task = self.get_json_from_file('T%s' % task['id'])
         else:
-            task = self.get_json_from_file('task')
-            task['title'] = 'T%s: Test Task' % task_number
-            task['priority'] = priority
+            _task = self.get_json_from_file('task')
+            for key, value in task.items():
+                _task[key] = value
 
-        if status is not None:
-            task['status'] = status
-
-        task['id'] = '%s-T%s' % (project_id, task_number)
-        task['project'] = project_id
-
-        return task
+        return _task
 
     def _generate_task_note_with_values(self, note_type, fields):
         task_note = self.get_json_from_file('%s_note' % note_type)
