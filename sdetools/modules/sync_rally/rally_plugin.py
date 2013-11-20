@@ -98,12 +98,13 @@ class RallyConnector(AlmConnector):
         config.add_custom_option('rally_done_statuses', 'Statuses that signify a task is Done in Rally',
             default='Completed,Accepted')
         config.add_custom_option('rally_workspace', 'Rally Workspace', default=None)
+        config.add_custom_option('rally_card_type', 'IDs for issues raised in Rally', default='Story')
 
     def initialize(self):
         super(RallyConnector, self).initialize()
 
         #Verify that the configuration options are set properly
-        for item in ['rally_done_statuses', 'rally_new_status', 'rally_workspace']:
+        for item in ['rally_done_statuses', 'rally_card_type', 'rally_new_status', 'rally_workspace']:
             if not self.config[item]:
                 raise AlmException('Missing %s in configuration' % item)
 
@@ -157,6 +158,9 @@ class RallyConnector(AlmConnector):
         self.validate_configs()
 
     def validate_configs(self):
+        if self.config['rally_card_type'] != 'Story':
+            raise AlmException('Invalid rally_card_type configuration. Expected "Story"')
+
         query_args = {
             'query': '(Name = \"Hierarchical Requirement\")',
             'workspace': self.workspace_ref,
