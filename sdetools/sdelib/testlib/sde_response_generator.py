@@ -44,7 +44,7 @@ class SdeResponseGenerator(ResponseGenerator):
                 "phase": phase,
                 "status": self.generator_get_valid_statuses()[0],
                 "analysis_notes": [],
-                "id": '1000-T%s' % task_number
+                "id": '%d-T%s' % (project_id, task_number)
             }
 
     def generate_sde_task(self, task_number=None, project_id=1000, status='TODO', priority=7, phase='requirement'):
