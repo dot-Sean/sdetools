@@ -159,7 +159,7 @@ class RallyConnector(AlmConnector):
 
     def validate_configs(self):
         if self.config['rally_card_type'] != 'Story':
-            raise AlmException('Invalid rally_card_type configuration. Expected "Story"')
+            raise AlmException('Invalid configuration for rally_card_type. Expected "Story"')
 
         query_args = {
             'query': '(Name = \"Hierarchical Requirement\")',

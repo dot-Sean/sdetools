@@ -30,6 +30,12 @@ class TestRallyCase(AlmPluginTestBase, unittest.TestCase):
         self.assert_exception(AlmException, '', 'Unable to retrieve subscription from Rally.',
                               self.connector.alm_connect_project)
 
+    def test_invalid_card_type(self):
+        self.config['rally_card_type'] = 'BAD_CARD_TYPE'
+
+        self.assert_exception(AlmException, '', 'Invalid configuration for rally_card_type. Expected "Story"',
+                              self.connector.alm_connect_project)
+
     def test_invalid_new_status(self):
         bad_status = 'INVALID_NEW_STATUS'
         allowed_statuses = [u'Defined', u'In-Progress', u'Completed', u'Accepted']
