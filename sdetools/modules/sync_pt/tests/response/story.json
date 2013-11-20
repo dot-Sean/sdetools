@@ -2,5 +2,6 @@
        "updated_at": "2013-10-02T17:18:48Z",
        "current_state": "unstarted",
        "name": "Test Story",
-       "id": 560
+       "id": 560,
+       "story_type": "bug"
 }
