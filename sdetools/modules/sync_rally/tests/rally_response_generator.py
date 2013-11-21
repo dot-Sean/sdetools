@@ -16,13 +16,48 @@ class RallyResponseGenerator(ResponseGenerator):
             '/%s/project\.js' % base_path: 'get_project',
             '/%s/hierarchicalrequirement\.js' % base_path: 'get_requirements',
             '/%s/hierarchicalrequirement/[0-9]+\.js' % base_path: 'call_card',
-            '/%s/hierarchicalrequirement/create\.js' % base_path: 'create_card'
+            '/%s/hierarchicalrequirement/create\.js' % base_path: 'create_card',
+            '/%s/typedefinition/[0-9]+\.js' % base_path: 'get_type_definition_by_id',
+            '/%s/typedefinition\.js' % base_path: 'get_type_definitions'
         }
         super(RallyResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
 
     """
        Response functions 
     """
+    def get_type_definition_by_id(self, target, flag, data, method):
+        if not flag:
+            if method == 'GET':
+                definition_id = re.search('[0-9]+(?=\.js$)', target).group(0)
+
+                if definition_id == '14409160065':
+                    return self.get_json_from_file('hierarchical_requirement_definition')
+                else:
+                    self.raise_error('404')
+            self.raise_error('405')
+        else:
+            self.raise_error('401')
+
+    def get_type_definitions(self, target, flag, data, method):
+        if not flag:
+            if method == 'GET':
+                response = self._generate_query_result()
+                params = self.get_url_parameters(target)
+                query = params.get('query')
+
+                if query:
+                    query = self._parse_rally_query(query[0])
+
+                    if query.get('Name') == '"Hierarchical Requirement"':
+                        result = self._generate_result(query.get('Name'), 'HierarchicalRequirement', '14409160065')
+                        response['QueryResult']['TotalResultCount'] = 1
+                        response['QueryResult']['Results'].append(result)
+
+                return response
+            self.raise_error('405')
+        else:
+            self.raise_error('401')
+
     def get_tasks(self, target, flag, data, method):
         if not flag:
             return self.get_json_from_file('task')
@@ -44,7 +79,7 @@ class RallyResponseGenerator(ResponseGenerator):
     def get_requirements(self, target, flag, data, method):
         if not flag:
             params = self.get_url_parameters(target)
-            task_number = self.extract_task_number_from_title(params['query'])
+            task_number = self.extract_task_number_from_title(params['query'][0])
             task = self.generator_get_task(task_number)
             requirements = self.get_json_from_file('hierarchical_requirements')
 
@@ -100,3 +135,26 @@ class RallyResponseGenerator(ResponseGenerator):
                 self.raise_error('405')
         else:
             self.raise_error('401')
+
+    # Generator Functions
+    def _generate_query_result(self):
+        return self.get_json_from_file('queryresult')
+
+    def _generate_result(self, object_name, object_type, ref_id):
+        return {
+            "_rallyAPIMajor": 1,
+            "_rallyAPIMinor": 39,
+            "_ref": "https://rally1.rallydev.com/slm/webservice/1.39/typedefinition/%s.js" % ref_id,
+            "_refObjectName": object_name,
+            "_type": object_type
+        }
+
+    @staticmethod
+    def _parse_rally_query(query):
+        """ Converts a rally query into a python dict.
+            E.g. (Name = "Requirement") -> {'Name': 'Requirement'}
+        """
+        query = re.findall('(?<=\()[^()]*(?=\))', query)
+        query = [re.split('\s*contains\s*|\s*=\s*', q) for q in query]
+
+        return dict(query)
