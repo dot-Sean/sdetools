@@ -280,7 +280,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
         return entities
 
     def get_url_parameters(self, url):
-        query, fields = [q for q in super(HPAlmResponseGenerator, self).get_url_parameters(url).values()]
+        query, fields = [q[0] for q in super(HPAlmResponseGenerator, self).get_url_parameters(url).values()]
         queries = [re.findall('[-\w ]+', q) for q in query.split(';')]
         fields = fields.split(',')
 
