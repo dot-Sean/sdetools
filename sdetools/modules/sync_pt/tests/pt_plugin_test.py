@@ -27,22 +27,29 @@ class TestPivotalTrackerCase(AlmPluginTestBase, unittest.TestCase):
         self.config['pt_story_type'] = 'BAD_STORY_TYPE'
         valid_types = ['feature', 'bug', 'chore']
 
-        self.assert_exception(AlmException, '', '%s is not a valid %s configuration. Expected one of %s.' %
-                                (['BAD_STORY_TYPE'], 'pt_story_type', valid_types), self.connector.alm_connect)
+        self.assert_exception(AlmException, '', 'Invalid %s %s. Expected one of %s.' %
+                              ('pt_story_type', 'BAD_STORY_TYPE', valid_types), self.connector.alm_connect)
 
     def test_invalid_new_status(self):
         self.config['pt_new_status'] = 'BAD_STATUS'
         valid_types = ['unstarted', 'unscheduled', 'started']
 
-        self.assert_exception(AlmException, '', '%s is not a valid %s configuration. Expected one of %s.' %
-                                (['BAD_STATUS'], 'pt_new_status', valid_types), self.connector.alm_connect)
+        self.assert_exception(AlmException, '', 'Invalid %s %s. Expected one of %s.' %
+                              ('pt_new_status', 'BAD_STATUS', valid_types), self.connector.alm_connect)
 
     def test_invalid_done_statuses(self):
-        self.config['pt_done_statuses'] = 'BAD_STATUS'
+        self.config['pt_done_statuses'] = ['BAD_STATUS', 'accepted']
         valid_types = ['accepted', 'delivered', 'finished']
 
-        self.assert_exception(AlmException, '', '%s is not a valid %s configuration. Expected one of %s.' %
-                                (['BAD_STATUS'], 'pt_done_statuses', valid_types), self.connector.alm_connect)
+        self.assert_exception(AlmException, '', 'Invalid %s %s. Expected one of %s.' %
+                              ('pt_done_statuses', set(['BAD_STATUS']), valid_types), self.connector.alm_connect)
+
+    def test_invalid_chore_done_status(self):
+        self.config['pt_done_statuses'] = ['finished']
+        self.config['pt_story_type'] = 'chore'
+
+        self.assert_exception(AlmException, '', 'Chores only have one completion state - "accepted"',
+                              self.connector.alm_connect)
 
     def test_pt_add_feature_story(self):
         self.config['conflict_policy'] = 'sde'

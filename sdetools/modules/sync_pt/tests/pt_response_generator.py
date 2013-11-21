@@ -54,7 +54,10 @@ class PivotalTrackerResponseGenerator(ResponseGenerator):
         if not flag:
             stories = []
             params = self.get_url_parameters(target)
-            story_id = re.search('(?<=T)[0-9]+(?=:)', params.get('filter')).group(0)
+            if not params.get('filter'):
+                self.raise_error('400')
+
+            story_id = re.search('(?<=T)[0-9]+(?=:)', params['filter'][0]).group(0)
             task = self.generator_get_task(story_id)
 
             if task:

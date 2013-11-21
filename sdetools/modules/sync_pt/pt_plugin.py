@@ -159,9 +159,7 @@ class PivotalTrackerConnector(AlmConnector):
         if self.project_uri is None:
             raise AlmException('PivotalTracker project %s is missing or invalid' % self.config['alm_project'])
 
-        self.validate_configs()
-
-    def validate_configs(self):
+    def alm_validate_configurations(self):
         """ We have no way of fetching the valid values for each field so we will hard-code them """
         validate_configurations = [
             (self.ALM_NEW_STATUS, self.PT_VALID_NEW_STATUSES),
@@ -173,14 +171,19 @@ class PivotalTrackerConnector(AlmConnector):
             configured_value = self.config[_conf]
 
             if type(configured_value) != ListType:
-                configured_value = [configured_value]
-            if not set(configured_value).intersection(set(valid_values)):
-                raise AlmException('%s is not a valid %s configuration. Expected one of %s.' %
-                                    (configured_value, _conf, valid_values))
+                if configured_value not in valid_values:
+                    raise AlmException('Invalid %s %s. Expected one of %s.' % (_conf, configured_value,  valid_values))
+            else:
+                difference_set = set(configured_value).difference(valid_values)
+                if difference_set:
+                    raise AlmException('Invalid %s %s. Expected one of %s.' % (_conf, difference_set,  valid_values))
 
-        if self.config[self.PT_STORY_TYPE] == 'chore' and 'accepted' not in self.config[self.ALM_DONE_STATUSES]:
+        if self.config[self.PT_STORY_TYPE] == 'chore':
             # Chores only have one applicable completion state - 'accepted'
-            self.config[self.ALM_DONE_STATUSES].insert(0, 'accepted')
+            if 'accepted' in self.config[self.ALM_DONE_STATUSES]:
+                self.config[self.ALM_DONE_STATUSES] = ['accepted']
+            else:
+                raise AlmException('Chores only have one completion state - "accepted"')
 
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])
