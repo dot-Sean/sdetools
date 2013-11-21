@@ -22,7 +22,7 @@ RALLY_HEADERS = [
     ('X-RallyIntegrationVendor', 'SD Elements'),
     ('X-RallyIntegrationVersion', '1.0'),
     ('X-RallyIntegrationOS', sys.platform),
-    ('X-RallyIntegrationPlatform', 'Python %s' % sys.version.split(' ',1)[0].replace('\n', '')),
+    ('X-RallyIntegrationPlatform', 'Python %s' % sys.version.split(' ', 1)[0].replace('\n', '')),
     ('X-RallyIntegrationLibrary', 'Rally REST API'),
 ]
 
@@ -94,9 +94,9 @@ class RallyConnector(AlmConnector):
 
         """ Adds Rally specific config options to the config file"""
         config.add_custom_option('rally_new_status', 'status to set for new tasks in Rally',
-            default='Defined')
+                                 default='Defined')
         config.add_custom_option('rally_done_statuses', 'Statuses that signify a task is Done in Rally',
-            default='Completed,Accepted')
+                                 default='Completed,Accepted')
         config.add_custom_option('rally_workspace', 'Rally Workspace', default=None)
         config.add_custom_option('rally_card_type', 'IDs for issues raised in Rally', default='Story')
 
@@ -124,7 +124,8 @@ class RallyConnector(AlmConnector):
         try:
             self.alm_plugin.call_api('task.js')
         except APIError, err:
-            raise AlmException('Unable to connect to Rally service (Check server URL, user, pass). Reason: %s' % str(err))
+            raise AlmException('Unable to connect to Rally service (Check server URL, user, pass). Reason: %s'
+                               % str(err))
 
     def alm_connect_project(self):
         workspace_ref = None
@@ -149,7 +150,7 @@ class RallyConnector(AlmConnector):
             'query': '(Name = \"%s\")' % self.config['alm_project'],
             'workspace': self.workspace_ref,
         }
-        project_ref = self.alm_plugin.call_api('project.js', args = query_args)
+        project_ref = self.alm_plugin.call_api('project.js', args=query_args)
         num_results = project_ref['QueryResult']['TotalResultCount']
         if not num_results:
             raise AlmException('Rally project not found: %s' % self.config['alm_project'])
@@ -202,7 +203,7 @@ class RallyConnector(AlmConnector):
         }
 
         try:
-            result = self.alm_plugin.call_api('hierarchicalrequirement.js',args=query_args)
+            result = self.alm_plugin.call_api('hierarchicalrequirement.js', args=query_args)
         except APIError, err:
             raise AlmException('Unable to get task %s from Rally. Reason: %s' % (task_id, str(err)))
         num_results = result['QueryResult']['TotalResultCount']
@@ -227,8 +228,8 @@ class RallyConnector(AlmConnector):
 
     def alm_add_task(self, task):
         try:
-            create_args = { 
-                'HierarchicalRequirement' : {
+            create_args = {
+                'HierarchicalRequirement': {
                     'Name': task['title'],
                     'Description': self.sde_get_task_content(task),
                     'Workspace': self.workspace_ref,
@@ -236,15 +237,15 @@ class RallyConnector(AlmConnector):
                 }
             }
             result = self.alm_plugin.call_api('hierarchicalrequirement/create.js',
-                    method = self.alm_plugin.URLRequest.POST, args = create_args)
+                                              method=self.alm_plugin.URLRequest.POST, args=create_args)
             logger.debug('Task %s added to Rally Project', task['id'])
 
         except APIError, err:
-            raise AlmException('Unable to add task to Rally %s because of %s' % 
-                    (task['id'], err))
+            raise AlmException('Unable to add task to Rally %s because of %s' %
+                               (task['id'], err))
         if result['CreateResult']['Errors']:
-            raise AlmException('Unable to add task to Rally %s. Reason: %s' % 
-                    (task['id'], str(result['CreateResult']['Errors'])[:200]))
+            raise AlmException('Unable to add task to Rally %s. Reason: %s' %
+                               (task['id'], str(result['CreateResult']['Errors'])[:200]))
 
         #Return a unique identifier to this task in Rally
         logger.info('Getting task %s', task['id'])
@@ -254,12 +255,11 @@ class RallyConnector(AlmConnector):
                                'check ALM-specific settings in config file')
 
         if (self.config['alm_standard_workflow'] and
-            (task['status'] == 'DONE' or task['status'] == 'NA')):
+                (task['status'] == 'DONE' or task['status'] == 'NA')):
             self.alm_update_task_status(alm_task, task['status'])
 
         return 'Project: %s, Story: %s' % (self.config['alm_project'],
                                            alm_task.get_alm_id())
-
 
     def alm_update_task_status(self, task, status):
         if not task or not self.config['alm_standard_workflow']:
@@ -290,7 +290,7 @@ class RallyConnector(AlmConnector):
     def alm_disconnect(self):
         pass
 
-    def convert_markdown_to_alm(self, content, ref): 
+    def convert_markdown_to_alm(self, content, ref):
         s = self.mark_down_converter.convert(content)
 
         # We do some jumping through hoops to add <br> at end of each
