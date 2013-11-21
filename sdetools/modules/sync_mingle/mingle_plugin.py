@@ -120,9 +120,7 @@ class MingleConnector(AlmConnector):
         if self._get_value_of_element_with_tag(project, 'anonymous_accessible') == 'false':
             self.sync_titles_only = False
 
-        self.validate_custom_configs()
-
-    def validate_custom_configs(self):
+    def alm_validate_configurations(self):
         # Check if card type is valid
         try:
             result = self.alm_plugin.call_api('%s/card_types.xml' % self.project_uri)

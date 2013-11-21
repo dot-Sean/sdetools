@@ -103,6 +103,9 @@ class AlmConnector(object):
         self.config.add_custom_option('test_alm_connection', 'Test Alm Connection Only '
                 '(Also checks existence of project if alm_project is specified)',
                 default='False')
+        self.config.add_custom_option('test_alm_configuration', 'Test Alm Configurations Only '
+                '(Should be ran after alm connection is successful)',
+                default='False')
         self.config.add_custom_option('alm_standard_workflow', 'Standard workflow in ALM?',
                 default='True')
         self.config.add_custom_option('alm_custom_fields', 
@@ -179,9 +182,21 @@ class AlmConnector(object):
 
         self.alm_connect_project()
 
+        if self.config['test_alm_connection'] and not self.config['test_alm_configuration']:
+            return
+
+        self.alm_validate_configurations()
+
     @abstractmethod
     def alm_connect_server(self):
         """ Sets up a connection to the ALM tool.
+
+        Raises an AlmException on encountering an error
+        """
+        pass
+
+    def alm_validate_configurations(self):
+        """ Validates alm-specific configurations
 
         Raises an AlmException on encountering an error
         """
