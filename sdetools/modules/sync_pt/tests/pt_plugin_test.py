@@ -51,6 +51,19 @@ class TestPivotalTrackerCase(AlmPluginTestBase, unittest.TestCase):
         self.assert_exception(AlmException, '', 'Chores only have one completion state - "accepted"',
                               self.connector.alm_connect)
 
+    def test_invalid_estimate_not_numeric(self):
+        self.config['pt_default_estimate'] = 'ONE'
+
+        self.assert_exception(AlmException, '', 'Expected a numeric value for pt_default_estimate',
+                              self.connector.alm_connect)
+
+    def test_invalid_estimate_out_of_range(self):
+        self.config['pt_default_estimate'] = '10000'
+        valid_values = [0.0, 1.0, 2.0, 3.0]
+
+        self.assert_exception(AlmException, '', 'Invalid %s %s. Expected one of %s.' %
+                              ('pt_default_estimate', '10000.0', valid_values), self.connector.alm_connect)
+
     def test_pt_add_feature_story(self):
         self.config['conflict_policy'] = 'sde'
         self.config['pt_story_type'] = 'feature'
