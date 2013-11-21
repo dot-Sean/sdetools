@@ -121,3 +121,7 @@ pt_done_statuses = accepted
 
 #[Optional] Specify a label to group all stories created by sync tool
 #pt_group_label = SD Elements
+
+#[Optional] Specify an estimate to apply to all newly added stories as well as
+#unestimated stories that are set to DONE during the sync 
+#pt_default_estimate = 0

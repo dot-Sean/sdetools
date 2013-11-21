@@ -329,7 +329,6 @@ class PivotalTrackerConnector(AlmConnector):
             'story_type': self.config[self.PT_STORY_TYPE],
         }
         if create_args['story_type'] in self.requires_estimate:
-            # We need to add an estimate to set the task to started
             create_args['estimate'] = self.config[self.PT_DEFAULT_ESTIMATE]
         if pt_priority_label:
             pt_labels.append({'name': pt_priority_label})
