@@ -3,6 +3,7 @@
 
 import re
 from datetime import datetime
+from types import ListType
 
 from sdetools.sdelib.commons import urlencode_str
 from sdetools.sdelib.restclient import RESTBase
@@ -42,13 +43,14 @@ class PivotalTrackerAPI(RESTBase):
 class PivotalTrackerTask(AlmTask):
     """ Representation of a task in PivotalTracker"""
 
-    def __init__(self, task_id, alm_id, status, timestamp, done_statuses):
+    def __init__(self, task_id, alm_id, status, timestamp, done_statuses, updateable):
         self.task_id = task_id
         self.alm_id = alm_id
         self.status = status
         self.timestamp = timestamp
         self.done_statuses = done_statuses  # comma-separated list
         self.priority = None
+        self.updateable = updateable
 
     def get_task_id(self):
         return self.task_id
@@ -67,6 +69,10 @@ class PivotalTrackerTask(AlmTask):
         """ Returns a datetime object """
         return datetime.strptime(self.timestamp, '%Y-%m-%dT%H:%M:%SZ')
 
+    def is_updateable(self):
+        """ The task is updateable from SDE to ALM if the story does not require estimates
+        or it does require estimates and has an estimate. False otherwise """
+        return self.updateable
 
 class PivotalTrackerConnector(AlmConnector):
     alm_name = 'PivotalTracker'
@@ -76,6 +82,9 @@ class PivotalTrackerConnector(AlmConnector):
     ALM_PROJECT_VERSION = 'alm_project_version'
     ALM_PRIORITY_MAP = 'alm_priority_map'
     PT_GROUP_LABEL = 'pt_group_label'
+    PT_VALID_STORY_TYPES = ['feature', 'bug', 'chore']
+    PT_VALID_DONE_STATUSES = ['accepted', 'delivered', 'finished']
+    PT_VALID_NEW_STATUSES = ['unstarted', 'unscheduled', 'started']
 
     def __init__(self, config, alm_plugin):
         """ Initializes connection to PivotalTracker """
@@ -83,10 +92,8 @@ class PivotalTrackerConnector(AlmConnector):
 
         config.add_custom_option(self.PT_STORY_TYPE, 'Default story type on PivotalTracker', default='bug')
         config.add_custom_option(self.ALM_NEW_STATUS, 'Status to set for new tasks in PivotalTracker',
-
-                                 default='unstarted')
+                                 default='unscheduled')
         config.add_custom_option(self.ALM_DONE_STATUSES, 'Statuses that signify a task is Done in PivotalTracker',
-
                                  default='accepted')
         config.add_custom_option(self.ALM_PROJECT_VERSION, 'Name of release marker to place all new stories under',
                                  default='')
@@ -97,6 +104,7 @@ class PivotalTrackerConnector(AlmConnector):
         self.alm_task_title_prefix = 'SDE '
         self.sync_titles_only = True
         self.pt_epic_exist = None
+        self.requires_estimate = ['feature']    # by default only features require an estimate
 
     def initialize(self):
         super(PivotalTrackerConnector, self).initialize()
@@ -144,10 +152,35 @@ class PivotalTrackerConnector(AlmConnector):
             if project['name'] == self.config['alm_project']:
                 self.project_uri = 'projects/%d' % project['id']
                 self.sync_titles_only = project['public']
+                if project['bugs_and_chores_are_estimatable']:
+                    self.requires_estimate = self.PT_VALID_STORY_TYPES
                 break
 
         if self.project_uri is None:
             raise AlmException('PivotalTracker project %s is missing or invalid' % self.config['alm_project'])
+
+        self.validate_configs()
+
+    def validate_configs(self):
+        """ We have no way of fetching the valid values for each field so we will hard-code them """
+        validate_configurations = [
+            (self.ALM_NEW_STATUS, self.PT_VALID_NEW_STATUSES),
+            (self.ALM_DONE_STATUSES, self.PT_VALID_DONE_STATUSES),
+            (self.PT_STORY_TYPE, self.PT_VALID_STORY_TYPES)
+        ]
+
+        for _conf, valid_values in validate_configurations:
+            configured_value = self.config[_conf]
+
+            if type(configured_value) != ListType:
+                configured_value = [configured_value]
+            if not set(configured_value).intersection(set(valid_values)):
+                raise AlmException('%s is not a valid %s configuration. Expected one of %s.' %
+                                    (configured_value, _conf, valid_values))
+
+        if self.config[self.PT_STORY_TYPE] == 'chore' and 'accepted' not in self.config[self.ALM_DONE_STATUSES]:
+            # Chores only have one applicable completion state - 'accepted'
+            self.config[self.ALM_DONE_STATUSES].insert(0, 'accepted')
 
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])
@@ -156,8 +189,8 @@ class PivotalTrackerConnector(AlmConnector):
 
         try:
             # Fields parameter will filter response data to only contain story status, name, timestamp and id
-            stories = self.alm_plugin.call_api('%s/stories?filter="%s:"&fields=current_state,name,updated_at,id' %
-                                               (self.project_uri, urlencode_str(task_id)))
+            stories = self.alm_plugin.call_api('%s/stories?filter="%s:"&fields=current_state,name,updated_at,id,estimate,story_type'
+                                               % (self.project_uri, urlencode_str(task_id)))
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get story %s from PivotalTracker' % task_id)
@@ -172,11 +205,14 @@ class PivotalTrackerConnector(AlmConnector):
                            % (task_id, story['id']))
 
         logger.info('Found task: %s', task_id)
+        updateable = story['story_type'] not in self.requires_estimate or story.get('estimate') is not None
+
         return PivotalTrackerTask(task_id,
                                   story['id'],
                                   story['current_state'],
                                   story['updated_at'],
-                                  self.config[self.ALM_DONE_STATUSES])
+                                  self.config[self.ALM_DONE_STATUSES],
+                                  updateable)
 
     def pt_get_release_marker_id(self, release_name):
         try:
@@ -272,7 +308,9 @@ class PivotalTrackerConnector(AlmConnector):
             'current_state': self.config[self.ALM_NEW_STATUS],
             'story_type': self.config[self.PT_STORY_TYPE],
         }
-
+        if create_args['story_type'] in self.requires_estimate and create_args['current_state'] == 'started':
+            # We need to add an estimate to set the task to started
+            create_args['estimate'] = 0.0
         if pt_priority_label:
             pt_labels.append({'name': pt_priority_label})
         if pt_release_marker_name:
@@ -302,12 +340,14 @@ class PivotalTrackerConnector(AlmConnector):
             raise AlmException('Unable to add story %s to PivotalTracker. Reason: %s - %s'
                                % (task['id'], new_story['code'], new_story['general_problem']))
 
+        updateable = new_story['story_type'] not in self.requires_estimate or new_story.get('estimate') is not None
         # API returns JSON of the new issue
         alm_task = PivotalTrackerTask(task['title'],
                                       new_story['id'],
                                       new_story['current_state'],
                                       new_story['updated_at'],
-                                      self.config[self.ALM_DONE_STATUSES])
+                                      self.config[self.ALM_DONE_STATUSES],
+                                      updateable)
 
         if (self.config['alm_standard_workflow'] and
                 (task['status'] == 'DONE' or task['status'] == 'NA')):
@@ -329,7 +369,8 @@ class PivotalTrackerConnector(AlmConnector):
         update_args = {
             'current_state': alm_state
         }
-
+        if not task.is_updateable():
+            update_args['estimate'] = 0.0
         if pt_release_marker_name:
             update_args['after_id'] = self.pt_get_release_marker_id(pt_release_marker_name)
         try:
