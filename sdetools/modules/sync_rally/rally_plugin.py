@@ -156,9 +156,7 @@ class RallyConnector(AlmConnector):
             raise AlmException('Rally project not found: %s' % self.config['alm_project'])
         self.project_ref = project_ref['QueryResult']['Results'][0]['_ref']
 
-        self.validate_configs()
-
-    def validate_configs(self):
+    def alm_validate_configurations(self):
         if self.config['rally_card_type'] != 'Story':
             raise AlmException('Invalid configuration for rally_card_type. Expected "Story"')
 
@@ -188,9 +186,11 @@ class RallyConnector(AlmConnector):
                 if self.config['rally_new_status'] not in allowed_values:
                     raise AlmException('Invalid rally_new_status "%s". Expected one of %s' %
                                        (self.config['rally_new_status'], allowed_values))
-                if not set(self.config['rally_done_statuses']).intersection(set(allowed_values)):
+
+                difference_set = set(self.config['rally_done_statuses']).difference(allowed_values)
+                if difference_set:
                     raise AlmException('Invalid rally_done_statuses %s. Expected one of %s' %
-                                       (self.config['rally_done_statuses'], allowed_values))
+                                       (difference_set, allowed_values))
                 return
         raise AlmException('Unable to retrieve allowed values for the "Schedule State" attribute')
 

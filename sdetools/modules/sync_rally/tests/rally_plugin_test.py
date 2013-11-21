@@ -5,7 +5,6 @@ import unittest
 from rally_response_generator import RallyResponseGenerator
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_rally.rally_plugin import RallyConnector, RallyAPIBase, AlmException
-PATH_TO_ALM_REST_API = 'sdetools.modules.sync_rally.rally_plugin'
 
 
 class TestRallyCase(AlmPluginTestBase, unittest.TestCase):
@@ -34,7 +33,7 @@ class TestRallyCase(AlmPluginTestBase, unittest.TestCase):
         self.config['rally_card_type'] = 'BAD_CARD_TYPE'
 
         self.assert_exception(AlmException, '', 'Invalid configuration for rally_card_type. Expected "Story"',
-                              self.connector.alm_connect_project)
+                              self.connector.alm_connect)
 
     def test_invalid_new_status(self):
         bad_status = 'INVALID_NEW_STATUS'
@@ -42,15 +41,15 @@ class TestRallyCase(AlmPluginTestBase, unittest.TestCase):
         self.config['rally_new_status'] = bad_status
 
         self.assert_exception(AlmException, '', 'Invalid rally_new_status "%s". Expected one of %s' %
-                                                (bad_status, allowed_statuses), self.connector.alm_connect_project)
+                              (bad_status, allowed_statuses), self.connector.alm_connect)
 
     def test_invalid_done_statuses(self):
-        bad_status = ['INVALID_DONE_STATUS']
+        bad_status = ['INVALID_DONE_STATUS','Defined']
         allowed_statuses = [u'Defined', u'In-Progress', u'Completed', u'Accepted']
         self.config['rally_done_statuses'] = bad_status
 
-        self.assert_exception(AlmException, '', 'Invalid rally_done_statuses %s. Expected one of %s' %
-                                                (bad_status, allowed_statuses), self.connector.alm_connect_project)
+        self.assert_exception(AlmException, '', 'Invalid rally_done_statuses set(%s). Expected one of %s' %
+                              ([bad_status[0]], allowed_statuses), self.connector.alm_connect)
 
 
 

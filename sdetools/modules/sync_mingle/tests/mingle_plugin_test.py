@@ -44,21 +44,21 @@ class TestMingleCase(AlmPluginTestBase, unittest.TestCase):
         exception_msg = "The given mingle card type 'INVALID-CARD-TYPE' is not one of the valid card types: " \
                         "[u'Story', u'Bug']"
 
-        self.assert_exception(AlmException, '', exception_msg, self.connector.synchronize)
+        self.assert_exception(AlmException, '', exception_msg, self.connector.alm_connect)
 
     def test_invalid_config_new_status(self):
         self.connector.config['mingle_new_status'] = 'BAD_NEW_STATUS'
-        exception_msg = "The following statuses, ['BAD_NEW_STATUS'], are invalid. Expected one of" \
+        exception_msg = "Invalid mingle_new_status BAD_NEW_STATUS. Expected one of" \
                         " ['New', 'Open', 'Closed']"
 
-        self.assert_exception(AlmException, '', exception_msg, self.connector.synchronize)
+        self.assert_exception(AlmException, '', exception_msg, self.connector.alm_connect)
 
     def test_invalid_config_done_statuses(self):
-        self.connector.config['mingle_new_status'] = 'BAD_DONE_STATUS_1,BAD_DONE_STATUS2'
-        exception_msg = "The following statuses, ['BAD_DONE_STATUS_1,BAD_DONE_STATUS2'], are invalid. Expected one of" \
+        self.connector.config['mingle_done_statuses'] = ['BAD_DONE_STATUS_1', 'New']
+        exception_msg = "Invalid mingle_done_statuses set(['BAD_DONE_STATUS_1']). Expected one of" \
                         " ['New', 'Open', 'Closed']"
 
-        self.assert_exception(AlmException, '', exception_msg, self.connector.synchronize)
+        self.assert_exception(AlmException, '', exception_msg, self.connector.alm_connect)
 
     def test_content_on_public_repo(self):
         PUBLIC_TASK_CONTENT = 'Visit us at http://www.sdelements.com/ to find out how you can easily add' \

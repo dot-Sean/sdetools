@@ -218,16 +218,18 @@ class HPAlmConnector(AlmConnector):
         except APIError, err:
             raise AlmException('Unable to retrieve statuses: %s' % err)
 
-        requirement_statuses = set([item['value'] for item in requirement_lists['lists'][0]['Items']])
+        requirement_statuses = [item['value'] for item in requirement_lists['lists'][0]['Items']]
 
-        for config in ['hp_alm_new_status', 'hp_alm_reopen_status', 'hp_alm_close_status', 'hp_alm_done_statuses']:
+        for config in ['hp_alm_new_status', 'hp_alm_reopen_status', 'hp_alm_close_status']:
             status = self.config[config]
 
-            if type(status) is not ListType:
-                status = [status]
-            if not set(status).intersection(requirement_statuses):
-                raise AlmException('Invalid configuration: %s. Expected [%s], got %s' %
-                                   (config, requirement_statuses, status))
+            if not status in requirement_statuses:
+                raise AlmException('Invalid %s %s. Expected one of %s' % (config, status, requirement_statuses))
+
+        difference_set = set(self.config['hp_alm_done_statuses']).difference(requirement_statuses)
+        if difference_set:
+            raise AlmException('Invalid hp_alm_done_statuses %s. Expected one of %s' %
+                               (difference_set, requirement_statuses))
 
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])

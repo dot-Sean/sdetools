@@ -151,13 +151,15 @@ class MingleConnector(AlmConnector):
 
                 property_values = result.getElementsByTagName('property_value')
                 statuses = [str(self._get_value_of_element_with_tag(status, 'value')) for status in property_values]
-                configured_statuses = list(self.config['mingle_done_statuses'])
-                configured_statuses.append(self.config['mingle_new_status'])
-                invalid_statuses = [status for status in configured_statuses if status not in statuses]
 
-                if invalid_statuses:
-                    raise AlmException('The following statuses, %s, are invalid. Expected one of %s' %
-                                       (invalid_statuses, statuses))
+                if self.config['mingle_new_status'] not in statuses:
+                    raise AlmException('Invalid mingle_new_status %s. Expected one of %s' %
+                                       (self.config['mingle_new_status'], statuses))
+
+                difference_set = set(self.config['mingle_done_statuses']).difference(statuses)
+                if difference_set:
+                    raise AlmException('Invalid mingle_done_statuses %s. Expected one of %s' % (difference_set, statuses))
+
                 return
         raise AlmException('Could not find the property definition for Status to validate configured statuses')
 
