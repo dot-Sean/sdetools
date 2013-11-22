@@ -1,4 +1,4 @@
-[{
+{
 	"url": "https://api.github.com/org:/repo:/milestones/1",
 	"number": 1,
 	"state": "open",
@@ -16,4 +16,4 @@
 	"closed_issues": 8,
 	"created_at": "2011-04-10T20:09:31Z",
 	"due_on": null
-}]
+}

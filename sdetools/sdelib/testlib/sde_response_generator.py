@@ -50,9 +50,9 @@ class SdeResponseGenerator(ResponseGenerator):
             "status": status,
             "id": '%d-T%s' % (project_id, task_number)
         }
-        self.generator_add_task(task_number, sde_task)
+        self.generator_add_resource('task', task_number, sde_task)
 
-        return self.generator_get_task(task_number)
+        return self.generate_resource_from_template('task', sde_task)
 
     """
        Response functions 
@@ -177,11 +177,10 @@ class SdeResponseGenerator(ResponseGenerator):
     def add_project_analysis_note(self, target, flag, data, method):
         if not flag:
             if method == 'POST':
-                if data:
-                    if data['analysis_type'] in self.ANALYSIS_TOOLS:
-                        self.generator_add_resource('project_analysis_note', resource_data=data)
+                if self.is_data_valid(data, ['analysis_type']) and data['analysis_type'] in self.ANALYSIS_TOOLS:
+                    self.generator_add_resource('project_analysis_note', resource_data=data)
 
-                        return self.generate_resource_from_template('project_analysis_note', data)
+                    return self.generate_resource_from_template('project_analysis_note', data)
             self.raise_error('500')
         else:
             self.raise_error('401')
