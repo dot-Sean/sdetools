@@ -49,9 +49,13 @@ class Config(object):
             'proxy_auth': '',
         }
 
-    def __init__(self, command_list, args, ret_chn, call_src, call_options={}):
+    def __init__(self, cmd_name, sub_cmd_name, command_list, args, ret_chn, call_src, call_options={}):
         if call_src not in ['shell', 'import']:
             raise UsageError("Invalid config source")
+
+        self.command = cmd_name
+        self.sub_cmd = sub_cmd_name
+        self.args = args[1:]
 
         self.call_src = call_src
         self.command_list = command_list
@@ -60,9 +64,15 @@ class Config(object):
         self.parser = None
         self.use_conf_file = True
         self.call_options = call_options
-        self.args = args
         self.ret_chn = ret_chn
         self.emit = self.ret_chn.emit
+
+    def copy(self):
+        dup = Config(self.command, self.sub_cmd, self.command_list, [''] + self.args, self.ret_chn,
+                self.call_src, self.call_options)
+        dup.settings = self.settings.copy()
+        dup.use_conf_file = self.use_conf_file
+        return dup
 
     def __getitem__(self, key):
         if key in self.settings:
@@ -253,9 +263,6 @@ class Config(object):
         ret_stat, ret_val = self.parse_config_file(self['conf_file'])
         if not ret_stat:
             raise UsageError("Unable to read or process configuration file.\n Reason: %s" % (ret_val))
-
-        self.command = args[0]
-        self.args = args[1:]
 
         # No more errors, lets apply the changes
         if opts.quiet:

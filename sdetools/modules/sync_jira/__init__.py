@@ -11,6 +11,7 @@ from sdetools.sdelib.interactive_plugin import PluginError
 
 class Command(BaseCommand):
     help = 'JIRA <-> SDE sync utility.'
+    sub_cmds = ['4', '5', '6']
 
     def configure(self):
         self.config.add_custom_option('jira_version', 'Version of JIRA [e.g. 4.3.3, 5, or 6.0]', 

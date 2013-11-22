@@ -17,6 +17,7 @@ class Command(BaseCommand):
 
     def configure(self):
         self.help_cmd = None
+        self.help_subcmd = None
 
     def parse_args(self):
         # We bypass parsing and validation of args by overwriting the base class behavior
@@ -24,10 +25,19 @@ class Command(BaseCommand):
         if not self.args:
             return True
 
+        if '-h' in self.args:
+            self.config.parse_args(self)
+            return False
+
         self.help_cmd = self.args[0]
+        if '.' in self.help_cmd:
+            self.help_cmd, self.help_subcmd = self.help_cmd.split('.', 1)
 
         if self.help_cmd not in self.config.command_list:
             raise commons.UsageError('Unable to find command %s' % (self.help_cmd))
+        if self.help_subcmd is not None:
+            if self.help_subcmd not in self.config.command_list[self.help_cmd].sub_cmds:
+                raise commons.UsageError('Unable to find subcommand %s' % (self.help_subcmd))
         return True
 
     def get_commands_help(self):
@@ -48,8 +58,12 @@ class Command(BaseCommand):
 
     def handle(self):
         if self.help_cmd:
+            cmd_config = self.config.copy()
+            cmd_config.command = self.help_cmd
+            cmd_config.sub_cmd = self.help_subcmd
+
             cmd_obj = self.config.command_list[self.help_cmd]
-            cmd_inst = cmd_obj(self.config, self.args)
+            cmd_inst = cmd_obj(cmd_config, self.args)
             cmd_inst.configure()
             cmd_inst.config.prepare_parser(cmd_inst)
             cmd_inst.config.parser.print_help()
@@ -58,4 +72,3 @@ class Command(BaseCommand):
             self.print_command_list(cmd_list)
 
         return True
-

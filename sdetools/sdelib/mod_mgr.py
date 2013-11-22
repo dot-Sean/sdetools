@@ -108,6 +108,8 @@ def load_modules():
             cmd_cls.name = mod_name
         if not hasattr(cmd_cls, 'help'):
             raise commons.UsageError('Missing help string for module %s' % (cmd_cls.name))
+        if not hasattr(cmd_cls, 'sub_cmds'):
+            cmd_cls.sub_cmds = []
         command[cmd_cls.name] = cmd_cls
 
     return command
@@ -115,15 +117,24 @@ def load_modules():
 def run_command(cmd_name, args, call_src, call_options={},
         call_back=stdout_callback, call_back_args={}):
 
-    command = load_modules()
+    # Split command and sub-command
+    sub_cmd_name = None
+    if '.' in cmd_name:
+        cmd_name, sub_cmd_name = cmd_name.split('.', 1)
 
-    if cmd_name not in command:
+    command_list = load_modules()
+
+    if cmd_name not in command_list:
         raise commons.UsageError("Command not found: %s" % (cmd_name))
 
-    curr_cmd = command[cmd_name]
-
     ret_chn = ReturnChannel(call_back, call_back_args)
-    config = conf_mgr.Config(command, args, ret_chn, call_src, call_options)
+    config = conf_mgr.Config(cmd_name, sub_cmd_name, command_list, args, ret_chn, call_src, call_options)
+
+    curr_cmd = command_list[cmd_name]
+
+    if sub_cmd_name is not None:
+        if sub_cmd_name not in curr_cmd.sub_cmds:
+            raise commons.UsageError("Sub-Command %s not found for command %s" % (sub_cmd_name, cmd_name))
 
     try:
         cmd_inst = curr_cmd(config, args)
