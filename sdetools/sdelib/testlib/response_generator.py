@@ -3,45 +3,55 @@ import json
 import re
 import urllib
 
+from types import IntType
 from mock import MagicMock
 from urllib2 import HTTPError
 from urlparse import urlparse
 from datetime import datetime
 from sdetools.extlib.defusedxml import minidom
-from sdetools.sdelib.commons import abc, get_directory_of_current_module
-from sdetools.sdelib import log_mgr
-abstractmethod = abc.abstractmethod
-logger = log_mgr.mods.add_mod(__name__)
+from sdetools.sdelib.commons import get_directory_of_current_module
 
 
 class ResponseGenerator(object):
-    def __init__(self, rest_api_targets, statuses, test_dir=None):
-        """
-            Initializes commonly used variables.
+    def __init__(self, rest_api_targets, resource_templates, test_dir=None, base_path='/'):
+        """Initializes commonly used variables.
 
-            statuses            - List of valid task statuses. First entry will be used as the default status
-            test_dir            - Directory containing current test; used to locate response files
-            alm_tasks           - Stores tasks created through our mock
-            rest_api_targets    - Dict object containing key-value pairs used in get_response to triage API calls
-                                  to its corresponding response generating method.
-                                  Expected format:
-                                    "regex_pattern_of_api_target": "method_to_call_on_match"
+        Keyword arguments:
+        rest_api_targets    -- Dict object containing key-value pairs used in get_response to triage API calls
+                               to its corresponding response generating method.
+                               Expected format:
+                                 "regex_pattern_of_api_target": "method_to_call_on_match"
+        resource_templates  -- List of resources we want to store. Specify the filename of the resource template.
+        test_dir            -- Directory containing current test; used to locate response files
+        base_path           -- URL that will be prepended to each rest api target.
+                               Expected format:
+                                 "/BASE_PATH/"
+
         """
         if test_dir is None:
             test_dir = get_directory_of_current_module(self)
 
-        self.statuses = statuses
+        self.resources = {}
         self.test_dir = test_dir
+        self.base_path = base_path
         self.alm_tasks = {}
         self.rest_api_targets = rest_api_targets
-        self.init_with_tasks()
 
-    def init_with_tasks(self):
+        for resource in resource_templates:
+            resource_name, file_type = resource.split('.')
+            self.resources[resource_name] = {
+                'resources': {},
+                'file_type': file_type
+            }
+
+        self.init_with_resources()
+
+    def init_with_resources(self):
         pass
 
     @staticmethod
     def encode_response(result):
-        """ Convert response into a string """
+        """Convert response into a string."""
         if result is not None:
             return json.dumps(result)
         else:
@@ -49,24 +59,24 @@ class ResponseGenerator(object):
 
     @staticmethod
     def decode_data(data):
-        """ Convert request data into a python object """
+        """Convert request data into a python object."""
         try:
             return json.loads(data)
         except:
-            # Return the original data
             return data
 
     def get_response(self, target, flags, data, method, headers=None):
-        """
-            Triage get_response calls to the correct response generator method based on the specified target.
-            Response generator methods must accept the following parameters: [target, flag, data, method]
+        """Triage get_response calls to the correct response generator method based on the specified target.
+        Response generator methods must accept the following parameters: [target, flag, data, method]
 
-            Keywords:
-            target - the path of the API call (without host name)
-            flags  - dict object containing response modifier flags in the form of
-                     {response_func_name: keyword}.
-            data   - data passed along with the API call
-            method - HTTP Verb, specified by the URLRequest class
+        Keyword Arguments:
+        target  -- the API endpoint (without server information)
+        flags   -- dict object containing response modifier flags in the form of
+                  {response_func_name: keyword}.
+        data    -- data passed along with the API call
+        method  -- HTTP Verb, specified by the URLRequest class
+        headers -- Values in the request header
+
         """
         self.target = target
         data = self.decode_data(data)
@@ -75,7 +85,7 @@ class ResponseGenerator(object):
         #print data
 
         for api_target in self.rest_api_targets:
-            if re.match(api_target, target):
+            if re.match('%s%s' % (self.base_path, api_target), target):
                 func_name = self.rest_api_targets.get(api_target)
 
                 if func_name is not None:
@@ -114,44 +124,85 @@ class ResponseGenerator(object):
 
         raise HTTPError('%s' % self.target, error_code, message, '', fp_mock)
 
-    def generator_get_valid_statuses(self):
-        return self.statuses
-
     """
-        Task management functions
+        Resource management functions
     """
-    def generator_add_task(self, task_number, task_name=None, status=None):
+    def generator_add_resource(self, resource_type, _id=None, resource_data={}):
+        """Save a resource created through our mock.
+
+        Keyword Arguments:
+        resource_type -- One of the resources in self.resources
+        _id           -- Unique identifier for the resource.
+        resource_data -- Data to be stored. Usually from the data field in the post request
         """
-            Save a task created through our mock. Uses the task number
-            as the alm_id
-        """
-        if not self.alm_tasks.get(task_number):
-            if not task_name:
-                task_name = "T%s" % task_number
-            if status is None:
-                status = self.generator_get_valid_statuses()[0]
-            self.alm_tasks[task_number] = {
-                "name": task_name,
-                "id": task_number,
-                "status": status,
-                "timestamp": self.get_current_timestamp()
-            }
+        self._check_resource_exists(resource_type)
+        if _id is None:
+            _id = len(self.resources[resource_type]['resources'])
+        if type(_id) == IntType:
+            _id = str(_id)
+        if _id not in self.resources[resource_type]['resources']:
+            self.resources[resource_type]['resources'][_id] = resource_data
 
-    def generator_get_task(self, task_number):
-        return self.alm_tasks.get(task_number)
+        return _id
 
-    def generator_get_all_tasks(self):
-        return self.alm_tasks
+    def generator_resource_exists(self, resource_type, _id):
+        self._check_resource_exists(resource_type)
 
-    def generator_update_task(self, task_number, field, value):
-        if self.alm_tasks.get(task_number):
-            self.alm_tasks[task_number][field] = value
+        return _id in self.resources[resource_type]['resources']
 
-    def generator_clear_tasks(self, full_clear=False):
-        self.alm_tasks = {}
+    def generator_get_resource(self, resource_type, _id, data_only=False):
+        self._check_resource_exists(resource_type)
+        if self.generator_resource_exists(resource_type, _id):
+            task_data = self.resources[resource_type]['resources'][_id]
+
+            if data_only:
+                return task_data
+            else:
+                return self.generate_resource_from_template(resource_type, task_data)
+        else:
+            return None
+
+    def generator_get_all_resource(self, resource_type):
+        self._check_resource_exists(resource_type)
+        resource_data = self.resources[resource_type]['resources'].values()
+
+        return [self.generate_resource_from_template(resource_type, t) for t in resource_data]
+
+    def generator_get_filtered_resource(self, resource_type, _filter):
+        self._check_resource_exists(resource_type)
+        filtered_tasks = []
+
+        for resource_data in self.resources[resource_type]['resources'].values():
+            if self._resource_in_scope(resource_data, _filter):
+                filtered_tasks.append(self.generate_resource_from_template(resource_type, resource_data))
+
+        return filtered_tasks
+
+    @staticmethod
+    def _resource_in_scope(task, _filter):
+        for key, value in _filter.items():
+            _task_value = task.get(key)
+            if type(_task_value) == IntType:
+                _task_value = str(_task_value)
+            if _task_value is None or _task_value != value:
+                return False
+        return True
+
+    def generator_update_resource(self, resource_type, _id, update_args):
+        self._check_resource_exists(resource_type)
+        if self.generator_resource_exists(resource_type, _id):
+            resource = self.resources[resource_type]['resources'][_id]
+            for key, value in update_args.items():
+                resource[key] = value
+        else:
+            raise Exception('Resource does not exist: Type: %s, ID: %s' % (resource_type, _id))
+
+    def generator_clear_resources(self, full_clear=False):
+        for resource_type in self.resources.values():
+            resource_type['resources'] = {}
 
         if not full_clear:
-            self.init_with_tasks()
+            self.init_with_resources()
 
     """
         Response reader functions
@@ -203,3 +254,25 @@ class ResponseGenerator(object):
     def get_url_parameters(url):
         return dict([q.split('=') for q in urlparse(urllib.unquote_plus(url)).query.split('&') if q])
 
+    def _check_resource_exists(self, resource_type):
+        if resource_type not in self.resources:
+            self.raise_error('500', 'Invalid resource type %s' % resource_type)
+
+    """
+        Generator Functions
+    """
+    def generate_resource_from_template(self, resource_type, resource_data):
+        self._check_resource_exists(resource_type)
+        file_type = self.resources[resource_type]['file_type']
+
+        if file_type == 'json':
+            template = self.get_json_from_file(resource_type)
+        elif file_type == 'xml':
+            template = self.get_xml_from_file(resource_type)
+        else:
+            raise Exception('Unsupported file type %s' % file_type)
+
+        for key, value in resource_data.items():
+            template[key] = value
+
+        return template

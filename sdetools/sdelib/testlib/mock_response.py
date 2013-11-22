@@ -90,7 +90,7 @@ class MockResponse(object):
         return self.response_generator
 
     def teardown(self):
-        self.get_response_generator().generator_clear_tasks()
+        self.get_response_generator().generator_clear_resources()
         self.set_response_flags({})
 
         if self.call_api_patch is not None:
