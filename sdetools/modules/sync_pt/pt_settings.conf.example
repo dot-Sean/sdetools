@@ -113,7 +113,7 @@ pt_story_type = bug
 #PT state for newly created story
 #Note: unscheduled puts the story in the icebox, unstarted/started puts it in backlog/current sprint
 #Expects one of [unstarted, unscheduled, started]
-pt_new_status = unstarted
+pt_new_status = unscheduled
 
 #A comma delimited list of statuses that signify a task is Done in PT.
 #This status cannot be one of the new statuses or the 'rejected' status

@@ -26,13 +26,13 @@ class TestHPAlmCase(AlmPluginTestBase, unittest.TestCase):
     def test_invalid_requirement_type(self):
         self.config['hp_alm_issue_type'] = 'BAD_ISSUE_TYPE'
 
-        self.assert_exception(AlmException, '', '%s type %s not found in project' % ('requirement', 'BAD_ISSUE_TYPE'),
+        self.assert_exception(AlmException, '', '%s type %s not found in project' % ('Requirement', 'BAD_ISSUE_TYPE'),
                               self.connector.alm_connect)
 
     def test_invalid_test_type(self):
         self.config['hp_alm_test_type'] = 'BAD_TEST_TYPE'
 
-        self.assert_exception(AlmException, '', '%s type %s not found in project' % ('test', 'BAD_TEST_TYPE'),
+        self.assert_exception(AlmException, '', '%s type %s not found in project' % ('Test', 'BAD_TEST_TYPE'),
                               self.connector.alm_connect)
 
     def _test_status_validation(self, _conf):
@@ -40,7 +40,7 @@ class TestHPAlmCase(AlmPluginTestBase, unittest.TestCase):
         self.config[_conf] = _status
         valid_statuses = [u'Not Completed', u'Not Run', u'Failed', u'Blocker', u'Passed']
 
-        self.assert_exception(AlmException, '', 'Invalid %s %s. Expected one of %s' % (_conf, _status, valid_statuses),
+        self.assert_exception(AlmException, '', 'Invalid %s: %s. Expected one of %s' % (_conf, _status, valid_statuses),
                               self.connector.alm_connect)
 
     def test_invalid_hp_alm_new_status(self):
@@ -58,7 +58,7 @@ class TestHPAlmCase(AlmPluginTestBase, unittest.TestCase):
         self.config['hp_alm_done_statuses'] = _status
         valid_statuses = [u'Not Completed', u'Not Run', u'Failed', u'Blocker', u'Passed']
 
-        self.assert_exception(AlmException, '', 'Invalid hp_alm_done_statuses set(%s). Expected one of %s' %
+        self.assert_exception(AlmException, '', 'Invalid hp_alm_done_statuses: set(%s). Expected one of %s' %
                               ([_status[0]], valid_statuses), self.connector.alm_connect)
 
     def test_add_test_plan(self):
