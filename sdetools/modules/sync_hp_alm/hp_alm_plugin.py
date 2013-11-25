@@ -224,11 +224,11 @@ class HPAlmConnector(AlmConnector):
             status = self.config[config]
 
             if not status in requirement_statuses:
-                raise AlmException('Invalid %s %s. Expected one of %s' % (config, status, requirement_statuses))
+                raise AlmException('Invalid %s: %s. Expected one of %s' % (config, status, requirement_statuses))
 
         difference_set = set(self.config['hp_alm_done_statuses']).difference(requirement_statuses)
         if difference_set:
-            raise AlmException('Invalid hp_alm_done_statuses %s. Expected one of %s' %
+            raise AlmException('Invalid hp_alm_done_statuses: %s. Expected one of %s' %
                                (difference_set, requirement_statuses))
 
     def alm_get_task(self, task):
@@ -437,7 +437,7 @@ class HPAlmConnector(AlmConnector):
         for entity_type in entity_types['types']:
             if entity_type['name'] == check_value:
                 return entity_type['id']
-        raise AlmException('%s type %s not found in project' % (type, check_value))
+        raise AlmException('%s type %s not found in project' % (type.capitalize(), check_value))
 
     def _fetch_test_plan_folder_id(self, query_args="{}"):
         try:
