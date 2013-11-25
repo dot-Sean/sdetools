@@ -11,22 +11,22 @@ class HPAlmResponseGenerator(ResponseGenerator):
     TEST_TYPES = ["MANUAL"]
 
     def __init__(self, config, test_dir=None):
+        self.new_status = config['hp_alm_new_status']
         hp_alm_domain = urlencode_str(config['hp_alm_domain'])
         hp_alm_project = urlencode_str(config['alm_project'])
-        self.hp_alm_user = urlencode_str(config['alm_user'])
-        statuses = ['Not Completed', 'Passed']
-        base_path = 'qcbin'
-        project_uri = '/%s/rest/domains/%s/projects/%s' % (base_path, hp_alm_domain, hp_alm_project)
+        self.hp_alm_user = config['alm_user']
+        project_uri = 'rest/domains/%s/projects/%s' % (hp_alm_domain, hp_alm_project)
+        resource_templates = ['user.json', 'requirement.json', 'test.json', 'test-folder.json', 'requirement-coverage.json']
         rest_api_targets = {
-            '/%s/authentication-point/authenticate' % base_path: 'authenticate',
+            'authentication-point/authenticate': 'authenticate',
             '%s/requirements' % project_uri: 'call_requirements',
-            '%s/customization/users/%s' % (project_uri, self.hp_alm_user): 'get_user',
+            '%s/customization/users/%s' % (project_uri, urlencode_str(self.hp_alm_user)): 'get_user',
             '%s/customization/entities/requirement/types/' % project_uri: 'get_requirement_types',
             '%s/customization/entities/test/types/' % project_uri: 'get_test_types',
             '%s/customization/used-lists\?name=Status' % project_uri: 'get_status_types',
             '%s/test-folders' % project_uri: 'call_test_folders',
             '%s/tests' % project_uri: 'call_tests',
-            '/%s/authentication-point/logout' % base_path: 'logout',
+            'authentication-point/logout': 'logout',
             '%s/requirement\-coverages' % project_uri: 'call_requirement_coverage'
         }
 
@@ -34,7 +34,11 @@ class HPAlmResponseGenerator(ResponseGenerator):
         self.tests = []
         self.requirements = []
         self.requirement_coverages = []
-        super(HPAlmResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
+        super(HPAlmResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir, '/qcbin/')
+
+    def init_with_resources(self):
+        self.generator_add_resource('user', resource_data={'Name': self.hp_alm_user})
+        self.generator_add_resource('test-folder', resource_data={'name': 'Subject', 'parent-id': '0', 'id': '1'})
 
     """
        Response functions 
@@ -42,25 +46,24 @@ class HPAlmResponseGenerator(ResponseGenerator):
     def call_requirement_coverage(self, target, flag, data, method):
         if not flag:
             if method == 'GET':
-                response = self.generate_collection_entity()
-                queries, fields = self.get_url_parameters(target)
-                coverages = self.get_entities('requirement-coverage', queries, fields)
+                query, fields = self.get_url_parameters(target)
+                entities = self.generator_get_filtered_resource('requirement-coverage', query)
 
-                if coverages:
-                    response['TotalResults'] = len(coverages)
-                    response['entities'] = coverages
-                return response
+                return self.generate_collection_entity(entities)
             elif method == 'POST':
                 if not self.is_data_valid(data, ['test-id', 'requirement-id']):
                     self.raise_error('405')
 
-                query = [['test-id', data.get('test-id')], ['requirement-id', data.get('requirement-id')]]
-                if not self.get_entities('requirement-coverage', query, ['requirement-id']):
-                    self.requirement_coverages.append(data)
-                    response = self.generate_entity('requirement-coverage')
-                    for key, value in data.items():
-                        response['Fields'].append(self.generate_requirement_field(key, value))
-                    return response
+                query = {
+                    'test-id': data.get('test-id'),
+                    'requirement-id': data.get('requirement-id')
+                }
+                entities = self.generator_get_filtered_resource('requirement-coverage', query)
+
+                if not entities:
+                    self.generator_add_resource('requirement-coverage', resource_data=data)
+
+                    return self.generate_resource_from_template('requirement-coverage', data)
                 else:
                     self.raise_error('405', 'Duplicate requirement-coverage')
         else:
@@ -69,25 +72,17 @@ class HPAlmResponseGenerator(ResponseGenerator):
     def call_tests(self, target, flag, data, method):
         if not flag:
             if method == 'GET':
-                response = self.generate_collection_entity()
-                queries, fields = self.get_url_parameters(target)
-                tests = self.get_entities('test', queries, fields)
+                query, fields = self.get_url_parameters(target)
 
-                if tests:
-                    response['TotalResults'] = len(tests)
-                    response['entities'] = tests
-
-                return response
+                return self.generate_collection_entity(self.generator_get_filtered_resource('test', query))
             elif method == 'POST':
-                response = self.generate_entity('test')
                 task_number = self.extract_task_number_from_title(data['name'].replace('-', ':'))
                 data['id'] = task_number
-                data['exec-status'] = self.statuses[0]
+                data['exec-status'] = self.new_status
                 data['last-modified'] = self.get_current_timestamp()
-                self.tests.append(data)
-                for key, value in data.items():
-                    response['Fields'].append(self.generate_requirement_field(key, value))
-                return response
+                self.generator_add_resource('test', task_number, data)
+
+                return self.generate_resource_from_template('test', data)
             else:
                 self.raise_error('403')
         else:
@@ -96,32 +91,20 @@ class HPAlmResponseGenerator(ResponseGenerator):
     def call_test_folders(self, target, flag, data, method):
         if not flag:
             if method == 'GET':
-                response = self.generate_collection_entity()
                 queries, fields = self.get_url_parameters(target)
-                folders = self.get_entities('test-folder', queries, fields)
+                entities = self.generator_get_filtered_resource('test-folder', queries)
 
-                if folders:
-                    response['TotalResults'] = len(folders)
-                    response['entities'] = folders
-
-                return response
+                return self.generate_collection_entity(entities)
             elif method == 'POST':
-                valid_parent_id = False
-                for folder in self.test_folders:
-                    if not valid_parent_id and folder['id'] == data['parent-id']:
-                        valid_parent_id = True
-                    if folder['name'] == data['name']:
-                        self.raise_error('500')
-                if not valid_parent_id:
-                    self.raise_error('405')
+                if self.is_data_valid(data, ['parent-id', 'name']):
+                    if self.generator_get_filtered_resource('test-folder', {'name': data['name']}):
+                        self.raise_error('405')
 
-                data['id'] = len(self.test_folders) + 1
-                self.test_folders.append(data)
-                response = {"Fields": [], 'Type': 'test-folder'}
-                for key, value in data.items():
-                    response['Fields'].append(self.generate_requirement_field(key, value))
+                    data['id'] = self.generator_add_resource('test-folder', resource_data=data)
+                    self.generator_update_resource('test-folder', data['id'], data)
 
-                return response
+                    return self.generate_resource_from_template('test-folder', data)
+                self.raise_error('405')
         else:
             self.raise_error('401')
 
@@ -136,40 +119,31 @@ class HPAlmResponseGenerator(ResponseGenerator):
 
     def get_requirements(self, target, flag, data):
         queries, fields = self.get_url_parameters(target)
-        response = self.generate_collection_entity()
-        reqs = self.get_entities('requirement', queries, fields)
+        print queries
+        entities = self.generator_get_filtered_resource('requirement', queries)
 
-        if reqs:
-            response['TotalResults'] = len(reqs)
-            response['entities'] = reqs
-
-        return response
+        return self.generate_collection_entity(entities)
 
     def post_requirements(self, flag, data):
         if not flag:
-            response = self.generate_entity('requirement')
-
-            if self.get_entities('requirement', [['name', data['name']]], []):
-                self.raise_error('405')
-
             task_number = self.extract_task_number_from_title(data['name'].replace('-', ':'))
+            if self.generator_resource_exists('requirement', task_number):
+                self.raise_error('405', 'Duplicate requirement')
+            print data['name']
             data['id'] = task_number
-            data['status'] = self.statuses[0]
             data['last-modified'] = self.get_current_timestamp()
-            self.requirements.append(data)
-            for key, value in data.items():
-                response['Fields'].append(self.generate_requirement_field(key, value))
-            return response
+
+            self.generator_add_resource('requirement', task_number, resource_data=data)
+
+            return self.generate_resource_from_template('requirement', data)
         else:
             self.raise_error('500')
 
     def update_requirement_status(self, flag, data):
-        if not data['id'] or not data['status']:
+        if not self.is_data_valid(data, ['id', 'status']):
             self.raise_error('405')
-        if self.update_entity('requirement', [['id', data['id']]], {'status': data['status']}):
-            return ''
-        else:
-            self.raise_error('405')
+
+        self.generator_update_resource('requirement', data['id'], {'status': data['status']})
 
     def call_requirements(self, target, flag, data, method):
         if not flag:
@@ -185,10 +159,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
 
     def get_user(self, target, flag, data, method):
         if not flag:
-            user = self.get_json_from_file('user')
-            user['Name'] = self.hp_alm_user
-
-            return user
+            return self.generator_get_all_resource('user')[0]
         else:
             self.raise_error('401')
 
@@ -246,42 +217,15 @@ class HPAlmResponseGenerator(ResponseGenerator):
         except:
             return data
 
-    def update_entity(self, type, queries, update):
-        return self.get_entities(type, queries, [], update)[0]
-
-    def get_entities(self, _type, queries, fields, update={}):
-        if _type == 'test':
-            entity_list = self.tests
-        elif _type == 'test-folder':
-            entity_list = self.test_folders
-        elif _type == 'requirement-coverage':
-            entity_list = self.requirement_coverages
-        else:
-            entity_list = self.requirements
-        entities = []
-
-        for entity in entity_list:
-            for param, value in queries:
-                if not re.match(value, entity.get(param)):
-                    found = False
-                    break
-                else:
-                    found = True
-            if found:
-                if update:
-                    for key, value in update.items():
-                        entity[key] = value
-
-                _entity = self.generate_entity(_type)
-                for param in fields:
-                    _entity['Fields'].append(self.generate_requirement_field(param, entity[param]))
-                entities.append(_entity)
-
-        return entities
-
     def get_url_parameters(self, url):
         query, fields = [q for q in super(HPAlmResponseGenerator, self).get_url_parameters(url).values()]
-        queries = [re.findall('[-\w ]+', q) for q in query.split(';')]
+        queries = {}
+
+        for q in query.split(';'):
+            key, value = re.findall('[-\w ]+', q)
+            if key == 'name':
+                value = value.replace(':', '-')
+            queries[key] = value
         fields = fields.split(',')
 
         return queries, fields
@@ -318,26 +262,23 @@ class HPAlmResponseGenerator(ResponseGenerator):
             ]
         }
 
-    def generate_task_fields(self, task):
-        response = {
-            "Fields": [
-                self.generate_requirement_field('id', task['id']),
-                self.generate_requirement_field('status', task['status']),
-                self.generate_requirement_field('last-modified', task['timestamp'])
-            ]
-        }
-        return response
+    def generate_resource_from_template(self, resource_type, resource_data):
+        if resource_type in ['requirement', 'requirement-coverage', 'test', 'test-folder']:
+            entity = {
+                "Fields": [],
+                "Type": resource_type
+            }
+
+            for key, value in resource_data.items():
+                entity['Fields'].append(self.generate_requirement_field(key, value))
+
+            return entity
+        else:
+            return super(HPAlmResponseGenerator, self).generate_resource_from_template(resource_type, resource_data)
 
     @staticmethod
-    def generate_collection_entity():
+    def generate_collection_entity(entities=[]):
         return {
-            "TotalResults": 0,
-            "entities": []
-        }
-
-    @staticmethod
-    def generate_entity(type):
-        return {
-            "Fields": [],
-            "Type": type
+            "TotalResults": len(entities),
+            "entities": entities
         }

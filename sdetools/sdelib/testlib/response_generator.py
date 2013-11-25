@@ -134,6 +134,7 @@ class ResponseGenerator(object):
         resource_type -- One of the resources in self.resources
         _id           -- Unique identifier for the resource.
         resource_data -- Data to be stored. Usually from the data field in the post request
+
         """
         self._check_resource_exists(resource_type)
         if _id is None:
@@ -147,6 +148,8 @@ class ResponseGenerator(object):
 
     def generator_resource_exists(self, resource_type, _id):
         self._check_resource_exists(resource_type)
+        if _id == IntType:
+            _id = str(_id)
 
         return _id in self.resources[resource_type]['resources']
 
@@ -184,12 +187,12 @@ class ResponseGenerator(object):
             _task_value = task.get(key)
             if type(_task_value) == IntType:
                 _task_value = str(_task_value)
-            if _task_value is None or _task_value != value:
+
+            if _task_value is None or not re.match(value, _task_value):
                 return False
         return True
 
     def generator_update_resource(self, resource_type, _id, update_args):
-        self._check_resource_exists(resource_type)
         if self.generator_resource_exists(resource_type, _id):
             resource = self.resources[resource_type]['resources'][_id]
             for key, value in update_args.items():

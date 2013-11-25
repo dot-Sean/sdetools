@@ -35,7 +35,7 @@ class SdeResponseGenerator(ResponseGenerator):
         self.generator_add_resource('task', '36', self.get_json_from_file('T36'))
         self.generator_add_resource('task', '38', self.get_json_from_file('T38'))
 
-    def generate_sde_task(self, task_number=None, project_id=None, status=VALID_STATUSES[0], priority=7, phase='requirement'):
+    def generate_sde_task(self, task_number=None, project_id=None, status=VALID_STATUSES[0], priority=7, phase='requirements'):
         if task_number is None:
             task_number = '%d' % random.randint(50, 999999999)
         if project_id is None:

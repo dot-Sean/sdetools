@@ -4,18 +4,18 @@ from sdetools.sdelib.commons import urlencode_str
 
 class GitHubResponseGenerator(ResponseGenerator):
     def __init__(self, config, test_dir=None):
-        self.project_uri = '%s/%s' % (urlencode_str(config['github_repo_owner']), urlencode_str(config['alm_project']))
+        project_uri = '%s/%s' % (urlencode_str(config['github_repo_owner']), urlencode_str(config['alm_project']))
         self.project_milestone = config['alm_project_version']
         self.username = config['alm_user']
         self.alm_project = config['alm_project']
         resource_templates = ['user.json', 'issue.json', 'repo.json', 'milestone.json']
         rest_api_targets = {
             'user': 'get_user',
-            'repos/%s$' % self.project_uri: 'get_repo',
-            'repos/%s/milestones' % self.project_uri: 'get_milestones',
-            'legacy/issues/search/%s' % self.project_uri: 'get_issue',
-            'repos/%s/issues$' % self.project_uri: 'post_issue',
-            'repos/%s/issues/[0-9]*$' % self.project_uri: 'update_status'
+            'repos/%s$' % project_uri: 'get_repo',
+            'repos/%s/milestones' % project_uri: 'get_milestones',
+            'legacy/issues/search/%s' % project_uri: 'get_issue',
+            'repos/%s/issues$' % project_uri: 'post_issue',
+            'repos/%s/issues/[0-9]*$' % project_uri: 'update_status'
         }
         super(GitHubResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir)
 
