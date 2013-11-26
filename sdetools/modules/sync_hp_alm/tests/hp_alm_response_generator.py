@@ -218,7 +218,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
             return data
 
     def get_url_parameters(self, url):
-        query, fields = [q for q in super(HPAlmResponseGenerator, self).get_url_parameters(url).values()]
+        query, fields = [q[0] for q in super(HPAlmResponseGenerator, self).get_url_parameters(url).values()]
         queries = {}
 
         for q in query.split(';'):
