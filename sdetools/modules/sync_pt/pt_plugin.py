@@ -186,16 +186,16 @@ class PivotalTrackerConnector(AlmConnector):
             (self.PT_STORY_TYPE, self.PT_VALID_STORY_TYPES)
         ]
 
-        for _conf, valid_values in validate_configurations:
-            configured_value = self.config[_conf]
+        for conf, valid_values in validate_configurations:
+            configured_value = self.config[conf]
 
             if type(configured_value) != ListType:
                 if configured_value not in valid_values:
-                    raise AlmException('Invalid %s %s. Expected one of %s.' % (_conf, configured_value,  valid_values))
+                    raise AlmException('Invalid %s %s. Expected one of %s.' % (conf, configured_value,  valid_values))
             else:
                 difference_set = set(configured_value).difference(valid_values)
                 if difference_set:
-                    raise AlmException('Invalid %s %s. Expected one of %s.' % (_conf, difference_set,  valid_values))
+                    raise AlmException('Invalid %s %s. Expected one of %s.' % (conf, difference_set,  valid_values))
 
         if self.config[self.PT_STORY_TYPE] == 'chore':
             # Chores only have one applicable completion state - 'accepted'
@@ -211,8 +211,9 @@ class PivotalTrackerConnector(AlmConnector):
 
         try:
             # Fields parameter will filter response data to only contain story status, name, timestamp and id
-            stories = self.alm_plugin.call_api('%s/stories?filter="%s:"&fields=current_state,name,updated_at,id,estimate,story_type'
-                                               % (self.project_uri, urlencode_str(task_id)))
+            target = ('%s/stories?filter="%s:"&fields=current_state,name,updated_at,id,estimate,story_type' %
+                     (self.project_uri, urlencode_str(task_id)))
+            stories = self.alm_plugin.call_api(target)
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get story %s from PivotalTracker' % task_id)
@@ -268,7 +269,7 @@ class PivotalTrackerConnector(AlmConnector):
 
         try:
             priority = int(priority)
-        except (TypeError):
+        except TypeError:
             logger.error('Could not coerce %s into an integer' % priority)
             raise AlmException("Error in translating SDE priority to PivotalTracker label: "
                                "%s is not an integer priority" % priority)
@@ -380,6 +381,8 @@ class PivotalTrackerConnector(AlmConnector):
         if not task or not self.config['alm_standard_workflow']:
             logger.debug('Status synchronization disabled')
             return
+
+        alm_state = None
 
         if status == 'DONE' or status == 'NA':
             alm_state = self.config[self.ALM_DONE_STATUSES][0]
