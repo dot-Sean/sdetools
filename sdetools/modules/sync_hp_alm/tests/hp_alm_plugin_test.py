@@ -49,7 +49,6 @@ class TestHPAlmCase(AlmPluginTestBase, unittest.TestCase):
     def test_invalid_hp_alm_reopen_status(self):
         self._test_status_validation('hp_alm_reopen_status')
 
-
     def test_invalid_hp_alm_close_status(self):
         self._test_status_validation('hp_alm_close_status')
 
