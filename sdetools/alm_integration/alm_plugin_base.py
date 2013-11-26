@@ -85,14 +85,14 @@ class AlmConnector(object):
         self.config.add_custom_option('alm_phases', 'Phases of the ALM',
                 default='requirements,architecture-design,development')
         self.config.add_custom_option('sde_statuses_in_scope', 'SDE statuses for adding to ALM '
-                '(comma seperated DONE,TODO,NA)', 
+                '(comma separated DONE,TODO,NA)',
                 default='TODO')
         self.config.add_custom_option('sde_min_priority', 'Minimum SDE priority in scope',
                 default='7')
         self.config.add_custom_option('how_tos_in_scope', 'Whether or not HowTos should be included',
                 default='False')
         self.config.add_custom_option('selected_tasks', 'Optionally limit the sync to certain tasks '
-                '(comma seperated, e.g. T12,T13). Note: Overrides other selections.',
+                '(comma separated, e.g. T12,T13). Note: Overrides other selections.',
                 default='')
         self.config.add_custom_option('alm_project', 'Project in ALM Tool',
                 default='')
@@ -100,9 +100,9 @@ class AlmConnector(object):
                 default='alm')
         self.config.add_custom_option('show_progress', 'Show progress',
                 default='False')
-        self.config.add_custom_option('test_alm_connection', 'Test Alm Connection Only '
-                '(Also checks existence of project if alm_project is specified)',
-                default='False')
+        self.config.add_custom_option('test_alm', 'Test Alm "server", "project" or "settings" '
+                                      'configuration only',
+                                      default='')
         self.config.add_custom_option('alm_standard_workflow', 'Standard workflow in ALM?',
                 default='True')
         self.config.add_custom_option('alm_custom_fields', 
@@ -120,7 +120,7 @@ class AlmConnector(object):
         self.config.process_list_config('selected_tasks')
         for task in self.config['selected_tasks']:
             if not RE_TASK_IDS.match(task):
-                raise UsageError('Invalid Task ID: %s' % (task))
+                raise UsageError('Invalid Task ID: %s' % task)
 
         if not self.config['selected_tasks']:
             if not self.config['alm_phases']:
@@ -134,8 +134,7 @@ class AlmConnector(object):
             self.config.process_list_config('sde_statuses_in_scope')
             for status in self.config['sde_statuses_in_scope']:
                 if status not in('TODO', 'DONE', 'NA'):
-                    raise AlmException('Invalid status specified in '
-                                   'sde_statuses_in_scope')
+                    raise AlmException('Invalid status specified in sde_statuses_in_scope')
 
         if (not self.config['conflict_policy'] or
             not (self.config['conflict_policy'] == 'alm' or
@@ -146,7 +145,7 @@ class AlmConnector(object):
                                'alm, sde, or timestamp.')
 
         if self.config['sde_min_priority']:
-            bad_priority_msg =  'Incorrect sde_min_priority specified in configuration. Valid values are > 0 '
+            bad_priority_msg = 'Incorrect sde_min_priority specified in configuration. Valid values are > 0 '
             bad_priority_msg += ' and <= 10'
 
             try:
@@ -159,9 +158,12 @@ class AlmConnector(object):
         else:
             self.config['sde_min_priority'] = 1
 
+        if self.config['test_alm'] and self.config['test_alm'] not in ['server', 'project', 'settings']:
+            raise AlmException('Incorrect test_alm configuration setting. '
+                               'Valid values are: server, project, or settings.')
+
         self.config.process_boolean_config('show_progress')
         self.config.process_boolean_config('how_tos_in_scope')
-        self.config.process_boolean_config('test_alm_connection')
         self.config.process_boolean_config('alm_standard_workflow')
         self.config.process_json_str_dict('alm_custom_fields')
 
@@ -173,15 +175,26 @@ class AlmConnector(object):
     def alm_connect(self):
         self.alm_connect_server()
 
-        # In case we just wanted to verify the server rather than the project
-        if self.config['test_alm_connection'] and not self.config['alm_project']:
+        if self.config['test_alm'] == 'server':
             return
 
         self.alm_connect_project()
 
+        if self.config['test_alm'] == 'project':
+            return
+
+        self.alm_validate_configurations()
+
     @abstractmethod
     def alm_connect_server(self):
         """ Sets up a connection to the ALM tool.
+
+        Raises an AlmException on encountering an error
+        """
+        pass
+
+    def alm_validate_configurations(self):
+        """ Validates alm-specific configurations
 
         Raises an AlmException on encountering an error
         """
@@ -423,7 +436,7 @@ class AlmConnector(object):
             if not self.sde_plugin:
                 raise AlmException('Requires initialization')
 
-            if self.config['test_alm_connection']:
+            if self.config['test_alm']:
                 self.alm_connect()
                 return
 
@@ -502,5 +515,5 @@ class AlmConnector(object):
 
         except AlmException, err:
             self.alm_disconnect()
-            raise 
+            raise
 
