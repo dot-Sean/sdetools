@@ -41,7 +41,7 @@ class PivotalTrackerAPI(RESTBase):
 
 
 class PivotalTrackerTask(AlmTask):
-    """ Representation of a task in PivotalTracker"""
+    """ Representation of a task in PivotalTracker """
 
     def __init__(self, task_id, alm_id, status, timestamp, done_statuses, updateable):
         self.task_id = task_id
@@ -70,8 +70,10 @@ class PivotalTrackerTask(AlmTask):
         return datetime.strptime(self.timestamp, '%Y-%m-%dT%H:%M:%SZ')
 
     def is_updateable(self):
-        """ The task is updateable from SDE to ALM if the story does not require estimates
-        or it does require estimates and has an estimate. False otherwise """
+        """
+        The task is updateable from SDE to ALM if the story does not require estimates
+        or it does require estimates and has an estimate. False otherwise
+        """
         return self.updateable
 
 class PivotalTrackerConnector(AlmConnector):
@@ -335,7 +337,7 @@ class PivotalTrackerConnector(AlmConnector):
         if pt_release_marker_name:
             create_args['after_id'] = self.pt_get_release_marker_id(pt_release_marker_name)
         if pt_group_label:
-            """ Using a boolean variable to prevent redundant api calls """
+            # Using a boolean variable to prevent redundant api calls
             if self.pt_epic_exist is None:
                 self.pt_epic_exist = self.pt_get_epic(pt_group_label)
             if not self.pt_epic_exist:
