@@ -15,27 +15,18 @@ DEFAULT_MAPPING_FILE = os.path.join(media_path, 'fortify', 'sde_fortify_map.xml'
 
 class FortifyIntegrator(BaseIntegrator):
     TOOL_NAME = "fortify"
+    SUPPORT_FILES = ["xml", "fpr", "fvdl"]
 
     def __init__(self, config):
-        config.add_custom_option("report_file", "Common separated list of Fortify Report Files", "x", None)
-        config.add_custom_option("report_type", "Fortify Report Type: xml|fpr|fvdl|auto", default="auto")
-        super(FortifyIntegrator, self).__init__(config, DEFAULT_MAPPING_FILE)
+        super(FortifyIntegrator, self).__init__(config, self.TOOL_NAME, self.SUPPORT_FILES, DEFAULT_MAPPING_FILE)
         self.raw_findings = []
         self.importer = None
         self.report_ids = []
 
     def parse(self):
-        if not self.config['report_file']:
-            raise UsageError("Missing configuration option 'report_file'")
-        else:
-            # Comma delimited report files
-            if isinstance(self.config['report_file'], basestring):
-                self.config.process_list_config('report_file')
-                report_files = self.config['report_file']
-            else:
-                report_files = [self.config['report_file']]
+        self.process_report_files()
 
-        for report_file in report_files:
+        for report_file in self.config['report_file']:
             if self.config['report_type'] == 'auto':
                 if not isinstance(report_file, basestring):
                     raise UsageError("On auto-detect mode, the file name needs to be specified.")

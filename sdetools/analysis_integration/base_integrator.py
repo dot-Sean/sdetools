@@ -2,12 +2,14 @@
 import collections
 import re
 import xml
+import os
+import glob
 import zipfile
 from datetime import datetime
 from xml.sax.handler import ContentHandler
 from sdetools.extlib.defusedxml import minidom, sax
 
-from sdetools.sdelib.commons import Error, abc
+from sdetools.sdelib.commons import Error, abc, UsageError
 from sdetools.sdelib.restclient import APIError
 from sdetools.sdelib.interactive_plugin import PlugInExperience
 
@@ -148,7 +150,7 @@ class BaseXMLImporter(BaseImporter):
 class BaseIntegrator(object):
     TOOL_NAME = 'External tool'
 
-    def __init__(self, config, default_mapping_file=None):
+    def __init__(self, config, tool_name, supported_file_types, default_mapping_file=None):
         self.findings = []
         self.phase_exceptions = ['testing']
         self.mapping = {}
@@ -158,12 +160,17 @@ class BaseIntegrator(object):
         self.weakness_title = {}
         self.confidence = {}
         self.plugin = PlugInExperience(self.config)
-        self.config.add_custom_option("mapping_file",
-                "Task ID -> Tool Weakness mapping in XML format", "m", default_mapping_file)
-        self.config.add_custom_option("flaws_only",
-                "Only update tasks identified having flaws. (True | False)", "z", "False")
-        self.config.add_custom_option("trial_run",
-                "Trial run only: 'True' or 'False'", "t", "False")
+        self.supported_file_types = supported_file_types
+
+        self.config.add_custom_option("report_file", "Common separated list of %s Report Files" % tool_name.capitalize(),
+                                      "x", None)
+        self.config.add_custom_option("report_type", "%s Report Type: %s|auto" %
+                                     (tool_name.capitalize(), '|'.join(supported_file_types)), default="auto")
+        self.config.add_custom_option("mapping_file", "Task ID -> Tool Weakness mapping in XML format", "m",
+                                      default_mapping_file)
+        self.config.add_custom_option("flaws_only", "Only update tasks identified having flaws. (True | False)", "z",
+                                      "False")
+        self.config.add_custom_option("trial_run", "Trial run only: 'True' or 'False'", "t", "False")
 
     def initialize(self):
         """
@@ -173,6 +180,35 @@ class BaseIntegrator(object):
         """
         self.config.process_boolean_config('flaws_only')
         self.config.process_boolean_config('trial_run')
+
+    def process_report_files(self):
+        """
+        If report files contains a directory path, find all possible files in that folder
+        """
+        if not self.config['report_file']:
+            raise UsageError("Missing configuration option 'report_file'")
+
+        if not isinstance(self.config['report_file'], basestring):
+            self.config['report_file'] = [self.config['report_file']]
+        else:
+            processed_report_files = []
+            for report_file in self.config['report_file'].split(','):
+                report_file = report_file.strip()
+
+                if os.path.isdir(report_file):
+                    for file_type in self.supported_file_types:
+                        processed_report_files.extend(glob.glob('%s/*.%s' % (report_file, file_type)))
+                else:
+                    found_files = glob.glob(report_file)
+                    if not found_files:
+                        logger.warn('Could not find the following report: %s' % report_file)
+                    else:
+                        processed_report_files.extend(glob.glob(report_file))
+
+            if not processed_report_files:
+                raise UsageError("Did not find any report files")
+            else:
+                self.config['report_file'] = processed_report_files
 
     def load_mapping_from_xml(self):
         try:
