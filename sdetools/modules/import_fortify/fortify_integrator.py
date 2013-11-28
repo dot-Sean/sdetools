@@ -17,38 +17,50 @@ class FortifyIntegrator(BaseIntegrator):
     TOOL_NAME = "fortify"
 
     def __init__(self, config):
-        config.add_custom_option("report_file", "Fortify Report File", "x", None)
+        config.add_custom_option("report_file", "Common separated list of Fortify Report Files", "x", None)
         config.add_custom_option("report_type", "Fortify Report Type: xml|fpr|fvdl|auto", default="auto")
         super(FortifyIntegrator, self).__init__(config, DEFAULT_MAPPING_FILE)
         self.raw_findings = []
         self.importer = None
+        self.report_ids = []
 
     def parse(self):
         if not self.config['report_file']:
             raise UsageError("Missing configuration option 'report_file'")
-
-        if self.config['report_type'] == 'auto': 
-            if not isinstance(self.config['report_file'], basestring):
-                raise UsageError("On auto-detect mode, the file name needs to be specified.")
-            file_name, file_extension = os.path.splitext(self.config['report_file'])
-            self.config['report_type'] = file_extension[1:]
-
-        if self.config['report_type'] == 'xml':
-            self.importer = FortifyReportImporter()
-        elif self.config['report_type'] == 'fpr':
-            self.importer = FortifyFPRImporter()
-        elif self.config['report_type'] == 'fvdl':
-            self.importer = FortifyFVDLImporter()
         else:
-            raise FortifyIntegrationError("Unsupported file type (%s)" % self.config['report_type'])
+            # Comma delimited report files
+            if isinstance(self.config['report_file'], basestring):
+                self.config.process_list_config('report_file')
+                report_files = self.config['report_file']
+            else:
+                report_files = [self.config['report_file']]
 
-        self.importer.parse(self.config['report_file'])
-        self.raw_findings = self.importer.raw_findings
+        for report_file in report_files:
+            if self.config['report_type'] == 'auto':
+                if not isinstance(report_file, basestring):
+                    raise UsageError("On auto-detect mode, the file name needs to be specified.")
+                file_name, file_extension = os.path.splitext(report_file)
+                report_type = file_extension[1:]
+            else:
+                report_type = self.config['report_type']
 
-        if self.importer.report_id:
-            self.report_id = self.importer.report_id
-        else:
-            self.emit.info("Report ID not found in report: Using default.")
+            if report_type == 'xml':
+                self.importer = FortifyReportImporter()
+            elif report_type == 'fpr':
+                self.importer = FortifyFPRImporter()
+            elif report_type == 'fvdl':
+                self.importer = FortifyFVDLImporter()
+            else:
+                raise FortifyIntegrationError("Unsupported file type (%s)" % report_type)
+
+            self.importer.parse(report_file)
+            self.raw_findings.extend(self.importer.raw_findings)
+
+            if self.importer.report_id:
+                self.report_ids.append(self.importer.report_id)
+            else:
+                self.emit.info("Report ID not found in report: Using default.")
+        self.report_id = ', '.join(self.report_ids)
 
     def _make_finding(self, item):
         return {'weakness_id': item['id'], 'description': item['description'], 'count': item['count']}
