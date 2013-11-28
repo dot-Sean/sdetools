@@ -77,7 +77,7 @@ class TestHPAlmCase(AlmPluginTestBase, unittest.TestCase):
     def test_add_requirement_coverage(self):
         self.config['alm_phases'] = 'requirements,testing'
         test_task = self.mock_sde_response.generate_sde_task(phase='testing')
-        requirement_task = self.mock_sde_response.generate_sde_task(phase='requirement')
+        requirement_task = self.mock_sde_response.generate_sde_task(phase='requirements')
         self.connector.synchronize()
         hp_requirement_id = self.connector.alm_get_task(requirement_task).get_alm_id()
         hp_test_id = self.connector.alm_get_task(test_task).get_alm_id()
