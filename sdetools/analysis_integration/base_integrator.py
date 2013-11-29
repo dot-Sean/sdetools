@@ -181,7 +181,51 @@ class BaseIntegrator(object):
         self.config.process_boolean_config('flaws_only')
         self.config.process_boolean_config('trial_run')
 
-    def process_report_files(self):
+        # Validate the report_type config. If report_type is not auto, we will process only
+        # the specified report_type, else we process all supported file types.
+        if self.config['report_type'] in self.supported_file_types:
+            self.supported_file_types = [self.config['report_type']]
+        elif self.config['report_type'] != 'auto':
+            raise UsageError('Invalid report_type %s' % self.config['report_type'])
+
+        self.process_report_file_config()
+
+    @staticmethod
+    def _get_file_extension(file_path):
+        return os.path.splitext(file_path)[1][1:]
+
+    @abstractmethod
+    def parse_report_file(self, report_file, report_type):
+        """Returns the raw findings and the report id for a single report file"""
+        return [], None
+
+    def parse(self):
+        _raw_findings = []
+        _report_ids = []
+
+        for report_file in self.config['report_file']:
+            if self.config['report_type'] == 'auto':
+                if not isinstance(report_file, basestring):
+                    raise UsageError("On auto-detect mode, the file name needs to be specified.")
+                report_type = self._get_file_extension(report_file)
+            else:
+                report_type = self.config['report_type']
+
+            raw_findings, report_id = self.parse_report_file(report_file, report_type)
+
+            _raw_findings.extend(raw_findings)
+
+            if report_id:
+                _report_ids.append(report_id)
+
+        self.raw_findings = _raw_findings
+
+        if _report_ids:
+            self.report_id = ', '.join(_report_ids)
+        else:
+            self.emit.info("Report ID not found in report: Using default.")
+
+    def process_report_file_config(self):
         """
         If report files contains a directory path, find all possible files in that folder
         """
@@ -189,24 +233,35 @@ class BaseIntegrator(object):
             raise UsageError("Missing configuration option 'report_file'")
 
         if not isinstance(self.config['report_file'], basestring):
+            # Should be a file object
             self.config['report_file'] = [self.config['report_file']]
         else:
             processed_report_files = []
-            for report_file in self.config['report_file'].split(','):
-                report_file = report_file.strip()
 
-                if os.path.isdir(report_file):
-                    for file_type in self.supported_file_types:
-                        processed_report_files.extend(glob.glob('%s/*.%s' % (report_file, file_type)))
-                else:
-                    found_files = glob.glob(report_file)
-                    if not found_files:
-                        logger.warn('Could not find the following report: %s' % report_file)
+            for file_path in self.config['report_file'].split(','):
+                file_path = file_path.strip()
+                file_name, file_ext = os.path.splitext(file_path)
+                file_ext = file_ext[1:]
+
+                if file_ext in self.supported_file_types:
+                    processed_report_files.extend(glob.glob(file_path))
+                elif re.search('[*?]', file_ext):
+                    # Run the glob and filter out unsupported file types
+                    processed_report_files.extend([f for f in glob.iglob(file_path)
+                                                  if self._get_file_extension(f) in self.supported_file_types])
+                elif not file_ext:
+                    # Glob using our supported file types
+                    if os.path.isdir(file_path):
+                        _base_path = file_path + '/*'
                     else:
-                        processed_report_files.extend(glob.glob(report_file))
-
+                        _base_path = file_name
+                    for file_type in self.supported_file_types:
+                        processed_report_files.extend(glob.glob('%s.%s' % (_base_path, file_type)))
+                else:
+                    raise UsageError('%s does not match any supported file type(s): %s' %
+                                     (file_path, self.supported_file_types))
             if not processed_report_files:
-                raise UsageError("Did not find any report files")
+                raise UsageError("Did not find any report files. Check if 'report_file' is configured properly.")
             else:
                 self.config['report_file'] = processed_report_files
 
@@ -386,7 +441,6 @@ class BaseIntegrator(object):
                     weakness_finding['count'] += weakness['count']
                 else:
                     weakness_finding['count'] += 1
-
             if len(finding.items()) > 0:
                 analysis_findings.append(weakness_finding)
 
@@ -472,3 +526,5 @@ class BaseIntegrator(object):
                                  noflaw_tasks=noflaw_tasks,
                                  error_count=stats_api_errors,
                                  error_weaknesses_unmapped=len(missing_weakness_map))
+
+
