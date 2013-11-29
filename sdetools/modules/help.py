@@ -35,9 +35,10 @@ class Command(BaseCommand):
 
         if self.help_cmd not in self.config.command_list:
             raise commons.UsageError('Unable to find command %s' % (self.help_cmd))
-        if self.help_subcmd is not None:
-            if self.help_subcmd not in self.config.command_list[self.help_cmd].sub_cmds:
-                raise commons.UsageError('Unable to find subcommand %s' % (self.help_subcmd))
+        if not self.help_subcmd:
+            self.help_subcmd = self.config.command_list[self.help_cmd].sub_cmds[0]
+        if self.help_subcmd not in self.config.command_list[self.help_cmd].sub_cmds:
+            raise commons.UsageError('Unable to find subcommand %s' % (self.help_subcmd))
         return True
 
     def get_commands_help(self):

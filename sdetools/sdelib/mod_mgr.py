@@ -127,19 +127,21 @@ def run_command(cmd_name, args, call_src, call_options={},
     if cmd_name not in command_list:
         raise commons.UsageError("Command not found: %s" % (cmd_name))
 
-    ret_chn = ReturnChannel(call_back, call_back_args)
-    config = conf_mgr.Config(cmd_name, sub_cmd_name, command_list, args, ret_chn, call_src, call_options)
-
     curr_cmd = command_list[cmd_name]
 
-    if sub_cmd_name is not None:
-        if sub_cmd_name not in curr_cmd.sub_cmds:
-            raise commons.UsageError("Sub-Command %s not found for command %s" % (sub_cmd_name, cmd_name))
+    if not sub_cmd_name:
+        sub_cmd_name = curr_cmd.sub_cmds[0]
+    if sub_cmd_name not in curr_cmd.sub_cmds:
+        raise commons.UsageError("Sub-Command %s not found for command %s" % (sub_cmd_name, cmd_name))
+
+    ret_chn = ReturnChannel(call_back, call_back_args)
+    config = conf_mgr.Config(cmd_name, sub_cmd_name, command_list, args, ret_chn, call_src, call_options)
 
     try:
         cmd_inst = curr_cmd(config, args)
 
         cmd_inst.configure()
+        cmd_inst.config.import_custom_options(cmd_inst.opts)
 
         ret_status = cmd_inst.parse_args()
 
