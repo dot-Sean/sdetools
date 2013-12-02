@@ -11,7 +11,7 @@ class AppScanXMLContent(BaseContentHandler):
         self.in_issuetype_advisory_node = False
         self.in_issuetype_advisory_threatclass_node = False
         self.in_issuetype_advisory_threatclass_name_node = False
-        self.raw_findings = []
+        self.findings = []
         self.count = 0
         self.report_id = ""
         self.check_id = ""
@@ -50,7 +50,7 @@ class AppScanXMLContent(BaseContentHandler):
             entry['count'] = self.count
             entry['description'] = data
 
-            self.raw_findings.append(entry)
+            self.findings.append(entry)
             
             # reset
             self.count = 0

@@ -33,11 +33,11 @@ class IntegrationResult(object):
 
 class BaseContentHandler(ContentHandler):
 
-    data = []
+    findings = []
     id = None
 
     def __init__(self):
-        self.data = []
+        self.findings = []
         self.id = None
 
     @abstractmethod

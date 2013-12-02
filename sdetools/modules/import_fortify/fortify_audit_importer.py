@@ -35,7 +35,7 @@ class AuditXMLContent(BaseContentHandler):
         if len(name_split) == 2:
             prefix, node_name = name_split
         else:
-            node_name = name_split
+            node_name = name_split[0]
 
         if node_name == 'Audit':
             self.saw_audit_node = True

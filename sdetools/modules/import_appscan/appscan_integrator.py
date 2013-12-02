@@ -29,10 +29,13 @@ class AppScanIntegrator(BaseIntegrator):
 
         importer.parse(report_file)
 
-        return importer.raw_findings, importer.report_id
+        self.findings = importer.findings
+        self.report_id = importer.id
+
+        return importer.findings, importer.id
 
     def _make_finding(self, item):
-        return {'weakness_id': item['id'], 'description': item['description'], 'count':item['count']}
+        return {'weakness_id': item['id'], 'description': item['description'], 'count': item['count']}
 
     def generate_findings(self):
-        return [self._make_finding(item) for item in self.raw_findings]
+        return [self._make_finding(item) for item in self.findings]

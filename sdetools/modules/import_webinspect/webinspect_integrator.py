@@ -9,8 +9,10 @@ __all__ = ['WebInspectIntegrator']
 
 DEFAULT_MAPPING_FILE = os.path.join(media_path, 'webinspect', 'sde_webinspect_map.xml')
 
+
 class WebInspectIntegrationError(IntegrationError):
     pass
+
 
 class WebInspectIntegrator(BaseIntegrator):
     TOOL_NAME = "webinspect"
@@ -29,10 +31,13 @@ class WebInspectIntegrator(BaseIntegrator):
 
         importer.parse(report_file)
 
-        return importer.raw_findings, importer.report_id
+        self.findings = importer.findings
+        self.report_id = importer.id
+
+        return importer.findings, importer.id
 
     def _make_finding(self, item):
         return {'weakness_id': item['id'], 'description': item['description'], 'type': item['type']}
 
     def generate_findings(self):
-        return [self._make_finding(item) for item in self.raw_findings]
+        return [self._make_finding(item) for item in self.findings]

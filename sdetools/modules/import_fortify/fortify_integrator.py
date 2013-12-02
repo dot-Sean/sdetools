@@ -38,10 +38,13 @@ class FortifyIntegrator(BaseIntegrator):
 
         importer.parse(report_file)
 
+        self.findings = importer.findings
+        self.report_id = importer.id
+        print self.findings
         return importer.findings, importer.id
 
     def _make_finding(self, item):
         return {'weakness_id': item['id'], 'description': item['description'], 'count': item['count']}
 
     def generate_findings(self):
-        return [self._make_finding(item) for item in self.raw_findings]
+        return [self._make_finding(item) for item in self.findings]
