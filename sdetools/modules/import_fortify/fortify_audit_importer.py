@@ -25,7 +25,7 @@ class AuditXMLContent(BaseContentHandler):
         self.current_instance = None
 
     def valid_content_detected(self):
-        return True #self.saw_project_info_name_node
+        return self.saw_project_info_node
 
     def processingInstruction(self, target, data):
         pass

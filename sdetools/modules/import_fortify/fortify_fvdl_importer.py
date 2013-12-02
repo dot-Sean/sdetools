@@ -18,7 +18,7 @@ class FVDLXMLContent(BaseContentHandler):
         self.entry = {}
 
     def valid_content_detected(self):
-        return True #self.saw_build_node
+        return self.saw_build_node
 
     def processingInstruction(self, target, data):
         pass
