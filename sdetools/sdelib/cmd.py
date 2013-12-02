@@ -10,15 +10,7 @@ class BaseCommand(object):
         self.config = config
         self.emit = self.config.emit
         self.args = args
-        self.opts = self.config.ModuleOptions(self.sub_cmds)
-
-    def add_opt(self, *args, **kwargs):
-        opt = self.opts.Option(*args, **kwargs)
-        self.opts.add_opt(opt)
-
-    def add_sub_opt(self, sub_cmd, *args, **kwargs):
-        opt = self.opts.Option(*args, **kwargs)
-        self.opts.add_opt(opt, sub_cmd)
+        self.opts = self.config.opts
 
     def configure(self):
         pass

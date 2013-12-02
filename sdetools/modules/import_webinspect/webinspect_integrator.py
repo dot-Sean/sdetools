@@ -16,8 +16,8 @@ class WebInspectIntegrator(BaseIntegrator):
     TOOL_NAME = "webinspect"
 
     def __init__(self, config):
-        config.add_custom_option("report_file", "WebInspect Report File", "x", None)
-        config.add_custom_option("report_type", "WebInspect Report Type: xml|fpr|auto", default="auto")
+        config.opts.add("report_file", "WebInspect Report File", "x", None)
+        config.opts.add("report_type", "WebInspect Report Type: xml|fpr|auto", default="auto")
         super(WebInspectIntegrator, self).__init__(config, DEFAULT_MAPPING_FILE)
         self.raw_findings = []
 

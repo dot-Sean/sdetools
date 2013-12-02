@@ -141,7 +141,7 @@ def run_command(cmd_name, args, call_src, call_options={},
         cmd_inst = curr_cmd(config, args)
 
         cmd_inst.configure()
-        cmd_inst.config.import_custom_options(cmd_inst.opts)
+        cmd_inst.config.import_custom_options()
 
         ret_status = cmd_inst.parse_args()
 

@@ -18,8 +18,8 @@ class VeracodeIntegrator(BaseIntegrator):
     TOOL_NAME = "veracode"
 
     def __init__(self, config):
-        config.add_custom_option("report_file", "Veracode Report File", "x", None)
-        config.add_custom_option("report_type", "Veracode Report Type: xml|auto", default="auto")
+        config.opts.add("report_file", "Veracode Report File", "x", None)
+        config.opts.add("report_type", "Veracode Report Type: xml|auto", default="auto")
         super(VeracodeIntegrator, self).__init__(config, DEFAULT_MAPPING_FILE)
         self.raw_findings = []
 

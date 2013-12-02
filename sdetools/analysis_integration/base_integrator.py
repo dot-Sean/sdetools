@@ -158,11 +158,11 @@ class BaseIntegrator(object):
         self.weakness_title = {}
         self.confidence = {}
         self.plugin = PlugInExperience(self.config)
-        self.config.add_custom_option("mapping_file",
+        self.config.opts.add("mapping_file",
                 "Task ID -> Tool Weakness mapping in XML format", "m", default_mapping_file)
-        self.config.add_custom_option("flaws_only",
+        self.config.opts.add("flaws_only",
                 "Only update tasks identified having flaws. (True | False)", "z", "False")
-        self.config.add_custom_option("trial_run",
+        self.config.opts.add("trial_run",
                 "Trial run only: 'True' or 'False'", "t", "False")
 
     def initialize(self):

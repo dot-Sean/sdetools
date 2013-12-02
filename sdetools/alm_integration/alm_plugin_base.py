@@ -82,30 +82,30 @@ class AlmConnector(object):
 
     def _add_alm_config_options(self):
         """ Adds ALM config options to the config file"""
-        self.config.add_custom_option('alm_phases', 'Phases of the ALM',
+        self.config.opts.add('alm_phases', 'Phases of the ALM',
                 default='requirements,architecture-design,development')
-        self.config.add_custom_option('sde_statuses_in_scope', 'SDE statuses for adding to ALM '
+        self.config.opts.add('sde_statuses_in_scope', 'SDE statuses for adding to ALM '
                 '(comma seperated DONE,TODO,NA)', 
                 default='TODO')
-        self.config.add_custom_option('sde_min_priority', 'Minimum SDE priority in scope',
+        self.config.opts.add('sde_min_priority', 'Minimum SDE priority in scope',
                 default='7')
-        self.config.add_custom_option('how_tos_in_scope', 'Whether or not HowTos should be included',
+        self.config.opts.add('how_tos_in_scope', 'Whether or not HowTos should be included',
                 default='False')
-        self.config.add_custom_option('selected_tasks', 'Optionally limit the sync to certain tasks '
+        self.config.opts.add('selected_tasks', 'Optionally limit the sync to certain tasks '
                 '(comma seperated, e.g. T12,T13). Note: Overrides other selections.',
                 default='')
-        self.config.add_custom_option('alm_project', 'Project in ALM Tool',
+        self.config.opts.add('alm_project', 'Project in ALM Tool',
                 default='')
-        self.config.add_custom_option('conflict_policy', 'Conflict policy to use',
+        self.config.opts.add('conflict_policy', 'Conflict policy to use',
                 default='alm')
-        self.config.add_custom_option('show_progress', 'Show progress',
+        self.config.opts.add('show_progress', 'Show progress',
                 default='False')
-        self.config.add_custom_option('test_alm_connection', 'Test Alm Connection Only '
+        self.config.opts.add('test_alm_connection', 'Test Alm Connection Only '
                 '(Also checks existence of project if alm_project is specified)',
                 default='False')
-        self.config.add_custom_option('alm_standard_workflow', 'Standard workflow in ALM?',
+        self.config.opts.add('alm_standard_workflow', 'Standard workflow in ALM?',
                 default='True')
-        self.config.add_custom_option('alm_custom_fields', 
+        self.config.opts.add('alm_custom_fields', 
                 'Customized fields to include when creating a task in ALM '
                 '(JSON encoded dictionary of strings)',
                 default='')

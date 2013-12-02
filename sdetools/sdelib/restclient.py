@@ -90,7 +90,7 @@ class RESTBase(object):
 
     def _customize_config(self, conf_opts):
         for var_name, desc, default in conf_opts:
-            self.config.add_custom_option(
+            self.config.opts.add(
                 var_name % {'prefix': self.conf_prefix},
                 desc % {'name': self.conf_name},
                 default=default,

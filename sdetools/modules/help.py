@@ -59,13 +59,13 @@ class Command(BaseCommand):
 
     def handle(self):
         if self.help_cmd:
-            cmd_config = self.config.copy()
-            cmd_config.command = self.help_cmd
-            cmd_config.sub_cmd = self.help_subcmd
-
             cmd_obj = self.config.command_list[self.help_cmd]
+            
+            cmd_config = self.config.copy()
+
             cmd_inst = cmd_obj(cmd_config, self.args)
             cmd_inst.configure()
+            cmd_inst.config.import_custom_options()
             cmd_inst.config.prepare_parser(cmd_inst)
             cmd_inst.config.parser.print_help()
         else:

@@ -17,8 +17,8 @@ class FortifyIntegrator(BaseIntegrator):
     TOOL_NAME = "fortify"
 
     def __init__(self, config):
-        config.add_custom_option("report_file", "Fortify Report File", "x", None)
-        config.add_custom_option("report_type", "Fortify Report Type: xml|fpr|fvdl|auto", default="auto")
+        config.opts.add("report_file", "Fortify Report File", "x", None)
+        config.opts.add("report_type", "Fortify Report Type: xml|fpr|fvdl|auto", default="auto")
         super(FortifyIntegrator, self).__init__(config, DEFAULT_MAPPING_FILE)
         self.raw_findings = []
         self.importer = None

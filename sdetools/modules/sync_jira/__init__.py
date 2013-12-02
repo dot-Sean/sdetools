@@ -11,10 +11,10 @@ from sdetools.sdelib.interactive_plugin import PluginError
 
 class Command(BaseCommand):
     help = 'JIRA <-> SDE sync utility.'
-    sub_cmds = ['4', '5', '6']
+    sub_cmds = ['6', '5', '4']
 
     def configure(self):
-        self.config.add_custom_option('jira_version', 'Version of JIRA [e.g. 4.3.3, 5, or 6.0]', 
+        self.opts.add('jira_version', 'Version of JIRA [e.g. 4.3.3, 5, or 6.0]', 
                 default='6')
 
         # We start with REST to get configuration and other stuff right

@@ -16,8 +16,8 @@ class AppScanIntegrator(BaseIntegrator):
     TOOL_NAME = "appscan"
 
     def __init__(self, config):
-        config.add_custom_option("report_file", "AppScan Report XML", "x", None)
-        config.add_custom_option("report_type", "AppScan Report Type: xml|zip|auto", default="auto")
+        config.opts.add("report_file", "AppScan Report XML", "x", None)
+        config.opts.add("report_type", "AppScan Report Type: xml|zip|auto", default="auto")
         super(AppScanIntegrator, self).__init__(config, DEFAULT_MAPPING_FILE)
         self.raw_findings = []
 

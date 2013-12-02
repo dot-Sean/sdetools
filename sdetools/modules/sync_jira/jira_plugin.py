@@ -28,21 +28,21 @@ class JIRAConnector(AlmConnector):
         """ Initializes connection to JIRA """
         super(JIRAConnector, self).__init__(config, alm_plugin)
 
-        config.add_custom_option('jira_issue_type', 'IDs for issues raised in JIRA',
+        config.opts.add('jira_issue_type', 'IDs for issues raised in JIRA',
                 default='Bug')
-        config.add_custom_option('jira_close_transition', 'Close transition in JIRA',
+        config.opts.add('jira_close_transition', 'Close transition in JIRA',
                 default='Close Issue')
-        config.add_custom_option('jira_reopen_transition', 'Re-open transition in JIRA',
+        config.opts.add('jira_reopen_transition', 'Re-open transition in JIRA',
                 default='Reopen Issue')
-        config.add_custom_option('jira_done_statuses', 'Statuses that signify a task is Done in JIRA',
+        config.opts.add('jira_done_statuses', 'Statuses that signify a task is Done in JIRA',
                 default='Resolved,Closed')
-        config.add_custom_option('jira_existing_issue', 'Provide the key of an existing issue to support custom fields (JIRA 4.x only)',
+        config.opts.add('jira_existing_issue', 'Provide the key of an existing issue to support custom fields (JIRA 4.x only)',
                 default='')
-        config.add_custom_option('alm_project_version', 'Project version',
+        config.opts.add('alm_project_version', 'Project version',
                 default='')
-        config.add_custom_option('alm_parent_issue', 'Create sub-tasks under this issue',
+        config.opts.add('alm_parent_issue', 'Create sub-tasks under this issue',
                 default='')
-        config.add_custom_option('alm_priority_map', 'Customized map from priority in SDE to JIRA '
+        config.opts.add('alm_priority_map', 'Customized map from priority in SDE to JIRA '
                 '(JSON encoded dictionary of strings)',
                 default='')
 
