@@ -18,8 +18,10 @@ abstractmethod = abc.abstractmethod
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
+
 class IntegrationError(Error):
     pass
+
 
 class IntegrationResult(object):
     def __init__(self, import_start_datetime, import_finish_datetime, affected_tasks, noflaw_tasks,
@@ -31,18 +33,20 @@ class IntegrationResult(object):
         self.error_count = error_count
         self.error_weaknesses_unmapped = error_weaknesses_unmapped
 
-class BaseContentHandler(ContentHandler):
 
+class BaseContentHandler(ContentHandler):
     @abstractmethod
     def valid_content_detected(self):
         pass
+
 
 class BaseImporter(object):
 
     def __init__(self):
         self.report_id = ""
         self.raw_findings = []
-        
+
+
 class BaseZIPImporter(BaseImporter):
     ARCHIVED_FILE_NAME = None
     MAX_SIZE_IN_MB = 300  # Maximum archived file size in MB
@@ -91,9 +95,9 @@ class BaseZIPImporter(BaseImporter):
             
         self.report_id = importer.report_id
         self.raw_findings = importer.raw_findings            
-        
-class BaseXMLImporter(BaseImporter):
 
+
+class BaseXMLImporter(BaseImporter):
     def __init__(self):
         super(BaseXMLImporter, self).__init__()
 
@@ -147,6 +151,7 @@ class BaseXMLImporter(BaseImporter):
         if XMLReader.report_id:
             self.report_id = XMLReader.report_id   
 
+
 class BaseIntegrator(object):
     TOOL_NAME = 'External tool'
 
@@ -162,7 +167,7 @@ class BaseIntegrator(object):
         self.plugin = PlugInExperience(self.config)
         self.supported_file_types = supported_file_types
 
-        self.config.add_custom_option("report_file", "Common separated list of %s Report Files" % tool_name.capitalize(),
+        self.config.add_custom_option("report_file", "Comma separated list of %s Report Files" % tool_name.capitalize(),
                                       "x", None)
         self.config.add_custom_option("report_type", "%s Report Type: %s|auto" %
                                      (tool_name.capitalize(), '|'.join(supported_file_types)), default="auto")
@@ -200,8 +205,8 @@ class BaseIntegrator(object):
         return [], None
 
     def parse(self):
-        _raw_findings = []
-        _report_ids = []
+        total_raw_findings = []
+        total_report_ids = []
 
         for report_file in self.config['report_file']:
             if self.config['report_type'] == 'auto':
@@ -213,15 +218,15 @@ class BaseIntegrator(object):
 
             raw_findings, report_id = self.parse_report_file(report_file, report_type)
 
-            _raw_findings.extend(raw_findings)
+            total_raw_findings.extend(raw_findings)
 
             if report_id:
-                _report_ids.append(report_id)
+                total_report_ids.append(report_id)
 
-        self.raw_findings = _raw_findings
+        self.raw_findings = total_raw_findings
 
-        if _report_ids:
-            self.report_id = ', '.join(_report_ids)
+        if total_report_ids:
+            self.report_id = ', '.join(total_report_ids)
         else:
             self.emit.info("Report ID not found in report: Using default.")
 
@@ -235,35 +240,37 @@ class BaseIntegrator(object):
         if not isinstance(self.config['report_file'], basestring):
             # Should be a file object
             self.config['report_file'] = [self.config['report_file']]
-        else:
-            processed_report_files = []
+            return
 
-            for file_path in self.config['report_file'].split(','):
-                file_path = file_path.strip()
-                file_name, file_ext = os.path.splitext(file_path)
-                file_ext = file_ext[1:]
+        processed_report_files = []
 
-                if file_ext in self.supported_file_types:
-                    processed_report_files.extend(glob.glob(file_path))
-                elif re.search('[*?]', file_ext):
-                    # Run the glob and filter out unsupported file types
-                    processed_report_files.extend([f for f in glob.iglob(file_path)
-                                                  if self._get_file_extension(f) in self.supported_file_types])
-                elif not file_ext:
-                    # Glob using our supported file types
-                    if os.path.isdir(file_path):
-                        _base_path = file_path + '/*'
-                    else:
-                        _base_path = file_name
-                    for file_type in self.supported_file_types:
-                        processed_report_files.extend(glob.glob('%s.%s' % (_base_path, file_type)))
+        for file_path in self.config['report_file'].split(','):
+            file_path = file_path.strip()
+            file_name, file_ext = os.path.splitext(file_path)
+            file_ext = file_ext[1:]
+
+            if file_ext in self.supported_file_types:
+                processed_report_files.extend(glob.glob(file_path))
+            elif re.search('[*?]', file_ext):
+                # Run the glob and filter out unsupported file types
+                processed_report_files.extend([f for f in glob.iglob(file_path)
+                                              if self._get_file_extension(f) in self.supported_file_types])
+            elif not file_ext:
+                # Glob using our supported file types
+                if os.path.isdir(file_path):
+                    _base_path = file_path + '/*'
                 else:
-                    raise UsageError('%s does not match any supported file type(s): %s' %
-                                     (file_path, self.supported_file_types))
-            if not processed_report_files:
-                raise UsageError("Did not find any report files. Check if 'report_file' is configured properly.")
+                    _base_path = file_name
+                for file_type in self.supported_file_types:
+                    processed_report_files.extend(glob.glob('%s.%s' % (_base_path, file_type)))
             else:
-                self.config['report_file'] = processed_report_files
+                raise UsageError('%s does not match any supported file type(s): %s' %
+                                 (file_path, self.supported_file_types))
+
+        if not processed_report_files:
+            raise UsageError("Did not find any report files. Check if 'report_file' is configured properly.")
+        else:
+            self.config['report_file'] = processed_report_files
 
     def load_mapping_from_xml(self):
         try:
@@ -465,7 +472,7 @@ class BaseIntegrator(object):
         affected_tasks = []
         noflaw_tasks = []
         for task in task_list:
-            if(task['phase'] in self.phase_exceptions):
+            if task['phase'] in self.phase_exceptions:
                 stats_test_tasks += 1
                 continue
             task_search = re.search('^(\d+)-[^\d]+(\d+)$', task['id'])
