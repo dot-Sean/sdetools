@@ -1,6 +1,6 @@
 import os
 
-from sdetools.sdelib.commons import media_path, UsageError
+from sdetools.sdelib.commons import media_path
 from sdetools.analysis_integration.base_integrator import BaseIntegrator
 
 from sdetools.modules.import_fortify.fortify_integration_error import FortifyIntegrationError
@@ -19,12 +19,18 @@ class FortifyIntegrator(BaseIntegrator):
     def __init__(self, config):
         supported_file_types = ["xml", "fpr", "fvdl"]
         super(FortifyIntegrator, self).__init__(config, self.TOOL_NAME, supported_file_types, DEFAULT_MAPPING_FILE)
+        self.config.add_custom_option("import_blacklist", "Do not import issues which have been triaged with these " +
+                                      "statuses (i.e. 'Bad Practice, Not an Issue').", "a", "Not an Issue")
+
+    def initialize(self):
+        super(FortifyIntegrator, self).initialize()
+        self.config.process_list_config('import_blacklist')
 
     def parse_report_file(self, report_file, report_type):
         if report_type == 'xml':
             importer = FortifyReportImporter()
         elif report_type == 'fpr':
-            importer = FortifyFPRImporter()
+            importer = FortifyFPRImporter(self.config['import_blacklist'])
         elif report_type == 'fvdl':
             importer = FortifyFVDLImporter()
         else:
@@ -32,7 +38,7 @@ class FortifyIntegrator(BaseIntegrator):
 
         importer.parse(report_file)
 
-        return importer.raw_findings, importer.report_id
+        return importer.findings, importer.id
 
     def _make_finding(self, item):
         return {'weakness_id': item['id'], 'description': item['description'], 'count': item['count']}

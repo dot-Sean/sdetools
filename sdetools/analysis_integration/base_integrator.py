@@ -33,49 +33,78 @@ class IntegrationResult(object):
 
 class BaseContentHandler(ContentHandler):
 
+    data = []
+    id = None
+
+    def __init__(self):
+        self.data = []
+        self.id = None
+
     @abstractmethod
     def valid_content_detected(self):
         pass
 
 class BaseImporter(object):
 
+    findings = []
+    id = ""
+
     def __init__(self):
-        self.report_id = ""
-        self.raw_findings = []
+        self.id = ""
+        self.findings = []
         
 class BaseZIPImporter(BaseImporter):
     ARCHIVED_FILE_NAME = None
     MAX_SIZE_IN_MB = 300  # Maximum archived file size in MB
     MAX_MEMORY_SIZE_IN_MB = 50  # Python 2.5 and prior must be much more conservative
+    IMPORTERS = {}
 
     def __init__(self):
         super(BaseZIPImporter, self).__init__()
+        self.IMPORTERS = {}
 
-    def process_archive(self, zip_archive, importer):
+    def register_importer(self, file_name, importer):
+        self.IMPORTERS[file_name] = importer
+
+    def process_archive(self, zip_archive):
+
+        logger.debug("Processing archive file: %s" % zip_archive)
+
         try:
             results_archive = zipfile.ZipFile(zip_archive, "r")
-        except zipfile.BadZipfile, e:
-            raise IntegrationError("Error opening file (Bad file) %s" % (zip_archive))
-        except zipfile.LargeZipFile, e:
-            raise IntegrationError("Error opening file (File too large) %s" % (zip_archive))
+        except zipfile.BadZipfile:
+            raise IntegrationError("Error opening file (Bad file) %s" % zip_archive)
+        except zipfile.LargeZipFile:
+            raise IntegrationError("Error opening file (File too large) %s" % zip_archive)
+
+        for file_name in self.IMPORTERS.keys():
+            self._process_archived_file(zip_archive, results_archive, file_name)
+
+        results_archive.close()
+
+    def _process_archived_file(self, archive_name, archive, file_name):
+
+        logger.debug("Processing archived file: %s" % file_name)
 
         try:
-            file_info = results_archive.getinfo(self.ARCHIVED_FILE_NAME)
-        except KeyError, ke:
-            raise IntegrationError("File (%s) not found in archive %s" % (self.ARCHIVED_FILE_NAME, zip_archive))
+            file_info = archive.getinfo(file_name)
+        except KeyError:
+            raise IntegrationError("File (%s) not found in archive %s" % (file_name, archive_name))
+
+        importer = self.IMPORTERS[file_name]
 
         # Python 2.6+ can open a ZIP file entry as a stream
-        if hasattr(results_archive, 'open'):
-        
+        if hasattr(archive, 'open'):
+
             # Restrict the size of the file we will open
             if file_info.file_size > self.MAX_SIZE_IN_MB * 1024 * 1024:
                 raise IntegrationError("File %s is larger than %s MB: %d bytes" %
-                        (self.ARCHIVED_FILE_NAME, self.MAX_SIZE_IN_MB, file_info.file_size))
+                                       (file_name, self.MAX_SIZE_IN_MB, file_info.file_size))
 
             try:
-                results_file = results_archive.open(self.ARCHIVED_FILE_NAME)
-            except KeyError, ke:
-                raise IntegrationError("File (%s) not found in archive %s" % (self.ARCHIVED_FILE_NAME, zip_archive))
+                results_file = archive.open(file_name)
+            except KeyError:
+                raise IntegrationError("File (%s) not found in archive %s" % (file_name, archive_name))
 
             importer.parse_file(results_file)
 
@@ -84,14 +113,15 @@ class BaseZIPImporter(BaseImporter):
             # Restrict the size of the file we will open into RAM
             if file_info.file_size > self.MAX_MEMORY_SIZE_IN_MB * 1024 * 1024:
                 raise IntegrationError("File %s is larger than %s MB: %d bytes" %
-                        (self.ARCHIVED_FILE_NAME, self.MAX_MEMORY_SIZE_IN_MB, file_info.file_size))
+                                      (file_name, self.MAX_MEMORY_SIZE_IN_MB, file_info.file_size))
 
-            results_xml = results_archive.read(self.ARCHIVED_FILE_NAME)
+            results_xml = archive.read(file_name)
             importer.parse_string(results_xml)
-            
-        self.report_id = importer.report_id
-        self.raw_findings = importer.raw_findings            
-        
+
+        # retain the results in the importer
+        self.IMPORTERS[file_name] = importer
+
+
 class BaseXMLImporter(BaseImporter):
 
     def __init__(self):
@@ -128,9 +158,9 @@ class BaseXMLImporter(BaseImporter):
         if not XMLReader.valid_content_detected():
             raise IntegrationError("Malformed document detected: %s" % xml_file)
 
-        self.raw_findings = XMLReader.raw_findings
-        if XMLReader.report_id:
-            self.report_id = XMLReader.report_id   
+        self.findings = XMLReader.findings
+        if XMLReader.id:
+            self.id = XMLReader.id
         
     def parse_string(self, xml):
         XMLReader = self._get_content_handler()
@@ -143,9 +173,9 @@ class BaseXMLImporter(BaseImporter):
         if not XMLReader.valid_content_detected():
             raise IntegrationError("Malformed document detected")
 
-        self.raw_findings = XMLReader.raw_findings
-        if XMLReader.report_id:
-            self.report_id = XMLReader.report_id   
+        self.findings = XMLReader.findings
+        if XMLReader.id:
+            self.id = XMLReader.id
 
 class BaseIntegrator(object):
     TOOL_NAME = 'External tool'
