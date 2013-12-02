@@ -104,9 +104,6 @@ conflict_policy = alm
 #Valid values: True, False
 alm_standard_workflow = True
 
-#card type for new cards created by SD Elements
-rally_card_type = Story
-
 #Initial 'status' to set for a new card
 rally_new_status = Defined
 
@@ -115,6 +112,8 @@ rally_new_status = Defined
 #in SD Elements inside of Rally
 rally_done_statuses = Completed,Accepted
 
+#card type for new cards created by SD Elements
+rally_card_type = Story
 
 ######Base settings, do not modify######
 interactive = True

@@ -8,7 +8,6 @@ from datetime import datetime
 from sdetools.sdelib.restclient import RESTBase, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from sdetools.alm_integration.alm_plugin_base import AlmException
-from sdetools.sdelib.conf_mgr import Config
 from sdetools.extlib import markdown
 
 from sdetools.sdelib import log_mgr
@@ -23,7 +22,7 @@ RALLY_HEADERS = [
     ('X-RallyIntegrationVendor', 'SD Elements'),
     ('X-RallyIntegrationVersion', '1.0'),
     ('X-RallyIntegrationOS', sys.platform),
-    ('X-RallyIntegrationPlatform', 'Python %s' % sys.version.split(' ',1)[0].replace('\n', '')),
+    ('X-RallyIntegrationPlatform', 'Python %s' % sys.version.split(' ', 1)[0].replace('\n', '')),
     ('X-RallyIntegrationLibrary', 'Rally REST API'),
 ]
 
@@ -41,21 +40,21 @@ RALLY_HTML_CONVERT = [
     ('</code></pre>', '</code></pre></span>'),
 ]
 
+
 class RallyAPIBase(RESTBase):
     """ Base plugin for Rally """
 
     def __init__(self, config):
-        super(RallyAPIBase, self).__init__('alm', 'Rally', config, 
-                'slm/webservice/%s' % (API_VERSION))
+        super(RallyAPIBase, self).__init__('alm', 'Rally', config, 'slm/webservice/%s' % API_VERSION)
 
     def get_custom_headers(self, target, method):
         return RALLY_HEADERS
 
+
 class RallyTask(AlmTask):
     """ Representation of a task in Rally """
 
-    def __init__(self, task_id, alm_id, alm_task_ref,
-                 status, timestamp, done_statuses):
+    def __init__(self, task_id, alm_id, alm_task_ref, status, timestamp, done_statuses):
         self.task_id = task_id
         self.alm_id = alm_id
 
@@ -85,6 +84,7 @@ class RallyTask(AlmTask):
         """ Returns a datetime object """
         return datetime.strptime(self.timestamp, '%Y-%m-%dT%H:%M:%S.%fZ')
 
+
 class RallyConnector(AlmConnector):
     """Connects SD Elements to Rally"""
     alm_name = 'Rally'
@@ -93,13 +93,12 @@ class RallyConnector(AlmConnector):
         super(RallyConnector, self).__init__(config, alm_plugin)
 
         """ Adds Rally specific config options to the config file"""
-        config.opts.add('rally_card_type', 'IDs for issues raised in Rally',
-            default='Story')
         config.opts.add('rally_new_status', 'status to set for new tasks in Rally',
-            default='Defined')
+                                 default='Defined')
         config.opts.add('rally_done_statuses', 'Statuses that signify a task is Done in Rally',
-            default='Completed,Accepted')
+                                 default='Completed,Accepted')
         config.opts.add('rally_workspace', 'Rally Workspace', default=None)
+        config.opts.add('rally_card_type', 'IDs for issues raised in Rally', default='Story')
 
     def initialize(self):
         super(RallyConnector, self).initialize()
@@ -125,8 +124,8 @@ class RallyConnector(AlmConnector):
         try:
             self.alm_plugin.call_api('task.js')
         except APIError, err:
-            raise AlmException('Unable to connect to Rally service (Check server URL, '
-                    'user, pass). Reason: %s' % str(err))
+            raise AlmException('Unable to connect to Rally service (Check server URL, user, pass). Reason: %s'
+                               % str(err))
 
     def alm_connect_project(self):
         workspace_ref = None
@@ -143,8 +142,7 @@ class RallyConnector(AlmConnector):
                 break
 
         if not workspace_ref:
-            raise AlmException('Workspace is not valid, please check config value: '
-                    '%s' % self.config['rally_workspace'])
+            raise AlmException('Workspace is not valid, please check config value: %s' % self.config['rally_workspace'])
         self.workspace_ref = workspace_ref
 
         #Now get project ID
@@ -152,53 +150,86 @@ class RallyConnector(AlmConnector):
             'query': '(Name = \"%s\")' % self.config['alm_project'],
             'workspace': self.workspace_ref,
         }
-        project_ref = self.alm_plugin.call_api('project.js',
-                                                args = query_args)
+        project_ref = self.alm_plugin.call_api('project.js', args=query_args)
         num_results = project_ref['QueryResult']['TotalResultCount']
         if not num_results:
             raise AlmException('Rally project not found: %s' % self.config['alm_project'])
-        project_ref = project_ref['QueryResult']['Results'][0]['_ref']
-        self.project_ref = project_ref
+        self.project_ref = project_ref['QueryResult']['Results'][0]['_ref']
+
+    def alm_validate_configurations(self):
+        if self.config['rally_card_type'] != 'Story':
+            raise AlmException('Invalid configuration for rally_card_type. Expected "Story"')
+
+        query_args = {
+            'query': '(Name = \"Hierarchical Requirement\")',
+            'workspace': self.workspace_ref,
+        }
+
+        try:
+            requirement_definition = self.alm_plugin.call_api('typedefinition.js', args=query_args)
+        except APIError, err:
+            raise AlmException('Error while querying type definition for "Hierarchical Requirement": %s' % err)
+        except (KeyError, IndexError):
+            raise AlmException('Failed to retrieve type definition for "Hierarchical Requirement"')
+
+        requirement_definition_ref = requirement_definition['QueryResult']['Results'][0]['_ref']
+
+        try:
+            requirement_attrs = self.alm_plugin.call_api(self._split_ref_link(requirement_definition_ref))
+        except APIError, err:
+            raise AlmException('Error while retrieving attribute definitions for "Hierarchical Requirement": %s' % err)
+
+        for attribute in requirement_attrs['TypeDefinition']['Attributes']:
+            if attribute['Name'] == 'Schedule State':
+                allowed_values = [v['StringValue'] for v in attribute['AllowedValues']]
+
+                if self.config['rally_new_status'] not in allowed_values:
+                    raise AlmException('Invalid rally_new_status "%s". Expected one of %s' %
+                                       (self.config['rally_new_status'], allowed_values))
+
+                difference_set = set(self.config['rally_done_statuses']).difference(allowed_values)
+                if difference_set:
+                    raise AlmException('Invalid rally_done_statuses %s. Expected one of %s' %
+                                       (difference_set, allowed_values))
+                return
+        raise AlmException('Unable to retrieve allowed values for the "Schedule State" attribute')
 
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])
-        result = None
+        query_args = {
+            'query': '(Name contains \"%s:\")' % task_id,
+            'workspace': self.workspace_ref,
+            'project': self.project_ref,
+        }
 
         try:
-            query_args = {
-                'query': '(Name contains \"%s:\")' % task_id,
-                'workspace': self.workspace_ref,
-                'project': self.project_ref,
-                }
-            result = self.alm_plugin.call_api('hierarchicalrequirement.js',
-                                               args = query_args)
+            result = self.alm_plugin.call_api('hierarchicalrequirement.js', args=query_args)
         except APIError, err:
-            raise AlmException('Unable to get task %s from Rally. '
-                    'Reason: %s' % (task_id, str(err)))
+            raise AlmException('Unable to get task %s from Rally. Reason: %s' % (task_id, str(err)))
         num_results = result['QueryResult']['TotalResultCount']
 
         if not num_results:
             return None
 
-        task_result_url = result['QueryResult']['Results'][0]['_ref']
-        task_result_url = task_result_url.split('/%s/' % API_VERSION)[1]
+        task_result_url = self._split_ref_link(result['QueryResult']['Results'][0]['_ref'])
+
         try:
             task_data = self.alm_plugin.call_api(task_result_url)
         except APIError, err:
-            raise AlmException('Unable to get card # for task %s from Rally. '
-                    'Reason: %s' % (task_id, str(err)))
+            raise AlmException('Unable to get user story %s from Rally. Reason: %s' % (task_id, str(err)))
         task_data = task_data['HierarchicalRequirement']
+
         return RallyTask(task_id,
                          task_data['FormattedID'],
-                         task_data['_ref'].split('/%s/' % API_VERSION)[1],
+                         self._split_ref_link(task_data['_ref']),
                          task_data['ScheduleState'],
                          task_data['LastUpdateDate'],
                          self.config['rally_done_statuses'])
 
     def alm_add_task(self, task):
         try:
-            create_args = { 
-                'HierarchicalRequirement' : {
+            create_args = {
+                'HierarchicalRequirement': {
                     'Name': task['title'],
                     'Description': self.sde_get_task_content(task),
                     'Workspace': self.workspace_ref,
@@ -206,15 +237,15 @@ class RallyConnector(AlmConnector):
                 }
             }
             result = self.alm_plugin.call_api('hierarchicalrequirement/create.js',
-                    method = self.alm_plugin.URLRequest.POST, args = create_args)
+                                              method=self.alm_plugin.URLRequest.POST, args=create_args)
             logger.debug('Task %s added to Rally Project', task['id'])
 
         except APIError, err:
-            raise AlmException('Unable to add task to Rally %s because of %s' % 
-                    (task['id'], err))
+            raise AlmException('Unable to add task to Rally %s because of %s' %
+                               (task['id'], err))
         if result['CreateResult']['Errors']:
-            raise AlmException('Unable to add task to Rally %s. Reason: %s' % 
-                    (task['id'], str(result['CreateResult']['Errors'])[:200]))
+            raise AlmException('Unable to add task to Rally %s. Reason: %s' %
+                               (task['id'], str(result['CreateResult']['Errors'])[:200]))
 
         #Return a unique identifier to this task in Rally
         logger.info('Getting task %s', task['id'])
@@ -224,59 +255,42 @@ class RallyConnector(AlmConnector):
                                'check ALM-specific settings in config file')
 
         if (self.config['alm_standard_workflow'] and
-            (task['status'] == 'DONE' or task['status'] == 'NA')):
+                (task['status'] == 'DONE' or task['status'] == 'NA')):
             self.alm_update_task_status(alm_task, task['status'])
 
         return 'Project: %s, Story: %s' % (self.config['alm_project'],
                                            alm_task.get_alm_id())
 
-
     def alm_update_task_status(self, task, status):
-
         if not task or not self.config['alm_standard_workflow']:
             logger.debug('Status synchronization disabled')
             return
-
         if status == 'DONE' or status == 'NA':
-            try:
-                trans_args = {
-                        'HierarchicalRequirement' : {
-                                'ScheduleState':
-                                        self.config['rally_done_statuses'][0]
-                        }
-                }
-                self.alm_plugin.call_api(task.get_alm_task_ref(),
-                                          args = trans_args,
-                                          method=self.alm_plugin.URLRequest.POST)
-            except APIError, err:
-                raise AlmException('Unable to update task status to DONE '
-                                   'for card: %s in Rally because of %s' % 
-                                   (task.get_alm_id(), err))
-
+            schedule_state = self.config['rally_done_statuses'][0]
+            status = 'DONE'
         elif status == 'TODO':
-            try:
-                trans_args = {
-                    'HierarchicalRequirement' : {
-                        'ScheduleState': 
-                            self.config['rally_new_status']
-                    }
-                }
-                self.alm_plugin.call_api(task.get_alm_task_ref(),
-                                          args = trans_args,
-                                          method=self.alm_plugin.URLRequest.POST)
-            except APIError, err:
-                raise AlmException('Unable to update task status to TODO '
-                                   'for card: '
-                                   '%s in Rally because of %s' %
-                                   (task.get_alm_id(), err))
+            schedule_state = self.config['rally_new_status']
+        else:
+            raise AlmException('Invalid status %s' % status)
 
-        logger.debug('Status changed to %s for task %s in Rally',
-                      status, task.get_alm_id())
+        trans_args = {
+            'HierarchicalRequirement': {
+                'ScheduleState': schedule_state
+            }
+        }
+
+        try:
+            self.alm_plugin.call_api(task.get_alm_task_ref(), args=trans_args, method=self.alm_plugin.URLRequest.POST)
+        except APIError, err:
+            raise AlmException('Unable to update task status to %s for user story %s in Rally because of %s' %
+                               (status, task.get_alm_id(), err))
+
+        logger.debug('Status changed to %s for task %s in Rally' % (status, task.get_alm_id()))
 
     def alm_disconnect(self):
         pass
 
-    def convert_markdown_to_alm(self, content, ref): 
+    def convert_markdown_to_alm(self, content, ref):
         s = self.mark_down_converter.convert(content)
 
         # We do some jumping through hoops to add <br> at end of each
@@ -301,3 +315,6 @@ class RallyConnector(AlmConnector):
 
         return s
 
+    @staticmethod
+    def _split_ref_link(ref):
+        return ref.split('/%s/' % API_VERSION)[1]

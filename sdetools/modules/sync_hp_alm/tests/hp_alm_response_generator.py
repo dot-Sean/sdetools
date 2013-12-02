@@ -62,7 +62,8 @@ class HPAlmResponseGenerator(ResponseGenerator):
                         response['Fields'].append(self.generate_requirement_field(key, value))
                     return response
                 else:
-                    self.raise_error('405', 'Duplicate requirement-coverage')
+                    self.raise_error('405', 'Duplicate requirement-coverage for test %s and requirement %s' %
+                                     (data.get('test-id'), data.get('requirement-id')))
         else:
             self.raise_error('401')
 
@@ -280,7 +281,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
         return entities
 
     def get_url_parameters(self, url):
-        query, fields = [q for q in super(HPAlmResponseGenerator, self).get_url_parameters(url).values()]
+        query, fields = [q[0] for q in super(HPAlmResponseGenerator, self).get_url_parameters(url).values()]
         queries = [re.findall('[-\w ]+', q) for q in query.split(';')]
         fields = fields.split(',')
 

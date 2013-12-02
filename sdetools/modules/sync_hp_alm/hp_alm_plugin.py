@@ -135,6 +135,7 @@ class HPAlmConnector(AlmConnector):
         self.mark_down_converter = markdown.Markdown(safe_mode="escape")
         self.project_uri = 'rest/domains/%s/projects/%s' % (urlencode_str(self.config['hp_alm_domain']),
                                                             urlencode_str(self.config['alm_project']))
+        self.test_plan_folder_id = None
         #We will map requirements its associated tests based on the problem id
         self.requirement_to_test_mapping = {}
 
@@ -204,8 +205,31 @@ class HPAlmConnector(AlmConnector):
         if user['Name'] != self.config['alm_user']:
             raise AlmException('Unable to verify user access to domain and project')
 
-        self.validate_configurations()
-        self.test_plan_folder_id = self._fetch_test_plan_folder_id("{name['%s']}" % self.config['hp_alm_test_plan_folder'])
+    def alm_validate_configurations(self):
+        # Check requirement type
+        self.issue_type = self._validate_entity_type('requirement', self.config['hp_alm_issue_type'])
+
+        # Check test plan type
+        self.config['hp_alm_test_type'] = self._validate_entity_type('test', self.config['hp_alm_test_type'])
+
+        # Check statuses
+        try:
+            requirement_lists = self._call_api('%s/customization/used-lists?name=Status' % self.project_uri)
+        except APIError, err:
+            raise AlmException('Unable to retrieve statuses: %s' % err)
+
+        requirement_statuses = [item['value'] for item in requirement_lists['lists'][0]['Items']]
+
+        for config in ['hp_alm_new_status', 'hp_alm_reopen_status', 'hp_alm_close_status']:
+            status = self.config[config]
+
+            if not status in requirement_statuses:
+                raise AlmException('Invalid %s: %s. Expected one of %s' % (config, status, requirement_statuses))
+
+        difference_set = set(self.config['hp_alm_done_statuses']).difference(requirement_statuses)
+        if difference_set:
+            raise AlmException('Invalid hp_alm_done_statuses: %s. Expected one of %s' %
+                               (difference_set, requirement_statuses))
 
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])
@@ -275,7 +299,8 @@ class HPAlmConnector(AlmConnector):
 
     def _alm_add_test_plan(self, task_id, field_data, task):
         if self.test_plan_folder_id is None:
-            self.test_plan_folder_id = self._create_test_plan_folder()
+            _query = "{name['%s']}" % self.config['hp_alm_test_plan_folder']
+            self.test_plan_folder_id = self._fetch_test_plan_folder_id(_query) or self._create_test_plan_folder()
 
         field_data.extend([
             ('parent-id', self.test_plan_folder_id),
@@ -404,30 +429,6 @@ class HPAlmConnector(AlmConnector):
                 if int(key) == priority:
                     return pmap[key]
 
-    def validate_configurations(self):
-        # Check requirement type
-        self.issue_type = self._validate_entity_type('requirement', self.config['hp_alm_issue_type'])
-
-        # Check test plan type
-        self.config['hp_alm_test_type'] = self._validate_entity_type('test', self.config['hp_alm_test_type'])
-
-        # Check statuses
-        try:
-            requirement_lists = self._call_api('%s/customization/used-lists?name=Status' % self.project_uri)
-        except APIError, err:
-            raise AlmException('Unable to retrieve statuses: %s' % err)
-
-        requirement_statuses = set([item['value'] for item in requirement_lists['lists'][0]['Items']])
-
-        for config in ['hp_alm_new_status', 'hp_alm_reopen_status', 'hp_alm_close_status', 'hp_alm_done_statuses']:
-            status = self.config[config]
-
-            if type(status) is not ListType:
-                status = [status]
-            if not set(status).intersection(requirement_statuses):
-                raise AlmException('Invalid configuration: %s. Expected [%s], got %s' %
-                                   (config, requirement_statuses, status))
-
     def _validate_entity_type(self, type, check_value):
         try:
             entity_types = self._call_api('%s/customization/entities/%s/types/' % (self.project_uri, type))
@@ -436,7 +437,7 @@ class HPAlmConnector(AlmConnector):
         for entity_type in entity_types['types']:
             if entity_type['name'] == check_value:
                 return entity_type['id']
-        raise AlmException('%s type %s not found in project' % (type, check_value))
+        raise AlmException('%s type %s not found in project' % (type.capitalize(), check_value))
 
     def _fetch_test_plan_folder_id(self, query_args="{}"):
         try:

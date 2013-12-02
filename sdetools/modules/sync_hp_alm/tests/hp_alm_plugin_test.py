@@ -4,7 +4,7 @@ import unittest
 
 from hp_alm_response_generator import HPAlmResponseGenerator
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
-from sdetools.modules.sync_hp_alm.hp_alm_plugin import HPAlmConnector, HPAlmAPIBase
+from sdetools.modules.sync_hp_alm.hp_alm_plugin import HPAlmConnector, HPAlmAPIBase, AlmException
 
 
 class TestHPAlmCase(AlmPluginTestBase, unittest.TestCase):
@@ -23,6 +23,43 @@ class TestHPAlmCase(AlmPluginTestBase, unittest.TestCase):
 
         self.assertEqual(result_alm_id, alm_id, 'Expected alm_id %s, got %s' % (alm_id, result_alm_id))
 
+    def test_invalid_requirement_type(self):
+        self.config['hp_alm_issue_type'] = 'BAD_ISSUE_TYPE'
+
+        self.assert_exception(AlmException, '', '%s type %s not found in project' % ('Requirement', 'BAD_ISSUE_TYPE'),
+                              self.connector.alm_connect)
+
+    def test_invalid_test_type(self):
+        self.config['hp_alm_test_type'] = 'BAD_TEST_TYPE'
+
+        self.assert_exception(AlmException, '', '%s type %s not found in project' % ('Test', 'BAD_TEST_TYPE'),
+                              self.connector.alm_connect)
+
+    def _test_status_validation(self, _conf):
+        _status = 'BAD_STATUS'
+        self.config[_conf] = _status
+        valid_statuses = [u'Not Completed', u'Not Run', u'Failed', u'Blocker', u'Passed']
+
+        self.assert_exception(AlmException, '', 'Invalid %s: %s. Expected one of %s' % (_conf, _status, valid_statuses),
+                              self.connector.alm_connect)
+
+    def test_invalid_hp_alm_new_status(self):
+        self._test_status_validation('hp_alm_new_status')
+
+    def test_invalid_hp_alm_reopen_status(self):
+        self._test_status_validation('hp_alm_reopen_status')
+
+    def test_invalid_hp_alm_close_status(self):
+        self._test_status_validation('hp_alm_close_status')
+
+    def test_invalid_hp_alm_done_statuses(self):
+        _status = ['BAD_STATUS', 'Passed']
+        self.config['hp_alm_done_statuses'] = _status
+        valid_statuses = [u'Not Completed', u'Not Run', u'Failed', u'Blocker', u'Passed']
+
+        self.assert_exception(AlmException, '', 'Invalid hp_alm_done_statuses: set(%s). Expected one of %s' %
+                              ([_status[0]], valid_statuses), self.connector.alm_connect)
+
     def test_add_test_plan(self):
         self.config['alm_phases'] = 'requirement,testing'
         self.connector.alm_connect()
@@ -40,7 +77,7 @@ class TestHPAlmCase(AlmPluginTestBase, unittest.TestCase):
     def test_add_requirement_coverage(self):
         self.config['alm_phases'] = 'requirements,testing'
         test_task = self.mock_sde_response.generate_sde_task(phase='testing')
-        requirement_task = self.mock_sde_response.generate_sde_task(phase='requirement')
+        requirement_task = self.mock_sde_response.generate_sde_task(phase='requirements')
         self.connector.synchronize()
         hp_requirement_id = self.connector.alm_get_task(requirement_task).get_alm_id()
         hp_test_id = self.connector.alm_get_task(test_task).get_alm_id()
