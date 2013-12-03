@@ -23,6 +23,7 @@ class AuditXMLContent(BaseContentHandler):
         self.project_version = ""
         self.findings = {}
         self.current_instance = None
+        self.depth = 0
 
     def valid_content_detected(self):
         return self.saw_project_info_node
@@ -31,6 +32,9 @@ class AuditXMLContent(BaseContentHandler):
         pass
 
     def startElement(self, name, attrs):
+
+        self.depth += 1
+
         name_split = name.split(':')
         if len(name_split) == 2:
             prefix, node_name = name_split
@@ -53,7 +57,8 @@ class AuditXMLContent(BaseContentHandler):
         elif self.in_issue_list_node and node_name == 'Issue':
             self.in_issue_node = True
             self.current_instance = attrs['instanceId']
-        elif self.in_issue_node and node_name == 'Tag':
+        # Ignore Tags from the audit trail
+        elif self.in_issue_node and node_name == 'Tag' and self.depth == 4:
             if attrs['id'] == self.TRIAGE_TAG_ID:
                 self.in_triage_node = True
         elif self.in_triage_node and node_name == 'Value':
@@ -69,6 +74,9 @@ class AuditXMLContent(BaseContentHandler):
                 self.findings[self.current_instance] = data
 
     def endElement(self, name):
+
+        self.depth -= 1
+
         name_split = name.split(':')
         if len(name_split) == 2:
             prefix, node_name = name_split
