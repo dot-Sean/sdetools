@@ -78,18 +78,21 @@ class BaseZIPImporter(BaseImporter):
             raise IntegrationError("Error opening file (File too large) %s" % zip_archive)
 
         for file_name in self.IMPORTERS.keys():
-            self._process_archived_file(zip_archive, results_archive, file_name)
+            try:
+                self._process_archived_file(results_archive, file_name)
+            except IntegrationError, ie:
+                raise IntegrationError("Error processing %s: %s" % (zip_archive, str(ie)))
 
         results_archive.close()
 
-    def _process_archived_file(self, archive_name, archive, file_name):
+    def _process_archived_file(self, archive, file_name):
 
         logger.debug("Processing archived file: %s" % file_name)
 
         try:
             file_info = archive.getinfo(file_name)
         except KeyError:
-            raise IntegrationError("File (%s) not found in archive %s" % (file_name, archive_name))
+            raise IntegrationError("File %s not found" % file_name)
 
         importer = self.IMPORTERS[file_name]
 
@@ -104,9 +107,11 @@ class BaseZIPImporter(BaseImporter):
             try:
                 results_file = archive.open(file_name)
             except KeyError:
-                raise IntegrationError("File (%s) not found in archive %s" % (file_name, archive_name))
+                raise IntegrationError("File %s not found" % file_name)
 
             importer.parse_file(results_file)
+
+            results_file.close()
 
         # Python 2.5 and prior must open the file into memory
         else:

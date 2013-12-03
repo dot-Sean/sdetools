@@ -3,7 +3,7 @@ import os
 from sdetools.sdelib import conf_mgr
 from sdetools.sdelib.mod_mgr import ReturnChannel
 from sdetools.sdelib.testlib.mock_response import MOCK_SDE_RESPONSE
-from sdetools.sdelib.commons import abc, get_directory_of_current_module
+from sdetools.sdelib.commons import abc, Error, get_directory_of_current_module
 abstractmethod = abc.abstractmethod
 TEST_FILES_DIR = 'files'
 
@@ -138,3 +138,16 @@ class BaseIntegrationTest(object):
         self.assertTrue('36' in result.affected_tasks, 'Expected to find task 36 in affected tasks')
         self.check_analysis_note('36', 'failed', 'high', 1)
 
+    def assert_exception(self, exception, reason, fn, *args):
+        if not exception:
+            raise AssertionError('No exception type specified')
+        if not fn:
+            raise AssertionError('No function specified')
+
+        try:
+            fn.__call__(*args)
+            raise AssertionError('Expected an exception to be thrown')
+        except Error, err:
+            self.assertEqual(type(err), exception, 'Expected exception type %s, Got %s' % (exception, type(err)))
+            if reason:
+                self.assertTrue(reason in str(err), "Expected error message '%s', Got '%s'" % (reason, str(err)))
