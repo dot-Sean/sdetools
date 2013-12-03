@@ -1,4 +1,3 @@
-import json
 from urllib2 import HTTPError
 from xmlrpclib import Fault
 
