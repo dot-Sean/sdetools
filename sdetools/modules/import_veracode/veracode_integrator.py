@@ -55,14 +55,14 @@ class VeracodeIntegrator(BaseIntegrator):
             dr.attributes['app_id'].value,
             dr.attributes['build_id'].value
         )
-        raw_findings = [self._make_raw_finding(node) for node in base.getElementsByTagName('flaw')]
+        findings = [self._make_raw_finding(node) for node in base.getElementsByTagName('flaw')]
 
         # Veracode tracks 'fixed' flaws - prune them out
-        for flaw in list(raw_findings):
+        for flaw in list(findings):
             if flaw['remediation_status'] == 'Fixed':
-                raw_findings.remove(flaw)
+                findings.remove(flaw)
 
-        return raw_findings, report_id
+        return findings, report_id
 
     def _make_finding(self, item):
         finding = {'weakness_id': item['cweid'], 'description': item['categoryname']}
@@ -75,5 +75,5 @@ class VeracodeIntegrator(BaseIntegrator):
         return finding
 
     def generate_findings(self):
-        return [self._make_finding(item) for item in self.raw_findings]
-        
+        return [self._make_finding(item) for item in self.findings]
+

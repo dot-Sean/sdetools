@@ -40,7 +40,7 @@ class FortifyIntegrator(BaseIntegrator):
 
         self.findings = importer.findings
         self.report_id = importer.id
-        print self.findings
+
         return importer.findings, importer.id
 
     def _make_finding(self, item):

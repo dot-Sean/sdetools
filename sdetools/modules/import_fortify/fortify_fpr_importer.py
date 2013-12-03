@@ -23,17 +23,15 @@ class FortifyFPRImporter(BaseZIPImporter):
         if not audit_findings or not self.ANALYSIS_BLACKLIST:
             self.findings = self.IMPORTERS['audit.fvdl'].findings
             return
-        print audit_findings
+
         self.id = self.IMPORTERS['audit.xml'].id
 
         # remove issues that match our blacklist
         for vulnerability_instance in self.IMPORTERS['audit.fvdl'].findings:
             instance_id = vulnerability_instance['instance_id']
-            print "checking %s " % instance_id
+
             if instance_id in audit_findings and audit_findings[instance_id] in self.ANALYSIS_BLACKLIST:
                 # skip this vulnerability
-                print "skip!"
                 continue
             else:
-                print "keep!"
                 self.findings.append(vulnerability_instance)

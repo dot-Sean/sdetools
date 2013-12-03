@@ -248,7 +248,7 @@ class BaseIntegrator(object):
             if report_id:
                 _report_ids.append(report_id)
 
-        self.raw_findings = _raw_findings
+        self.findings = _raw_findings
 
         if _report_ids:
             self.report_id = ', '.join(_report_ids)
