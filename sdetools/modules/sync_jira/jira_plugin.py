@@ -2,12 +2,9 @@
 # Extensible two way integration with JIRA
 
 import re
-from datetime import datetime
 
 from sdetools.alm_integration.alm_plugin_base import AlmConnector, AlmException
-from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
 from sdetools.modules.sync_jira.jira_markdown import convert_markdown
-from sdetools.sdelib.conf_mgr import Config
 
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
@@ -19,7 +16,8 @@ JIRA_DEFAULT_PRIORITY_MAP = {
     '5-6': 'Major',
     '3-4': 'Minor',
     '1-2': 'Trivial',
-    }
+}
+
 
 class JIRAConnector(AlmConnector):
     alm_name = 'JIRA'

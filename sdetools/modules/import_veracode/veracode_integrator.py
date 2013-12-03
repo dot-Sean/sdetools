@@ -18,10 +18,8 @@ class VeracodeIntegrator(BaseIntegrator):
     TOOL_NAME = "veracode"
 
     def __init__(self, config):
-        config.opts.add("report_file", "Veracode Report File", "x", None)
-        config.opts.add("report_type", "Veracode Report Type: xml|auto", default="auto")
-        super(VeracodeIntegrator, self).__init__(config, DEFAULT_MAPPING_FILE)
-        self.raw_findings = []
+        supported_file_types = ['xml']
+        super(VeracodeIntegrator, self).__init__(config, self.TOOL_NAME, supported_file_types, DEFAULT_MAPPING_FILE)
 
     def _make_raw_finding(self, node):
         """
@@ -37,41 +35,34 @@ class VeracodeIntegrator(BaseIntegrator):
                 entry[attr] = node.attributes[attr].value
         return entry
 
-    def parse(self):
-
-        if not self.config['report_file']:
-            raise UsageError("Missing configuration option 'report_file'")
-    
-        if self.config['report_type'] == 'auto': 
-            if not isinstance(self.config['report_file'], basestring):
-                raise UsageError("On auto-detect mode, the file name needs to be specified.")
-            fileName, file_extension = os.path.splitext(self.config['report_file'])
-            self.config['report_type'] = file_extension[1:]
-
-        if self.config['report_type'] != 'xml':
-            raise UsageError("Unsupported file type (%s)" % self.config['report_type'])
+    def parse_report_file(self, report_file, report_type):
+        if report_type != 'xml':
+            raise UsageError("Unsupported file type (%s)" % report_type)
 
         try:
-            base = minidom.parse(self.config['report_file'])
+            base = minidom.parse(report_file)
         except Exception, e:
-            raise VeracodeIntegrationError("Error opening report xml (%s)" % self.config['report_file'])
+            raise VeracodeIntegrationError("Error opening report xml (%s)" % report_file)
 
         detailed_reports = base.getElementsByTagName('detailedreport')
-        if len(detailed_reports) != 1:
-            raise VeracodeIntegrationError('An unexpected number of detailedreport nodes found (%d)' % len(detailed_reports))
-        dr = detailed_reports[0]
-        self.report_id = "%s (%s-b%s)" % (
-                dr.attributes['app_name'].value,
-                dr.attributes['app_id'].value,
-                dr.attributes['build_id'].value )
 
-        self.raw_findings[:] = [self._make_raw_finding(node)
-                                for node in base.getElementsByTagName('flaw')]
+        if len(detailed_reports) != 1:
+            raise VeracodeIntegrationError('An unexpected number of detailedreport nodes found (%d)' %
+                                           len(detailed_reports))
+        dr = detailed_reports[0]
+        report_id = "%s (%s-b%s)" % (
+            dr.attributes['app_name'].value,
+            dr.attributes['app_id'].value,
+            dr.attributes['build_id'].value
+        )
+        findings = [self._make_raw_finding(node) for node in base.getElementsByTagName('flaw')]
 
         # Veracode tracks 'fixed' flaws - prune them out
-        for flaw in list(self.raw_findings):
-            if(flaw['remediation_status'] == 'Fixed'):
-                self.raw_findings.remove(flaw)
+        for flaw in list(findings):
+            if flaw['remediation_status'] == 'Fixed':
+                findings.remove(flaw)
+
+        return findings, report_id
 
     def _make_finding(self, item):
         finding = {'weakness_id': item['cweid'], 'description': item['categoryname']}
@@ -84,5 +75,5 @@ class VeracodeIntegrator(BaseIntegrator):
         return finding
 
     def generate_findings(self):
-        return [self._make_finding(item) for item in self.raw_findings]
-        
+        return [self._make_finding(item) for item in self.findings]
+

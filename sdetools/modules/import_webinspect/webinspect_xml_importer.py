@@ -9,7 +9,7 @@ class WebInspectXMLContent(BaseContentHandler):
         self.in_issue_name_node = False
         self.in_session_node = False
         self.in_url_node = False
-        self.raw_findings = []
+        self.findings = []
         self.report_id = ""
         self.check_id = 0
         self.check_name_found = False
@@ -43,11 +43,11 @@ class WebInspectXMLContent(BaseContentHandler):
             entry['count'] = 1
             entry['type'] = 'check'
             entry['description'] = data
-            self.raw_findings.append(entry)
+            self.findings.append(entry)
             self.check_id = 0
             self.check_name_found = True
         elif self.in_session_node and self.in_url_node:
-            self.report_id = data
+            self.id = data
 
     def endElement(self, name):
         if self.in_issue_node and name == 'Issue':

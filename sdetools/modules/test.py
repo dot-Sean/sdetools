@@ -1,9 +1,9 @@
-import sys
 import traceback
 import unittest
 
 from sdetools.sdelib.cmd import BaseCommand
 from sdetools.sdelib import commons
+
 
 class Command(BaseCommand):
     name = 'test'
