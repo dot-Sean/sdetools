@@ -197,12 +197,18 @@ class BaseIntegrator(object):
         self.plugin = PlugInExperience(self.config)
         self.supported_file_types = supported_file_types
 
-        self.config.opts.add("report_file", "Common separated list of %s Report Files" % tool_name.capitalize(),
+        self.config.opts.add(
+                "report_file", 
+                "Common separated list of %s Report Files" % tool_name.capitalize(),
                 "x", None)
-        self.config.opts.add("report_type", "%s Report Type: %s|auto" %
-                (tool_name.capitalize(), '|'.join(supported_file_types)), default="auto")
-        self.config.opts.add("mapping_file", "Task ID -> Tool Weakness mapping in XML format", "m",
-                default_mapping_file)
+        self.config.opts.add(
+                "report_type", 
+                "%s Report Type: %s|auto" % (tool_name.capitalize(), '|'.join(supported_file_types)), 
+                default="auto")
+        self.config.opts.add(
+                "mapping_file", 
+                "Task ID -> Tool Weakness mapping in XML format", 
+                "m", default_mapping_file)
         self.config.opts.add("flaws_only", "Only update tasks identified having flaws. (True | False)", "z", "False")
         self.config.opts.add("trial_run", "Trial run only: 'True' or 'False'", "t", "False")
 
