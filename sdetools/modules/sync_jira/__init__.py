@@ -7,7 +7,7 @@ from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
 from sdetools.modules.sync_jira.jira_soap import JIRASoapAPI
 from sdetools.modules.sync_jira.jira_plugin import JIRAConnector
 from sdetools.alm_integration.alm_plugin_base import AlmException
-from sdetools.sdelib.interactive_plugin import PluginError
+
 
 class Command(BaseCommand):
     help = 'JIRA <-> SDE sync utility.'

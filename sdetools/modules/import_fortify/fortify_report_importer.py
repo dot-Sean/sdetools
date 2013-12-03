@@ -26,7 +26,7 @@ class FortifyReportImporter(BaseImporter):
         except Exception, e:
             raise FortifyIntegrationError("Error opening report xml %s Reason: %s" % (report_xml, str(e)))
 
-        self.report_id = ""
+        self.id = ""
         root = base.documentElement
 
         if root.tagName != "ReportDefinition":
@@ -45,10 +45,10 @@ class FortifyReportImporter(BaseImporter):
                 issue_listing = report_section.getElementsByTagName('IssueListing')[0]
                 grouping_sections = issue_listing.getElementsByTagName('GroupingSection')
                 for grouping_section in grouping_sections:
-                    self.raw_findings.append(self._make_raw_finding(grouping_section))
+                    self.findings.append(self._make_raw_finding(grouping_section))
             elif title.firstChild.data == 'Project Summary':
                 subsection = report_section.getElementsByTagName('SubSection')[0]
                 subsection_text = subsection.getElementsByTagName('Text')[0]
                 m = re.search('Build Label:\s*(.+)', subsection_text.firstChild.data)
                 if m:
-                    self.report_id = m.group(1)
+                    self.id = m.group(1)
