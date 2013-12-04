@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<property_definition>
+  <id type="integer">114</id>
+  <name>Status</name>
+  <description>
+  </description>
+  <data_type>string</data_type>
+  <is_numeric type="boolean">false</is_numeric>
+  <hidden type="boolean">false</hidden>
+  <restricted type="boolean">false</restricted>
+  <transition_only type="boolean">false</transition_only>
+  <project url="http://localhost:8080/api/v2/projects/test_project.xml">
+    <name>test project</name>
+    <identifier>test_project</identifier>
+  </project>
+  <column_name>cp_status</column_name>
+  <position nil="true"></position>
+  <property_values_description>Managed text list</property_values_description>
+  <property_value_details type="array">
+    <property_value>
+      <id type="integer">117</id>
+      <value>New</value>
+      <color nil="true"></color>
+      <position type="integer">1</position>
+    </property_value>
+    <property_value>
+      <id type="integer">118</id>
+      <value>Open</value>
+      <color nil="true"></color>
+      <position type="integer">2</position>
+    </property_value>
+    <property_value>
+      <id type="integer">119</id>
+      <value>Closed</value>
+      <color nil="true"></color>
+      <position type="integer">3</position>
+    </property_value>
+  </property_value_details>
+</property_definition>

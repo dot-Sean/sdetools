@@ -2,12 +2,9 @@
 # Extensible two way integration with JIRA
 
 import re
-from datetime import datetime
 
 from sdetools.alm_integration.alm_plugin_base import AlmConnector, AlmException
-from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
 from sdetools.modules.sync_jira.jira_markdown import convert_markdown
-from sdetools.sdelib.conf_mgr import Config
 
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
@@ -19,7 +16,8 @@ JIRA_DEFAULT_PRIORITY_MAP = {
     '5-6': 'Major',
     '3-4': 'Minor',
     '1-2': 'Trivial',
-    }
+}
+
 
 class JIRAConnector(AlmConnector):
     alm_name = 'JIRA'
@@ -54,7 +52,7 @@ class JIRAConnector(AlmConnector):
             len(self.config['jira_done_statuses']) < 1):
             raise AlmException('Missing jira_done_statuses in configuration')
 
-        self.config['jira_done_statuses'] = (self.config['jira_done_statuses'].split(','))
+        self.config.process_list_config('jira_done_statuses')
 
         if not self.config['jira_issue_type']:
             raise AlmException('Missing jira_issue_type in configuration')
@@ -106,7 +104,7 @@ class JIRAConnector(AlmConnector):
         self.alm_plugin.setup_fields(self.jira_issue_type_id)
 
     def alm_get_task(self, task):
-        task_id = task['title'].partition(':')[0]
+        task_id = self._extract_task_id(task['id'])
 
         task = self.alm_plugin.get_task(task, task_id)
         if task:
@@ -153,7 +151,8 @@ class JIRAConnector(AlmConnector):
 
         trans_name = self.config['jira_%s_transition' % new_state]
         if trans_name not in trans_table:
-            raise AlmException('Unable to find transition %s' % trans_name)
+            raise AlmException('Transition %s is invalid for issue %s. Valid entries are: %s' % (
+                trans_name, alm_id, ', '.join(trans_table)))
         trans_id = trans_table[trans_name]
 
         self.alm_plugin.update_task_status(alm_id, trans_id)

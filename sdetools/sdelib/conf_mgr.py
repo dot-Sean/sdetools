@@ -308,6 +308,13 @@ class Config(object):
             return
         self[key] = (str(self[key]).lower() == 'true')
 
+    def process_list_config(self, key):
+        if not self[key]:
+            self[key] = []
+            return
+        if isinstance(self[key], basestring):
+            self[key] = [x.strip() for x in self[key].split(',')]
+
     def process_json_str_dict(self, key):
         try:
             if not self[key]:

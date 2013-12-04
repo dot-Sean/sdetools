@@ -158,7 +158,7 @@ class PlugInExperience:
 
     @_verify_connect
     def get_task_notes(self, task_id, note_type=''):
-        return self.api.get_task_ide_notes("%d-%s" % (self.prj_id, task_id), note_type)
+        return self.api.get_task_notes("%d-%s" % (self.prj_id, task_id), note_type)
 
     @_verify_connect
     def add_project_analysis_note(self, analysis_ref, analysis_type):
