@@ -1,3 +1,4 @@
+import pprint
 import logging
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,10 @@ class Info(object):
                 msg += 'Failed'
             if self.msg:
                 msg += ': %s' % self.msg
+            attachments = self.items.keys()
+            attachments.remove('status')
+            if attachments:
+                msg += '\n Attachments:\n%s' % (pprint.pformat(self.items))
             return msg
         else:
             return '%s: %s' % (ev_type.title(), self.msg)

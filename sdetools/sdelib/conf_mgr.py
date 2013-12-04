@@ -7,6 +7,7 @@ import logging
 import datetime
 
 import log_mgr
+logger = log_mgr.mods.add_mod(__name__)
 
 from sdetools.sdelib.commons import UsageError, json
 
@@ -50,6 +51,17 @@ class Option(object):
         self.default = default
         self.meta_var = meta_var
         self.group_name = group_name
+
+    def __str__(self):
+        summary = {}
+        for item in [
+                'var_name', 'help_title', 'short_form', 'default',
+                'meta_var', 'group_name']:
+            summary[item] = getattr(self, item)
+        return str(summary)
+
+    def __repr__(self):
+        return '%s(**%s)' % (self.__class__.__name__, str(self))
 
 class ModuleOptions(dict):
     """
@@ -134,15 +146,18 @@ class Config(object):
         self.ret_chn = ret_chn
         self.emit = self.ret_chn.emit
 
-    def copy(self, command=None, sub_cmd=None):
+    def copy(self, command=None, sub_cmd=''):
+        copy_opts = False
         if command is None:
             command = self.command
             sub_cmd = self.sub_cmd
+            copy_opts = True
         dup = Config(command, sub_cmd, self.command_list, [''] + self.args, self.ret_chn,
                 self.call_src, self.call_options)
-        dup.settings = self.settings.copy()
         dup.use_conf_file = self.use_conf_file
-        dup.opts = self.opts.copy()
+        if copy_opts:
+            dup.settings = self.settings.copy()
+            dup.opts = self.opts.copy()
         return dup
 
     def __getitem__(self, key):
@@ -175,7 +190,7 @@ class Config(object):
     def _add_custom_option(self, var_name, help_title, short_form=None, 
             default='', meta_var=None, group_name=None):
         if var_name in self.settings:
-            log_mgr.warning('Attempting to re-customize an existing '
+            logger.warning('Attempting to re-customize an existing '
                 'config %s (IGNORE)' % var_name)
             return
 

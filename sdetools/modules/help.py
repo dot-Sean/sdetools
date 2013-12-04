@@ -61,7 +61,7 @@ class Command(BaseCommand):
         if self.help_cmd:
             cmd_obj = self.config.command_list[self.help_cmd]
             
-            cmd_config = self.config.copy()
+            cmd_config = self.config.copy(self.help_cmd, self.help_subcmd)
 
             cmd_inst = cmd_obj(cmd_config, self.args)
             cmd_inst.configure()
