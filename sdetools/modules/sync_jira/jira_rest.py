@@ -19,7 +19,7 @@ class JIRARestAPI(RESTBase):
         """ Verifies that JIRA connection works """
         # Verify that we can connect to JIRA
         try:
-            result = self.call_api('project')
+            self.call_api('project')
         except APIError, err:
             raise AlmException('Unable to connect to JIRA service (Check server URL, '
                     'user, pass). Reason: %s' % str(err))
@@ -82,7 +82,7 @@ class JIRARestAPI(RESTBase):
             url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s%%5C%%5C:\'' % (
                     self.config['alm_project'], task_id)
             result = self.call_api(url)
-        except APIError, err:
+        except APIError:
             raise AlmException("Unable to get task %s from JIRA" % task_id)
 
         if not result['total']:
@@ -171,7 +171,7 @@ class JIRARestAPI(RESTBase):
         ret_trans = {}
         try:
             transitions = self.call_api(trans_url)
-        except APIError, err:
+        except APIError:
             raise AlmException("Unable to get transition IDS for JIRA task %s" % task_id)
         for transition in transitions['transitions']:
             ret_trans[transition['name']] = transition['id']

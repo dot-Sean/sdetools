@@ -25,7 +25,7 @@ class SOAPProxyWrap:
             logger.debug(' + Args: %s' % ((repr(args)[:200]) + (repr(args)[200:] and '...')))
             try:
                 return self.__fobj(*args)
-            except (xml.parsers.expat.ExpatError, socket.error), err:
+            except (xml.parsers.expat.ExpatError, socket.error):
                 raise AlmException('Unable to access JIRA (for %s). '
                         ' Please check network connectivity.' % (self.__fname))
 
@@ -80,7 +80,8 @@ class JIRASoapAPI:
     def connect_project(self):
         # Test for project existence
         try:
-            result = self.proxy.getProjectByKey(self.auth, self.config['alm_project'])
+            # We don't use the result of this call
+            self.proxy.getProjectByKey(self.auth, self.config['alm_project'])
         except SOAPpy.Types.faultType:
             raise AlmException('Unable to connect to project %s. Please check project'
                                ' settings' % (self.config['alm_project']))
@@ -213,7 +214,7 @@ class JIRASoapAPI:
         update = [{'id':'versions', 'values':self.get_affected_versions(task)}]
         try:
             self.proxy.updateIssue(self.auth, task.get_alm_id(), update)
-        except (SOAPpy.Types.faultType, AlmException), err:
+        except (SOAPpy.Types.faultType, AlmException):
             raise AlmException('Unable to update issue %s with new version %s' % (task.get_alm_id(), project_version))
     
         return True

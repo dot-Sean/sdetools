@@ -41,7 +41,7 @@ class VeracodeIntegrator(BaseIntegrator):
 
         try:
             base = minidom.parse(report_file)
-        except Exception, e:
+        except Exception:
             raise VeracodeIntegrationError("Error opening report xml (%s)" % report_file)
 
         detailed_reports = base.getElementsByTagName('detailedreport')

@@ -303,7 +303,7 @@ class BaseIntegrator(object):
     def load_mapping_from_xml(self):
         try:
             base = minidom.parse(self.config['mapping_file'])
-        except KeyError, ke:
+        except KeyError:
             raise IntegrationError("Missing configuration option 'mapping_file'")
         except Exception, e:
             raise IntegrationError("An error occurred opening mapping file '%s': %s" % (self.config['mapping_file'], e))
