@@ -3,7 +3,7 @@ import json
 import re
 import urllib
 
-from types import IntType
+from types import IntType, DictionaryType, ListType
 from mock import MagicMock
 from urllib2 import HTTPError
 from urlparse import urlparse, parse_qs
@@ -34,8 +34,8 @@ class ResponseGenerator(object):
         self.resources = {}
         self.test_dir = test_dir
         self.base_path = base_path
-        self.alm_tasks = {}
         self.rest_api_targets = rest_api_targets
+        self.external_targets = {}      # Non-rest targets
 
         for resource in resource_templates:
             resource_name, file_type = resource.split('.')
@@ -86,22 +86,26 @@ class ResponseGenerator(object):
 
         for api_target in self.rest_api_targets:
             if re.match('%s%s' % (self.base_path, api_target), target):
-                func_name = self.rest_api_targets.get(api_target)
-
-                if func_name is not None:
-                    func = getattr(self, func_name)
-
-                    if callable(func):
-                        response = func(target, flags.get(func_name), data, method)
-                        try:
-                            response = self.encode_response(response)
-                        except:
-                            # Do not encode the response
-                            pass
-                        return 200, response
-
-                self.raise_error('500', 'Response generator error: Could not find method %s' % func_name)
+                return self._call_target(self.rest_api_targets.get(api_target), target, flags, data, method)
+        for api_target in self.external_targets:
+            if re.match(api_target, target):
+                return self._call_target(self.external_targets.get(api_target), target, flags, data, method)
         self.raise_error('404')
+
+    def _call_target(self, func_name, target, flags, data, method):
+        if func_name is not None:
+            func = getattr(self, func_name)
+
+            if callable(func):
+                response = func(target, flags.get(func_name), data, method)
+                try:
+                    response = self.encode_response(response)
+                except:
+                    # Do not encode the response
+                    pass
+                return 200, response
+
+        self.raise_error('500', 'Response generator error: Could not find method %s' % func_name)
 
     def raise_error(self, error_code, message=None):
         fp_mock = MagicMock()
@@ -187,7 +191,9 @@ class ResponseGenerator(object):
             _task_value = task.get(key)
             if type(_task_value) == IntType:
                 _task_value = str(_task_value)
-
+            if type(value) == ListType:
+                value = value[0]
+                print value
             if _task_value is None or not re.match(value, _task_value):
                 return False
         return True
@@ -284,6 +290,18 @@ class ResponseGenerator(object):
             raise Exception('Unsupported file type %s' % file_type)
 
         for key, value in resource_data.items():
-            template[key] = value
+            if type(value) == DictionaryType:
+                template[key] = self._update_template(template[key], value)
+            else:
+                template[key] = value
+
+        return self._update_template(template, resource_data)
+
+    def _update_template(self, template, data):
+        for key, value in data.items():
+            if type(value) == DictionaryType:
+                template[key] = self._update_template(template[key], value)
+            else:
+                template[key] = value
 
         return template

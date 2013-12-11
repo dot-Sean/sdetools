@@ -21,19 +21,30 @@ class JiraResponseGenerator(ResponseGenerator):
         self.project_version = config['alm_project_version']
         self.username = config['alm_user']
         statuses = [1]
+        resource_templates = ['issue.json', 'project.json', 'project_version.json']
         rest_api_targets = {
-            '/%s/project$' % base_url: 'get_projects',
-            '/%s/project/%s/versions' % (base_url, self.project_key): 'get_project_versions',
-            '/%s/issue/createmeta' % base_url: 'get_create_meta',
-            '/%s/issuetype' % base_url: 'get_issue_types',
-            '/%s/search\?jql=project%%3D\'%s\'%%20AND%%20summary~.*' % (base_url, self.project_key): 'get_issue',
-            '/%s/issue/%s-\S.*/remotelink$' % (base_url, self.project_key): 'post_remote_link',
-            '/%s/issue$' % base_url: 'post_issue',
-            '/%s/issue/%s-[0-9]*$' % (base_url, self.project_key): 'update_version',
-            '/%s/issue/%s-\S.*/transitions$' % (base_url, self.project_key): 'update_status',
+            'project$': 'get_projects',
+            'project/%s/versions' % self.project_key: 'get_project_versions',
+            'issue/createmeta': 'get_create_meta',
+            'issuetype': 'get_issue_types',
+            'search\?jql=project%%3D\'%s\'%%20AND%%20summary~.*' % self.project_key: 'get_issue',
+            'issue/%s-\S.*/remotelink$' % self.project_key: 'post_remote_link',
+            'issue$': 'post_issue',
+            'issue/%s-[0-9]*$' % self.project_key: 'update_version',
+            'issue/%s-\S.*/transitions$' % self.project_key: 'update_status',
+        }
+        super(JiraResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir, '/rest/api/2/')
+        self.external_targets = {
             'https://jira-server:5000/rpc/soap/jirasoapservice-v2': 'jira_soap_service'
         }
-        super(JiraResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
+
+    def init_with_resources(self):
+        project_data = {
+            'self': '%s/project/%s' % (self.api_url, self.project_key),
+            'id': self.PROJECT_ID,
+            'key': self.project_key,
+        }
+        self.generator_add_resource('project', self.PROJECT_ID, project_data)
 
     def jira_soap_service(self, target, flag, data, method):
         return ''
@@ -108,7 +119,7 @@ class JiraResponseGenerator(ResponseGenerator):
             task_number = task_id.split('-')[1]
 
             if task_number:
-                self.generator_update_task(task_number, 'version', version_name)
+                self.generator_update_resource('issue', task_number, {'version': version_name})
 
                 return {
                     "id": "10000",
@@ -139,8 +150,7 @@ class JiraResponseGenerator(ResponseGenerator):
 
     def get_projects(self, target, flag, data, method):
         if not flag:
-            response = [self.generate_project()]
-            return response
+            return self.generator_get_all_resource('project')
         else:
             self.raise_error('500')
 
@@ -186,15 +196,16 @@ class JiraResponseGenerator(ResponseGenerator):
                 'issues': []
             }
 
-            if name:
-                target = name
+            if not name:
+                params = self.get_url_parameters(target)
+                name = re.search('(?<=summary~).*', params['jql'][0].replace('\\', '')).group(0)
 
-            task_number = self.extract_task_number_from_title(target)
-            task = self.generator_get_task(task_number)
+            task_number = self.extract_task_number_from_title(name)
+            print task_number
+            task = self.generator_get_resource('issue', task_number)
+            print task
             if task:
-                status_id = task.get('status')
-                version = task.get('version')
-                response['issues'].append(self.generate_issue('T%s' % task_number, task_number, status_id, version))
+                response['issues'].append(task)
                 response['total'] = 1
 
             return response
@@ -215,10 +226,11 @@ class JiraResponseGenerator(ResponseGenerator):
             transition_id = data['transition']['id']
             task_number = re.search('(?<=%s-)[0-9a-zA-z]+' % self.project_key, target).group(0)
 
-            if not self.generator_get_task(task_number):
+            if not self.generator_get_resource('issue', task_number):
                 self.raise_error('404')
 
-            self.generator_update_task(task_number, 'status', int(transition_id) + 1)
+            updated_status = {'fields': {'status': self.generate_status(int(transition_id) + 1)}}
+            self.generator_update_resource('issue', task_number, updated_status)
 
             return None
         else:
@@ -234,15 +246,18 @@ class JiraResponseGenerator(ResponseGenerator):
 
             if task_name is not None:
                 task_id = self.extract_task_number_from_title(task_name)
-                self.generator_add_task(task_id)
-                response = {
-                    'id': task_id,
-                    'key': '%s-%s' % (self.project_key, 1),
-                    'self': '%s/issue/%s' % (self.api_url, task_id)
-                }
+                data['id'] = task_id
+                data['key'] = '%s-%s' % (self.project_key, task_id)
+                data['self'] = '%s/issue/%s' % (self.api_url, task_id)
 
-                return response
+                if data.get('fields') is None:
+                    data['fields'] = {}
+                if data['fields'].get('status') is None:
+                    data['fields']['status'] = self.generate_status(1)
 
+                self.generator_add_resource('issue', task_id, data)
+
+                return self.generate_resource_from_template('issue', data)
         self.raise_error('400', '{"errorMessages":["Missing field"],"errors":{}}')
 
     def post_remote_link(self, target, flag, data, method):
