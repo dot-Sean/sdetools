@@ -53,10 +53,10 @@ class ResponseGenerator(object):
         pass
 
     @staticmethod
-    def encode_response(result):
-        """Converts result into a string"""
-        if result is not None:
-            return json.dumps(result)
+    def encode_response(response):
+        """Convert the response into a string"""
+        if response is not None:
+            return json.dumps(response)
         else:
             return "{}"
 
@@ -96,6 +96,7 @@ class ResponseGenerator(object):
         self.raise_error('404')
 
     def _call_target(self, func_name, target, flags, data, method):
+        """Invokes target function in the response generator"""
         if func_name is not None:
             func = getattr(self, func_name)
 
@@ -111,6 +112,7 @@ class ResponseGenerator(object):
         self.raise_error('500', 'Response generator error: Could not find method %s' % func_name)
 
     def raise_error(self, error_code, message=None):
+        """Basic error response generator"""
         fp_mock = MagicMock()
 
         if message is None:
@@ -141,7 +143,7 @@ class ResponseGenerator(object):
         resource_data -- Data to be stored. Usually from the data field in the post request
 
         """
-        self._check_resource_exists(resource_type)
+        self._check_resource_type_exists(resource_type)
         if _id is None:
             _id = len(self.resources[resource_type]['resources'])
         if type(_id) == IntType:
@@ -154,14 +156,14 @@ class ResponseGenerator(object):
         return _id
 
     def generator_resource_exists(self, resource_type, _id):
-        self._check_resource_exists(resource_type)
+        self._check_resource_type_exists(resource_type)
         if _id == IntType:
             _id = str(_id)
 
         return _id in self.resources[resource_type]['resources'].keys()
 
     def generator_get_resource(self, resource_type, _id, data_only=False):
-        self._check_resource_exists(resource_type)
+        self._check_resource_type_exists(resource_type)
         if self.generator_resource_exists(resource_type, _id):
             task_data = self.resources[resource_type]['resources'][_id]
 
@@ -174,13 +176,16 @@ class ResponseGenerator(object):
 
     def generator_get_all_resource(self, resource_type):
         """Returns all resource of the given type"""
-        self._check_resource_exists(resource_type)
+        self._check_resource_type_exists(resource_type)
         resource_data = self.resources[resource_type]['resources'].values()
 
         return [self.generate_resource_from_template(resource_type, t) for t in resource_data]
 
     def generator_get_filtered_resource(self, resource_type, _filter):
-        self._check_resource_exists(resource_type)
+        """Returns a list of resource of the given resource_type filtered by
+            values in the _filter dict
+        """
+        self._check_resource_type_exists(resource_type)
         filtered_tasks = []
 
         for resource_data in self.resources[resource_type]['resources'].values():
@@ -191,6 +196,9 @@ class ResponseGenerator(object):
 
     @staticmethod
     def _resource_in_scope(task, _filter):
+        """Determines if a resource is in scope by checking if the values in _filter match
+            the corresponding values in the resource
+        """
         for key, value in _filter.items():
             _task_value = task.get(key)
             if type(_task_value) == IntType:
@@ -244,6 +252,7 @@ class ResponseGenerator(object):
     #
     @staticmethod
     def extract_task_number_from_title(s):
+        """Extracts the task number from a string containing the SDE task ID"""
         task_number = re.search("(?<=T)[0-9]+", s)
 
         if task_number:
@@ -257,12 +266,13 @@ class ResponseGenerator(object):
 
     @staticmethod
     def is_data_valid(data, fields=None):
+        """Check if the data param of a URL request contains the fields in fields"""
         if not fields:
             return True
         if data is None:
             return False
         for field in fields:
-            if not field in data:
+            if not field in data.keys():
                 return False
 
         return True
@@ -279,15 +289,19 @@ class ResponseGenerator(object):
 
         return parse_qs(urlparse(url).query)
 
-    def _check_resource_exists(self, resource_type):
-        if resource_type not in self.resources:
+    def _check_resource_type_exists(self, resource_type):
+        """Checks that the resource type is one of the defined types"""
+        if resource_type not in self.resources.keys():
             self.raise_error('500', 'Invalid resource type %s' % resource_type)
 
     #
     #   Generator Functions
     #
     def generate_resource_from_template(self, resource_type, resource_data):
-        self._check_resource_exists(resource_type)
+        """Loads a json resource file corresponding to resource_type and update it with
+            values from resource_data
+        """
+        self._check_resource_type_exists(resource_type)
         file_type = self.resources[resource_type]['file_type']
 
         if file_type == 'json':
@@ -306,6 +320,7 @@ class ResponseGenerator(object):
         return self._update_template(template, resource_data)
 
     def _update_template(self, template, data):
+        """Update the fields and sub-fields of a json template"""
         for key, value in data.items():
             if type(value) == DictionaryType:
                 template[key] = self._update_template(template[key], value)

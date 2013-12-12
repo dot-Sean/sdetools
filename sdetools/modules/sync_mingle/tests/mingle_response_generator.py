@@ -22,9 +22,9 @@ class MingleResponseGenerator(ResponseGenerator):
         super(MingleResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir, '/org_name/api/v2/')
 
     @staticmethod
-    def encode_response(result):
-        if result:
-            return result.toxml()
+    def encode_response(response):
+        if response:
+            return response.toxml()
         else:
             return ''
 
@@ -142,7 +142,7 @@ class MingleResponseGenerator(ResponseGenerator):
        XML Generator
     """
     def generate_resource_from_template(self, resource_type, resource_data):
-        self._check_resource_exists(resource_type)
+        self._check_resource_type_exists(resource_type)
 
         card = self.get_xml_from_file('card')
         name_node = card.getElementsByTagName('name').item(0)

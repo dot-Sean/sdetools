@@ -231,10 +231,10 @@ class HPAlmResponseGenerator(ResponseGenerator):
         return queries, fields
 
     @staticmethod
-    def encode_response(result):
+    def encode_response(response):
         """ Convert response into a string """
-        if result:
-            return json.dumps(result)
+        if response:
+            return json.dumps(response)
         else:
             return ""
 

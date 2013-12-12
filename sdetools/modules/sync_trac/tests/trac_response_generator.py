@@ -27,8 +27,8 @@ class TracResponseGenerator(ResponseGenerator):
         return data
 
     @staticmethod
-    def encode_response(result):
-        return result
+    def encode_response(response):
+        return response
 
     def raise_error(self, error_code, return_value=None):
         try:
@@ -140,7 +140,7 @@ class TracResponseGenerator(ResponseGenerator):
             self.raise_error('401')
 
     def generate_resource_from_template(self, resource_type, resource_data):
-        self._check_resource_exists(resource_type)
+        self._check_resource_type_exists(resource_type)
         task_attrs = {
             "status": resource_data['status'],
             "changetime": '2013-10-02T20:27:27Z',
