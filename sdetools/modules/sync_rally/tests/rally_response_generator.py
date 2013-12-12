@@ -10,7 +10,6 @@ class RallyResponseGenerator(ResponseGenerator):
     def __init__(self, config, test_dir=None):
         base_path = '/slm/webservice/1.39/'
         resource_templates = ['card.json']
-        statuses = ['Defined', 'Completed', 'Accepted']
         rest_api_targets = {
             'task\.js': 'get_tasks',
             'subscription\.js': 'get_subscription',

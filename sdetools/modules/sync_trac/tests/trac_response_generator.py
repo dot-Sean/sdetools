@@ -1,4 +1,3 @@
-import json
 from urllib2 import HTTPError
 from xmlrpclib import Fault
 
@@ -6,10 +5,13 @@ from sdetools.sdelib.testlib.response_generator import ResponseGenerator
 
 
 class TracResponseGenerator(ResponseGenerator):
-    ACTIONS = ['resolve', 'reopen']
+    ACTIONS = {
+        'resolve': 'closed',
+        'reopen': 'new'
+    }
 
     def __init__(self, config=None, test_dir=None):
-        statuses = ['new', 'closed']
+        resource_templates = ['ticket.xml']
         rest_api_targets = {
             'system\.getAPIVersion': 'get_api_version',
             'ticket\.get$': 'get_ticket_by_id',
@@ -18,7 +20,7 @@ class TracResponseGenerator(ResponseGenerator):
             'ticket\.update': 'update_ticket',
             'ticket\.getActions': 'get_ticket_actions',
         }
-        super(TracResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
+        super(TracResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir, '')
 
     @staticmethod
     def decode_data(data):
@@ -58,12 +60,7 @@ class TracResponseGenerator(ResponseGenerator):
     def get_ticket_by_id(self, target, flag, data, method):
         if not flag:
             if data:
-                task_number = data[0]
-                task = self.generator_get_task(task_number)
-
-                if task:
-                    return self.generate_task(task['status'], task_number, task.get('milestone'))
-
+                return self.generator_get_resource('ticket', data[0])
             self.raise_error('405')
         else:
             self.raise_error('401')
@@ -71,14 +68,12 @@ class TracResponseGenerator(ResponseGenerator):
     def query_ticket(self, target, flag, data, method):
         if not flag:
             if data:
-                task_id = data[0]
-                task_number = self.extract_task_number_from_title(task_id)
-                response = []
+                task_number = self.extract_task_number_from_title(data[0])
+                task = self.generator_get_resource('ticket', task_number)
 
-                if self.generator_get_task(task_number):
-                    response.append(task_number)
-
-                return response
+                if task:
+                    return task
+                return []
 
             self.raise_error('405')
         else:
@@ -89,13 +84,14 @@ class TracResponseGenerator(ResponseGenerator):
             if data:
                 task_title = data[0]
                 task_number = self.extract_task_number_from_title(task_title)
-                alm_task = self.generator_get_task(task_number)
 
-                if not alm_task:
-                    task_attributes = data[2]
-                    task_status = task_attributes['status']
-                    self.generator_add_task(task_number, task_title, task_status)
-
+                if not self.generator_resource_exists('ticket', task_number):
+                    self.generator_add_resource('ticket', task_number, {
+                        'id': task_number,
+                        'title': task_title,
+                        'milestone': None,
+                        'status': data[2]['status']
+                    })
                     return task_number
 
             self.raise_error('405')
@@ -107,25 +103,22 @@ class TracResponseGenerator(ResponseGenerator):
             if data:
                 task_number = data[0]
                 update_args = data[2]
-                task = self.generator_get_task(task_number)
 
-                if task:
+                if self.generator_resource_exists('ticket', task_number):
                     milestone = update_args.get('milestone')
                     action = update_args.get('action')
+                    update_values = {}
 
-                    if update_args.get('milestone'):
-                        self.generator_update_task(task_number, 'milestone', milestone)
+                    if milestone:
+                        update_values['milestone'] = milestone
                     if action:
-                        new_status = None
+                        new_status = self.ACTIONS.get(action)
+                        if new_status:
+                            update_values['status'] = new_status
+                    if update_values:
+                        self.generator_update_resource('ticket', task_number, update_values)
 
-                        if action == self.ACTIONS[0]:
-                            new_status = self.generator_get_valid_statuses()[1]
-                        elif action == self.ACTIONS[1]:
-                            new_status = self.generator_get_valid_statuses()[0]
-                        self.generator_update_task(task_number, 'status', new_status)
-
-                    task = self.generator_get_task(task_number)
-                    return self.generate_task(task['status'], task_number, task.get('milestone'))
+                    return self.generator_get_resource('ticket', task_number)
                 else:
                     self.raise_error('405')
         else:
@@ -136,7 +129,7 @@ class TracResponseGenerator(ResponseGenerator):
             if data:
                 task_number = data[0]
                 action_set = []
-                if self.generator_get_task(task_number):
+                if self.generator_resource_exists('ticket', task_number):
                     for transition in self.ACTIONS:
                         action_set.append([transition, 'Label', 'Hints', ['Name', 'Value']])
 
@@ -146,12 +139,12 @@ class TracResponseGenerator(ResponseGenerator):
         else:
             self.raise_error('401')
 
-    @staticmethod
-    def generate_task(task_status, task_id, task_milestone):
+    def generate_resource_from_template(self, resource_type, resource_data):
+        self._check_resource_exists(resource_type)
         task_attrs = {
-            "status": task_status,
+            "status": resource_data['status'],
             "changetime": '2013-10-02T20:27:27Z',
-            "milestone": task_milestone
+            "milestone": resource_data['milestone']
         }
 
-        return [task_id, '2013-10-02T20:27:27Z', '2013-10-02T20:27:27Z', task_attrs]
+        return [resource_data['id'], '2013-10-02T20:27:27Z', '2013-10-02T20:27:27Z', task_attrs]

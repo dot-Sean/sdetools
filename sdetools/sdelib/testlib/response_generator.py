@@ -158,7 +158,7 @@ class ResponseGenerator(object):
         if _id == IntType:
             _id = str(_id)
 
-        return _id in self.resources[resource_type]['resources']
+        return _id in self.resources[resource_type]['resources'].keys()
 
     def generator_get_resource(self, resource_type, _id, data_only=False):
         self._check_resource_exists(resource_type)
