@@ -1,6 +1,5 @@
 from commons import UsageError, json
 import restclient
-from restclient import APIError, APIHTTPError, APICallError, APIAuthError, ServerError, APIFormatError
 
 import logging
 logger = logging.getLogger(__name__)

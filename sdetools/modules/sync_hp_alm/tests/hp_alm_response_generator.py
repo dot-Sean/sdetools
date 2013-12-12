@@ -65,7 +65,8 @@ class HPAlmResponseGenerator(ResponseGenerator):
 
                     return self.generate_resource_from_template('requirement-coverage', data)
                 else:
-                    self.raise_error('405', 'Duplicate requirement-coverage')
+                    self.raise_error('405', 'Duplicate requirement-coverage for test %s and requirement %s' %
+                                     (data.get('test-id'), data.get('requirement-id')))
         else:
             self.raise_error('401')
 

@@ -5,9 +5,10 @@
 #
 
 from sdetools.sdelib.cmd import BaseCommand
-from sdetools.sdelib.commons import show_error, Error, UsageError
+from sdetools.sdelib.commons import UsageError
 from sdetools.sdelib.interactive_plugin import PlugInExperience
 from sdetools.sdelib.scanner import Scanner
+
 
 class Command(BaseCommand):
     name = 'lint'

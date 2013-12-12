@@ -151,7 +151,8 @@ class GitHubConnector(AlmConnector):
         """ Verifies that GitHub connection works """
         # Check if user can successfully authenticate and retrieve user profile
         try:
-            user_info = self.alm_plugin.call_api('user')
+            # This returns some stuff that we don't use right now
+            self.alm_plugin.call_api('user')
         except APIError, err:
             if self.config.get('alm_api_token'):
                 auth_field_check = 'api token'

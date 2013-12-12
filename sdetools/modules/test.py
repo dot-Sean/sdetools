@@ -1,9 +1,9 @@
-import sys
 import traceback
 import unittest
 
 from sdetools.sdelib.cmd import BaseCommand
 from sdetools.sdelib import commons
+
 
 class Command(BaseCommand):
     name = 'test'
@@ -32,7 +32,8 @@ class Command(BaseCommand):
         if hasattr(test_mod, '__all__'):
             for test_class in test_mod.__all__:
                 try:
-                    inmod = __import__('sdetools.modules.%s.tests.%s' % (mod_name, test_class))
+                    # we don't actually use the import stuff yet (WIP)
+                    __import__('sdetools.modules.%s.tests.%s' % (mod_name, test_class))
                 except:
                     print '  ***** Unable to import from %s.tests.%s' % (mod_name, test_class)
                     print traceback.format_exc()

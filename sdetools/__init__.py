@@ -7,7 +7,7 @@ __all__ = [
     'extlib',
 ]
 
-VERSION = '3.10.2'
+VERSION = '3.10.3'
 
 from sdetools.sdelib import mod_mgr
 
@@ -21,7 +21,6 @@ def setup_path():
         base_path = os.path.split(os.path.abspath(sys.argv[0]))[0]
         base_path = os.path.join(base_path, 'sdetools')
     else:
-        current_file = __file__
         base_path = os.path.split(os.path.abspath(__file__))[0]
 
     commons.setup_base_path(base_path)

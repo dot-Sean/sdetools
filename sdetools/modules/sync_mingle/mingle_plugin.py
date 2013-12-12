@@ -30,7 +30,7 @@ class MingleAPIBase(RESTBase):
         if result:
             try:
                 result = minidom.parseString(result)
-            except Exception, err:
+            except Exception:
                 # This means that the result doesn't have XML, not an error
                 pass
         return result
@@ -169,7 +169,7 @@ class MingleConnector(AlmConnector):
         if elements.length > 0:
             try:
                 return elements.item(0).firstChild.nodeValue
-            except Exception, err:
+            except Exception:
                 raise AlmException('Could not get the value of the "%s" element" %s' % tag_name)
         else:
             raise AlmException('Could not find any element with the tag "%s"' % tag_name)
@@ -203,7 +203,7 @@ class MingleConnector(AlmConnector):
 
         try:
             return self.alm_plugin.call_api('%s/cards/%s.xml' % (self.project_uri, card_num))
-        except APIError, err:
+        except APIError:
             raise AlmException('Could not find Mingle card with the card number %s' % card_num)
 
     def _alm_get_task_by_title(self, task_title):

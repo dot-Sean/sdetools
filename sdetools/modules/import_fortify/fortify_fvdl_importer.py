@@ -11,8 +11,11 @@ class FVDLXMLContent(BaseContentHandler):
         self.in_vuln_node = False
         self.in_vuln_class_info_node = False
         self.in_vuln_class_info_type_node = False
-        self.raw_findings = []
-        self.report_id = ""
+        self.in_vuln_instance_info_node = False
+        self.in_vuln_instance_info_instance_id_node = False
+        self.findings = []
+        self.id = ""
+        self.entry = {}
 
     def valid_content_detected(self):
         return self.saw_build_node
@@ -29,6 +32,10 @@ class FVDLXMLContent(BaseContentHandler):
             self.in_vuln_class_info_node = True
         elif self.in_vuln_class_info_node and name == 'Type':
             self.in_vuln_class_info_type_node = True
+        elif self.in_vuln_node and name == 'InstanceInfo':
+            self.in_vuln_instance_info_node = True
+        elif self.in_vuln_instance_info_node and name == 'InstanceID':
+            self.in_vuln_instance_info_instance_id_node = True
         elif self.saw_fvdl_node and name == 'Build':
             self.saw_build_node = True
             self.in_build_node = True
@@ -37,13 +44,15 @@ class FVDLXMLContent(BaseContentHandler):
 
     def characters(self, data):
         if self.in_vuln_class_info_type_node:
-            entry = {}
-            entry['id'] = data
-            entry['count'] = 1
-            entry['description'] = data
-            self.raw_findings.append(entry)
+            self.entry = {}
+            self.entry['id'] = data
+            self.entry['count'] = 1
+            self.entry['description'] = data
+        elif self.in_vuln_instance_info_instance_id_node:
+            self.entry['instance_id'] = data
+            self.findings.append(self.entry)
         elif self.in_build_build_id_node:
-            self.report_id = data
+            self.id = data
 
     def endElement(self, name):
         if self.in_vuln_node and name == 'Vulnerability':
@@ -52,6 +61,10 @@ class FVDLXMLContent(BaseContentHandler):
             self.in_vuln_class_info_node = False
         elif self.in_vuln_class_info_type_node and name == 'Type':
             self.in_vuln_class_info_type_node = False
+        elif self.in_vuln_instance_info_node and name == 'InstanceInfo':
+            self.in_vuln_instance_info_node = False
+        elif self.in_vuln_instance_info_instance_id_node and name == 'InstanceID':
+            self.in_vuln_instance_info_instance_id_node = False
         elif self.in_build_build_id_node and name == 'BuildID':
             self.in_build_build_id_node = False
         elif self.in_build_node and name == 'Build':

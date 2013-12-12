@@ -124,7 +124,6 @@ class Mapping:
                 continue
 
             debug = 'GD_CreditCardDinersClub' == check['check_id'] and False
-            added = False
             task_id = self.get_task_based_cause(check['cause_id'])
             if task_id:
                 if debug:
@@ -133,7 +132,6 @@ class Mapping:
                     self.task_map[task_id] = []
                 if not self.check_in_list(self.task_map[task_id], check['check_id']):
                     self.task_map[task_id].append(check)
-                    added = True
                     if debug:
                         print ">> added to %s " % task_id
 
