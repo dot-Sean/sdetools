@@ -119,7 +119,6 @@ class HPAlmResponseGenerator(ResponseGenerator):
 
     def get_requirements(self, target, flag, data):
         queries, fields = self.get_url_parameters(target)
-        print queries
         entities = self.generator_get_filtered_resource('requirement', queries)
 
         return self.generate_collection_entity(entities)
@@ -129,7 +128,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
             task_number = self.extract_task_number_from_title(data['name'].replace('-', ':'))
             if self.generator_resource_exists('requirement', task_number):
                 self.raise_error('405', 'Duplicate requirement')
-            print data['name']
+
             data['id'] = task_number
             data['last-modified'] = self.get_current_timestamp()
 

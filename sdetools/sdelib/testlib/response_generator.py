@@ -13,6 +13,8 @@ from sdetools.sdelib.commons import get_directory_of_current_module
 
 
 class ResponseGenerator(object):
+    """Base response generator class, used in unittests"""
+
     def __init__(self, rest_api_targets, resource_templates, test_dir=None, base_path='/'):
         """Initializes commonly used variables.
 
@@ -47,11 +49,12 @@ class ResponseGenerator(object):
         self.init_with_resources()
 
     def init_with_resources(self):
+        """Initializes the response generator with these resources"""
         pass
 
     @staticmethod
     def encode_response(result):
-        """Convert response into a string."""
+        """Converts result into a string"""
         if result is not None:
             return json.dumps(result)
         else:
@@ -121,17 +124,15 @@ class ResponseGenerator(object):
                 message = 'Server error'
             else:
                 message = 'Unknown error'
-        else:
-            message
         message = json.dumps(message)
         fp_mock.read.return_value = message
 
         raise HTTPError('%s' % self.target, error_code, message, '', fp_mock)
 
-    """
-        Resource management functions
-    """
-    def generator_add_resource(self, resource_type, _id=None, resource_data={}):
+    #
+    #Resource management functions
+    #
+    def generator_add_resource(self, resource_type, _id=None, resource_data=None):
         """Save a resource created through our mock.
 
         Keyword Arguments:
@@ -145,7 +146,9 @@ class ResponseGenerator(object):
             _id = len(self.resources[resource_type]['resources'])
         if type(_id) == IntType:
             _id = str(_id)
-        if _id not in self.resources[resource_type]['resources']:
+        if _id not in self.resources[resource_type]['resources'].keys():
+            if resource_data is None:
+                resource_data = {}
             self.resources[resource_type]['resources'][_id] = resource_data
 
         return _id
@@ -170,6 +173,7 @@ class ResponseGenerator(object):
             return None
 
     def generator_get_all_resource(self, resource_type):
+        """Returns all resource of the given type"""
         self._check_resource_exists(resource_type)
         resource_data = self.resources[resource_type]['resources'].values()
 
@@ -193,7 +197,6 @@ class ResponseGenerator(object):
                 _task_value = str(_task_value)
             if type(value) == ListType:
                 value = value[0]
-                print value
             if _task_value is None or not re.match(value, _task_value):
                 return False
         return True
@@ -207,15 +210,18 @@ class ResponseGenerator(object):
             raise Exception('Resource does not exist: Type: %s, ID: %s' % (resource_type, _id))
 
     def generator_clear_resources(self, full_clear=False):
+        """Removes all stored resources from the generator. If full_clear is true,
+            do not re-initialize the default resources
+        """
         for resource_type in self.resources.values():
             resource_type['resources'] = {}
 
         if not full_clear:
             self.init_with_resources()
 
-    """
-        Response reader functions
-    """
+    #
+    #   Response reader functions
+    #
     def _read_response_file(self, file_name):
         file_path = os.path.join(self.test_dir, 'response', file_name)
 
@@ -233,9 +239,9 @@ class ResponseGenerator(object):
         raw_xml = self._read_response_file('%s.xml' % file_name)
         return minidom.parseString(raw_xml)
 
-    """
-        Util functions
-    """
+    #
+    #   Util functions
+    #
     @staticmethod
     def extract_task_number_from_title(s):
         task_number = re.search("(?<=T)[0-9]+", s)
@@ -250,7 +256,9 @@ class ResponseGenerator(object):
         return datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
     @staticmethod
-    def is_data_valid(data, fields=[]):
+    def is_data_valid(data, fields=None):
+        if not fields:
+            return True
         if data is None:
             return False
         for field in fields:
@@ -275,9 +283,9 @@ class ResponseGenerator(object):
         if resource_type not in self.resources:
             self.raise_error('500', 'Invalid resource type %s' % resource_type)
 
-    """
-        Generator Functions
-    """
+    #
+    #   Generator Functions
+    #
     def generate_resource_from_template(self, resource_type, resource_data):
         self._check_resource_exists(resource_type)
         file_type = self.resources[resource_type]['file_type']

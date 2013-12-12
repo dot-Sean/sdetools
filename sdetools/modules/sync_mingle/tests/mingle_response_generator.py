@@ -7,15 +7,11 @@ from sdetools.sdelib.commons import urlencode_str
 
 
 class MingleResponseGenerator(ResponseGenerator):
-    BASE_PATH = 'api/v2'
-
     def __init__(self, config, test_dir=None):
-        project_name = urlencode_str(config['alm_project'])
-        statuses = ['New', 'Closed', 'Open']
-        base_path = 'org_name/api/v2'
-        self.project_uri = '/%s/projects/%s' % (base_path, urlencode_str(project_name))
+        resource_templates = ['card.xml']
+        self.project_uri = 'projects/%s' % urlencode_str(urlencode_str(config['alm_project']))
         rest_api_targets = {
-            '/%s/projects.xml' % base_path: 'get_projects',
+            'projects.xml': 'get_projects',
             '%s.xml' % self.project_uri: 'get_project',
             '%s/cards.xml' % self.project_uri: 'call_cards',
             '%s/cards/[0-9]+.xml' % self.project_uri: 'call_card_by_number',
@@ -23,7 +19,7 @@ class MingleResponseGenerator(ResponseGenerator):
             '%s/property_definitions.xml' % self.project_uri: 'get_property_definitions',
             '%s/property_definitions/[0-9]+.xml' % self.project_uri: 'get_property_definition_by_id'
         }
-        super(MingleResponseGenerator, self).__init__(rest_api_targets, statuses, test_dir)
+        super(MingleResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir, '/org_name/api/v2/')
 
     @staticmethod
     def encode_response(result):
@@ -95,32 +91,32 @@ class MingleResponseGenerator(ResponseGenerator):
         if not flag:
             if method == 'GET':
                 cards = self.get_xml_from_file('cards')
-                _mingle_tasks = self.generator_get_all_tasks().values()
 
                 if data:
                     _mingle_tasks = []
                     filter_arg = data.get('filters[]')
                     card_name = re.search('(?<=\[Name\]\[is\]\[).*(?=\])', filter_arg).group(0)
                     card_number = self.extract_task_number_from_title(card_name)
-                    task = self.generator_get_task(card_number)
+                    task = self.generator_get_resource('card', card_number)
 
                     if task:
                         _mingle_tasks.append(task)
+                else:
+                    _mingle_tasks = self.generator_get_all_resource('card')
 
                 for task in _mingle_tasks:
-                    card = self.generate_card(task['id'], task['name'], task['status'], task['card_type'], task['description'])
-                    cards.documentElement.appendChild(card.documentElement)
+                    cards.documentElement.appendChild(task.documentElement)
 
                 return cards
             elif method == 'POST':
-                card_name = data['card[name]']
-                card_type = data['card[card_type_name]']
-                description = data['card[description]']
-                status = data['card[properties][][value]']
-                card_number = self.extract_task_number_from_title(card_name)
-                self.generator_add_task(card_number, card_name, status)
-                self.generator_update_task(card_number, 'card_type', card_type)
-                self.generator_update_task(card_number, 'description', description)
+                resource_data = {
+                    'id': self.extract_task_number_from_title(data['card[name]']),
+                    'title': data['card[name]'],
+                    'card_type': data['card[card_type_name]'],
+                    'description': data['card[description]'],
+                    'status': data['card[properties][][value]']
+                }
+                self.generator_add_resource('card', resource_data['id'], resource_data)
                 return None
         else:
             self.raise_error('401')
@@ -130,15 +126,12 @@ class MingleResponseGenerator(ResponseGenerator):
             card_number = re.search('[0-9]+(?=\.xml)', target).group(0)
 
             if method == 'GET':
-                task = self.generator_get_task(card_number)
-
-                if task:
-                    return self.generate_card(card_number, task['name'], task['status'], task['card_type'], task['description'])
+                return self.generator_get_resource('card', card_number)
             elif method == 'PUT':
                 status = data['card[properties][][value]']
 
-                if self.generator_get_task(card_number):
-                    self.generator_update_task(card_number, 'status', status)
+                if self.generator_get_resource('card', card_number):
+                    self.generator_update_resource('card', card_number, {'status': status})
 
             return None
         else:
@@ -148,28 +141,30 @@ class MingleResponseGenerator(ResponseGenerator):
 
        XML Generator
     """
-    def generate_card(self, card_id, card_name, status, card_type, description):
+    def generate_resource_from_template(self, resource_type, resource_data):
+        self._check_resource_exists(resource_type)
+
         card = self.get_xml_from_file('card')
         name_node = card.getElementsByTagName('name').item(0)
-        name_node.firstChild.nodeValue = card_name
+        name_node.firstChild.nodeValue = resource_data['title']
 
         number_node = card.getElementsByTagName('number').item(0)
-        number_node.firstChild.nodeValue = int(card_id)
+        number_node.firstChild.nodeValue = int(resource_data['id'])
 
         description_node = card.getElementsByTagName('description').item(0)
-        description_node.firstChild.nodeValue = description
+        description_node.firstChild.nodeValue = resource_data['description']
 
         id_node = card.getElementsByTagName('id').item(0)
-        id_node.firstChild.nodeValue = int(card_id)
+        id_node.firstChild.nodeValue = int(resource_data['id'])
 
         properties = card.getElementsByTagName('property')
         for prop in properties:
             if (prop.getElementsByTagName('name').item(0).firstChild.nodeValue == 'Status'):
                 status_node = prop.getElementsByTagName('value').item(0).firstChild
-                status_node.nodeValue = status
+                status_node.nodeValue = resource_data['status']
 
         card_type_node = card.getElementsByTagName('card_type').item(0)
         card_type_name_node = card_type_node.getElementsByTagName('name').item(0)
-        card_type_name_node.firstChild.nodeValue = card_type
+        card_type_name_node.firstChild.nodeValue = resource_data['card_type']
 
         return card

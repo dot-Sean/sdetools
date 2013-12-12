@@ -16,11 +16,9 @@ class JiraResponseGenerator(ResponseGenerator):
     def __init__(self, config, test_dir=None):
         self.base_url = '%s://%s' % (config['alm_method'], config['alm_server'])
         self.api_url = '%s/%s' % (self.base_url, self.api_url)
-        base_url = 'rest/api/2'
         self.project_key = config['alm_project']
         self.project_version = config['alm_project_version']
         self.username = config['alm_user']
-        statuses = [1]
         resource_templates = ['issue.json', 'project.json', 'project_version.json']
         rest_api_targets = {
             'project$': 'get_projects',
@@ -201,9 +199,8 @@ class JiraResponseGenerator(ResponseGenerator):
                 name = re.search('(?<=summary~).*', params['jql'][0].replace('\\', '')).group(0)
 
             task_number = self.extract_task_number_from_title(name)
-            print task_number
             task = self.generator_get_resource('issue', task_number)
-            print task
+
             if task:
                 response['issues'].append(task)
                 response['total'] = 1
@@ -308,26 +305,6 @@ class JiraResponseGenerator(ResponseGenerator):
 
         return transition
 
-    def generate_issue(self, task_name, task_number, status_id, version=None):
-        if status_id is None:
-            status_id = 1
-
-        issue = self.get_json_from_file('issue')
-        issue['id'] = '%s' % task_number
-        issue['self'] = '%s/issue/%s' % (self.api_url, task_number)
-        issue['key'] = '%s-%s' % (self.project_key, task_number)
-        fields = issue['fields']
-        fields['issuetype'] = self.generate_issue_type(1)
-        fields['reporter'] = self.generate_user()
-        fields['priority'] = self.generate_priority(1)
-        fields['status'] = self.generate_status(status_id)
-        fields['assignee'] = self.generate_user()
-        fields['project'] = self.generate_project()
-        if version:
-            fields['versions'].append(self.generate_project_version(version))
-
-        return issue
-
     def generate_status(self, id):
         status_name = self.JIRA_STATUS_NAMES[id - 1]
         status = {
@@ -350,9 +327,6 @@ class JiraResponseGenerator(ResponseGenerator):
 
         return priority
 
-    def generate_user(self):
-        return self.get_json_from_file('user')
-
     def generate_project(self):
         response = self.get_json_from_file('project')
         response['self'] = '%s/project/%s' % (self.api_url, self.project_key)
@@ -374,7 +348,7 @@ class JiraResponseGenerator(ResponseGenerator):
 
         return issue_type
 
-    def generate_project_version(self, version_name=None):
+    def generate_project_version(self):
         version = self.get_json_from_file('project_version')
         version['self'] = "%s/version/%s" % (self.api_url, self.project_version)
         version['id'] = self.project_version
