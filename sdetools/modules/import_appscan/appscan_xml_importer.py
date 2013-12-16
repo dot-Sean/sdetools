@@ -13,7 +13,7 @@ class AppScanXMLContent(BaseContentHandler):
         self.in_issuetype_advisory_threatclass_name_node = False
         self.findings = []
         self.count = 0
-        self.report_id = ""
+        self.id = ""
         self.check_id = ""
 
     def valid_content_detected(self):
@@ -41,7 +41,7 @@ class AppScanXMLContent(BaseContentHandler):
             self.in_hosts_node = True
         elif self.in_hosts_node and name == 'Host':
             self.in_hosts_host_id_node = True
-            self.report_id = attrs['Name']
+            self.id = attrs['Name']
 
     def characters(self, data):
         if self.in_issuetype_advisory_threatclass_name_node:
