@@ -25,3 +25,10 @@ class TestFortifyIntegration(BaseIntegrationTest, unittest.TestCase):
             self.integrator.config['report_file'] = os.path.join(self.test_file_dir, test['fpr'])
             self.assert_exception(IntegrationError, "FATAL ERROR: Error processing %s: FATAL ERROR: File %s not found" %
                                   (self.integrator.config['report_file'], test['file']), self.init_data)
+
+    def test_report_import(self):
+        self.integrator.config['report_file'] = os.path.join(self.test_file_dir, 'webgoat.xml')
+        self.init_data()
+        findings = self.integrator.generate_findings()
+        self.assertTrue(self.integrator.report_id, 'Expected a report_id value')
+        self.assertTrue(len(findings), 'Expected to process some findings')
