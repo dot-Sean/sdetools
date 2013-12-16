@@ -138,6 +138,10 @@ class BaseIntegrationTest(object):
         self.assertTrue('36' in result.affected_tasks, 'Expected to find task 36 in affected tasks')
         self.check_analysis_note('36', 'failed', 'high', 1)
 
+    def test_reportid_exists(self):
+        self.init_data()
+        self.assertTrue(self.integrator.report_id != '', 'Expected a report_id value')
+
     def assert_exception(self, exception, reason, fn, *args):
         if not exception:
             raise AssertionError('No exception type specified')
