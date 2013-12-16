@@ -5,42 +5,41 @@ from sdetools.sdelib.testlib.response_generator import ResponseGenerator
 
 
 class SdeResponseGenerator(ResponseGenerator):
-    ANALYSIS_TOOLS = ['appscan', 'veracode', 'fortify', 'webinspect']
-    VALID_STATUSES = ['TODO', 'DONE']
-    DEFAULT_PROJECT_ID = 1296
-    DEFAULT_APP_ID = 874
-
     def __init__(self, config, test_dir=None):
+        self.analysis_tools = ['appscan', 'veracode', 'fortify', 'webinspect']
+        self.default_project_id = 1296
+        self.default_app_id = 874
         self.app_name = config['sde_application']
         self.project_name = config['sde_project']
         resource_templates = ['application.json', 'project.json', 'task.json', 'text_note.json', 'ide_note.json',
                               'analysis_note.json', 'project_analysis_note.json']
         rest_api_targets = {
-            'applications': 'call_applications',
-            'projects': 'get_projects',
-            'tasks/[0-9]+-[0-9a-zA-z]+': 'call_task',
-            'tasks': 'get_tasks',
-            'tasknotes.*': 'call_task_notes',
-            'projectnotes/analysis$': 'add_project_analysis_note'
+            '/api/applications': 'call_applications',
+            '/api/projects': 'get_projects',
+            '/api/tasks/[0-9]+-[0-9a-zA-z]+': 'call_task',
+            '/api/tasks': 'get_tasks',
+            '/api/tasknotes.*': 'call_task_notes',
+            '/api/projectnotes/analysis$': 'add_project_analysis_note'
         }
 
-        super(SdeResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir, '/api/')
+        super(SdeResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir)
 
     def init_with_resources(self):
-        app_data = {'id': self.DEFAULT_APP_ID, 'name': self.app_name}
-        self.generator_add_resource('application', self.DEFAULT_APP_ID, app_data)
-        project_data = {'name': self.project_name, 'id': self.DEFAULT_PROJECT_ID, 'application': self.DEFAULT_APP_ID}
-        self.generator_add_resource('project', self.DEFAULT_PROJECT_ID, project_data)
+        app_data = {'id': self.default_app_id, 'name': self.app_name}
+        self.generator_add_resource('application', self.default_app_id, app_data)
+        project_data = {'name': self.project_name, 'id': self.default_project_id, 'application': self.default_app_id}
+        self.generator_add_resource('project', self.default_project_id, project_data)
         self.generator_add_resource('task', '40', self.get_json_from_file('T40'))
         self.generator_add_resource('task', '36', self.get_json_from_file('T36'))
         self.generator_add_resource('task', '38', self.get_json_from_file('T38'))
 
-    def generate_sde_task(self, task_number=None, project_id=None, status=VALID_STATUSES[0], priority=7, phase='requirements'):
+    def generate_sde_task(self, task_number=None, project_id=None, status=None, priority=7, phase='requirements'):
         if task_number is None:
             task_number = '%d' % random.randint(50, 999999999)
         if project_id is None:
-            project_id = self.DEFAULT_PROJECT_ID
-
+            project_id = self.default_project_id
+        if status is None:
+            status = 'TODO'
         sde_task = {
             "title": "T%s: Task Title" % task_number,
             "timestamp": self.get_current_timestamp(),
@@ -177,7 +176,7 @@ class SdeResponseGenerator(ResponseGenerator):
     def add_project_analysis_note(self, target, flag, data, method):
         if not flag:
             if method == 'POST':
-                if self.is_data_valid(data, ['analysis_type']) and data['analysis_type'] in self.ANALYSIS_TOOLS:
+                if self.is_data_valid(data, ['analysis_type']) and data['analysis_type'] in self.analysis_tools:
                     self.generator_add_resource('project_analysis_note', resource_data=data)
 
                     return self.generate_resource_from_template('project_analysis_note', data)

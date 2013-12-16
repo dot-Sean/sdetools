@@ -7,23 +7,22 @@ from sdetools.sdelib.commons import urlencode_str
 
 class PivotalTrackerResponseGenerator(ResponseGenerator):
     def __init__(self, config, test_dir=None):
-        base_path = '/services/v5/'
         resource_templates = ['story.json', 'epic.json', 'me.json', 'project.json']
         self.project_id = 1000
-        self.project_uri = 'projects/%s' % self.project_id
+        self.project_uri = '/services/v5/projects/%s' % self.project_id
         self.project_name = config['alm_project']
         self.release_marker_name = config['alm_project_version']
         rest_api_targets = {
-            'me': 'get_user',
-            'projects$': 'get_projects',
-            '%s/stories\?filter=type:release,(.*)&fields=id' % self.project_uri: 'get_release_marker',
-            '%s/stories\?filter=.*' % self.project_uri: 'get_stories',
+            '/services/v5/me': 'get_user',
+            '/services/v5/projects$': 'get_projects',
+            '%s/stories\?filter=type:(?=release).*' % self.project_uri: 'get_release_marker',
+            '%s/stories\?filter=(?!type:release).*' % self.project_uri: 'get_stories',
             '%s/epics\?filter=(.*)&fields=id' % self.project_uri: 'get_epic',
             '%s/epics$' % self.project_uri: 'add_epic',
             '%s/stories$' % self.project_uri: 'add_story',
             '%s/stories/[0-9]*' % self.project_uri: 'update_status'
         }
-        super(PivotalTrackerResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir, base_path)
+        super(PivotalTrackerResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir)
 
     def init_with_resources(self):
         self.generator_add_resource('me', self.project_id, {

@@ -10,12 +10,12 @@ class GitHubResponseGenerator(ResponseGenerator):
         self.alm_project = config['alm_project']
         resource_templates = ['user.json', 'issue.json', 'repo.json', 'milestone.json']
         rest_api_targets = {
-            'user': 'get_user',
-            'repos/%s$' % project_uri: 'get_repo',
-            'repos/%s/milestones' % project_uri: 'get_milestones',
-            'legacy/issues/search/%s' % project_uri: 'get_issue',
-            'repos/%s/issues$' % project_uri: 'post_issue',
-            'repos/%s/issues/[0-9]*$' % project_uri: 'update_status'
+            '/user': 'get_user',
+            '/repos/%s$' % project_uri: 'get_repo',
+            '/repos/%s/milestones' % project_uri: 'get_milestones',
+            '/legacy/issues/search/%s' % project_uri: 'get_issue',
+            '/repos/%s/issues$' % project_uri: 'post_issue',
+            '/repos/%s/issues/[0-9]*$' % project_uri: 'update_status'
         }
         super(GitHubResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir)
 
@@ -115,9 +115,3 @@ class GitHubResponseGenerator(ResponseGenerator):
                 self.raise_error('404')
         else:
             self.raise_error('401')
-
-    """
-       JSON Generator 
-    """
-    def generator_generate_task_template(self):
-        return self.get_json_from_file('issue')

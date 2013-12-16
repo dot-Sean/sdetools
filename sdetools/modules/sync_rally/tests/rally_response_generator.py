@@ -4,23 +4,20 @@ from sdetools.sdelib.testlib.response_generator import ResponseGenerator
 
 
 class RallyResponseGenerator(ResponseGenerator):
-    API_VERSION = '1.39'
-    BASE_PATH = 'slm/webservice/%s' % API_VERSION
-
     def __init__(self, config, test_dir=None):
-        base_path = '/slm/webservice/1.39/'
+        base_path = '/slm/webservice/1.39'
         resource_templates = ['card.json']
         rest_api_targets = {
-            'task\.js': 'get_tasks',
-            'subscription\.js': 'get_subscription',
-            'project\.js': 'get_project',
-            'hierarchicalrequirement\.js': 'get_requirements',
-            'hierarchicalrequirement/[0-9]+\.js': 'call_card',
-            'hierarchicalrequirement/create\.js': 'create_card',
-            'typedefinition/[0-9]+\.js': 'get_type_definition_by_id',
-            'typedefinition\.js': 'get_type_definitions'
+            '%s/task\.js' % base_path: 'get_tasks',
+            '%s/subscription\.js' % base_path: 'get_subscription',
+            '%s/project\.js' % base_path: 'get_project',
+            '%s/hierarchicalrequirement\.js' % base_path: 'get_requirements',
+            '%s/hierarchicalrequirement/[0-9]+\.js' % base_path: 'call_card',
+            '%s/hierarchicalrequirement/create\.js' % base_path: 'create_card',
+            '%s/typedefinition/[0-9]+\.js' % base_path: 'get_type_definition_by_id',
+            '%s/typedefinition\.js' % base_path: 'get_type_definitions'
         }
-        super(RallyResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir, base_path)
+        super(RallyResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir)
 
     """
        Response functions 

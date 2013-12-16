@@ -15,7 +15,7 @@ from sdetools.sdelib.commons import get_directory_of_current_module
 class ResponseGenerator(object):
     """Base response generator class, used in unittests"""
 
-    def __init__(self, rest_api_targets, resource_templates, test_dir=None, base_path='/'):
+    def __init__(self, rest_api_targets, resource_templates, test_dir=None):
         """Initializes commonly used variables.
 
         Keyword arguments:
@@ -35,9 +35,7 @@ class ResponseGenerator(object):
 
         self.resources = {}
         self.test_dir = test_dir
-        self.base_path = base_path
         self.rest_api_targets = rest_api_targets
-        self.external_targets = {}      # Non-rest targets
 
         for resource in resource_templates:
             resource_name, file_type = resource.split('.')
@@ -84,32 +82,27 @@ class ResponseGenerator(object):
         self.target = target
         data = self.decode_data(data)
         print 'Generating %s response for target: %s' % (method, target)
-        #print 'With flags: %s\n With data: ' % flags
-        #print data
 
         for api_target in self.rest_api_targets:
-            if re.match('%s%s' % (self.base_path, api_target), target):
-                return self._call_target(self.rest_api_targets.get(api_target), target, flags, data, method)
-        for api_target in self.external_targets:
-            if re.match(api_target, target):
-                return self._call_target(self.external_targets.get(api_target), target, flags, data, method)
-        self.raise_error('404')
+            if not re.match(api_target, target):
+                continue
 
-    def _call_target(self, func_name, target, flags, data, method):
-        """Invokes target function in the response generator"""
-        if func_name is not None:
+            func_name = self.rest_api_targets.get(api_target)
+            if func_name is None:
+                self.raise_error('500', 'Response generator error: No response method defined for target: %s' % api_target)
+
             func = getattr(self, func_name)
+            if not callable(func):
+                self.raise_error('500', 'Response generator error: Uncallable response method: %s' % func_name)
 
-            if callable(func):
-                response = func(target, flags.get(func_name), data, method)
-                try:
-                    response = self.encode_response(response)
-                except:
-                    # Do not encode the response
-                    pass
-                return 200, response
-
-        self.raise_error('500', 'Response generator error: Could not find method %s' % func_name)
+            response = func(target, flags.get(func_name), data, method)
+            try:
+                response = self.encode_response(response)
+            except:
+                # Failed to encode the response, return raw data
+                pass
+            return 200, response
+        self.raise_error('404')
 
     def raise_error(self, error_code, message=None):
         """Basic error response generator"""

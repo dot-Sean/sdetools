@@ -15,10 +15,10 @@ class HPAlmResponseGenerator(ResponseGenerator):
         hp_alm_domain = urlencode_str(config['hp_alm_domain'])
         hp_alm_project = urlencode_str(config['alm_project'])
         self.hp_alm_user = config['alm_user']
-        project_uri = 'rest/domains/%s/projects/%s' % (hp_alm_domain, hp_alm_project)
+        project_uri = '/qcbin/rest/domains/%s/projects/%s' % (hp_alm_domain, hp_alm_project)
         resource_templates = ['user.json', 'requirement.json', 'test.json', 'test-folder.json', 'requirement-coverage.json']
         rest_api_targets = {
-            'authentication-point/authenticate': 'authenticate',
+            '/qcbin/authentication-point/authenticate': 'authenticate',
             '%s/requirements' % project_uri: 'call_requirements',
             '%s/customization/users/%s' % (project_uri, urlencode_str(self.hp_alm_user)): 'get_user',
             '%s/customization/entities/requirement/types/' % project_uri: 'get_requirement_types',
@@ -26,15 +26,10 @@ class HPAlmResponseGenerator(ResponseGenerator):
             '%s/customization/used-lists\?name=Status' % project_uri: 'get_status_types',
             '%s/test-folders' % project_uri: 'call_test_folders',
             '%s/tests' % project_uri: 'call_tests',
-            'authentication-point/logout': 'logout',
+            '/qcbin/authentication-point/logout': 'logout',
             '%s/requirement\-coverages' % project_uri: 'call_requirement_coverage'
         }
-
-        self.test_folders = [{'name': 'Subject', 'parent-id': '0', 'id': '1'}]
-        self.tests = []
-        self.requirements = []
-        self.requirement_coverages = []
-        super(HPAlmResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir, '/qcbin/')
+        super(HPAlmResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir)
 
     def init_with_resources(self):
         self.generator_add_resource('user', resource_data={'Name': self.hp_alm_user})
@@ -46,7 +41,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
     def call_requirement_coverage(self, target, flag, data, method):
         if not flag:
             if method == 'GET':
-                query, fields = self.get_url_parameters(target)
+                query, _ = self.get_url_parameters(target)
                 entities = self.generator_get_filtered_resource('requirement-coverage', query)
 
                 return self.generate_collection_entity(entities)

@@ -154,7 +154,7 @@ class TestJiraAPI4Case(JiraBaseCase, unittest.TestCase):
         patch('sdetools.modules.sync_jira.jira_soap.SOAPpy.WSDL.Proxy', mock_proxy).start()
 
     def test_api_exceptions_are_handled(self):
-        self.test_api_exceptions_are_handled(['post_remote_link', 'get_create_meta'])
+        self._test_api_exceptions_are_handled(['post_remote_link', 'get_create_meta'])
 
     def test_bad_credentials(self):
         self.mock_alm_response.set_response_flags({'get_auth_token': '401'})

@@ -9,9 +9,9 @@ from sdetools.sdelib.commons import urlencode_str
 class MingleResponseGenerator(ResponseGenerator):
     def __init__(self, config, test_dir=None):
         resource_templates = ['card.xml']
-        self.project_uri = 'projects/%s' % urlencode_str(urlencode_str(config['alm_project']))
+        self.project_uri = '/org_name/api/v2/projects/%s' % urlencode_str(urlencode_str(config['alm_project']))
         rest_api_targets = {
-            'projects.xml': 'get_projects',
+            '/org_name/api/v2/projects.xml': 'get_projects',
             '%s.xml' % self.project_uri: 'get_project',
             '%s/cards.xml' % self.project_uri: 'call_cards',
             '%s/cards/[0-9]+.xml' % self.project_uri: 'call_card_by_number',
@@ -19,7 +19,7 @@ class MingleResponseGenerator(ResponseGenerator):
             '%s/property_definitions.xml' % self.project_uri: 'get_property_definitions',
             '%s/property_definitions/[0-9]+.xml' % self.project_uri: 'get_property_definition_by_id'
         }
-        super(MingleResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir, '/org_name/api/v2/')
+        super(MingleResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir)
 
     @staticmethod
     def encode_response(response):

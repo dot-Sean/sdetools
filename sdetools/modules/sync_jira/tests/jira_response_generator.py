@@ -6,7 +6,6 @@ from sdetools.extlib.SOAPpy.Types import structType, faultType
 
 
 class JiraResponseGenerator(ResponseGenerator):
-    api_url = 'rest/api/2'
     PROJECT_ID = '10000'
     JIRA_ISSUE_TYPES = ["Bug", "New Feature", "Task", "Improvement", "Sub-task"]
     JIRA_PRIORITY_NAMES = ['Blocker', 'Critical', 'Major', 'Minor', 'Trivial']
@@ -15,26 +14,23 @@ class JiraResponseGenerator(ResponseGenerator):
 
     def __init__(self, config, test_dir=None):
         self.base_url = '%s://%s' % (config['alm_method'], config['alm_server'])
-        self.api_url = '%s/%s' % (self.base_url, self.api_url)
+        self.api_url = '%s/%s' % (self.base_url, 'rest/api/2')
         self.project_key = config['alm_project']
         self.project_version = config['alm_project_version']
-        self.username = config['alm_user']
         resource_templates = ['issue.json', 'project.json', 'project_version.json']
         rest_api_targets = {
-            'project$': 'get_projects',
-            'project/%s/versions' % self.project_key: 'get_project_versions',
-            'issue/createmeta': 'get_create_meta',
-            'issuetype': 'get_issue_types',
-            'search\?jql=project%%3D\'%s\'%%20AND%%20summary~.*' % self.project_key: 'get_issue',
-            'issue/%s-\S.*/remotelink$' % self.project_key: 'post_remote_link',
-            'issue$': 'post_issue',
-            'issue/%s-[0-9]*$' % self.project_key: 'update_version',
-            'issue/%s-\S.*/transitions$' % self.project_key: 'update_status',
-        }
-        super(JiraResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir, '/rest/api/2/')
-        self.external_targets = {
+            '/rest/api/2/project$': 'get_projects',
+            '/rest/api/2/project/%s/versions' % self.project_key: 'get_project_versions',
+            '/rest/api/2/issue/createmeta': 'get_create_meta',
+            '/rest/api/2/issuetype': 'get_issue_types',
+            '/rest/api/2/search\?jql=project%%3D\'%s\'%%20AND%%20summary~.*' % self.project_key: 'get_issue',
+            '/rest/api/2/issue/%s-\S.*/remotelink$' % self.project_key: 'post_remote_link',
+            '/rest/api/2/issue$': 'post_issue',
+            '/rest/api/2/issue/%s-[0-9]*$' % self.project_key: 'update_version',
+            '/rest/api/2/issue/%s-\S.*/transitions$' % self.project_key: 'update_status',
             'https://jira-server:5000/rpc/soap/jirasoapservice-v2': 'jira_soap_service'
         }
+        super(JiraResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir)
 
     def init_with_resources(self):
         project_data = {

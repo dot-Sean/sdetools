@@ -20,7 +20,7 @@ class TracResponseGenerator(ResponseGenerator):
             'ticket\.update': 'update_ticket',
             'ticket\.getActions': 'get_ticket_actions',
         }
-        super(TracResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir, '')
+        super(TracResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir)
 
     @staticmethod
     def decode_data(data):
