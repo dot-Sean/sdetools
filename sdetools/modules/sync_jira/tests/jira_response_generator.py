@@ -54,27 +54,34 @@ class JiraResponseGenerator(ResponseGenerator):
         """
         method_name = args[0]
         flags = args[1]
-        flag = flags.get(method_name)
         token = args[2]
 
         try:
             if not token:
                 self.raise_error('401')
             if method_name == 'getProjectByKey':
+                flag = flags.get('get_projects')
                 return self.get_projects('', flag, None, None)[0]
             elif method_name == 'getIssueTypes':
+                flag = flags.get('get_issue_types')
                 return self.get_issue_types('', flag, None, None)
             elif method_name == 'login':
+                flag = flags.get('get_auth_token')
                 return self.get_auth_token(flag)
             elif method_name == 'getStatuses':
+                flag = flags.get('get_statuses')
                 return self.get_statuses(flag)
             elif method_name == 'getPriorities':
+                flag = flags.get('get_priorities')
                 return self.get_priorities(flag)
             elif method_name == 'getVersions':
+                flag = flags.get('get_project_versions')
                 return self.get_project_versions('', flag, None, None)
             elif method_name == 'getFieldsForCreate':
+                flag = flags.get('get_fields_for_create')
                 return self.get_fields_for_create(flag)
             elif method_name == 'getIssuesFromJqlSearch':
+                flag = flags.get('get_issue')
                 task_name = re.sub(r".*summary~", '', args[3])
                 rest_response = self.get_issue('', flag, None, 'GET', task_name)
                 issues = rest_response.get('issues')
@@ -88,18 +95,23 @@ class JiraResponseGenerator(ResponseGenerator):
 
                     return [structType(data=issue)]
             elif method_name == 'createIssue':
+                flag = flags.get('post_issue')
                 return self.post_issue('', flag, args[3], 'GET')
             elif method_name == 'updateIssue':
+                flag = flags.get('update_issue') or flags.get('update_version')
                 if not flag:
                     pass
                 else:
                     self.raise_error('401')
             elif method_name == 'getAvailableActions':
+                flag = flags.get('update_status')
                 return self.update_status(args[3], flag, '{}', 'GET').get('transitions')
             elif method_name == 'progressWorkflowAction':
+                flag = flags.get('update_status')
                 transition_data = {"transition": {"id": args[4]}}
                 return self.update_status(args[3], flag, transition_data, 'POST')
             elif method_name == 'getFieldsForEdit':
+                flag = flags.get('get_fields_for_edit')
                 return self.get_fields_for_edit(flag)
             else:
                 self.raise_error('404')
@@ -164,6 +176,7 @@ class JiraResponseGenerator(ResponseGenerator):
     def get_project_versions(self, target, flag, data, method):
         if not flag:
             response = []
+            response.append(self.generate_project_version('1.2'))
 
             if self.project_version is not None:
                 response.append(self.generate_project_version())
@@ -348,9 +361,11 @@ class JiraResponseGenerator(ResponseGenerator):
 
         return issue_type
 
-    def generate_project_version(self):
+    def generate_project_version(self, project_version=None):
         version = self.get_json_from_file('project_version')
         version['self'] = "%s/version/%s" % (self.api_url, self.project_version)
         version['id'] = self.project_version
+        if project_version:
+            version['id'] = project_version
 
         return version

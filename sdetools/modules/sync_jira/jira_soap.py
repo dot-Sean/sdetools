@@ -85,8 +85,10 @@ class JIRASoapAPI:
         except SOAPpy.Types.faultType:
             raise AlmException('Unable to connect to project %s. Please check project'
                                ' settings' % (self.config['alm_project']))
-        
-        self.versions = self.proxy.getVersions(self.auth, self.config['alm_project'])
+        try:
+            self.versions = self.proxy.getVersions(self.auth, self.config['alm_project'])
+        except SOAPpy.Types.faultType:
+            raise AlmException('Unable to get project version')
 
     def get_issue_types(self):
         try:
@@ -260,7 +262,11 @@ class JIRASoapAPI:
         return ref
 
     def get_available_transitions(self, task_id):
-        transitions = self.proxy.getAvailableActions(self.auth, task_id)
+        try:
+            transitions = self.proxy.getAvailableActions(self.auth, task_id)
+        except SOAPpy.Types.faultType, err:
+            raise AlmException("Unable to get available actions for task %s. Reason: %s" % (task_id, err))
+
         ret_trans = {}
         for transition in transitions:
             ret_trans[transition['name']] = transition['id']

@@ -50,3 +50,6 @@ class TestTracCase(AlmPluginTestBase, unittest.TestCase):
         result_alm_id = test_task_result.get_alm_id()
 
         self.assertEqual(result_alm_id, alm_id, 'Expected alm_id %s, got %s' % (alm_id, result_alm_id))
+
+    def test_api_exceptions_are_handled(self):
+        pass

@@ -80,6 +80,9 @@ class GitHubResponseGenerator(ResponseGenerator):
             return []
 
     def get_issue(self, target, flag, data, method):
+        if flag:
+            self.raise_error('401')
+
         params = target.split('/')
         state = params[-2]
         task_number = self.extract_task_number_from_title(params[-1])

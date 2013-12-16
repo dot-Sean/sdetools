@@ -150,7 +150,10 @@ class RallyConnector(AlmConnector):
             'query': '(Name = \"%s\")' % self.config['alm_project'],
             'workspace': self.workspace_ref,
         }
-        project_ref = self.alm_plugin.call_api('project.js', args=query_args)
+        try:
+            project_ref = self.alm_plugin.call_api('project.js', args=query_args)
+        except APIError, err:
+            raise AlmException('Unable to retrieve project info from Rally. Reason: %s' % err)
         num_results = project_ref['QueryResult']['TotalResultCount']
         if not num_results:
             raise AlmException('Rally project not found: %s' % self.config['alm_project'])

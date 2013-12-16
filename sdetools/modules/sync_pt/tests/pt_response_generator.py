@@ -16,8 +16,8 @@ class PivotalTrackerResponseGenerator(ResponseGenerator):
         rest_api_targets = {
             'me': 'get_user',
             'projects$': 'get_projects',
-            '%s/stories\?filter="(.*):"&fields=current_state,name,updated_at,id,estimate' % self.project_uri: 'get_stories',
             '%s/stories\?filter=type:release,(.*)&fields=id' % self.project_uri: 'get_release_marker',
+            '%s/stories\?filter=.*' % self.project_uri: 'get_stories',
             '%s/epics\?filter=(.*)&fields=id' % self.project_uri: 'get_epic',
             '%s/epics$' % self.project_uri: 'add_epic',
             '%s/stories$' % self.project_uri: 'add_story',
