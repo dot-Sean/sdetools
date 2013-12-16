@@ -140,7 +140,7 @@ class BaseIntegrationTest(object):
 
     def test_reportid_exists(self):
         self.init_data()
-        self.assertTrue(self.integrator.report_id != '', 'Expected a report_id value')
+        self.assertTrue(self.integrator.report_id, 'Expected a report_id value')
 
     def assert_exception(self, exception, reason, fn, *args):
         if not exception:
