@@ -21,9 +21,9 @@ class PlugInExperience:
         self.api = sdeapi.APIBase(self.config)
         self.app_id = None
         self.prj_id = None
-        config.add_custom_option('sde_application', "SDE Application to use", 
+        config.opts.add('sde_application', "SDE Application to use", 
             default='', group_name="SD Elements Connector")
-        config.add_custom_option('sde_project', "SDE Project to use",
+        config.opts.add('sde_project', "SDE Project to use",
             default='', group_name="SD Elements Connector")
         self.connected = False
 

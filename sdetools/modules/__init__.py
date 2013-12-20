@@ -18,4 +18,5 @@ __all__ = [
     'sync_trac',
     'connect',
     'add_ssl_cert',
+    'fetch_config',
 ]

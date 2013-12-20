@@ -16,17 +16,22 @@ def main(argv):
         return False
     
     curr_cmd_name = None
-    for arg in argv[1:]:
-        if not arg.startswith('-'):
-            curr_cmd_name = arg
-            break
+    if '-h' in argv[1:]:
+        curr_cmd_name = 'help'
+        args = ['help', '-h']
+    else:
+        args = argv[1:]
+        for arg in args:
+            if not arg.startswith('-'):
+                curr_cmd_name = arg
+                break
 
     if not curr_cmd_name:
         commons.show_error("Missing command", usage_hint=True)
         return False
 
     try:
-        exit_stat = mod_mgr.run_command(curr_cmd_name, argv[2:], 'shell')
+        exit_stat = mod_mgr.run_command(curr_cmd_name, args[1:], 'shell')
     except commons.UsageError, e:
         commons.show_error(str(e), usage_hint=True)
         return False

@@ -93,12 +93,12 @@ class RallyConnector(AlmConnector):
         super(RallyConnector, self).__init__(config, alm_plugin)
 
         """ Adds Rally specific config options to the config file"""
-        config.add_custom_option('rally_new_status', 'status to set for new tasks in Rally',
+        config.opts.add('rally_new_status', 'status to set for new tasks in Rally',
                                  default='Defined')
-        config.add_custom_option('rally_done_statuses', 'Statuses that signify a task is Done in Rally',
+        config.opts.add('rally_done_statuses', 'Statuses that signify a task is Done in Rally',
                                  default='Completed,Accepted')
-        config.add_custom_option('rally_workspace', 'Rally Workspace', default=None)
-        config.add_custom_option('rally_card_type', 'IDs for issues raised in Rally', default='Story')
+        config.opts.add('rally_workspace', 'Rally Workspace', default=None)
+        config.opts.add('rally_card_type', 'IDs for issues raised in Rally', default='Story')
 
     def initialize(self):
         super(RallyConnector, self).initialize()

@@ -105,21 +105,21 @@ class HPAlmConnector(AlmConnector):
         super(HPAlmConnector, self).__init__(config, alm_plugin)
 
         """ Adds HP Alm specific config options to the config file"""
-        config.add_custom_option('hp_alm_issue_type', 'IDs for issues raised in HP Alm',
+        config.opts.add('hp_alm_issue_type', 'IDs for issues raised in HP Alm',
                                  default='Functional')
-        config.add_custom_option('hp_alm_new_status', 'status to set for new tasks in HP Alm',
+        config.opts.add('hp_alm_new_status', 'status to set for new tasks in HP Alm',
                                  default='Not Completed')
-        config.add_custom_option('hp_alm_reopen_status', 'status to set to reopen a task in HP Alm',
+        config.opts.add('hp_alm_reopen_status', 'status to set to reopen a task in HP Alm',
                                  default='Not Completed')
-        config.add_custom_option('hp_alm_close_status', 'status to set to close a task in HP Alm',
+        config.opts.add('hp_alm_close_status', 'status to set to close a task in HP Alm',
                                  default='Passed')
-        config.add_custom_option('hp_alm_done_statuses', 'Statuses that signify a task is Done in HP Alm',
+        config.opts.add('hp_alm_done_statuses', 'Statuses that signify a task is Done in HP Alm',
                                  default='Passed')
-        config.add_custom_option('hp_alm_domain', 'Domain',
+        config.opts.add('hp_alm_domain', 'Domain',
                                  default=None)
-        config.add_custom_option('hp_alm_test_plan_folder', 'Test plan folder where we import our test tasks',
+        config.opts.add('hp_alm_test_plan_folder', 'Test plan folder where we import our test tasks',
                                  default='SD Elements')
-        config.add_custom_option('hp_alm_test_type', 'Default type for new test plans',
+        config.opts.add('hp_alm_test_type', 'Default type for new test plans',
                                  default='MANUAL')
 
     def initialize(self):

@@ -12,9 +12,9 @@ class Command(BaseCommand):
     help = 'Import a self-signed or other SSL certificate to sdetools'
 
     def configure(self):
-        self.config.add_custom_option('server', "Server to connect to", 
+        self.config.opts.add('server', "Server to connect to", 
             default=None)
-        self.config.add_custom_option('port', "Port to connect to", 
+        self.config.opts.add('port', "Port to connect to", 
             default='443')
 
     def handle(self):

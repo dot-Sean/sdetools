@@ -15,8 +15,8 @@ class Command(BaseCommand):
 
     def configure(self):
         self.api = sdeapi.APIBase(self.config)
-        self.config.add_custom_option("api_func", "API Function to be Called", "f", None)
-        self.config.add_custom_option("api_args", "API Arguments in URL Encoded format (skip if empty)", "a", '')
+        self.config.opts.add("api_func", "API Function to be Called", "f", None)
+        self.config.opts.add("api_args", "API Arguments in URL Encoded format (skip if empty)", "a", '')
 
     def list_functions(self):
         all_funcs = [x for x in dir(self.api) 
