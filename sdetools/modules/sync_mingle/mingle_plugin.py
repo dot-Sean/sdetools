@@ -74,11 +74,11 @@ class MingleConnector(AlmConnector):
         """ Initializes connection to Mingle """
         super(MingleConnector, self).__init__(config, alm_plugin)
 
-        config.add_custom_option('mingle_card_type', 'IDs for issues raised in Mingle',
+        config.opts.add('mingle_card_type', 'IDs for issues raised in Mingle',
             default='Story')
-        config.add_custom_option('mingle_new_status', 'Status to set for new tasks in Mingle',
+        config.opts.add('mingle_new_status', 'Status to set for new tasks in Mingle',
             default='Ready for Analysis')
-        config.add_custom_option('mingle_done_statuses', 'Statuses that signify a task is Done in Mingle',
+        config.opts.add('mingle_done_statuses', 'Statuses that signify a task is Done in Mingle',
             default='Ready for Testing,In Testing,Ready for Signoff,Accepted')
 
         self.cached_cards = None

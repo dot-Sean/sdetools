@@ -72,13 +72,13 @@ class TracConnector(AlmConnector):
         """ Initializes connection to Trac """
         super(TracConnector, self).__init__(config, alm_plugin)
 
-        config.add_custom_option('alm_close_transition', 'Close transition in Trac',
+        config.opts.add('alm_close_transition', 'Close transition in Trac',
                 default='resolve,{"action_resolve_resolve_resolution":"fixed"}')
-        config.add_custom_option('alm_reopen_transition', 'Re-open transiiton in Trac',
+        config.opts.add('alm_reopen_transition', 'Re-open transiiton in Trac',
                 default='reopen')
-        config.add_custom_option('alm_new_status', 'Status to set for new tasks in Trac',
+        config.opts.add('alm_new_status', 'Status to set for new tasks in Trac',
             default='Ready for Analysis')
-        config.add_custom_option('alm_done_statuses', 'Statuses that signify a task is Done in Trac',
+        config.opts.add('alm_done_statuses', 'Statuses that signify a task is Done in Trac',
             default='closed')
         self.alm_task_title_prefix = 'SDE '
 

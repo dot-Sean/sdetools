@@ -2,7 +2,7 @@ import re
 import os
 
 from datetime import datetime
-from sdetools.sdelib.mod_mgr import ReturnChannel
+from sdetools.sdelib.mod_mgr import ReturnChannel, load_modules
 from sdetools.sdelib.conf_mgr import Config
 from sdetools.sdelib.commons import abc, Error, get_directory_of_current_module
 from sdetools.sdelib.testlib.mock_response import MOCK_ALM_RESPONSE, MOCK_SDE_RESPONSE
@@ -64,10 +64,11 @@ class AlmPluginTestBase(object):
             Plugin setup mirrors the setup that occurs during a sync_alm call.
             Also initializes the mock responses.
         """
-        self.config = Config('', '', self.ret_chn, 'import')
+        command_list = load_modules()
+        self.config = Config('help', '', command_list, [], self.ret_chn, 'shell')
         self.init_alm_connector()
         self.pre_parse_config()
-
+        self.config.import_custom_options()
         Config.parse_config_file(self.config, self.conf_path)
 
         self.post_parse_config()

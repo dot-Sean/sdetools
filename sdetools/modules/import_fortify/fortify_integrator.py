@@ -19,8 +19,8 @@ class FortifyIntegrator(BaseIntegrator):
     def __init__(self, config):
         supported_file_types = ["xml", "fpr", "fvdl"]
         super(FortifyIntegrator, self).__init__(config, self.TOOL_NAME, supported_file_types, DEFAULT_MAPPING_FILE)
-        self.config.add_custom_option("import_blacklist", "Do not import issues which have been triaged with these " +
-                                      "statuses (i.e. 'Bad Practice, Not an Issue').", "a", "Not an Issue")
+        self.config.opts.add("import_blacklist", "Do not import issues which have been triaged with these " +
+                "statuses (i.e. 'Bad Practice, Not an Issue').", "a", "Not an Issue")
 
     def initialize(self):
         super(FortifyIntegrator, self).initialize()

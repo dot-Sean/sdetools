@@ -20,7 +20,7 @@ class JiraBaseCase(AlmPluginTestBase):
         super(JiraBaseCase, cls).setUpClass(alm_classes=alm_classes)
 
     def pre_parse_config(self):
-        self.config.add_custom_option('jira_version', 'Version of JIRA [e.g. 4.3.3, 5, or 6.0]', default='6')
+        self.config.opts.add('jira_version', 'Version of JIRA [e.g. 4.3.3, 5, or 6.0]', default='6')
 
     def post_parse_config(self):
         api_ver = self.config['jira_version'][:1]

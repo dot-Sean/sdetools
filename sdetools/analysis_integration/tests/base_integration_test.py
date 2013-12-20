@@ -1,7 +1,7 @@
 import os
 
 from sdetools.sdelib import conf_mgr
-from sdetools.sdelib.mod_mgr import ReturnChannel
+from sdetools.sdelib.mod_mgr import ReturnChannel, load_modules
 from sdetools.sdelib.testlib.mock_response import MOCK_SDE_RESPONSE
 from sdetools.sdelib.commons import abc, Error, get_directory_of_current_module
 abstractmethod = abc.abstractmethod
@@ -27,8 +27,9 @@ class BaseIntegrationTest(object):
         cls.mock_sde_response = MOCK_SDE_RESPONSE
 
     def setUp(self):
+        command_list = load_modules()
         ret_chn = ReturnChannel(stdout_callback, {})
-        self.config = conf_mgr.Config(self.sde_cmd, [], ret_chn, 'shell', {})
+        self.config = conf_mgr.Config(self.sde_cmd, '', command_list, [], ret_chn, 'shell')
 
         self.init_integrator()
         self.setup_sde_configs()
@@ -51,6 +52,7 @@ class BaseIntegrationTest(object):
 
     def init_integrator(self):
         self.integrator = self.integrator_cls(self.config)
+        self.config.import_custom_options()
         self.integrator.config['mapping_file'] = os.path.join(self.test_file_dir, self.mapping_file)
         self.integrator.config['report_file'] = os.path.join(self.test_file_dir, self.report_file)
         self.num_reports = 1

@@ -138,10 +138,12 @@ class JIRARestAPI(RESTBase):
                'description': task['formatted_content'],
                'issuetype': {
                    'id': issue_type_id
-               },
-               'labels':['SD-Elements']
+               }
            }
         }
+        if self.has_field('labels'):
+            args['fields']['labels'] = ['SD-Elements']
+
         if self.has_field('priority'):
             args['fields']['priority'] = {'name':task['alm_priority']}
 
