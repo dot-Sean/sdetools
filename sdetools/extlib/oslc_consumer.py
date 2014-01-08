@@ -4,8 +4,12 @@
 import json
 from sdetools.sdelib.restclient import RESTBase
 from sdetools.sdelib.restclient import URLRequest, APIError
-from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
+from sdetools.alm_integration.alm_plugin_base import AlmConnector
 from sdetools.alm_integration.alm_plugin_base import AlmException
+from rdflib import Graph, term
+
+from sdetools.sdelib import log_mgr
+logger = log_mgr.mods.add_mod(__name__)
 
 
 class OSLCAPI(RESTBase):
@@ -14,14 +18,31 @@ class OSLCAPI(RESTBase):
 
     def __init__(self, config):
         super(OSLCAPI, self).__init__('alm', 'OSLC', config)
+        self.rdf_graph = Graph()
 
     def post_conf_init(self):
         super(OSLCAPI, self).post_conf_init()
 
     def call_api(self, target, method=URLRequest.GET, args=None):
 
-        headers = {'Accept': 'application/json', 'OSLC-Core-Version': '2.0'}
+        headers = {'Accept': 'application/rdf+xml', 'OSLC-Core-Version': '2.0', 'Content-Type': 'application/rdf+xml'}
         return super(OSLCAPI, self).call_api(target, method, args, headers)
+
+    def parse_response(self, result):
+        #print result
+        try:
+            result = self.rdf_graph.parse(data=result)
+        except Exception, e:
+            logger.error('Error parsing rdf+xml: %s' % e)
+            raise AlmException('Unable to process RDF+XML data: %s' % str(result)[:200])
+        return result
+
+    def parse_error(self, result):
+        try:
+            error = self.rdf_graph.parse(result)
+        except:
+            raise AlmException('Unable to process RDF+XML data: %s' % str(result)[:200])
+        return error
 
 
 class OSLCConnector(AlmConnector):
@@ -45,53 +66,80 @@ class OSLCConnector(AlmConnector):
         except APIError, err:
             raise AlmException('Unable to connect retrieve root services (Check server URL, user, pass).'
                                'Reason: %s' % str(err))
+        #for s, p, o in catalog:
+        #    print s, p, o
+        #print list(catalog.subjects())
 
-        root_services = catalog[self.alm_plugin.base_uri + '/rootservices']
+        rdf_query = "SELECT DISTINCT ?url WHERE  { ?url rdf:type <http://open-services.net/ns/core#ServiceProvider> . ?url dcterms:title ?u }"
+        o = catalog.query(rdf_query)
+        print o
+        for oo in o:
+            print "%s" % (oo)
+        print "DONE"
+        subj = term.URIRef(self.alm_plugin.base_uri+'/rootservices')
+        pred = term.URIRef(self.OSLC_SERVICE_PROVIDER)
+        #objs = self.alm_plugin.rdf_graph.value(subject=subj, predicate=pred)
+        self.service_provider_uri = catalog.value(subject=subj, predicate=pred)
 
-        if self.OSLC_SERVICE_PROVIDER not in root_services:
+        if not self.service_provider_uri:
             raise AlmException('Service provider not found (Check server URL, user, pass).')
 
-        service_providers = root_services[self.OSLC_SERVICE_PROVIDER]
-        self.service_provider_uri = service_providers[0]['value']
-
         service_provider_target = self.service_provider_uri.replace(self.alm_plugin.base_uri+'/', '')
-
         try:
             service_catalog = self.alm_plugin.call_api(service_provider_target)
         except APIError, err:
             raise AlmException('Unable to connect retrieve service catalog (Check server URL, user, pass).'
                                'Reason: %s' % str(err))
-
         if not service_catalog:
             raise AlmException('Unable to connect retrieve service catalog (Check server URL, user, pass).')
 
+        #for s, p, o in service_catalog:
+        #    print s, p, o
+        #print list(service_catalog)
         resource_url = None
-        for service_provider in service_catalog['oslc:serviceProvider']:
-            if service_provider['dcterms:title'] == self.config['alm_project']:
-                resource_url = service_provider['rdf:about']
+        #for service_provider in service_catalog['oslc:serviceProvider']:
+        #    if service_provider['dcterms:title'] == self.config['alm_project']:
+        #        resource_url = service_provider['rdf:about']
 
+        pred = term.URIRef("http://purl.org/dc/terms/title")
+        obj = term.Literal(self.config['alm_project'],
+                           datatype=term.URIRef(u'http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral'))
+
+        resource_url = service_catalog.value(predicate=pred, object=obj)
         if not resource_url:
             raise AlmException('Unable to connect retrieve resource url (Check server URL, user, pass).')
 
         resource_service = resource_url.replace(self.alm_plugin.base_uri+'/', '')
+        #import pprint
+        #pprint.pprint(resource_service)
         services = self.alm_plugin.call_api(resource_service)
         #print json.dumps(services['oslc:service'][1], indent=4)
+        #for s, p, o in services:
+        #    print s, p, o
+        #print list(services)
 
-        for service in services['oslc:service']:
-            if 'oslc:queryCapability' in service:
-                query_url = service['oslc:queryCapability'][0]['oslc:queryBase']['rdf:resource']
-                self.query_url = query_url.replace(self.alm_plugin.base_uri+'/', '')
-            if 'oslc:creationFactory' in service:
-                for factory in service['oslc:creationFactory']:
-                    if 'oslc:usage' in factory:
-                        #print json.dumps( factory, indent=4)
-                        for resource in factory['oslc:usage']:
-                            if resource['rdf:resource'] == self.OSLC_TYPE:
-                                creation_url = factory['oslc:creation']['rdf:resource']
-                                resource_shape_url = factory['oslc:resourceShape']['rdf:resource']
-                                self.creation_url = creation_url.replace(self.alm_plugin.base_uri+'/', '')
-                                self.resource_shape_url = resource_shape_url.replace(self.alm_plugin.base_uri+'/', '')
+        pred = term.URIRef("http://open-services.net/ns/core#usage")
+        obj = term.URIRef(self.OSLC_TYPE)
 
+        bnode = services.value(predicate=pred, object=obj)
+        subj = bnode
+
+        # Find the lookup/query url
+        pred = term.URIRef("http://open-services.net/ns/core#queryBase")
+        query_url = services.value(subject=subj, predicate=pred)
+        self.query_url = query_url.replace(self.alm_plugin.base_uri+'/', '')
+
+        # Find the resource shape url
+        pred = term.URIRef("http://open-services.net/ns/core#resourceShape")
+        resource_shape_url = services.value(subject=subj, predicate=pred)
+        self.resource_shape_url = resource_shape_url.replace(self.alm_plugin.base_uri+'/', '')
+
+        # Find the creation url
+        pred = term.URIRef("http://open-services.net/ns/core#creation")
+        creation_url = services.value(subject=subj, predicate=pred)
+        self.creation_url = creation_url.replace(self.alm_plugin.base_uri+'/', '')
+
+        # Grab the priorities
         self.priorities = self._rtc_get_priorities()
 
     def _rtc_get_priorities(self):
