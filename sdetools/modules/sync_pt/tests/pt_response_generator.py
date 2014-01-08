@@ -59,7 +59,6 @@ class PivotalTrackerResponseGenerator(ResponseGenerator):
 
     def get_stories(self, target, flag, data, method):
         if not flag:
-            stories = []
             params = self.get_url_parameters(target)
             if not params.get('filter'):
                 self.raise_error('400')

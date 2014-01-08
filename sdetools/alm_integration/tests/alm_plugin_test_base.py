@@ -179,7 +179,7 @@ class AlmPluginTestBase(object):
                 self.connector.alm_add_task(test_task)
                 self.connector.synchronize()
                 raise Exception('Expected an AlmException to be thrown for the following target: %s' % api_target)
-            except AlmException, err:
+            except AlmException:
                 pass
 
     @staticmethod

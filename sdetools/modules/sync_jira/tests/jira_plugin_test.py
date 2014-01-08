@@ -51,7 +51,7 @@ class JiraBaseCase(AlmPluginTestBase):
                 self.connector.config['alm_project_version'] = '1.2'
                 self.connector.synchronize()
                 raise Exception('Expected an AlmException to be thrown for the following target: %s' % api_target)
-            except AlmException, err:
+            except AlmException:
                 pass
 
     def test_parsing_alm_task(self):
