@@ -26,6 +26,34 @@ class JiraBaseCase(AlmPluginTestBase):
         api_ver = self.config['jira_version'][:1]
         self.config.jira_api_ver = int(api_ver)
 
+    def test_api_exceptions_are_handled(self):
+        self._test_api_exceptions_are_handled()
+
+    def _test_api_exceptions_are_handled(self, ignore_targets=[]):
+        # Check that all api exceptions are properly handled. Some api targets will never be used in Soap calls,
+        # add those to the ignore targets param so our tests pass
+        for api_target, mock_flag in self.response_generator.rest_api_targets.items():
+            if mock_flag in ignore_targets:
+                continue
+            self.tearDown()
+            self.setUp()
+            self.connector.config['conflict_policy'] = 'sde'
+            self.mock_sde_response.get_response_generator().generator_clear_resources()
+            # All response methods should throw an exception if the fail flag is encountered
+            self.mock_alm_response.set_response_flags({mock_flag: 'fail'})
+
+            try:
+                # This will invoke add, get and update task
+                self.connector.alm_connect()
+                test_task = self.mock_sde_response.generate_sde_task()
+                test_task['status'] = 'DONE'
+                self.connector.alm_add_task(test_task)
+                self.connector.config['alm_project_version'] = '1.2'
+                self.connector.synchronize()
+                raise Exception('Expected an AlmException to be thrown for the following target: %s' % api_target)
+            except AlmException, err:
+                pass
+
     def test_parsing_alm_task(self):
         result = super(JiraBaseCase, self).test_parsing_alm_task()
         test_task = result[0]
@@ -125,8 +153,11 @@ class TestJiraAPI4Case(JiraBaseCase, unittest.TestCase):
         mock_proxy = MockSoapProxy
         patch('sdetools.modules.sync_jira.jira_soap.SOAPpy.WSDL.Proxy', mock_proxy).start()
 
+    def test_api_exceptions_are_handled(self):
+        self._test_api_exceptions_are_handled(['post_remote_link', 'get_create_meta'])
+
     def test_bad_credentials(self):
-        self.mock_alm_response.set_response_flags({'login': '401'})
+        self.mock_alm_response.set_response_flags({'get_auth_token': '401'})
 
         self.assert_exception(AlmException, '', 'Unable to login to JIRA. Please check ID, password',
                               self.connector.alm_plugin.connect_server)

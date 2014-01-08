@@ -90,7 +90,7 @@ class MockResponse(object):
         return self.response_generator
 
     def teardown(self):
-        self.get_response_generator().generator_clear_tasks()
+        self.get_response_generator().generator_clear_resources()
         self.set_response_flags({})
 
         if self.call_api_patch is not None:
@@ -107,7 +107,7 @@ class MockSDEResponse(MockResponse):
         response_generator = SdeResponseGenerator(config)
         super(MockSDEResponse, self).initialize(response_generator)
 
-    def generate_sde_task(self, task_number=None, project_id=1000, status='TODO', priority=7, phase='requirements'):
+    def generate_sde_task(self, task_number=None, project_id=None, status='TODO', priority=7, phase='requirements'):
         return self.get_response_generator().generate_sde_task(task_number, project_id, status, priority, phase)
 
 MOCK_ALM_RESPONSE = MockResponse()

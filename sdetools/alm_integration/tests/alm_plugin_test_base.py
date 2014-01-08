@@ -6,6 +6,7 @@ from sdetools.sdelib.mod_mgr import ReturnChannel, load_modules
 from sdetools.sdelib.conf_mgr import Config
 from sdetools.sdelib.commons import abc, Error, get_directory_of_current_module
 from sdetools.sdelib.testlib.mock_response import MOCK_ALM_RESPONSE, MOCK_SDE_RESPONSE
+from sdetools.alm_integration.alm_plugin_base import AlmException
 
 abstractmethod = abc.abstractmethod
 CONF_FILE_LOCATION = 'test_settings.conf'
@@ -159,6 +160,27 @@ class AlmPluginTestBase(object):
     def test_synchronize(self):
         # Verify no exceptions are thrown
         self.connector.synchronize()
+
+    def test_api_exceptions_are_handled(self):
+        # Check that all api exceptions are properly handled
+        for api_target, mock_flag in self.response_generator.rest_api_targets.items():
+            self.tearDown()
+            self.setUp()
+            self.connector.config['conflict_policy'] = 'sde'
+            self.mock_sde_response.get_response_generator().generator_clear_resources()
+            # All response methods should throw an exception if the fail flag is encountered
+            self.mock_alm_response.set_response_flags({mock_flag: 'fail'})
+
+            try:
+                # This will invoke add, get and update task
+                self.connector.alm_connect()
+                test_task = self.mock_sde_response.generate_sde_task()
+                test_task['status'] = 'DONE'
+                self.connector.alm_add_task(test_task)
+                self.connector.synchronize()
+                raise Exception('Expected an AlmException to be thrown for the following target: %s' % api_target)
+            except AlmException, err:
+                pass
 
     @staticmethod
     def assertIn(value, expectations, msg=None):
