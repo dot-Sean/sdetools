@@ -1,0 +1,32 @@
+{
+    "expand": "editmeta,renderedFields,transitions,changelog,operations",
+    "id": "10002",
+    "self": "http://www.example.com/jira/rest/api/2/issue/10002",
+    "key": "EX-1",
+    "fields": {
+        "summary":"Issue summary",
+        "progress":{"progress":0,"total":0},
+        "issuetype": {},
+        "priority":{},
+        "issuelinks":[],
+        "status": {},
+        "labels":"SD-Elements",
+        "assignee":{},
+        "sub-tasks": [],
+		"versions" : [],
+        "project": {
+            "self": "http://www.example.com/jira/rest/api/2/project/EX",
+            "id": "10000",
+            "key": "EX",
+            "name": "Example",
+            "avatarUrls": {
+                "24x24": "http://www.example.com/jira/secure/projectavatar?size=small&pid=10000",
+                "16x16": "http://www.example.com/jira/secure/projectavatar?size=xsmall&pid=10000",
+                "32x32": "http://www.example.com/jira/secure/projectavatar?size=medium&pid=10000",
+                "48x48": "http://www.example.com/jira/secure/projectavatar?size=large&pid=10000"
+            }
+        },
+        "updated": "2013-09-04T19:34:03.000+0000",
+        "description": "example bug report"
+    }
+}

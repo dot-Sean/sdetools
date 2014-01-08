@@ -37,7 +37,9 @@ class JIRARestAPI(RESTBase):
         self.fields = []
 
         try:
-            meta_info = self.call_api('issue/createmeta', method=self.URLRequest.GET, args={'projectKeys':self.config['alm_project'], 'expand':'projects.issuetypes.fields'})
+            meta_info = self.call_api('issue/createmeta', method=self.URLRequest.GET,
+                                      args = {'projectKeys': self.config['alm_project'],
+                                      'expand': 'projects.issuetypes.fields'})
         except APIError:
             raise AlmException('Could not retrieve fields for JIRA project: %s' % self.config['alm_project'])
 
@@ -77,7 +79,7 @@ class JIRARestAPI(RESTBase):
 
     def get_task(self, task, task_id):
         try:
-            url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s\'' % (
+            url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s%%5C%%5C:\'' % (
                     self.config['alm_project'], task_id)
             result = self.call_api(url)
         except APIError, err:
@@ -103,7 +105,7 @@ class JIRARestAPI(RESTBase):
         if 'priority' in jtask['fields'] and jtask['fields']['priority']:
             task_priority = jtask['fields']['priority']['name']
 
-        return JIRATask(task['id'],
+        return JIRATask(task_id,
                         jtask['key'],
                         task_priority,
                         jtask['fields']['status']['name'],

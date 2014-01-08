@@ -24,24 +24,31 @@ class FortifyReportImporter(BaseImporter):
         try:
             base = minidom.parse(report_xml)
         except Exception, e:
-            raise FortifyIntegrationError("Error opening report xml (%s)" % report_xml)
+            raise FortifyIntegrationError("Error opening report xml %s Reason: %s" % (report_xml, str(e)))
 
-        self.report_id = ""
+        self.id = ""
+        root = base.documentElement
 
-        report_sections = base.getElementsByTagName('ReportSection')
+        if root.tagName != "ReportDefinition":
+            raise FortifyIntegrationError("Malformed report detected: ReportDefinition is not found")
+
+        report_sections = root.getElementsByTagName('ReportSection')
         if not report_sections:
             raise FortifyIntegrationError("Malformed report detected: ReportSection not found")
 
         for report_section in report_sections:
-            title = report_section.getElementsByTagName('Title')[0]
+            titles = report_section.getElementsByTagName('Title')
+            if not titles:
+                raise FortifyIntegrationError("Malformed report detected: Title not found")
+            title = titles[0]
             if title.firstChild.data == 'Issue Count by Category':
                 issue_listing = report_section.getElementsByTagName('IssueListing')[0]
                 grouping_sections = issue_listing.getElementsByTagName('GroupingSection')
                 for grouping_section in grouping_sections:
-                    self.raw_findings.append(self._make_raw_finding(grouping_section))
+                    self.findings.append(self._make_raw_finding(grouping_section))
             elif title.firstChild.data == 'Project Summary':
                 subsection = report_section.getElementsByTagName('SubSection')[0]
                 subsection_text = subsection.getElementsByTagName('Text')[0]
                 m = re.search('Build Label:\s*(.+)', subsection_text.firstChild.data)
                 if m:
-                    self.report_id = m.group(1)
+                    self.id = m.group(1)

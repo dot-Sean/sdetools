@@ -101,7 +101,7 @@ class JIRASoapAPI:
 
     def get_task(self, task, task_id):
         try:
-            jql = "project='%s' AND summary~'%s'" % (self.config['alm_project'], task_id)
+            jql = "project='%s' AND summary~'%s\\\\:'" % (self.config['alm_project'], task_id)
             issues = self.proxy.getIssuesFromJqlSearch(self.auth, jql, SOAPpy.Types.intType(1))
         except SOAPpy.Types.faultType:
             raise AlmException("Unable to get task %s from JIRA" % task_id)
@@ -135,7 +135,7 @@ class JIRASoapAPI:
             for version in jtask.affectsVersions:
                 task_versions.append(version['name'])
 
-        return JIRATask(task['id'],
+        return JIRATask(task_id,
                         jtask['key'],
                         task_priority,
                         task_status,
@@ -271,3 +271,7 @@ class JIRASoapAPI:
         except SOAPpy.Types.faultType, err:
             logger.error(err)
             raise AlmException("Unable to set task status: %s" % err)
+            
+    def post_conf_init(self):
+        pass
+

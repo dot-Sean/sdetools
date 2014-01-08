@@ -5,8 +5,8 @@ class Command(BaseCommand):
     help = 'Mingle <-> SDE sync utility.'
 
     def configure(self):
-        mbase = MingleAPIBase(self.config)
-        self.mingle = MingleConnector(self.config, mbase)
+        alm_api = MingleAPIBase(self.config)
+        self.mingle = MingleConnector(self.config, alm_api)
 
     def handle(self):
         self.mingle.initialize()

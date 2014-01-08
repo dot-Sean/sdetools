@@ -1,0 +1,183 @@
+{
+    "status": "TODO",
+    "contextrulesets": [],
+    "timestamp": 1381173270,
+    "note_count": 0,
+    "implementations": [
+        {
+            "contextrulesets": [
+                {
+                    "required": [
+                        {
+                            "type": "file-type",
+                            "value": "jsp"
+                        }
+                    ],
+                    "excluded": []
+                }
+            ],
+            "url": "https://m1.sdelements.com/library/tasks/T36/escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-java-ee-with-tag-libraries/",
+            "title": "I43: Java EE with Tag Libraries",
+            "id": "I43",
+            "content": "## Description\r\n\r\nTag library output may be vulnerable to XSS, depending on several factors:\r\n1) If HTML/XML escaping for tags that output data to web context is not turned on by default \r\n2) Even if HTML escaping is turned on, it may be insufficient to protect against XSS when the tag output is within the context of an HTML attribute, JavaScript, or CSS. In these cases, proper contextual escaping using the appropriate contextual encoding is required.\r\nESAPI provides Expression Language (EL) contextual escaping functions for tag libraries. Use the function depending on the context of your output.\r\n\r\n## Code\r\n\r\n    <c:set \r\n        var=\"dangerous\" \r\n        scope=\"request\" \r\n        value=\"<%= request.getParameter(\\\"test\\\") %>\" />\r\n    <p></p>\r\n    <p>\r\n        Test using ESAPI tag libraries with JSTL in HTML: \r\n        ${esapi:encodeForHTML(dangerous)}\r\n    </p>\r\n    <p>\r\n        Test using ESAPI tag libraries with JSTL in HTML Attribute:  \r\n        <input type=\"text\" value=\"${esapi:encodeForHTMLAttribute(dangerous)}\"/>\r\n    </p>\r\n    <p>\r\n        Test using ESAPI tag libraries with JSTL in JavaScript:  \r\n        <script language=\"javascript\">\r\n            var str=${esapi:encodeForJavaScript(dangerous)};\r\n        </script>\r\n    </p>\r\n\r\n[Download the Complete Code Example]({{ USE_MEDIA_URL }}code/J2EE/j2ee.data_validation.jstl.web_encoding.war){@class=code-download}\r\n\r\n## 3rd Party Libraries\r\n\r\nOWASP ESAPI for Java 2.0, RC7\r\n",
+            "slug": "escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-java-ee-with-tag-libraries"
+        },
+        {
+            "contextrulesets": [
+                {
+                    "required": [
+                        {
+                            "type": "file-type",
+                            "value": "jsp"
+                        }
+                    ],
+                    "excluded": []
+                }
+            ],
+            "url": "https://m1.sdelements.com/library/tasks/T36/escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-java-ee-with-esapi/",
+            "title": "I44: Java EE with ESAPI",
+            "id": "I44",
+            "content": "## Description\r\n\r\nUse the reference Encoder implementation to provide appropriate encoding.\r\n\r\n## Code\r\n\r\nHere's an example with HTML encoding:\r\n\r\n    <%= ESAPI.encoder().encodeForHTML(request.getParameter(\"test\")); %>\r\n    Using an ESAPI tag library:\r\n    <%@page import=\"org.owasp.esapi.*\"%>\r\n    <p>\r\n        Test using ESAPI tag libraries \r\n        <esapi:encodeForHTML>\r\n            <%= request.getParameter(\"test\") %> \r\n        </esapi:encodeForHTML>\r\n    </p>\r\n\r\n[Download the Complete Code Example]({{ USE_MEDIA_URL }}code/J2EE/j2ee.data_validation.web_encoding.war){@class=code-download}\r\n\r\n## 3rd Party Libraries\r\n\r\nOWASP ESAPI for Java 2.0, RC7\r\n",
+            "slug": "escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-java-ee-with-esapi"
+        },
+        {
+            "contextrulesets": [],
+            "url": "https://m1.sdelements.com/library/tasks/T36/escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-java-ee-with-jsf/",
+            "title": "I45: Java EE with JSF",
+            "id": "I45",
+            "content": "## Description\r\n\r\nThe following JSF tags encode data in normal HTML safely  because they have the escape attribute set to \"true\" by default; however, the tags themselves cannot be used safely *within* an HTML attribute, JavaScript, or CSS without the use of an escaping function in Expression Language (such as the esapi:escapeForHTMLAttributes() function):\r\n\r\n * h:outputFormat  \r\n * h:outputText  \r\n\r\nDo not trust any other JSF HTML (commonly denoted with the \"h:\" prefix) tag to sanitize output for the web properly. If you must use un-trusted text to display within HTML, consider using the ESAPI Express Language functions esapi:escapeForHTML(), etc.\r\n",
+            "slug": "escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-java-ee-with-jsf"
+        },
+        {
+            "contextrulesets": [
+                {
+                    "required": [
+                        {
+                            "type": "file-type",
+                            "value": "xhtml"
+                        }
+                    ],
+                    "excluded": []
+                }
+            ],
+            "url": "https://m1.sdelements.com/library/tasks/T36/escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-java-ee-with-jsf-and-facelets/",
+            "title": "I46: Java EE with JSF and Facelets",
+            "id": "I46",
+            "content": "## Description\r\n\r\nFacelets HTML-encode the result of any Expression Library (EL) expression automatically. This means that outputting a bean variable by using ${bean.name} will HTML encode; however, ensure that you test this for your specific Facelet implementation prior to deployment.\r\nNote that this creates a challenge for other contexts. With Java Server Face (JSF) and other Java Server Page (JSP) tag libraries, you can use the ESAPI EL functions to encode safely for other contexts. With Facelets, the results of a function call such as #{esapi:encodeForHTMLAttribute(bean.value)} may be double-encoded and break functionality.\r\nAvoid outputting untrusted data in Facelets outside of HTML elements. Never output untrusted Facelet data in a JavaScript, HTML Attribute, or Cascading Stylesheet encoding.\r\n\r\n## Code\r\n\r\n     <ui:define name=\"body\">\r\n        This will safely encode as an HTML element in a Facelet: \r\n        <h:outputText value=\"#{SimpleBean.val}\" ></h:outputText>\r\n      </ui:define>\r\n\r\n## 3rd Party Libraries\r\n\r\nJSF Facelets,OWASP ESAPI for Java 2.0, RC7\r\n",
+            "slug": "escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-java-ee-with-jsf-and-facelets"
+        },
+        {
+            "contextrulesets": [
+                {
+                    "required": [
+                        {
+                            "type": "regex",
+                            "value": "http://richfaces.org/"
+                        }
+                    ],
+                    "excluded": []
+                }
+            ],
+            "url": "https://m1.sdelements.com/library/tasks/T36/escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-java-ee-with-richfaces/",
+            "title": "I47: Java EE with RichFaces",
+            "id": "I47",
+            "content": "## Description\r\n\r\nFacelets HTML-encode the result of any Expression Library (EL) expression automatically. This means that outputting a bean variable by using `${bean.name}` will HTML-encode.\r\nIf you include user-supplied input, certain tags may lead to Cross-Site Scripting (XSS) directly. Never use user-supplied data in the `<a4j:loadScript>`, `<a4j:loadStyle>` or `<rich:componentControl >` tags.\r\nAvoid use of the `<rich:editor>` tag. This tag uses the TinyMCE editor, which has several known vulnerabilities, and more may exist: http://osvdb.org/search?search[vuln_title]=tinymce&search[text_type]=alltext\r\nIn general, avoid using tag libraries that make use of third-party sites unless you can validate that the site content is safe from XSS. For example, avoid the `<rich:effect>`, `<rich:gmap>`, and `<rich:virtualEarth>` tags.\r\n\r\n## 3rd Party Libraries\r\n\r\nRichFaces 3.3.3+\r\n",
+            "slug": "escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-java-ee-with-richfaces"
+        },
+        {
+            "contextrulesets": [],
+            "url": "https://m1.sdelements.com/library/tasks/T36/escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-java-ee-with-struts-1x/",
+            "title": "I48: Java EE with Struts 1.x",
+            "id": "I48",
+            "content": "## Description\r\n\r\nThe following Struts tags encode data in normal HTML safely because they have the \"escape\" attribute set to \"True\" by default. However, the tags themselves cannot be used safely *within* an HTML attribute, JavaScript, or CSS without the use of an escaping function in Expression Language (such as the \"esapi:escapeForHTMLAttributes()\" function):\r\n\r\n * bean:Write  \r\n * html:Hidden  \r\n * html:Messages (if the value is String)  \r\n * html:OptionsCollection  \r\n * html:Options  \r\n * html:Radio  \r\n * html:TextArea  \r\n * html:Password  \r\n * html:Text  \r\n\r\nNote that \"html:Option\" is NOT HTML-encoded by default; you must set the \"filter\" attribute to \"true.\"\r\nDo not trust any other Struts tag to sanitize output for the web properly. If you must use un-trusted text to display within HTML, consider use the ESAPI Express Language functions esapi:escapeForHTML(), etc.\r\n\r\n## 3rd Party Libraries\r\n\r\nStruts 1.x\r\n",
+            "slug": "escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-java-ee-with-struts-1x"
+        },
+        {
+            "contextrulesets": [],
+            "url": "https://m1.sdelements.com/library/tasks/T36/escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-java-ee-with-spring-mvc-2x/",
+            "title": "I49: Java EE with Spring MVC 2.x",
+            "id": "I49",
+            "content": "## Description\r\n\r\nThe Spring MVC tag library provides an option to auto-escape all output tags in the page. In addition, there is an option to perform JavaScript escaping in the context of JavaScript. For escaping for CSS and HTML attributes, use escaping functions in Expression Language (such as the \"esapi:escapeForHTMLAttributes()\" function).\r\n\r\n## 3rd Party Libraries\r\n\r\nSpring MVC 2.x\r\n",
+            "slug": "escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-java-ee-with-spring-mvc-2x"
+        },
+        {
+            "contextrulesets": [
+                {
+                    "required": [
+                        {
+                            "type": "file-type",
+                            "value": "aspx"
+                        }
+                    ],
+                    "excluded": []
+                }
+            ],
+            "url": "https://m1.sdelements.com/library/tasks/T36/escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-aspnet/",
+            "title": "I95: ASP.Net / C#",
+            "id": "I95",
+            "content": "## Description\r\n\r\nWe recommend using Microsoft's Anti-XSS library. If you are unable to use that library, ensure you use the correct library for the context. Use the following methods from .NET `System.Web.HttpUtility` class:\r\n\r\n- `UrlEncode`: for locations inside CSS, Javascript Blocks, and Html Attributes.\r\n- `HtmlEncode`: for locations inside HTML Element's InnerHTML.\r\nNote that for HTML attributes in particular, the single-quote (') and <space> are not encoded by `Server.UrlEncode`. This leaves an attribute vulnerable to Cross-Site Scripting (XSS) in certain browsers. Either explicitly validate for the absence of these characters in HTML attributes, or manually translate the characters to their safe HTML-escaped equivalents prior to outputting them to HTML.\r\n\r\n\r\n## Code\r\n\r\n    <%@ Page Language=\"C#\" AutoEventWireup=\"true\"\r\n                   validateRequest = \"false\" %>\r\n\r\n    <script runat=\"server\">\r\n\r\n\r\n            string testPayload = \r\n                \"; : }%0a.css{css:payload} ' = &quot;><h3>payload\";\r\n            string fontSize;\r\n\r\n            protected void Page_Load(object sender, EventArgs e)\r\n        {\r\n            fontSize = Request[\"FontSize\"] ?? \"10\"; // load questdata if exists\r\n            Literal1.Text = \"Font size: \" +  Server.HtmlEncode(fontSize);\r\n        }\r\n    </script>\r\n\r\n    <html>\r\n    <head>\r\n        <style type=\"text/css\">\r\n            <!-- payload is inserted in the CSS -->\r\n            .textCss {\r\n                font-family:verdana;\r\n                font-size:<%= Server.UrlEncode(fontSize)%>px;\r\n            }\r\n        </style>\r\n    </head>\r\n    <body>\r\n            <!-- payload is inserted inside an Javascript Block-->\r\n            <script language=\"Javascript\">\r\n                   var fontsize = '<%= Server.UrlEncode(fontSize) %>';\r\n                   document.write(\"The font size is: \" + fontsize);\r\n                   document.write(\"<hr>\");\r\n            </script>\r\n            <form id=\"form2\" runat=Server>\r\n                <div class=\"textCss\">\r\n                       <!-- payload is inserted inside an HTML Element -->\r\n                           This is a test with font size: \r\n                           <%= Server.HtmlEncode(fontSize)%><br/>\r\n\r\n                           <!-- \r\n                                payload is inserted inside an Server-Side \r\n                                ASP Literal control \r\n                           -->\r\n                           <asp:Literal \r\n                                ID=\"Literal1\" \r\n                                runat=Server \r\n                                text=\"Literal value\"/>\r\n                           <br/>\r\n\r\n                           <!-- \r\n                                payload is inserted inside an HTML Attribute \r\n                                using Double-Quotes (safe)\r\n                            -->\r\n    <a href=\"Using_HttpUtility.aspx?FontSize=<%=Server.UrlEncode(fontSize) %>\">\r\n        Reload with font size\r\n    </a>\r\n\r\n                           <!-- Helper links-->\r\n                           <hr/>\r\n                           <a href=\"Using_HttpUtility.aspx?FontSize=10\">\r\n                                Reload with font size 10\r\n                            </a><br/>\r\n           <a href=\"Using_HttpUtility.aspx?FontSize=<%=testPayload%></h3>\">\r\n                Reload with XSS test Payload\r\n            </a><br/>\r\n                   </div>\r\n            </form>\r\n    </body>\r\n    </html>\r\n\r\n[Download the Complete Code Example]({{ USE_MEDIA_URL }}code/DotNet/DotNet.Escape untrusted data in HTML CSS and JScript.zip){@class=code-download}\r\n",
+            "slug": "escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-aspnet"
+        },
+        {
+            "contextrulesets": [
+                {
+                    "required": [
+                        {
+                            "type": "file-type",
+                            "value": "aspx"
+                        }
+                    ],
+                    "excluded": []
+                }
+            ],
+            "url": "https://m1.sdelements.com/library/tasks/T36/escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-aspnet-with-microsoft-anti-xss/",
+            "title": "I96: ASP.Net / C# with Microsoft Anti XSS",
+            "id": "I96",
+            "content": "## Description\r\n\r\nMicrosoft published the Anti-XSS library, which contains a number of specific Encoding methods depending on the context: HtmlEncode, HtmlAttributeEncode, UrlEncode, JavaScriptEncode, VisualBasicScriptEncode, XmlEncode, and XmlAttributeEncode.\r\n\r\n## Code\r\n\r\n    <%@ Page Language=\"C#\" AutoEventWireup=\"true\"\r\n      validateRequest = \"false\"\r\n       Debug = \"true\" %>\r\n    <%@ Import Namespace = \"Microsoft.Security.Application\" %>\r\n\r\n    <script runat=\"server\">\r\n     string testPayload = \" ' ; : }%0a.css{css:payload} ' &quot;><h3>payload\";\r\n     string fontSize;\r\n\r\n     protected void Page_Load(object sender, EventArgs e)\r\n        {\r\n         fontSize = Request[\"FontSize\"] ?? \"10\"; // load questdata if exists\r\n         Literal1.Text = \"Font size: \" +  AntiXss.HtmlEncode(fontSize);\r\n        }\r\n    </script>\r\n\r\n    <html>\r\n    <head>\r\n        <style type=\"text/css\">      aksdlkasjf\r\n         <!-- payload is inserted in the CSS -->\r\n      .textCss {\r\n        font-family:verdana;\r\n        font-size:<%= AntiXss.UrlEncode(fontSize)%>px;\r\n      }\r\n     </style>\r\n    </head>\r\n    <body>\r\n     <!-- payload is inserted inside an Javascript Block-->\r\n     <script language=\"Javascript\">\r\n      var fontsize = '<%=AntiXss.JavaScriptEncode(fontSize,false) %>;\r\n      document.write(\"The font size is: \" + fontsize);\r\n\r\n      //using AntiXss.JavaScriptEncode without single-quotes\r\n      var fontsize1 = <%=AntiXss.JavaScriptEncode(fontSize,true) %>;\r\n      var fontsize2 = <%=AntiXss.JavaScriptEncode(fontSize) %>;\r\n     </script>\r\n     <form id=\"form2\" runat=Server>\r\n         <div class=\"textCss\">\r\n          <!-- payload is inserted inside an HTML Element -->\r\n       This is a test with font size: <%= AntiXss.HtmlEncode(fontSize)%><br/>\r\n\r\n       <!-- payload is inserted inside an Server-Side ASP Literal control -->\r\n       <asp:Literal ID=\"Literal1\" runat=Server text=\"Literal value\"/><br/>\r\n\r\n       <!-- payload is inserted inside an HTML Attribute-->\r\n       <a href=\"Using_AntiXSS_Methods.aspx?FontSize=<%=\r\n            AntiXss.HtmlAttributeEncode(fontSize) %>\">\r\n        Reload with font size\r\n       </a>\r\n\r\n       <!-- Helper links-->\r\n       <hr/>\r\n       <a href=\"Using_AntiXSS_Methods.aspx?FontSize=10\">\r\n        Reload with font size 10\r\n       </a><br/>\r\n       <a href=\"Using_AntiXSS_Methods.aspx?FontSize=<%=testPayload%></h3>\">\r\n        Reload with XSS test Payload\r\n       </a><br/>\r\n\r\n      </div>\r\n     </form>\r\n    </body>\r\n    </html>\r\n\r\n[Download the Complete Code Example]({{ USE_MEDIA_URL }}code/DotNet/DotNet.Escape untrusted data in HTML CSS and JScript.zip){@class=code-download}\r\n\r\n## 3rd Party Libraries\r\n\r\nMicrosoft Anti XSS\r\n",
+            "slug": "escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-aspnet-with-microsoft-anti-xss"
+        },
+        {
+            "contextrulesets": [],
+            "url": "https://m1.sdelements.com/library/tasks/T36/escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-rails/",
+            "title": "I236: Rails",
+            "id": "I236",
+            "content": "## Description\r\n\r\nRails 3 usually automatically escapes strings marked as not \"HTML safe\" in Rails views.\r\nFor example:\r\n\r\n    <%= user.first_name %>\r\n\r\nHTML safe strings are basically the strings produced by standard Rails helpers such as\r\nlink_to() because they already internally escape the supplied values. All other strings are\r\nHTML unsafe. Manually escaping strings with the h() method will also mark them as\r\n\"HTML safe\". Here are some examples:\r\n\r\n    @user.first_name.html_safe? #=> false\r\n    h(@project.name).html_safe? #=> true\r\n    link_to(...).html_safe? #=> true\r\n\r\nNote that concatenating two \"HTML safe\" strings with +, << or string.concat() will produce\r\na HTML safe string. However, if one of the strings is unsafe, the whole result will be unsafe\r\n(and thus automatically escaped). String interpolation is deliberately unsafe:\r\n\r\n    <%= \"Go to: #{link_to(@user.name, @user)}\u201c %>\r\n\r\nYou can also print out the raw HTML but you\u02bbve to make sure that it doesn\u02bbt contain any\r\nunexpected HTML/JavaScript. The auto_link() method automatically creates links so you\r\ndon\u02bbt want the result to be escaped:\r\n\r\n    <%= raw auto_link(@product.description) %>\r\n\r\nHowever note that the description may contain other HTML which has to be removed with\r\nthe sanitize() method before:\r\n\r\n    <%= sanitize auto_link(@product.description) %>\r\n\r\nThe sanitize() method is based on regular expressions which might be weaker than a real\r\nparser. It\u02bbs recommended to use the gem sanitize (https://github.com/rgrove/sanitize)\r\ninstead.\r\n\r\nBeware of string manipulations directly in the view which might be vulnerable:\r\n\r\n    <%= link_to('hello world', @user).sub(/hello/, params[:xss]) %>\r\n\r\nMoreover, make sure that you escape strings in RJS templates (\"Ajax\") yourself if they\u02bbre\r\nnot HTML safe:\r\n\r\n    page.replace_html :notice, \"Updated product #{h(@product.title)}\"\r\n\r\nHTML tag attributes are also automatically escaped when using a Rails helper. That way\r\nthe user_type attribute in the following example may not introduce new attributes or tags:\r\n\r\n    <%= content_tag(:tr, :class => user.user_type) do ... end %>\r\n\r\nFor a CSS environment there is an sanitization method, but you can also use h()\r\ndepending on the expected input:\r\n\r\n    <%= content_tag(:tr, :style => sanitize_css(\"color:\r\n        #{user.bgcolor};\")) do .. end %>\r\n\r\nThe escape_javascript method replaces carrier returns and single and double quotes in an\r\nJavaScript environment:\r\n\r\n    $('#some_div').innerHTML=\"<%=escape_javascript(...) %>\";\r\n\r\n## Code\r\n\r\n -- app/views/users/index.html.erb\r\n\r\n    ...\r\n    <%= content_tag :tr, :class => user.user_type, \r\n        :style => sanitize_css(\"color: #{user.bgcolor};\") do %>\r\n    ...\r\n\r\n[Download the Complete Code Example]({{ USE_MEDIA_URL }}code/Rails/escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript.zip){@class=code-download}\r\n",
+            "slug": "escape-untrusted-data-in-html-html-attributes-cascading-style-sheets-and-javascript-rails"
+        },
+        {
+            "contextrulesets": [],
+            "url": "https://m1.sdelements.com/library/tasks/T36/apex/",
+            "title": "I350: Apex",
+            "id": "I350",
+            "content": "*Note: This content has been extracted from the DeveloperForce [Secure Coding Guideline](http://wiki.developerforce.com/page/Secure_Coding_Guideline). Content is courtesy of salesforce.com*\r\n\r\nAll standard Visualforce components (tags of the form `<apex:...>`) have anti-XSS filters in place. For example, the following code would normally be vulnerable to an XSS attack because it takes user-supplied input and outputs it directly back to the user. But the `<apex:outputText>` tag is XSS-safe. All characters that appear to be HTML tags will be converted to their literal form. For example, the `<` character will be converted to `&lt;` so that a literal `<` will display on the user\u2019s screen.\r\n\r\n    <apex:outputText>\r\n    {!$CurrentPage.parameters.userInput}\r\n    </apex:outputText>\r\n\r\n# Exceptions to watch for\r\n\r\nIt is possible to disable this protection by adding the `escape=\"false\"` attribute to the outputText. Avoid setting this attribute to false whenever possible, unless you are certain than the text within cannot contain un-trusted / user-supplied data.\r\n\r\nIn addition, note that the `<apex:includeScript>` tag may be susceptible to XSS if users can influence the value attribute.\r\n\r\n\r\n",
+            "slug": "apex"
+        }
+    ],
+    "phase": "requirement",
+    "id": "1296-T36",
+    "categories": [
+        "Output Encoding"
+    ],
+    "priority": 8,
+    "weakness": {
+        "content": "Cross-site scripting (XSS) vulnerabilities occur when the software does not neutralize or incorrectly neutralizes user-controllable input before it is placed in output. \r\n\r\nOnce the malicious script is injected, the attacker can perform a variety of malicious activities. The attacker could transfer private information, such as cookies that may include session information, from the victim's machine to the attacker. \r\n\r\nThe attacker could send malicious requests to a web site on behalf of the victim, which could be especially dangerous to the site if the victim has administrator privileges to manage that site. Phishing attacks could be used to emulate trusted web sites and trick the victim into entering a password, allowing the attacker to compromise the victim's account on that web site. \r\n\r\nFinally, the script could exploit a vulnerability in the web browser itself possibly taking over the victim's machine, sometimes referred to as \"drive-by hacking.\"In many cases, the attack can be launched without the victim even being aware of it. Even with careful users, attackers frequently use a variety of methods to encode the malicious portion of the attack, such as URL encoding or Unicode, so the request looks less suspicious.\r\n\r\n\r\n### Training\r\n * Learn about [cross site scripting](http://securitycompass.com/training/free/course-demos/modules/XSS/player.html)",
+        "cwe": [
+            {
+                "url": "http://cwe.mitre.org/data/definitions/79",
+                "title": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')",
+                "cwe_id": 79
+            }
+        ],
+        "id": "P632",
+        "title": "P632: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+    },
+    "title": "T36: Escape untrusted data in HTML, HTML attributes, Cascading Style Sheets and JavaScript",
+    "url": "https://m1.sdelements.com/library/tasks/T36/",
+    "age": "current",
+    "project": 1296,
+    "assigned_to": [],
+    "content": "Always escape untrusted data such as user-supplied HTTP parameters before printing them onto a web page. For example, HTML entities encode dangerous characters that are included inside of HTML. Doing so will decrease the risk of a Cross-Site Scripting (XSS) vulnerability.\r\n\r\nNote that any form of output on a web page may be vulnerable to script injection. The rules for encoding the data will differ by the form of output. In most cases, web applications use untrusted data within HTML; however, your application may dynamically generate JavaScript, Cascading Style Sheets (CSS), or Adobe Flash data based on untrusted data. The rules on how to escape characters differ by format.\r\n\r\nThe best approach to escaping is to use a white-list: escape all characters unless you explicitly know them to be safe (such as Unicode letters and numbers). However, in some cases this approach may be infeasible. At a minimum, encode known special characters for each output format.\r\n\r\nYou can review existing encoding implementations as a reference. For example, the OWASP Enterprise Security API provides implementation of the encoder interface, which enables encoding data in several formats, including, HTML, HTML attributes, CSS and JavaScript.",
+    "verification_coverage": [
+        "No Automated Dynamic Analysis Coverage"
+    ]
+}

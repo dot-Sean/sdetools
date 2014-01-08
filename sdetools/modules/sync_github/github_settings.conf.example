@@ -116,13 +116,6 @@ alm_standard_workflow = True
 #Username of the repository owner
 github_repo_owner = repo_owner
 
-#The status of a TODO task in GitHub
-github_new_status = open
-
-#A comma delimited list of statuses in GitHub that are the
-#equivalent of DONE in SDE
-github_done_statuses = closed
-
 #GitHub label for duplicate issues
 #Issues with this label will be ignored during the sync
 github_duplicate_label = duplicate

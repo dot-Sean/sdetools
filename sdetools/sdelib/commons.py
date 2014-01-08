@@ -65,3 +65,10 @@ def get_password():
 
 def urlencode_str(inp):
     return urllib.urlencode({'a':inp})[2:]
+
+
+def get_directory_of_current_module(self):
+    file_path = sys.modules[self.__module__].__file__
+    file_directory = os.path.dirname(file_path)
+
+    return file_directory

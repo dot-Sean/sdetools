@@ -7,7 +7,7 @@ from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
 from sdetools.modules.sync_jira.jira_soap import JIRASoapAPI
 from sdetools.modules.sync_jira.jira_plugin import JIRAConnector
 from sdetools.alm_integration.alm_plugin_base import AlmException
-from sdetools.sdelib.interactive_plugin import PluginError
+
 
 class Command(BaseCommand):
     help = 'JIRA <-> SDE sync utility.'
@@ -18,8 +18,8 @@ class Command(BaseCommand):
 
         # We start with REST to get configuration and other stuff right
         # Then we switch to SOAP for JIRA 4 if we need to
-        jbase = JIRARestAPI(self.config)
-        self.jira = JIRAConnector(self.config, jbase)
+        alm_api = JIRARestAPI(self.config)
+        self.jira = JIRAConnector(self.config, alm_api)
 
     def handle(self):
         api_ver = self.config['jira_version'][:1]

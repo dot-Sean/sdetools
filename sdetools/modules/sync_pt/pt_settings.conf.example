@@ -36,8 +36,8 @@ alm_pass = pt_passsword
 #access. If you supply a token you don't have to supply a user/pass
 alm_api_token = pt_api_token
               
-#PivotalTracker project id
-alm_project = pt_project_id
+#PivotalTracker project name
+alm_project = pt_project_name
           
 #A comma-delimited list of statuses for tasks
 #that you wish to import into the ALM.
@@ -67,16 +67,16 @@ alm_phases = requirements
 
 #Which system takes precedence in case of
 #confliciting status. For example, if you mark
-#an issue as Closed in JIRA and the task is TODO in
+#an issue as Closed in Pivotal Tracker and the task is TODO in
 #SD Elements, it will be changed to DONE in SD Elemenets.
 #If you mark a task as Done in SD Elements, but it's still
-#Open in JIRA, the task will automatically revert back
+#Open in Pivotal Tracker, the task will automatically revert back
 #to TODO in SD Elements.
 #Valid values:
-#alm -> ALM tool (i.e JIRA) takes precedence
+#alm -> ALM tool (i.e Pivotal Tracker) takes precedence
 #sde -> SDE takes precedence
 #Note that timezone is currently unsupported
-#since JIRA does not provide timezone support
+#since Pivotal Tracker does not provide timezone support
 conflict_policy = alm
 
 #[Optional] Select certain tasks to sync
@@ -90,7 +90,7 @@ conflict_policy = alm
 #This is a JSON representation of a list of ranges mapped to certain
 #labels in PivotalTracker. Make sure to cover all priorities 1 to 10. Note that
 #the ranges are inclusive
-#alm_priority_map = {"1-6":"Trivial", "7-9":"Major", "10":"Blocker"}
+#alm_priority_map = {"1-3":"Low", "4-6":"Medium", "7-10":"High"}
 
 #[Optional] ALM Project Version
 #The name of the release marker you wish to place all new
@@ -111,12 +111,17 @@ alm_standard_workflow = True
 pt_story_type = bug
 
 #PT state for newly created story
-#Note: unscheduled puts the story in the icebox, unstarted puts it in backlog/current sprint
-pt_new_status = unstarted
+#Note: unscheduled puts the story in the icebox, unstarted/started puts it in backlog/current sprint
+#Expects one of [unstarted, unscheduled, started]
+pt_new_status = unscheduled
 
-#A comma delimited list of statuses that signify a task is 
-#Done in PT.
+#A comma delimited list of statuses that signify a task is Done in PT.
+#This status cannot be one of the new statuses or the 'rejected' status
 pt_done_statuses = accepted
 
 #[Optional] Specify a label to group all stories created by sync tool
 #pt_group_label = SD Elements
+
+#[Optional] Specify an estimate to apply to all newly added stories as well as
+#unestimated stories that are set to DONE during the sync 
+#pt_default_estimate = 0
