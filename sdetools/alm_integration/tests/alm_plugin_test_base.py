@@ -115,7 +115,7 @@ class AlmPluginTestBase(object):
 
         self.assertNotNone(test_task_result, 'Failed retrieve newly added task')
 
-    def test_alm_connect(self):
+    def test_alm_test_connect(self):
         self.connector.config['test_alm'] = 'project'
         self.connector.synchronize()
 
@@ -203,6 +203,7 @@ class AlmPluginTestBase(object):
                 self.connector.synchronize()
                 test_task = self.mock_sde_response.generate_sde_task(phase='testing')
                 requirement_task = self.mock_sde_response.generate_sde_task(phase='requirements')
+                self.assertNotNone(requirement_task, 'Expected requirements task to be generated')
                 self.connector.synchronize()
                 raise Exception('Expected an AlmException to be thrown for the following target: %s' % api_target)
             except AlmException:
