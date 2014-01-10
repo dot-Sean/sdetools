@@ -223,14 +223,6 @@ class AlmPluginTestBase(object):
             raise AssertionError(msg)
 
     @staticmethod
-    def assertNone(obj, msg=None):
-        if obj is not None:
-            if not msg:
-                msg = 'Expected None'
-
-            raise AssertionError(msg)
-
-    @staticmethod
     def assertMatch(regex, str, msg):
         pattern = re.compile(regex)
         result = pattern.match(str)
