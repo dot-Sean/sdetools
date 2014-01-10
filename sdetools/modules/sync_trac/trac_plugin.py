@@ -28,8 +28,9 @@ class TracXMLRPCAPI(RESTBase):
             self.base_path)
 
     def connect(self):
-        self.post_conf_init()
-        self.proxy = xmlrpclib.ServerProxy(self.base_uri)
+        if self.proxy is None:
+            self.post_conf_init()
+            self.proxy = xmlrpclib.ServerProxy(self.base_uri)
 
 class TracTask(AlmTask):
     """ Representation of a task in Trac"""
