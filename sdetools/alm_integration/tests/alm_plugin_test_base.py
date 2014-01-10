@@ -115,9 +115,28 @@ class AlmPluginTestBase(object):
 
         self.assertNotNone(test_task_result, 'Failed retrieve newly added task')
 
-    def test_update_task_status_to_done(self):
+    def test_alm_connect(self):
+        self.connector.config['test_alm'] = 'project'
+        self.connector.synchronize()
+
+    def test_update_existing_task_sde(self):
+        # The plugin may initialize variables during alm_connect() so we need
+        # to call alm_connect() before proceeding
+        self.connector.config['conflict_policy'] = 'sde'
+        self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
+        self.connector.synchronize()
+        alm_task = self.connector.alm_get_task(test_task)
+        self.connector.alm_update_task_status(alm_task, 'DONE')
+
+    def test_update_task_status_to_done(self):
+        self.connector.config['conflict_policy'] = 'alm'
+        self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
+        self.connector.alm_connect()
+        # Most of the module test configurations set the minimum priority to be 8
+        # so we will create a task with this priority to make sure its in scope
+        test_task = self.mock_sde_response.generate_sde_task(priority=8)
         self.connector.alm_add_task(test_task)
         alm_task = self.connector.alm_get_task(test_task)
 
@@ -128,6 +147,9 @@ class AlmPluginTestBase(object):
         test_task_result = self.connector.alm_get_task(test_task)
 
         self.assertEqual(test_task_result.get_status(), 'DONE', 'Failed to update task status to DONE')
+        self.connector.synchronize()
+        the_task = self.connector.sde_get_task(test_task['id'])
+        self.assertEqual(the_task['status'], 'DONE', 'Failed to update SDE task to DONE')
 
     def test_update_task_status_to_na(self):
         self.connector.alm_connect()
@@ -167,6 +189,7 @@ class AlmPluginTestBase(object):
             self.tearDown()
             self.setUp()
             self.connector.config['conflict_policy'] = 'sde'
+            self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
             self.mock_sde_response.get_response_generator().generator_clear_resources()
             # All response methods should throw an exception if the fail flag is encountered
             self.mock_alm_response.set_response_flags({mock_flag: 'fail'})
@@ -177,6 +200,9 @@ class AlmPluginTestBase(object):
                 test_task = self.mock_sde_response.generate_sde_task()
                 test_task['status'] = 'DONE'
                 self.connector.alm_add_task(test_task)
+                self.connector.synchronize()
+                test_task = self.mock_sde_response.generate_sde_task(phase='testing')
+                requirement_task = self.mock_sde_response.generate_sde_task(phase='requirements')
                 self.connector.synchronize()
                 raise Exception('Expected an AlmException to be thrown for the following target: %s' % api_target)
             except AlmException:

@@ -27,7 +27,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
             '%s/test-folders' % project_uri: 'call_test_folders',
             '%s/tests' % project_uri: 'call_tests',
             '/qcbin/authentication-point/logout': 'logout',
-            '%s/requirement\-coverages' % project_uri: 'call_requirement_coverage'
+            '%s/requirement-coverages' % project_uri: 'call_requirement_coverage'
         }
         super(HPAlmResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir)
 

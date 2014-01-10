@@ -484,7 +484,7 @@ class AlmConnector(object):
                         elif self.config['conflict_policy'] == 'timestamp':
                             sde_time = datetime.fromtimestamp(task['timestamp'])
                             alm_time = alm_task.get_timestamp()
-                            logger.debug('comparing timestamps for task %s - SDE: %s, ALM: %s' %
+                            logger.debug('Comparing timestamps for task %s - SDE: %s, ALM: %s' %
                                           (task['id'], str(sde_time), str(alm_time)))
                             if sde_time > alm_time:
                                 precedence = 'sde'

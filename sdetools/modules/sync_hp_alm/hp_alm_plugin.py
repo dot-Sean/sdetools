@@ -136,6 +136,7 @@ class HPAlmConnector(AlmConnector):
         self.project_uri = 'rest/domains/%s/projects/%s' % (urlencode_str(self.config['hp_alm_domain']),
                                                             urlencode_str(self.config['alm_project']))
         self.test_plan_folder_id = None
+        self.hp_alm_test_type_id = None
         #We will map requirements its associated tests based on the problem id
         self.requirement_to_test_mapping = {}
 
@@ -210,7 +211,7 @@ class HPAlmConnector(AlmConnector):
         self.issue_type = self._validate_entity_type('requirement', self.config['hp_alm_issue_type'])
 
         # Check test plan type
-        self.config['hp_alm_test_type'] = self._validate_entity_type('test', self.config['hp_alm_test_type'])
+        self.hp_alm_test_type_id = self._validate_entity_type('test', self.config['hp_alm_test_type'])
 
         # Check statuses
         try:
@@ -304,7 +305,7 @@ class HPAlmConnector(AlmConnector):
 
         field_data.extend([
             ('parent-id', self.test_plan_folder_id),
-            ('subtype-id', self.config['hp_alm_test_type']),
+            ('subtype-id', self.hp_alm_test_type_id),
             ('owner', self.config['alm_user']),
             ('status', 'Imported')
         ])
@@ -404,7 +405,7 @@ class HPAlmConnector(AlmConnector):
         try:
             self._call_api('authentication-point/logout')
         except APIError, err:
-            logger.warn('Unable to logout from HP Alm. Reason: %s' % (str(err)))
+            raise AlmException('Unable to logout from HP Alm. Reason: %s' % (str(err)))
 
     def convert_markdown_to_alm(self, content, ref):
         return '<html>'+self.mark_down_converter.convert(content)+'</html>'
@@ -413,7 +414,7 @@ class HPAlmConnector(AlmConnector):
         """ Translates an SDE priority into a HP ALM priority """
         try:
             priority = int(priority)
-        except (TypeError):
+        except TypeError:
             logger.error('Could not coerce %s into an integer' % priority)
             raise AlmException("Error in translating SDE priority to HP Alm: "
                                "%s is not an integer priority" % priority)
