@@ -7,10 +7,17 @@ from sdetools.sdelib.restclient import URLRequest, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmConnector
 from sdetools.alm_integration.alm_plugin_base import AlmException
 from rdflib import Graph, term
+import re
 
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
+def trunc_uri(victim):
+        victim = str(victim)
+        uri_start = victim.find('http')
+        uri_end = victim.find("'),)")
+        uri = victim[uri_start:uri_end]
+        return uri
 
 class OSLCAPI(RESTBase):
 
@@ -18,7 +25,7 @@ class OSLCAPI(RESTBase):
 
     def __init__(self, config):
         super(OSLCAPI, self).__init__('alm', 'OSLC', config)
-        self.rdf_graph = Graph()
+        #self.rdf_graph = Graph()
 
     def post_conf_init(self):
         super(OSLCAPI, self).post_conf_init()
@@ -29,9 +36,9 @@ class OSLCAPI(RESTBase):
         return super(OSLCAPI, self).call_api(target, method, args, headers)
 
     def parse_response(self, result):
-        #print result
+        print result
         try:
-            result = self.rdf_graph.parse(data=result)
+            result = Graph().parse(data=result)
         except Exception, e:
             logger.error('Error parsing rdf+xml: %s' % e)
             raise AlmException('Unable to process RDF+XML data: %s' % str(result)[:200])
@@ -59,6 +66,7 @@ class OSLCConnector(AlmConnector):
         config.add_custom_option(self.ALM_PRIORITY_MAP, ('Customized map from priority in SDE to %s '
                                  '(JSON encoded dictionary of strings)' % self.OSLC_APP_NAME), default='')
 
+
     def alm_connect_server(self):
 
         try:
@@ -70,21 +78,22 @@ class OSLCConnector(AlmConnector):
         #    print s, p, o
         #print list(catalog.subjects())
 
-        rdf_query = "SELECT DISTINCT ?url WHERE  { ?url rdf:type <http://open-services.net/ns/core#ServiceProvider> . ?url dcterms:title ?u }"
-        o = catalog.query(rdf_query)
-        print o
-        for oo in o:
-            print "%s" % (oo)
-        print "DONE"
-        subj = term.URIRef(self.alm_plugin.base_uri+'/rootservices')
-        pred = term.URIRef(self.OSLC_SERVICE_PROVIDER)
+        rdf_query = "SELECT ?y WHERE { ?y ?x ?z FILTER (?z = <http://open-services.net/ns/cm#>) }"
+        uri = list(catalog.query(rdf_query))[0][0].toPython()
+
+        #subj = term.URIRef(self.alm_plugin.base_uri+'/rootservices')
+        #pred = term.URIRef(self.OSLC_SERVICE_PROVIDER)
         #objs = self.alm_plugin.rdf_graph.value(subject=subj, predicate=pred)
-        self.service_provider_uri = catalog.value(subject=subj, predicate=pred)
+        #self.service_provider_uri = catalog.value(subject=subj, predicate=pred)
+        self.service_provider_uri = uri
 
         if not self.service_provider_uri:
             raise AlmException('Service provider not found (Check server URL, user, pass).')
 
-        service_provider_target = self.service_provider_uri.replace(self.alm_plugin.base_uri+'/', '')
+        base_uri_end = len(self.alm_plugin.base_uri)+1
+
+        service_provider_target = uri[base_uri_end:]
+        print service_provider_target
         try:
             service_catalog = self.alm_plugin.call_api(service_provider_target)
         except APIError, err:
@@ -93,19 +102,29 @@ class OSLCConnector(AlmConnector):
         if not service_catalog:
             raise AlmException('Unable to connect retrieve service catalog (Check server URL, user, pass).')
 
+        del uri
         #for s, p, o in service_catalog:
         #    print s, p, o
         #print list(service_catalog)
         resource_url = None
         #for service_provider in service_catalog['oslc:serviceProvider']:
-        #    if service_provider['dcterms:title'] == self.config['alm_project']:
+        #    if service_provider['dc:title'] == self.config['alm_project']:
         #        resource_url = service_provider['rdf:about']
 
-        pred = term.URIRef("http://purl.org/dc/terms/title")
-        obj = term.Literal(self.config['alm_project'],
-                           datatype=term.URIRef(u'http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral'))
-
-        resource_url = service_catalog.value(predicate=pred, object=obj)
+        #pred = term.URIRef("http://purl.org/dc/terms/title")
+        #obj = term.Literal(self.config['alm_project'],
+        #                   datatype=term.URIRef(u'http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral'))
+        #print "START TEST"
+        print str(self.config['alm_project'])
+        rdf_query = 'SELECT DISTINCT ?x WHERE {?x ?y ?z FILTER (str(?z) = "' + str(self.config['alm_project']) + '")}'
+        print rdf_query
+        resource_url = list(service_catalog.query(rdf_query))[0][0].toPython()
+        #print list(resource_url)
+        #oo = list(resource_url)[0]
+        #uri = trunc_uri(str(oo))
+        #print uri
+        #print "END TEST"
+        #resource_url = uri
         if not resource_url:
             raise AlmException('Unable to connect retrieve resource url (Check server URL, user, pass).')
 
@@ -125,36 +144,56 @@ class OSLCConnector(AlmConnector):
         subj = bnode
 
         # Find the lookup/query url
-        pred = term.URIRef("http://open-services.net/ns/core#queryBase")
-        query_url = services.value(subject=subj, predicate=pred)
+
+        query_query = "SELECT ?x ?y ?z ?j ?k WHERE {?x ?y ?z ; ?j ?k . FILTER (?y = <http://open-services.net/ns/core#usage> && ?j = <http://open-services.net/ns/core#queryBase> )}"
+        query_url = list(services.query(query_query))[0][0].toPython()
         self.query_url = query_url.replace(self.alm_plugin.base_uri+'/', '')
 
         # Find the resource shape url
-        pred = term.URIRef("http://open-services.net/ns/core#resourceShape")
-        resource_shape_url = services.value(subject=subj, predicate=pred)
+        resource_shape_query = "SELECT ?k WHERE {?x ?y ?z ; ?j ?k . FILTER (?y = <http://open-services.net/ns/core#usage> && ?z = <http://open-services.net/ns/cm#task> && ?j = <http://open-services.net/ns/core#resourceShape>)}"
+        resource_shape_url = list(services.query(resource_shape_query))[0][0].toPython()
         self.resource_shape_url = resource_shape_url.replace(self.alm_plugin.base_uri+'/', '')
 
         # Find the creation url
-        pred = term.URIRef("http://open-services.net/ns/core#creation")
-        creation_url = services.value(subject=subj, predicate=pred)
+        creation_query = "SELECT ?k WHERE {?x ?y ?z ; ?j ?k . FILTER (?j = <http://open-services.net/ns/core#creation> && ?z =<http://open-services.net/ns/cm#task>)}"
+        creation_url = list(services.query(creation_query))[0][0].toPython()
         self.creation_url = creation_url.replace(self.alm_plugin.base_uri+'/', '')
 
         # Grab the priorities
-        self.priorities = self._rtc_get_priorities()
+        self.priorities = self._rtc_get_priorities_not_plugin()
 
-    def _rtc_get_priorities(self):
+    def _rtc_get_priorities_not_plugin(self):
 
         try:
             resource_shapes = self.alm_plugin.call_api(self.resource_shape_url)
         except APIError, err:
             raise AlmException('Unable to get resource shapes')
 
+        #  CHANGEME
+        #priority_about = trunc_uri(list(resource_shapes.query('SELECT DISTINCT ?x WHERE {?x ?y ?z ; ?j ?k . FILTER (?z = <http://open-services.net/ns/cm-x#priority>)}'))[0])
+        priority_allowed_val = list(resource_shapes.query('SELECT DISTINCT ?k WHERE {?x ?y ?z ; ?j ?k . FILTER (?z = <http://open-services.net/ns/cm-x#priority> && ?j = <http://open-services.net/ns/core#allowedValues>)}'))[0][0].toPython()
+        print priority_allowed_val
         priorities = []
-        for rs in resource_shapes['oslc:property']:
-            if rs['oslc:name'] == 'priority':
-                #print json.dumps(rs,indent=4)
-                for p in rs['oslc:allowedValues']['oslc:allowedValue']:
-                    priorities.append(self._get_priority_details(p['rdf:resource']))
+        priority_allowed_val = priority_allowed_val.replace(self.alm_plugin.base_uri+'/', '')
+        print priority_allowed_val
+        priority_literals = self.alm_plugin.call_api(priority_allowed_val)
+        literals_list_temp = list(priority_literals.query('SELECT DISTINCT ?z WHERE {?x ?y ?z FILTER (?y = <http://open-services.net/ns/core#allowedValue>)}'))
+        print literals_list_temp
+        for x in literals_list_temp:
+            priority = self._get_priority_details(x[0].toPython())
+            priority_name = list(priority.query('PREFIX dcterms: <http://purl.org/dc/terms/> SELECT ?z  WHERE {?x dcterms:title ?z}'))[0][0].toPython()
+            priority_uri = list(priority.query('SELECT Distinct ?x WHERE {?x ?y ?z}'))[0][0].toPython()
+            print priority_name
+            priorities.append((priority_name, priority_uri))
+        del literals_list_temp
+        priorities = dict(priorities)
+        print priorities
+
+        #for rs in resource_shapes['oslc:property']:
+        #    if rs['oslc:name'] == 'priority':
+        #        #print json.dumps(rs,indent=4)
+        #        for p in rs['oslc:allowedValues']['oslc:allowedValue']:
+        #            priorities.append(self._get_priority_details(p['rdf:resource']))
 
         return priorities
 
@@ -170,11 +209,11 @@ class OSLCConnector(AlmConnector):
         #print json.dumps(priority_details,indent=4)
         return priority_details
 
-    def _get_priority_literal(self, priority_name):
-        for priority in self.priorities:
-            if priority['dcterms:title'] == priority_name:
-                return priority['rdf:about']
-        return None
+    #def _get_priority_literal(self, priority_name):
+    #    for priority in self.priorities:
+    #        if priority['dcterms:title'] == priority_name:
+    #            return priority['rdf:about']
+    #    return None
 
     def get_item(self, query_str):
 
