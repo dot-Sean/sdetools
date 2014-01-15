@@ -68,10 +68,10 @@ class OSLCConnector(AlmConnector):
                                'Reason: %s' % str(err))
         #for s, p, o in catalog:
         #    print s, p, o
-        #print list(catalog.subjects())
+        #print catalog.subjects().result
 
         rdf_query = "SELECT ?y WHERE { ?y ?x ?z FILTER (?z = <http://open-services.net/ns/cm#>) }"
-        uri = list(catalog.query(rdf_query))[0][0].toPython()
+        uri = catalog.query(rdf_query).result[0][0].toPython()
 
         #subj = term.URIRef(self.alm_plugin.base_uri+'/rootservices')
         #pred = term.URIRef(self.OSLC_SERVICE_PROVIDER)
@@ -111,7 +111,7 @@ class OSLCConnector(AlmConnector):
         #print str(self.config['alm_project'])
         rdf_query = 'SELECT DISTINCT ?x WHERE {?x ?y ?z FILTER (str(?z) = "' + str(self.config['alm_project']) + '")}'
         #print rdf_query
-        resource_url = list(service_catalog.query(rdf_query))[0][0].toPython()
+        resource_url = service_catalog.query(rdf_query).result[0][0].toPython()
         #print list(resource_url)
         #oo = list(resource_url)[0]
         #uri = trunc_uri(str(oo))
@@ -139,17 +139,17 @@ class OSLCConnector(AlmConnector):
         # Find the lookup/query url
 
         query_query = "SELECT ?x ?y ?z ?j ?k WHERE {?x ?y ?z ; ?j ?k . FILTER (?y = <http://open-services.net/ns/core#usage> && ?j = <http://open-services.net/ns/core#queryBase> )}"
-        query_url = list(services.query(query_query))[0][0].toPython()
+        query_url = services.query(query_query).result[0][0].toPython()
         self.query_url = query_url.replace(self.alm_plugin.base_uri+'/', '')
 
         # Find the resource shape url
         resource_shape_query = "SELECT ?k WHERE {?x ?y ?z ; ?j ?k . FILTER (?y = <http://open-services.net/ns/core#usage> && ?z = <http://open-services.net/ns/cm#task> && ?j = <http://open-services.net/ns/core#resourceShape>)}"
-        resource_shape_url = list(services.query(resource_shape_query))[0][0].toPython()
+        resource_shape_url = services.query(resource_shape_query).result[0][0].toPython()
         self.resource_shape_url = resource_shape_url.replace(self.alm_plugin.base_uri+'/', '')
 
         # Find the creation url
         creation_query = "SELECT ?k WHERE {?x ?y ?z ; ?j ?k . FILTER (?j = <http://open-services.net/ns/core#creation> && ?z =<http://open-services.net/ns/cm#task>)}"
-        creation_url = list(services.query(creation_query))[0][0].toPython()
+        creation_url = services.query(creation_query).result[0][0].toPython()
         self.creation_url = creation_url.replace(self.alm_plugin.base_uri+'/', '')
 
         # Grab the priorities
@@ -163,19 +163,19 @@ class OSLCConnector(AlmConnector):
             raise AlmException('Unable to get resource shapes')
 
         #  CHANGEME
-        #priority_about = trunc_uri(list(resource_shapes.query('SELECT DISTINCT ?x WHERE {?x ?y ?z ; ?j ?k . FILTER (?z = <http://open-services.net/ns/cm-x#priority>)}'))[0])
-        priority_allowed_val = list(resource_shapes.query('SELECT DISTINCT ?k WHERE {?x ?y ?z ; ?j ?k . FILTER (?z = <http://open-services.net/ns/cm-x#priority> && ?j = <http://open-services.net/ns/core#allowedValues>)}'))[0][0].toPython()
+        #priority_about = trunc_uri(resource_shapes.query('SELECT DISTINCT ?x WHERE {?x ?y ?z ; ?j ?k . FILTER (?z = <http://open-services.net/ns/cm-x#priority>)}').result[0])
+        priority_allowed_val = resource_shapes.query('SELECT DISTINCT ?k WHERE {?x ?y ?z ; ?j ?k . FILTER (?z = <http://open-services.net/ns/cm-x#priority> && ?j = <http://open-services.net/ns/core#allowedValues>)}').result[0][0].toPython()
         #print priority_allowed_val
         priorities = []
         priority_allowed_val = priority_allowed_val.replace(self.alm_plugin.base_uri+'/', '')
         #print priority_allowed_val
         priority_literals = self.alm_plugin.call_api(priority_allowed_val)
-        literals_list_temp = list(priority_literals.query('SELECT DISTINCT ?z WHERE {?x ?y ?z FILTER (?y = <http://open-services.net/ns/core#allowedValue>)}'))
+        literals_list_temp = priority_literals.query('SELECT DISTINCT ?z WHERE {?x ?y ?z FILTER (?y = <http://open-services.net/ns/core#allowedValue>)}').result
         #print literals_list_temp
         for x in literals_list_temp:
             priority = self._get_priority_details(x[0].toPython())
-            priority_name = list(priority.query('PREFIX dcterms: <http://purl.org/dc/terms/> SELECT ?z  WHERE {?x dcterms:title ?z}'))[0][0].toPython()
-            priority_uri = list(priority.query('SELECT Distinct ?x WHERE {?x ?y ?z}'))[0][0].toPython()
+            priority_name = priority.query('PREFIX dcterms: <http://purl.org/dc/terms/> SELECT ?z  WHERE {?x dcterms:title ?z}').result[0][0].toPython()
+            priority_uri = priority.query('SELECT Distinct ?x WHERE {?x ?y ?z}').result[0][0].toPython()
             #print priority_name
             priorities.append((priority_name, priority_uri))
         del literals_list_temp
