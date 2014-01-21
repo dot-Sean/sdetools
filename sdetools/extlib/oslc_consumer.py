@@ -6,10 +6,12 @@ from sdetools.sdelib.restclient import RESTBase
 from sdetools.sdelib.restclient import URLRequest, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmConnector
 from sdetools.alm_integration.alm_plugin_base import AlmException
-from rdflib import Graph, term
+from rdflib import Graph, RDF, RDFS, Namespace, Literal, term
 
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
+DCTERMS = Namespace("http://purl.org/dc/terms/")
+OSLC = Namespace("http://open-services.net/ns/core#")
 
 class OSLCAPI(RESTBase):
 
@@ -22,9 +24,35 @@ class OSLCAPI(RESTBase):
     def post_conf_init(self):
         super(OSLCAPI, self).post_conf_init()
 
-    def call_api(self, target, method=URLRequest.GET, args=None):
+    def encode_post_args(self, args):
+        g = Graph()
+        print args
+        OSLC_CM = Namespace("http://open-services.net/ns/cm#")
+        OSLC_CMX = Namespace("http://open-services.net/ns/cm-x#")
+        try:
+            g.add((OSLC_CM.changerequest, DCTERMS.identifier, Literal(args['id'])))
+        except:
+            pass
+        try:
+            g.add((OSLC_CM.changerequest, DCTERMS.title, Literal(args['dcterms:title'])))
+        except:
+            pass
+        try:
+            g.add((OSLC_CM.changerequest, OSLC_CMX.priority, Literal(args['oslc_cmx:priority'])))
+        except:
+            pass
+        try:
+            g.add((OSLC_CM.changerequest, DCTERMS.description, Literal(args['dcterms:description'])))
+        except:
+            pass
+        try:
+            g.add((OSLC_CM.changerequest, OSLC_CM.status, Literal(args['oslc_cm:status'])))
+        except:
+            pass
+        return g.serialize()
 
-        headers = {'Accept': 'application/rdf+xml', 'OSLC-Core-Version': '2.0', 'Content-Type': 'application/rdf+xml'}
+    def call_api(self, target, method=URLRequest.GET, args=None, headers={'Accept': 'application/rdf+xml', 'OSLC-Core-Version': '2.0', 'Content-Type': 'application/rdf+xml'}):
+
         return super(OSLCAPI, self).call_api(target, method, args, headers)
 
     def parse_response(self, result):
@@ -138,9 +166,11 @@ class OSLCConnector(AlmConnector):
 
         # Find the lookup/query url
 
-        query_query = "SELECT ?x ?y ?z ?j ?k WHERE {?x ?y ?z ; ?j ?k . FILTER (?y = <http://open-services.net/ns/core#usage> && ?j = <http://open-services.net/ns/core#queryBase> )}"
+        query_query = "SELECT ?k WHERE {?x ?y ?z ; ?j ?k . FILTER (?y = <http://open-services.net/ns/core#usage> && ?j = <http://open-services.net/ns/core#queryBase> )}"
         query_url = services.query(query_query).result[0][0].toPython()
+        #print query_url
         self.query_url = query_url.replace(self.alm_plugin.base_uri+'/', '')
+        #print self.query_url
 
         # Find the resource shape url
         resource_shape_query = "SELECT ?k WHERE {?x ?y ?z ; ?j ?k . FILTER (?y = <http://open-services.net/ns/core#usage> && ?z = <http://open-services.net/ns/cm#task> && ?j = <http://open-services.net/ns/core#resourceShape>)}"
@@ -202,11 +232,11 @@ class OSLCConnector(AlmConnector):
         #print json.dumps(priority_details,indent=4)
         return priority_details
 
-    #def _get_priority_literal(self, priority_name):
-    #    for priority in self.priorities:
-    #        if priority['dcterms:title'] == priority_name:
-    #            return priority['rdf:about']
-    #    return None
+    def _get_priority_literal(self, priority_name):
+        try:
+            return self.priorities[priority_name]
+        except:
+            return None
 
     def get_item(self, query_str):
 
@@ -215,13 +245,28 @@ class OSLCConnector(AlmConnector):
         work_items = self.alm_plugin.call_api(target)
 
         #print json.dumps(work_items,indent=4)
-        if work_items['oslc:responseInfo']['oslc:totalCount'] == 0:
+        #if work_items['oslc:responseInfo']['oslc:totalCount'] == 0:
+        items_count = int(work_items.query('SELECT ?z WHERE {?x <http://open-services.net/ns/core#totalCount> ?z  }').result[0][0].toPython())
+        #print type(items_count)
+        if items_count == 0:
             return None
 
-        work_item_url = work_items['oslc:results'][0]['rdf:resource']
+        #work_item_url = work_items['oslc:results'][0]['rdf:resource']
+        work_item_url = work_items.query('SELECT ?z WHERE {?x <http://www.w3.org/2000/01/rdf-schema#member> ?z}').result[0][0].toPython()
+        #print work_item_url
         work_item_target = work_item_url.replace(self.alm_plugin.base_uri+'/', '')
+        workitem = self.alm_plugin.call_api(work_item_target)
+        result = []
+        date = workitem.query('PREFIX dcterms: <http://purl.org/dc/terms/> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> SELECT ?z WHERE {?x dcterms:modified ?z} ').result[0][0].toPython()
+        result.append(('modified', date))
+        ident = workitem.query('PREFIX dcterms: <http://purl.org/dc/terms/> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> SELECT ?z WHERE {?x dcterms:identifier ?z} ').result[0][0].toPython()
+        result.append(('identifier', ident))
+        about = workitem.query('select distinct ?x where {?x ?y ?z}').result[0][0].toPython()
+        result.append(('about', about))
+        status = workitem.query('select ?z where {?x <http://open-services.net/ns/cm#status> ?z}').result[0][0].toPython()
+        result.append(('status', status))
+        return dict(result)
 
-        return self.alm_plugin.call_api(work_item_target)
 
     def add_item(self, create_args):
 

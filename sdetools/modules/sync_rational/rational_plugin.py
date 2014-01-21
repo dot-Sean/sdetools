@@ -169,17 +169,16 @@ class RationalConnector(OSLCConnector):
 
         logger.info('Found task: %s', task_id)
         return RationalTask(task_id,
-                                  work_item['rdf:about'],
-                                  work_item['dcterms:identifier'],
-                                  work_item['oslc_cm:status'],
-                                  work_item['dcterms:modified'],
+                                  work_item['about'],
+                                  work_item['identifier'],
+                                  work_item['status'],
+                                  work_item['modified'],
                                   self.config[self.ALM_DONE_STATUSES])
 
     def alm_add_task(self, task):
 
         priority_name = self.translate_priority(task['priority'])
         priority_literal_resource = super(RationalConnector, self)._get_priority_literal(priority_name)
-
         create_args = {
             'dcterms:title': task['title'],
             'dcterms:description': "This is content",
@@ -193,8 +192,6 @@ class RationalConnector(OSLCConnector):
             raise AlmException('Unable to add task %s to RTC because of %s'
                                % (task['id'], err))
 
-        #print json.dumps(work_item,indent=4)
-        # API returns JSON of the new issue
         alm_task = RationalTask(task['title'],
                                       None, # try to fill this in later
                                       work_item['dcterms:identifier'],
