@@ -143,7 +143,7 @@ class RESTBase(object):
     def encode_post_args(self, args):
         return json.dumps(args)
 
-    def parse_response(self, result):
+    def parse_response(self, result, headers):
         try:
             result = json.loads(result)
         except:
@@ -268,7 +268,7 @@ class RESTBase(object):
             result += res_buf
         handle.close()
 
-        result = self.parse_response(result)
+        result = self.parse_response(result, dict(handle.headers))
 
         return result
 

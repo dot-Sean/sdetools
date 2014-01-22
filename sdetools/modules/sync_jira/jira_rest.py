@@ -9,11 +9,11 @@ class JIRARestAPI(RESTBase):
         super(JIRARestAPI, self).__init__('alm', 'JIRA', config, 'rest/api/2')
         self.versions = None
 
-    def parse_response(self, result):
+    def parse_response(self, result, headers):
         if result == "":
             return "{}"
         else:
-            return super(JIRARestAPI, self).parse_response(result)
+            return super(JIRARestAPI, self).parse_response(result, headers)
 
     def connect_server(self):
         """ Verifies that JIRA connection works """
