@@ -28,7 +28,7 @@ class HPAlmAPIBase(RESTBase):
     def __init__(self, config):
         super(HPAlmAPIBase, self).__init__('alm', 'HP Alm', config, 'qcbin')
 
-    def parse_response(self, result):
+    def parse_response(self, result, headers):
         if not result or result.strip() == "":
             return {}
         else:
