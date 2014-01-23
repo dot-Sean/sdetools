@@ -32,7 +32,8 @@ class TestRallyCase(AlmPluginTestBase, unittest.TestCase):
     def test_invalid_card_type(self):
         self.config['rally_card_type'] = 'BAD_CARD_TYPE'
 
-        self.assert_exception(AlmException, '', 'Invalid configuration for rally_card_type. Expected "Story"',
+        self.assert_exception(AlmException, '',
+                              'Invalid configuration for rally_card_type "BAD_CARD_TYPE". Expected one of Story, Task',
                               self.connector.alm_connect)
 
     def test_invalid_new_status(self):

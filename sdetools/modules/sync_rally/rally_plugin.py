@@ -183,13 +183,19 @@ class RallyConnector(AlmConnector):
 
         # Retrieve the reference for the parent Story
         if self.config['alm_parent_issue']:
-            rally_artifact = self.rally_get_artifact('(FormattedID = \"%s\")' % self.config['alm_parent_issue'], 'Story',
-                                                     'HierarchicalRequirement', 'hierarchicalrequirement')
+            rally_artifact = self.rally_get_artifact(self.config['alm_parent_issue'],
+                                                     '(FormattedID = \"%s\")' % self.config['alm_parent_issue'],
+                                                     'Story', 'HierarchicalRequirement', 'hierarchicalrequirement')
+
             if rally_artifact and 'FormattedID' in rally_artifact:
                 self.alm_parent_issue_ref = rally_artifact['_ref']
 
             if not self.alm_parent_issue_ref:
                 raise AlmException('Could not retrieve reference for %s' % self.config['alm_parent_issue'])
+
+        if self.config['rally_card_type'] not in self.card_types.keys():
+            raise AlmException("Invalid configuration for rally_card_type \"%s\". Expected one of %s" %
+                               (self.config['rally_card_type'], ', '.join(self.card_types.keys())))
 
         card_type_details = self.card_types[self.config['rally_card_type']]
 
@@ -228,7 +234,7 @@ class RallyConnector(AlmConnector):
                 return
         raise AlmException('Unable to retrieve allowed values for "%s"' % card_type_details['name'])
 
-    def rally_get_artifact(self, query, card_type, artifact_type, api):
+    def rally_get_artifact(self, name, query, card_type, artifact_type, api):
 
         query_args = {
             'query': query,
@@ -256,7 +262,7 @@ class RallyConnector(AlmConnector):
         card_type_details = self.card_types[self.config['rally_card_type']]
         task_id = self._extract_task_id(task['id'])
 
-        task_data = self.rally_get_artifact('(Name contains "%s:")' % task_id, card_type_details['type'],
+        task_data = self.rally_get_artifact(task_id, '(Name contains "%s:")' % task_id, card_type_details['type'],
                                             card_type_details['type'], card_type_details['api'])
         if not task_data:
             return task_data
