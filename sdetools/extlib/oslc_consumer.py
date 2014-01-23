@@ -27,8 +27,9 @@ class OSLCAPI(RESTBase):
         headers = {'Accept': 'application/rdf+xml', 'OSLC-Core-Version': '2.0', 'Content-Type': 'application/rdf+xml'}
         return super(OSLCAPI, self).call_api(target, method, args, headers)
 
-    def parse_response(self, result):
-        #print result
+    def parse_response(self, result, headers):
+        print result
+        print headers
         try:
             result = Graph().parse(data=result)
         except Exception, e:
@@ -66,17 +67,10 @@ class OSLCConnector(AlmConnector):
         except APIError, err:
             raise AlmException('Unable to connect retrieve root services (Check server URL, user, pass).'
                                'Reason: %s' % str(err))
-        #for s, p, o in catalog:
-        #    print s, p, o
-        #print catalog.subjects().result
 
         rdf_query = "SELECT ?y WHERE { ?y ?x ?z FILTER (?z = <http://open-services.net/ns/cm#>) }"
         uri = catalog.query(rdf_query).result[0][0].toPython()
 
-        #subj = term.URIRef(self.alm_plugin.base_uri+'/rootservices')
-        #pred = term.URIRef(self.OSLC_SERVICE_PROVIDER)
-        #objs = self.alm_plugin.rdf_graph.value(subject=subj, predicate=pred)
-        #self.service_provider_uri = catalog.value(subject=subj, predicate=pred)
         self.service_provider_uri = uri
 
         if not self.service_provider_uri:
@@ -96,46 +90,15 @@ class OSLCConnector(AlmConnector):
             raise AlmException('Unable to connect retrieve service catalog (Check server URL, user, pass).')
 
         del uri
-        #for s, p, o in service_catalog:
-        #    print s, p, o
-        #print list(service_catalog)
         resource_url = None
-        #for service_provider in service_catalog['oslc:serviceProvider']:
-        #    if service_provider['dc:title'] == self.config['alm_project']:
-        #        resource_url = service_provider['rdf:about']
-
-        #pred = term.URIRef("http://purl.org/dc/terms/title")
-        #obj = term.Literal(self.config['alm_project'],
-        #                   datatype=term.URIRef(u'http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral'))
-        #print "START TEST"
-        #print str(self.config['alm_project'])
         rdf_query = 'SELECT DISTINCT ?x WHERE {?x ?y ?z FILTER (str(?z) = "' + str(self.config['alm_project']) + '")}'
         #print rdf_query
         resource_url = service_catalog.query(rdf_query).result[0][0].toPython()
-        #print list(resource_url)
-        #oo = list(resource_url)[0]
-        #uri = trunc_uri(str(oo))
-        #print uri
-        #print "END TEST"
-        #resource_url = uri
         if not resource_url:
             raise AlmException('Unable to connect retrieve resource url (Check server URL, user, pass).')
 
         resource_service = resource_url.replace(self.alm_plugin.base_uri+'/', '')
-        #import pprint
-        #pprint.pprint(resource_service)
         services = self.alm_plugin.call_api(resource_service)
-        #print json.dumps(services['oslc:service'][1], indent=4)
-        #for s, p, o in services:
-        #    print s, p, o
-        #print list(services)
-
-        #pred = term.URIRef("http://open-services.net/ns/core#usage")
-        #obj = term.URIRef(self.OSLC_TYPE)
-
-        #bnode = services.value(predicate=pred, object=obj)
-        #subj = bnode
-
         # Find the lookup/query url
 
         query_query = "SELECT ?x ?y ?z ?j ?k WHERE {?x ?y ?z ; ?j ?k . FILTER (?y = <http://open-services.net/ns/core#usage> && ?j = <http://open-services.net/ns/core#queryBase> )}"
