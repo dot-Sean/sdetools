@@ -287,7 +287,10 @@ class RallyConnector(AlmConnector):
         }
         if card_type_details['type'] == 'Task':
             create_args[card_type_details['type']]['WorkProduct'] = self.alm_parent_issue_ref
-            #create_args[card_type_details['type']]['TaskIndex'] = 1
+
+        if self.config['alm_custom_fields']:
+            for key in self.config['alm_custom_fields']:
+                create_args[card_type_details['type']][key] = self.config['alm_custom_fields'][key]
 
         try:
             result = self.alm_plugin.call_api('%s/create.js' % card_type_details['api'],
