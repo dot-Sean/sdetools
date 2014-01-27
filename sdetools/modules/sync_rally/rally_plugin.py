@@ -125,15 +125,11 @@ class RallyConnector(AlmConnector):
         if self.config['rally_card_type'] == 'Task' and not self.config['alm_parent_issue']:
             raise AlmException('Missing alm_parent_issue in configuration')
 
-        if self.config['rally_card_type'] not in self.card_types.keys():
-            raise AlmException('Invalid configuration for rally_card_type: %s' % self.config['rally_card_type'])
-
         self.project_ref = None
         self.workspace_ref = None
         self.alm_parent_issue_ref = None
 
         self.mark_down_converter = markdown.Markdown(safe_mode="escape")
-
 
     def carriage_return(self):
         return '<br//>'
