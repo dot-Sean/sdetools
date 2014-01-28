@@ -179,9 +179,12 @@ class RallyConnector(AlmConnector):
 
         # Retrieve the reference for the parent Story
         if self.config['alm_parent_issue']:
-            rally_artifact = self.rally_get_artifact(self.config['alm_parent_issue'],
-                                                     '(FormattedID = \"%s\")' % self.config['alm_parent_issue'],
-                                                     'Story', 'HierarchicalRequirement', 'hierarchicalrequirement')
+            rally_artifact = self.rally_get_artifact(
+                self.config['alm_parent_issue'],
+                '(FormattedID = \"%s\")' % self.config['alm_parent_issue'],
+                'Story',
+                'HierarchicalRequirement',
+                'hierarchicalrequirement')
 
             if rally_artifact and 'FormattedID' in rally_artifact:
                 self.alm_parent_issue_ref = rally_artifact['_ref']
