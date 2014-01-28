@@ -111,13 +111,26 @@ class RallyConnector(AlmConnector):
 
         self.config.process_list_config('rally_done_statuses')
 
-        self.card_types = {}
-        self.card_types['Story'] = {'name': 'Story', 'type': 'HierarchicalRequirement',
-                                    'query': 'Hierarchical Requirement', 'api': 'hierarchicalrequirement',
-                                    'field_state': 'ScheduleState', 'requires_parent': False,
-                                    'field_validation_state': 'Schedule State'}
-        self.card_types['Task'] = {'name': 'Task', 'type': 'Task', 'query': 'Task', 'api': 'task',
-                                   'field_state': 'State', 'requires_parent': True, 'field_validation_state': 'State'}
+        self.card_types = {
+            'Story': {
+                'name': 'Story',
+                'type': 'HierarchicalRequirement',
+                'query': 'Hierarchical Requirement',
+                'api': 'hierarchicalrequirement',
+                'field_state': 'ScheduleState',
+                'requires_parent': False,
+                'field_validation_state': 'Schedule State'
+            },
+            'Task': {
+                'name': 'Task',
+                'type': 'Task',
+                'query': 'Task',
+                'api': 'task',
+                'field_state': 'State',
+                'requires_parent': True,
+                'field_validation_state': 'State'
+            }
+        }
 
         # Sanity-check alm_parent_issue
         if self.config['alm_parent_issue'] and self.config['rally_card_type'] != 'Task':
@@ -184,7 +197,8 @@ class RallyConnector(AlmConnector):
                 '(FormattedID = \"%s\")' % self.config['alm_parent_issue'],
                 'Story',
                 'HierarchicalRequirement',
-                'hierarchicalrequirement')
+                'hierarchicalrequirement'
+            )
 
             if rally_artifact and 'FormattedID' in rally_artifact:
                 self.alm_parent_issue_ref = rally_artifact['_ref']
