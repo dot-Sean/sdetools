@@ -150,3 +150,18 @@ class RallyResponseGenerator(ResponseGenerator):
         query = [re.split('\s*contains\s*|\s*=\s*', q) for q in query]
 
         return dict(query)
+
+
+class RallyCustomFieldResponseGenerator(RallyResponseGenerator):
+
+    def __init__(self, config, test_dir=None):
+        super(RallyCustomFieldResponseGenerator, self).__init__(config, test_dir)
+
+    def create_card(self, target, flag, data, method):
+        if not flag:
+            data_h_reqs = data['HierarchicalRequirement']
+            if not 'Package' in data_h_reqs or not data_h_reqs['Package']:
+                self.raise_error('404', 'Validation error: HierarchicalRequirement.Package should not be null')
+            return super(RallyCustomFieldResponseGenerator, self).create_card(target, flag, data, method)
+        else:
+            self.raise_error('401')

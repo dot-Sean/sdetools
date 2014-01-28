@@ -47,11 +47,11 @@ class AlmPluginTestBase(object):
         else:
             self.connector = self.connector_cls(self.config, self.api_cls(self.config))
 
-    def init_response_generator(self):
-        if self.generator_cls is not None:
-            self.response_generator = self.generator_cls(self.config, self.test_dir)
-        else:
+    def init_response_generator(self, resp_generator_cls=None):
+        resp_generator_cls = resp_generator_cls or self.generator_cls
+        if not resp_generator_cls:
             raise Error('No response generator found')
+        self.response_generator = resp_generator_cls(self.config, self.test_dir)
 
     def pre_parse_config(self):
         pass
