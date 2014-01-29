@@ -34,7 +34,11 @@ class RationalAPI(RESTBase):
 
     def __init__(self, config):
         #base_path = config['rational_context_root']
-        super(RationalAPI, self).__init__('alm', 'Rational', config, 'sandbox02-ccm')
+        super(RationalAPI, self).__init__('alm', 'Rational', config)
+
+    def post_conf_init(self):
+        self.base_path = self.config['rational_context_root']
+        super(RationalAPI, self).post_conf_init()
 
 #    def get_custom_headers(self, target, method):
 #        return [('Accept', 'application/json'), ('Accept','application/x-oslc-disc-service-provider-catalog+json')]
@@ -88,13 +92,15 @@ class RationalConnector(AlmConnector):
         """ Initializes connection to Rational """
         super(RationalConnector, self).__init__(config, alm_plugin)
 
-        config.add_custom_option(self.ALM_NEW_STATUS, 'Status to set for new'
+        config.add_custom_option(self.ALM_NEW_STATUS, 'Status to set for new '
                                  'tasks in Rational', default='New')
         config.add_custom_option(self.ALM_DONE_STATUSES, 'Statuses that '
                                  'signify a task is Done in Rational',
                                  default='Complete,Done')
         config.add_custom_option(self.ALM_PRIORITY_MAP, 'Customized map from priority in SDE to RTC '
                                  '(JSON encoded dictionary of strings)', default='')
+        config.add_custom_option('rational_context_root', 'Application context root: the part of the URL that accesses '
+                                 'each application and Jazz Team Server', default='')
 
     def initialize(self):
         super(RationalConnector, self).initialize()
