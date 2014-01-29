@@ -34,7 +34,7 @@ class RationalAPI(RESTBase):
 
     def __init__(self, config):
         #base_path = config['rational_context_root']
-        super(RationalAPI, self).__init__('alm', 'Rational', config, "sandbox01-ccm")
+        super(RationalAPI, self).__init__('alm', 'Rational', config, 'sandbox02-ccm')
 
 #    def get_custom_headers(self, target, method):
 #        return [('Accept', 'application/json'), ('Accept','application/x-oslc-disc-service-provider-catalog+json')]
@@ -151,7 +151,7 @@ class RationalConnector(AlmConnector):
         if not self.service_catalog:
             raise AlmException('Unable to connect retrieve Rational service catalog (Check server URL, user, pass).')
             
-        proj = "gwhittington's Project (Change and Configuration Management)"
+        proj = "elknar's Project (Change and Configuration Management)"
         for service_provider in self.service_catalog['oslc:serviceProvider']:
             if service_provider['dcterms:title'] == proj:
                 self.resource_url = service_provider['rdf:about']
@@ -162,7 +162,7 @@ class RationalConnector(AlmConnector):
         self.cm_resource_service = self.resource_url.replace(self.alm_plugin.base_uri+'/', '')
         self.services = self.alm_plugin.call_api(self.cm_resource_service, call_headers=headers)
         #print json.dumps(self.services,indent=4)
-        query_url = self.services['oslc:service'][0]['oslc:queryCapability'][0]['oslc:queryBase']['rdf:resource']
+        query_url = self.services['oslc:service'][1]['oslc:queryCapability'][0]['oslc:queryBase']['rdf:resource']
 
         self.query_url = query_url.replace(self.alm_plugin.base_uri+'/', '')
         for service in self.services['oslc:service']:
