@@ -1,3 +1,4 @@
+from datetime import datetime
 from sdetools.alm_integration.alm_plugin_base import AlmTask
 
 class JIRATask(AlmTask):
@@ -19,9 +20,6 @@ class JIRATask(AlmTask):
 
     def get_alm_id(self):
         return self.alm_id
-
-    def get_priority(self):
-        return self.priority
 
     def get_status(self):
         """ Translates JIRA priority into SDE priority """

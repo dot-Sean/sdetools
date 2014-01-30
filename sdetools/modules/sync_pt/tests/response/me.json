@@ -1,0 +1,28 @@
+{
+   "autosave": true,
+   "name": "Test User",
+   "email": "test+user@sdelemnts.com",
+   "api_token": "testToken$",
+   "projects":
+   [
+       {
+           "role": "owner",
+           "project_id": 98,
+           "project_name": "Test Project",
+           "last_viewed_at": "2013-09-24T12:00:00Z",
+           "kind": "membership_summary",
+           "id": 108
+       }
+   ],
+   "time_zone":
+   {
+       "offset": "-08:00",
+       "olson_name": "America/Los_Angeles",
+       "kind": "time_zone"
+   },
+   "kind": "me",
+   "id": 101,
+   "username": "test",
+   "initials": "TU",
+   "has_google_identity": false
+}

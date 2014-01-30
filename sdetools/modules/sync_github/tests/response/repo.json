@@ -1,0 +1,16 @@
+{
+	"id": 1296269,
+	"owner": 
+			{
+				"login": "test",
+				"id": 1,
+				"avatar_url": "testIcon.gif",
+				"gravatar_id": "somehexcode",
+				"url": "https://api.github.com/users/test"
+			},
+	"name": "test repo",
+	"full_name": "testOrg/testRepo",
+	"description": "TestRepo",
+	"url": "https://api.github.com/repos/org:/repo:",
+	"private": true
+}

@@ -1,4 +1,6 @@
-class InternalAPI(object):
+from sdetools.sdelib import restclient 
+
+class InternalAPI(restclient):
     """
     Note: In all the API calls:
     - a 'project' arg variable is the project id
@@ -6,7 +8,7 @@ class InternalAPI(object):
         e.g. '127-T106'
     """
 
-    def __init__(self, config):
+    def __init__(self, conf_prefix, conf_name, config):
         pass
 
     def get_applications(self, **filters):

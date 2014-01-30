@@ -16,6 +16,7 @@ logger = log_mgr.mods.add_mod(__name__)
 RE_CODE_DOWNLOAD = re.compile(r'\{\{ USE_MEDIA_URL \}\}([^\)]+\))\{@class=code-download\}')
 RE_TASK_IDS = re.compile('^C?T\d+$')
 
+
 class AlmException(Error):
     """ Class for ALM Exceptions """
 
@@ -24,6 +25,7 @@ class AlmException(Error):
 
     def __str__(self):
         return str(self.value)
+
 
 class AlmTask(object):
     """
@@ -36,11 +38,6 @@ class AlmTask(object):
     @abstractmethod
     def get_task_id(self):
         """ Returns an ID string compatiable with SD Elements """
-        pass
-
-    @abstractmethod
-    def get_priority(self):
-        """ Returns a priority string compatible with SD Elements """
         pass
 
     @abstractmethod
@@ -57,6 +54,7 @@ class AlmTask(object):
     def get_timestamp(self):
         """ Returns a datetime.datetime object of last modified time """
         pass
+
 
 class AlmConnector(object):
     """
@@ -84,30 +82,30 @@ class AlmConnector(object):
 
     def _add_alm_config_options(self):
         """ Adds ALM config options to the config file"""
-        self.config.add_custom_option('alm_phases', 'Phases of the ALM',
+        self.config.opts.add('alm_phases', 'Phases of the ALM',
                 default='requirements,architecture-design,development')
-        self.config.add_custom_option('sde_statuses_in_scope', 'SDE statuses for adding to ALM '
-                '(comma seperated DONE,TODO,NA)', 
+        self.config.opts.add('sde_statuses_in_scope', 'SDE statuses for adding to ALM '
+                '(comma separated DONE,TODO,NA)',
                 default='TODO')
-        self.config.add_custom_option('sde_min_priority', 'Minimum SDE priority in scope',
+        self.config.opts.add('sde_min_priority', 'Minimum SDE priority in scope',
                 default='7')
-        self.config.add_custom_option('how_tos_in_scope', 'Whether or not HowTos should be included',
+        self.config.opts.add('how_tos_in_scope', 'Whether or not HowTos should be included',
                 default='False')
-        self.config.add_custom_option('selected_tasks', 'Optionally limit the sync to certain tasks '
-                '(comma seperated, e.g. T12,T13). Note: Overrides other selections.',
+        self.config.opts.add('selected_tasks', 'Optionally limit the sync to certain tasks '
+                '(comma separated, e.g. T12,T13). Note: Overrides other selections.',
                 default='')
-        self.config.add_custom_option('alm_project', 'Project in ALM Tool',
+        self.config.opts.add('alm_project', 'Project in ALM Tool',
                 default='')
-        self.config.add_custom_option('conflict_policy', 'Conflict policy to use',
+        self.config.opts.add('conflict_policy', 'Conflict policy to use',
                 default='alm')
-        self.config.add_custom_option('show_progress', 'Show progress',
+        self.config.opts.add('show_progress', 'Show progress',
                 default='False')
-        self.config.add_custom_option('test_alm_connection', 'Test Alm Connection Only '
-                '(Also checks existence of project if alm_project is specified)',
-                default='False')
-        self.config.add_custom_option('alm_standard_workflow', 'Standard workflow in ALM?',
+        self.config.opts.add('test_alm', 'Test Alm "server", "project" or "settings" '
+                                      'configuration only',
+                                      default='')
+        self.config.opts.add('alm_standard_workflow', 'Standard workflow in ALM?',
                 default='True')
-        self.config.add_custom_option('alm_custom_fields', 
+        self.config.opts.add('alm_custom_fields', 
                 'Customized fields to include when creating a task in ALM '
                 '(JSON encoded dictionary of strings)',
                 default='')
@@ -119,26 +117,24 @@ class AlmConnector(object):
 
         #Note: This will consider space as empty due to strip
         #We do this before checking if the config is non-empty later
-        self.config['selected_tasks'] = [x.strip(' ') 
-            for x in self.config['selected_tasks'].split(',') if x.strip(' ')]
+        self.config.process_list_config('selected_tasks')
         for task in self.config['selected_tasks']:
             if not RE_TASK_IDS.match(task):
-                raise UsageError('Invalid Task ID: %s' % (task))
+                raise UsageError('Invalid Task ID: %s' % task)
 
         if not self.config['selected_tasks']:
             if not self.config['alm_phases']:
                 raise AlmException('Missing alm_phases in configuration')
 
-            self.config['alm_phases'] = self.config['alm_phases'].split(',')
+            self.config.process_list_config('alm_phases')
 
             if not self.config['sde_statuses_in_scope']:
                 raise AlmException('Missing the SD Elements statuses in scope')
 
-            self.config['sde_statuses_in_scope'] = self.config['sde_statuses_in_scope'].split(',')
+            self.config.process_list_config('sde_statuses_in_scope')
             for status in self.config['sde_statuses_in_scope']:
                 if status not in('TODO', 'DONE', 'NA'):
-                    raise AlmException('Invalid status specified in '
-                                   'sde_statuses_in_scope')
+                    raise AlmException('Invalid status specified in sde_statuses_in_scope')
 
         if (not self.config['conflict_policy'] or
             not (self.config['conflict_policy'] == 'alm' or
@@ -148,8 +144,8 @@ class AlmConnector(object):
                                'in configuration. Valid values are '
                                'alm, sde, or timestamp.')
 
-        if (self.config['sde_min_priority']):
-            bad_priority_msg =  'Incorrect sde_min_priority specified in configuration. Valid values are > 0 '
+        if self.config['sde_min_priority']:
+            bad_priority_msg = 'Incorrect sde_min_priority specified in configuration. Valid values are > 0 '
             bad_priority_msg += ' and <= 10'
 
             try:
@@ -157,31 +153,48 @@ class AlmConnector(object):
             except:
                 raise AlmException(bad_priority_msg)
 
-            if (self.config['sde_min_priority'] < 1 or self.config['sde_min_priority'] >10):
+            if self.config['sde_min_priority'] < 1 or self.config['sde_min_priority'] > 10:
                 raise AlmException(bad_priority_msg)
         else:
             self.config['sde_min_priority'] = 1
 
+        if self.config['test_alm'] and self.config['test_alm'] not in ['server', 'project', 'settings']:
+            raise AlmException('Incorrect test_alm configuration setting. '
+                               'Valid values are: server, project, or settings.')
+
         self.config.process_boolean_config('show_progress')
         self.config.process_boolean_config('how_tos_in_scope')
-        self.config.process_boolean_config('test_alm_connection')
         self.config.process_boolean_config('alm_standard_workflow')
         self.config.process_json_str_dict('alm_custom_fields')
+
+        self.alm_plugin.post_conf_init()
+        self.ignored_tasks = []
 
         logger.info('*** AlmConnector initialized ***')
 
     def alm_connect(self):
         self.alm_connect_server()
 
-        # In case we just wanted to verify the server rather than the project
-        if self.config['test_alm_connection'] and not self.config['alm_project']:
+        if self.config['test_alm'] == 'server':
             return
 
         self.alm_connect_project()
 
+        if self.config['test_alm'] == 'project':
+            return
+
+        self.alm_validate_configurations()
+
     @abstractmethod
     def alm_connect_server(self):
         """ Sets up a connection to the ALM tool.
+
+        Raises an AlmException on encountering an error
+        """
+        pass
+
+    def alm_validate_configurations(self):
+        """ Validates alm-specific configurations
 
         Raises an AlmException on encountering an error
         """
@@ -198,7 +211,7 @@ class AlmConnector(object):
     @abstractmethod
     def alm_get_task(self, task):
         """ Returns an AlmTask that represents the value of this
-        SD Elemets task in the ALM, or None if the task doesn't exist
+        SD Elements task in the ALM, or None if the task doesn't exist
 
         Raises an AlmException on encountering an error
 
@@ -211,7 +224,7 @@ class AlmConnector(object):
     def alm_add_task(self, task):
         """ Adds SD Elements task to the ALM tool.
 
-        Returns a string represeting the task in the ALM tool,
+        Returns a string representing the task in the ALM tool,
         or None if that's not possible. This string will be
         added to a note for the task.
 
@@ -262,6 +275,16 @@ class AlmConnector(object):
             return False
         return self.sde_plugin.connected
 
+    def _extract_task_id(self, full_task_id):
+        """
+        Extract the task id e.g. "CT213" from the full project_id-task_id string e.g. "123-CT213"
+        """
+        task_id = None
+        task_search = re.search('^(\d+)-([^\d]+\d+)$', full_task_id)
+        if task_search:
+            task_id = task_search.group(2)
+        return task_id
+
     def sde_get_tasks(self):
         """ Gets all tasks for project in SD Elements
 
@@ -299,9 +322,8 @@ class AlmConnector(object):
             raise AlmException('Requires initialization')
 
         try:
-            self.sde_plugin.api.add_task_ide_note(task_id, note_msg,
-                                             filename, status)
-            logger.debug('Successfuly set note for task %s' % task_id)
+            self.sde_plugin.api.add_task_ide_note(task_id, note_msg, filename, status)
+            logger.debug('Successfully set note for task %s' % task_id)
 
         except APIError, err:
             logger.error(err)
@@ -316,7 +338,7 @@ class AlmConnector(object):
         if self.config['selected_tasks']:
             return (tid in self.config['selected_tasks'])
         return (task['phase'] in self.config['alm_phases'] and
-            task['priority'] >= self.config['sde_min_priority'])
+                task['priority'] >= self.config['sde_min_priority'])
 
     def sde_update_task_status(self, task, status):
         """ Updates the status of the given task in SD Elements
@@ -348,7 +370,7 @@ class AlmConnector(object):
             self._add_note(task['id'], note_msg, '', status)
         except APIError, err:
             logger.error('Unable to set a note to mark status '
-                         'for %s to %s' % (task['id'], status))
+                         'for %s to %s. Reason: %s' % (task['id'], status, str(err)))
 
     def convert_markdown_to_alm(self, content, ref):
         return content
@@ -380,10 +402,15 @@ class AlmConnector(object):
             sys.stdout.flush()
 
     def status_match(self, alm_status, sde_status):
-        if sde_status=="NA" or sde_status=="DONE":
+        if sde_status == "NA" or sde_status == "DONE":
             return alm_status == "DONE"
         else:
             return alm_status == "TODO"
+
+    def prune_tasks(self, tasks):
+        tasks = [task for task in tasks if self.in_scope(task)]
+
+        return tasks
 
     def synchronize(self):
         """ Synchronizes SDE project with ALM project.
@@ -409,7 +436,7 @@ class AlmConnector(object):
             if not self.sde_plugin:
                 raise AlmException('Requires initialization')
 
-            if self.config['test_alm_connection']:
+            if self.config['test_alm']:
                 self.alm_connect()
                 return
 
@@ -429,7 +456,7 @@ class AlmConnector(object):
             logger.info('Retrieved all tasks from SDE')
 
             #Prune unnecessary tasks - progress must match reality
-            tasks = [task for task in tasks if self.in_scope(task)]
+            tasks = self.prune_tasks(tasks)
 
             logger.info('Pruned tasks out of scope')
 
@@ -457,13 +484,13 @@ class AlmConnector(object):
                         elif self.config['conflict_policy'] == 'timestamp':
                             sde_time = datetime.fromtimestamp(task['timestamp'])
                             alm_time = alm_task.get_timestamp()
-                            logger.debug('comparing timestamps for task %s - SDE: %s, ALM: %s' %
+                            logger.debug('Comparing timestamps for task %s - SDE: %s, ALM: %s' %
                                           (task['id'], str(sde_time), str(alm_time)))
-                            if (sde_time > alm_time):
+                            if sde_time > alm_time:
                                 precedence = 'sde'
 
                         status = alm_task.get_status()
-                        if (precedence == 'alm'):
+                        if precedence == 'alm':
                             self.sde_update_task_status(task, alm_task.get_status())
                         else:
                             self.alm_update_task_status(alm_task, task['status'])
@@ -473,7 +500,8 @@ class AlmConnector(object):
                 else:
                     # Only exists in SD Elements
                     # Skip if this task should not be added to ALM
-                    if not self.config['selected_tasks'] and task['status'] not in self.config['sde_statuses_in_scope']:
+                    if ((not self.config['selected_tasks'] and task['status'] not in self.config['sde_statuses_in_scope']) or
+                            task['id'] in self.ignored_tasks):
                         continue
                     ref = self.alm_add_task(task)
                     self.emit.info('Added task %s to %s' % (tid, self.alm_name))
@@ -482,9 +510,10 @@ class AlmConnector(object):
                     logger.debug(note_msg)
 
             logger.info('Synchronization complete')
+
             self.alm_disconnect()
 
-        except AlmException, err:
+        except AlmException:
             self.alm_disconnect()
-            raise 
+            raise
 

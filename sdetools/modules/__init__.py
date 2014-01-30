@@ -1,4 +1,5 @@
 __all__ = [
+    'test',
     'help',
     'lint',
     'report',
@@ -9,12 +10,14 @@ __all__ = [
     'sync_jira',
     'sync_mingle',
     'sync_rally',
+    'sync_hp_alm',
+    'sync_pt',
+    'sync_github',
+    'sync_rational',
     'api_proxy',
     'list_projects',
     'sync_trac',
     'connect',
     'add_ssl_cert',
-    'sync_pt',
-    'sync_github',
-    'sync_rational',
+    'fetch_config',
 ]

@@ -25,7 +25,7 @@ class SOAPProxyWrap:
             logger.debug(' + Args: %s' % ((repr(args)[:200]) + (repr(args)[200:] and '...')))
             try:
                 return self.__fobj(*args)
-            except (xml.parsers.expat.ExpatError, socket.error), err:
+            except (xml.parsers.expat.ExpatError, socket.error):
                 raise AlmException('Unable to access JIRA (for %s). '
                         ' Please check network connectivity.' % (self.__fname))
 
@@ -80,12 +80,15 @@ class JIRASoapAPI:
     def connect_project(self):
         # Test for project existence
         try:
-            result = self.proxy.getProjectByKey(self.auth, self.config['alm_project'])
+            # We don't use the result of this call
+            self.proxy.getProjectByKey(self.auth, self.config['alm_project'])
         except SOAPpy.Types.faultType:
             raise AlmException('Unable to connect to project %s. Please check project'
                                ' settings' % (self.config['alm_project']))
-        
-        self.versions = self.proxy.getVersions(self.auth, self.config['alm_project'])
+        try:
+            self.versions = self.proxy.getVersions(self.auth, self.config['alm_project'])
+        except SOAPpy.Types.faultType:
+            raise AlmException('Unable to get project version')
 
     def get_issue_types(self):
         try:
@@ -101,7 +104,7 @@ class JIRASoapAPI:
 
     def get_task(self, task, task_id):
         try:
-            jql = "project='%s' AND summary~'%s'" % (self.config['alm_project'], task_id)
+            jql = "project='%s' AND summary~'%s\\\\:'" % (self.config['alm_project'], task_id)
             issues = self.proxy.getIssuesFromJqlSearch(self.auth, jql, SOAPpy.Types.intType(1))
         except SOAPpy.Types.faultType:
             raise AlmException("Unable to get task %s from JIRA" % task_id)
@@ -135,7 +138,7 @@ class JIRASoapAPI:
             for version in jtask.affectsVersions:
                 task_versions.append(version['name'])
 
-        return JIRATask(task['id'],
+        return JIRATask(task_id,
                         jtask['key'],
                         task_priority,
                         task_status,
@@ -213,7 +216,7 @@ class JIRASoapAPI:
         update = [{'id':'versions', 'values':self.get_affected_versions(task)}]
         try:
             self.proxy.updateIssue(self.auth, task.get_alm_id(), update)
-        except (SOAPpy.Types.faultType, AlmException), err:
+        except (SOAPpy.Types.faultType, AlmException):
             raise AlmException('Unable to update issue %s with new version %s' % (task.get_alm_id(), project_version))
     
         return True
@@ -259,7 +262,11 @@ class JIRASoapAPI:
         return ref
 
     def get_available_transitions(self, task_id):
-        transitions = self.proxy.getAvailableActions(self.auth, task_id)
+        try:
+            transitions = self.proxy.getAvailableActions(self.auth, task_id)
+        except SOAPpy.Types.faultType, err:
+            raise AlmException("Unable to get available actions for task %s. Reason: %s" % (task_id, err))
+
         ret_trans = {}
         for transition in transitions:
             ret_trans[transition['name']] = transition['id']
@@ -271,3 +278,7 @@ class JIRASoapAPI:
         except SOAPpy.Types.faultType, err:
             logger.error(err)
             raise AlmException("Unable to set task status: %s" % err)
+            
+    def post_conf_init(self):
+        pass
+

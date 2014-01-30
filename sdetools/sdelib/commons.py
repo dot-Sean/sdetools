@@ -1,4 +1,4 @@
-__all__ = ['json', 'Error', 'show_error', 'get_password', 'urlencode_str']
+__all__ = ['json', 'abc', 'argparse', 'Error', 'show_error', 'get_password', 'urlencode_str']
 
 import sys
 import os
@@ -65,3 +65,10 @@ def get_password():
 
 def urlencode_str(inp):
     return urllib.urlencode({'a':inp})[2:]
+
+
+def get_directory_of_current_module(self):
+    file_path = sys.modules[self.__module__].__file__
+    file_directory = os.path.dirname(file_path)
+
+    return file_directory

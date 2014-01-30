@@ -2,12 +2,9 @@
 # Extensible two way integration with JIRA
 
 import re
-from datetime import datetime
 
 from sdetools.alm_integration.alm_plugin_base import AlmConnector, AlmException
-from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
 from sdetools.modules.sync_jira.jira_markdown import convert_markdown
-from sdetools.sdelib.conf_mgr import Config
 
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
@@ -19,7 +16,8 @@ JIRA_DEFAULT_PRIORITY_MAP = {
     '5-6': 'Major',
     '3-4': 'Minor',
     '1-2': 'Trivial',
-    }
+}
+
 
 class JIRAConnector(AlmConnector):
     alm_name = 'JIRA'
@@ -28,21 +26,21 @@ class JIRAConnector(AlmConnector):
         """ Initializes connection to JIRA """
         super(JIRAConnector, self).__init__(config, alm_plugin)
 
-        config.add_custom_option('jira_issue_type', 'IDs for issues raised in JIRA',
+        config.opts.add('jira_issue_type', 'IDs for issues raised in JIRA',
                 default='Bug')
-        config.add_custom_option('jira_close_transition', 'Close transition in JIRA',
+        config.opts.add('jira_close_transition', 'Close transition in JIRA',
                 default='Close Issue')
-        config.add_custom_option('jira_reopen_transition', 'Re-open transition in JIRA',
+        config.opts.add('jira_reopen_transition', 'Re-open transition in JIRA',
                 default='Reopen Issue')
-        config.add_custom_option('jira_done_statuses', 'Statuses that signify a task is Done in JIRA',
+        config.opts.add('jira_done_statuses', 'Statuses that signify a task is Done in JIRA',
                 default='Resolved,Closed')
-        config.add_custom_option('jira_existing_issue', 'Provide the key of an existing issue to support custom fields (JIRA 4.x only)',
+        config.opts.add('jira_existing_issue', 'Provide the key of an existing issue to support custom fields (JIRA 4.x only)',
                 default='')
-        config.add_custom_option('alm_project_version', 'Project version',
+        config.opts.add('alm_project_version', 'Project version',
                 default='')
-        config.add_custom_option('alm_parent_issue', 'Create sub-tasks under this issue',
+        config.opts.add('alm_parent_issue', 'Create sub-tasks under this issue',
                 default='')
-        config.add_custom_option('alm_priority_map', 'Customized map from priority in SDE to JIRA '
+        config.opts.add('alm_priority_map', 'Customized map from priority in SDE to JIRA '
                 '(JSON encoded dictionary of strings)',
                 default='')
 
@@ -54,7 +52,7 @@ class JIRAConnector(AlmConnector):
             len(self.config['jira_done_statuses']) < 1):
             raise AlmException('Missing jira_done_statuses in configuration')
 
-        self.config['jira_done_statuses'] = (self.config['jira_done_statuses'].split(','))
+        self.config.process_list_config('jira_done_statuses')
 
         if not self.config['jira_issue_type']:
             raise AlmException('Missing jira_issue_type in configuration')
@@ -106,7 +104,7 @@ class JIRAConnector(AlmConnector):
         self.alm_plugin.setup_fields(self.jira_issue_type_id)
 
     def alm_get_task(self, task):
-        task_id = task['title'].partition(':')[0]
+        task_id = self._extract_task_id(task['id'])
 
         task = self.alm_plugin.get_task(task, task_id)
         if task:
@@ -153,7 +151,8 @@ class JIRAConnector(AlmConnector):
 
         trans_name = self.config['jira_%s_transition' % new_state]
         if trans_name not in trans_table:
-            raise AlmException('Unable to find transition %s' % trans_name)
+            raise AlmException('Transition %s is invalid for issue %s. Valid entries are: %s' % (
+                trans_name, alm_id, ', '.join(trans_table)))
         trans_id = trans_table[trans_name]
 
         self.alm_plugin.update_task_status(alm_id, trans_id)

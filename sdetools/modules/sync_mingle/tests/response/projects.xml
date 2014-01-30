@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projects type="array">
+  <project>
+    <name>test project</name>
+    <identifier>test_project</identifier>
+    <icon nil="true"></icon>
+    <anonymous_accessible>false</anonymous_accessible>
+  </project>
+</projects>

@@ -1,0 +1,44 @@
+{
+   "Subscription":{
+      "_rallyAPIMajor":"1",
+      "_rallyAPIMinor":"39",
+      "_ref":"https://rally1.rallydev.com/slm/webservice/1.39/subscription/14409159535.js",
+      "_objectVersion":"2",
+      "_refObjectName":"Test Project",
+      "CreationDate":"2013-10-02T18:57:34.642Z",
+      "_CreatedAt":"yesterday at 12:57 pm",
+      "ObjectID":14409159535,
+      "ExpirationDate":null,
+      "MaximumProjects":1,
+      "Modules":"",
+      "Name":"Test Project",
+      "PasswordExpirationDays":0,
+      "PreviousPasswordCount":0,
+      "ProjectHierarchyEnabled":false,
+      "RevisionHistory":{
+         "_rallyAPIMajor":"1",
+         "_rallyAPIMinor":"39",
+         "_ref":"https://rally1.rallydev.com/slm/webservice/1.39/revisionhistory/14409159536.js",
+         "_type":"RevisionHistory"
+      },
+      "SessionTimeoutSeconds":null,
+      "StoryHierarchyEnabled":true,
+      "SubscriptionID":47395,
+      "SubscriptionType":"Community (HS_1)",
+      "Workspaces":[
+         {
+            "_rallyAPIMajor":"1",
+            "_rallyAPIMinor":"39",
+            "_ref":"https://rally1.rallydev.com/slm/webservice/1.39/workspace/14409159690.js",
+            "_refObjectName":"Workspace 1",
+            "_type":"Workspace"
+         }
+      ],
+      "Errors":[
+
+      ],
+      "Warnings":[
+         "API status is Deprecated and will become Not Supported on 2013-12-05"
+      ]
+   }
+}

@@ -4,11 +4,13 @@ class BaseCommand(object):
     cmd_name = None
     conf_syntax = ''
     conf_help = ''
+    sub_cmds = ['']
 
     def __init__(self, config, args):
         self.config = config
         self.emit = self.config.emit
         self.args = args
+        self.opts = self.config.opts
 
     def configure(self):
         pass

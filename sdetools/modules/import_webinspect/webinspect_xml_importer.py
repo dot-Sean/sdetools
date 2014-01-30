@@ -1,24 +1,29 @@
-import xml.sax.handler
+from sdetools.analysis_integration.base_integrator import BaseXMLImporter, BaseContentHandler
 
-from sdetools.analysis_integration.base_integrator import BaseXMLImporter
 
-class WebInspectXMLContent(xml.sax.handler.ContentHandler):
+class WebInspectXMLContent(BaseContentHandler):
     def __init__(self):
+        self.saw_sessions_node = False
         self.in_issue_node = False
         self.in_vuln_node = False
         self.in_issue_name_node = False
         self.in_session_node = False
         self.in_url_node = False
-        self.raw_findings = []
+        self.findings = []
         self.report_id = ""
         self.check_id = 0
         self.check_name_found = False
+
+    def valid_content_detected(self):
+        return self.saw_sessions_node
 
     def processingInstruction(self, target, data):
         pass
 
     def startElement(self, name, attrs):
-        if name == 'Issue':
+        if name == 'Sessions':
+            self.saw_sessions_node = True
+        elif name == 'Issue':
             self.in_issue_node = True
         elif name == 'VulnerabilityID':
             self.in_vuln_node = True
@@ -38,11 +43,11 @@ class WebInspectXMLContent(xml.sax.handler.ContentHandler):
             entry['count'] = 1
             entry['type'] = 'check'
             entry['description'] = data
-            self.raw_findings.append(entry)
+            self.findings.append(entry)
             self.check_id = 0
             self.check_name_found = True
         elif self.in_session_node and self.in_url_node:
-            self.report_id = data
+            self.id = data
 
     def endElement(self, name):
         if self.in_issue_node and name == 'Issue':
