@@ -4,9 +4,6 @@
 import re, json
 from datetime import datetime
 
-from sdetools.extlib import http_req
-from sdetools.extlib.defusedxml import minidom
-from sdetools.sdelib.commons import urlencode_str
 from sdetools.sdelib.restclient import RESTBase
 from sdetools.sdelib.restclient import URLRequest, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
@@ -29,19 +26,22 @@ RDF_PREFIX = 'rdf'
 OSLC_CM_SERVICE_PROVIDER ='http://open-services.net/xmlns/cm/1.0/cmServiceProviders'
 OSLC_CR_TYPE = "http://open-services.net/ns/cm#task"
 
+
 class RationalAPI(RESTBase):
     """ Base plugin for Rational """
 
     def __init__(self, config):
-        #base_path = config['rational_context_root']
         super(RationalAPI, self).__init__('alm', 'Rational', config)
 
     def post_conf_init(self):
         self.base_path = self.config['rational_context_root']
         super(RationalAPI, self).post_conf_init()
 
-#    def get_custom_headers(self, target, method):
-#        return [('Accept', 'application/json'), ('Accept','application/x-oslc-disc-service-provider-catalog+json')]
+    def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}, auth_mode=None):
+        call_headers['Accept'] = 'application/json'
+        call_headers['OSLC-Core-Version'] = '2.0'
+
+        return super(RationalAPI, self).call_api(target, method, args, call_headers, auth_mode)
 
 
 class RationalTask(AlmTask):
@@ -92,14 +92,14 @@ class RationalConnector(AlmConnector):
         """ Initializes connection to Rational """
         super(RationalConnector, self).__init__(config, alm_plugin)
 
-        config.add_custom_option(self.ALM_NEW_STATUS, 'Status to set for new '
+        config.opts.add(self.ALM_NEW_STATUS, 'Status to set for new '
                                  'tasks in Rational', default='New')
-        config.add_custom_option(self.ALM_DONE_STATUSES, 'Statuses that '
+        config.opts.add(self.ALM_DONE_STATUSES, 'Statuses that '
                                  'signify a task is Done in Rational',
                                  default='Complete,Done')
-        config.add_custom_option(self.ALM_PRIORITY_MAP, 'Customized map from priority in SDE to RTC '
+        config.opts.add(self.ALM_PRIORITY_MAP, 'Customized map from priority in SDE to RTC '
                                  '(JSON encoded dictionary of strings)', default='')
-        config.add_custom_option('rational_context_root', 'Application context root: the part of the URL that accesses '
+        config.opts.add('rational_context_root', 'Application context root: the part of the URL that accesses '
                                  'each application and Jazz Team Server', default='')
 
     def initialize(self):
@@ -130,44 +130,42 @@ class RationalConnector(AlmConnector):
         """ Verifies that Rational connection works """
         # Check if user can successfully authenticate and retrieve service catalog
         
-        headers = {'Accept':'application/json'}
         try:
-            catalog = self.alm_plugin.call_api('rootservices', call_headers=headers)
+            catalog = self.alm_plugin.call_api('rootservices')
         except APIError, err:
             raise AlmException('Unable to connect retrieve root services (Check server URL, user, pass).'
-                               'Reason: %s' %str(err))
+                               'Reason: %s' % str(err))
 
         root_services = catalog[self.alm_plugin.base_uri + '/rootservices']
         
         if OSLC_CM_SERVICE_PROVIDER not in root_services:
-            raise AlmException('Change management service provider not found (Check server URL, user, pass).'
-                               'Reason: %s' %str(err))
+            raise AlmException('Change management service provider not found (Check server URL, user, pass)')
                                
         cm_service_providers = root_services[OSLC_CM_SERVICE_PROVIDER]
         self.cm_service_provider = cm_service_providers[0]['value']
         
         self.cm_service_provider_target = self.cm_service_provider.replace(self.alm_plugin.base_uri+'/', '')
-        headers = {'Accept':'application/json', 'OSLC-Core-Version':'2.0'}
+
         try:
-            self.service_catalog = self.alm_plugin.call_api(self.cm_service_provider_target+".json", call_headers=headers)
+            self.service_catalog = self.alm_plugin.call_api(self.cm_service_provider_target)
         except APIError, err:
             raise AlmException('Unable to connect retrieve Rational service catalog (Check server URL, user, pass).'
-                               'Reason: %s' %str(err))
+                               'Reason: %s' % str(err))
                                
         if not self.service_catalog:
-            raise AlmException('Unable to connect retrieve Rational service catalog (Check server URL, user, pass).')
-            
-        proj = "elknar's Project (Change and Configuration Management)"
+            raise AlmException('Unable to connect retrieve service catalog (Check connection settings).')
+
         for service_provider in self.service_catalog['oslc:serviceProvider']:
-            if service_provider['dcterms:title'] == proj:
+            if service_provider['dcterms:title'] == self.config['alm_project']:
                 self.resource_url = service_provider['rdf:about']
 
         if not self.resource_url:
-            raise AlmException('Unable to connect retrieve Rational resource url (Check server URL, user, pass).')
+            raise AlmException('Unable to retrieve resource url for project "%s" (Check project name).' %
+                               self.config['alm_project'])
         
         self.cm_resource_service = self.resource_url.replace(self.alm_plugin.base_uri+'/', '')
-        self.services = self.alm_plugin.call_api(self.cm_resource_service, call_headers=headers)
-        #print json.dumps(self.services,indent=4)
+        self.services = self.alm_plugin.call_api(self.cm_resource_service)
+
         query_url = self.services['oslc:service'][1]['oslc:queryCapability'][0]['oslc:queryBase']['rdf:resource']
 
         self.query_url = query_url.replace(self.alm_plugin.base_uri+'/', '')
@@ -175,7 +173,6 @@ class RationalConnector(AlmConnector):
             if 'oslc:creationFactory' in service:
                 for factory in service['oslc:creationFactory']:
                     if 'oslc:usage' in factory:
-                        #print json.dumps( factory, indent=4)
                         for resource in factory['oslc:usage']:
                             if resource['rdf:resource'] == OSLC_CR_TYPE:
                                 creation_url = factory['oslc:creation']['rdf:resource']
@@ -187,9 +184,8 @@ class RationalConnector(AlmConnector):
 
     def _rtc_get_priorities(self):
 
-        headers = {'Accept': 'application/json', 'OSLC-Core-Version': '2.0'}
         try:
-            resource_shapes = self.alm_plugin.call_api(self.resource_shape_url, call_headers=headers)
+            resource_shapes = self.alm_plugin.call_api(self.resource_shape_url)
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get resource shapes from Rational')
@@ -197,7 +193,6 @@ class RationalConnector(AlmConnector):
         priorities = []
         for rs in resource_shapes['oslc:property']:
             if rs['oslc:name'] == 'priority':
-                #print json.dumps(rs,indent=4)
                 for p in rs['oslc:allowedValues']['oslc:allowedValue']:
                     priorities.append(self._rtc_get_priority_details(p['rdf:resource']))
 
@@ -206,14 +201,13 @@ class RationalConnector(AlmConnector):
     def _rtc_get_priority_details(self, priority_resource_url):
 
         priority_resource_url = priority_resource_url.replace(self.alm_plugin.base_uri+'/', '')
-        headers = {'Accept': 'application/json', 'OSLC-Core-Version': '2.0'}
+
         try:
-            priority_details = self.alm_plugin.call_api(priority_resource_url, call_headers=headers)
+            priority_details = self.alm_plugin.call_api(priority_resource_url)
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get priority details from Rational' % priority_resource_url)
 
-        #print json.dumps(priority_details,indent=4)
         return priority_details
 
     def _get_priority_literal(self, priority_name):
@@ -237,29 +231,25 @@ class RationalConnector(AlmConnector):
         if not task_id:
             return None
 
-        target = '%s/workitems?oslc.where=dcterms:title="%s:*"' % (self.query_url, task_id)
-        headers = {'Accept': 'application/json', 'OSLC-Core-Version': '2.0'}
-        
         try:
             # Fields parameter will filter response data to only contain story status, name, timestamp and id
-            work_items = self.alm_plugin.call_api(target, call_headers=headers)
+            work_items = self.alm_plugin.call_api('%s/workitems?oslc.where=dcterms:title="%s:*"' %
+                                                  (self.query_url, task_id))
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get task %s from Rational' % task_id)
 
-        #print json.dumps(work_items,indent=4)
         if work_items['oslc:responseInfo']['oslc:totalCount'] == 0:
             return None
 
         work_item_url = work_items['oslc:results'][0]['rdf:resource']
         work_item_target = work_item_url.replace(self.alm_plugin.base_uri+'/', '')
         try:
-            # Fields parameter will filter response data to only contain story status, name, timestamp and id
-            work_item = self.alm_plugin.call_api(work_item_target, call_headers=headers)
+            work_item = self.alm_plugin.call_api(work_item_target)
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get task %s from Rational' % task_id)
-        #print json.dumps( work_item, indent=4)
+
         logger.info('Found task: %s', task_id)
         return RationalTask(task_id,
                                   work_item_url,
@@ -270,8 +260,6 @@ class RationalConnector(AlmConnector):
 
     def alm_add_task(self, task):
 
-        headers = {'Accept': 'application/json', 'OSLC-Core-Version': '2.0'}
-
         priority_name = self.translate_priority(task['priority'])
         priority_literal_resource = self._get_priority_literal(priority_name)
 
@@ -280,17 +268,16 @@ class RationalConnector(AlmConnector):
             'dcterms:description': "This is content",
             'oslc_cmx:priority': priority_literal_resource,
         }
-        print json.dumps(create_args,indent=4)
+
         try:
             work_item = self.alm_plugin.call_api(self.creation_url,
                                                  method=self.alm_plugin.URLRequest.POST,
-                                                 args=create_args, call_headers=headers)
+                                                 args=create_args)
             logger.debug('Task %s added to Rational Project', task['id'])
         except APIError, err:
             raise AlmException('Unable to add task %s to Rational because of %s'
                                % (task['id'], err))
 
-        #print json.dumps(work_item,indent=4)
         # API returns JSON of the new issue
         alm_task = RationalTask(task['title'],
                                       None, # try to fill this in later
@@ -319,18 +306,19 @@ class RationalConnector(AlmConnector):
             'oslc_cm:status': alm_state
         }
 
-        headers = {'Accept':'application/json', 'OSLC-Core-Version':'2.0'}
-        
+        if not task.get_alm_url():
+            raise AlmException("Missing Rational reference for task %s" % task.get_task_id())
+
         work_item_target = task.get_alm_url().replace(self.alm_plugin.base_uri+'/', '')
 
         try:
-            result = self.alm_plugin.call_api(work_item_target, args=update_args, method=URLRequest.PUT, call_headers=headers)
+            result = self.alm_plugin.call_api(work_item_target, args=update_args, method=URLRequest.PUT)
         except APIError, err:
             raise AlmException('Unable to update status to %s '
                                'for task: %s in Rational because of %s' %
                                (status, task.get_alm_id(), err))
 
-        logger.debug('Task changed to %s for task %s in PivotalTracker' %
+        logger.debug('Task changed to %s for task %s in Rational' %
                      (status, task.get_alm_id()))
 
     def alm_disconnect(self):
@@ -347,7 +335,7 @@ class RationalConnector(AlmConnector):
             priority = int(priority)
         except TypeError:
             logger.error('Could not coerce %s into an integer' % priority)
-            raise AlmException("Error in translating SDE priority to GitHub label: "
+            raise AlmException("Error in translating SDE priority to Rational label: "
                                "%s is not an integer priority" % priority)
 
         for key in pmap:
