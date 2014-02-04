@@ -176,6 +176,9 @@ class SdeResponseGenerator(ResponseGenerator):
     def add_project_analysis_note(self, target, flag, data, method):
         if not flag:
             if method == 'POST':
+                if not self.is_data_valid(data, ['analysis_ref']) or not data['analysis_ref']:
+                    self.raise_error(400)
+
                 if self.is_data_valid(data, ['analysis_type']) and data['analysis_type'] in self.analysis_tools:
                     self.generator_add_resource('project_analysis_note', resource_data=data)
 

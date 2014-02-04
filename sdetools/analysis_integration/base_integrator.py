@@ -263,6 +263,7 @@ class BaseIntegrator(object):
         if _report_ids:
             self.report_id = ', '.join(_report_ids)
         else:
+            self.report_id = "Not specified"
             self.emit.info("Report ID not found in report: Using default.")
 
     def process_report_file_config(self):
