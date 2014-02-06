@@ -230,6 +230,10 @@ class SdeResponseGenerator(ResponseGenerator):
                 self.raise_error('500')
             else:
                 if data['analysis_type'] in self.ANALYSIS_TOOLS:
+
+                    if not 'analysis_ref' in data or not data['analysis_ref']:
+                        self.raise_error('400')
+
                     response = self.get_json_from_file('project_analysis_note')
                     response['analysis_ref'] = data['analysis_ref']
                     response['project'] = data['project']

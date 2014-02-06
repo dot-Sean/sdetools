@@ -18,13 +18,13 @@ class FortifyFPRImporter(BaseZIPImporter):
         self.findings = []
         self.process_archive(fpr_file)
 
+        self.id = self.IMPORTERS['audit.xml'].id or self.IMPORTERS['audit.fvdl'].id
+
         # If we have no audit details or blacklists then we're done
         audit_findings = self.IMPORTERS['audit.xml'].findings
         if not audit_findings or not self.ANALYSIS_BLACKLIST:
             self.findings = self.IMPORTERS['audit.fvdl'].findings
             return
-
-        self.id = self.IMPORTERS['audit.xml'].id
 
         # remove issues that match our blacklist
         for vulnerability_instance in self.IMPORTERS['audit.fvdl'].findings:

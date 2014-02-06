@@ -85,7 +85,8 @@ class AuditXMLContent(BaseContentHandler):
 
         if self.in_project_info_node and node_name == 'ProjectInfo':
             self.in_project_info_node = False
-            self.id = "%s %s" % (self.project_name, self.project_version)
+            if self.project_name:
+                self.id = "%s %s" % (self.project_name, self.project_version)
         elif self.in_project_info_name_node and node_name == 'Name':
             self.in_project_info_name_node = False
         elif self.in_project_info_version_node and node_name == 'ProjectVersionName':
