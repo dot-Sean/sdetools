@@ -32,3 +32,11 @@ class TestFortifyIntegration(BaseIntegrationTest, unittest.TestCase):
         findings = self.integrator.generate_findings()
         self.assertTrue(self.integrator.report_id, 'Expected a report_id value')
         self.assertTrue(len(findings), 'Expected to process some findings')
+
+    def test_import_auditxml_missing_project_name(self):
+        self.integrator.config['report_file'] = os.path.join(self.test_file_dir, 'audit-xml-missing-project-name.fpr')
+        self.init_data()
+
+        findings = self.integrator.generate_findings()
+        self.assertTrue(self.integrator.report_id, 'Expected a report_id value')
+        self.assertTrue(len(findings), 'Expected to process some findings')
