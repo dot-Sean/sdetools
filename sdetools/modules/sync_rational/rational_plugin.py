@@ -76,7 +76,7 @@ class RationalTask(AlmTask):
 
     def get_timestamp(self):
         """ Returns a datetime object """
-        return datetime.strptime(self.timestamp, '%Y-%m-%dT%H:%M:%SZ')
+        return datetime.strptime(self.timestamp[:-5]+'Z', '%Y-%m-%dT%H:%M:%SZ')
 
 
 class RationalConnector(AlmConnector):
