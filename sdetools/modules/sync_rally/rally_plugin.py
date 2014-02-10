@@ -275,7 +275,13 @@ class RallyConnector(AlmConnector):
         card_type_details = self.card_types[self.config['rally_card_type']]
         task_id = self._extract_task_id(task['id'])
 
-        task_data = self.rally_get_artifact(task_id, '(Name contains "%s:")' % task_id, card_type_details['type'],
+        artifact_query = '(Name contains "%s:")' % task_id
+
+        if card_type_details['type'] == 'Task':
+            artifact_query = '(%s and (WorkProduct.FormattedID = "%s"))' % (
+                    artifact_query, self.config['alm_parent_issue'])
+
+        task_data = self.rally_get_artifact(task_id, artifact_query, card_type_details['type'],
                                             card_type_details['type'], card_type_details['api'])
         if not task_data:
             return task_data
