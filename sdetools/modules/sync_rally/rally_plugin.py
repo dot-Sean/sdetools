@@ -218,10 +218,9 @@ class RallyConnector(AlmConnector):
                     'tag/create.js',
                     args=create_args,
                     method=self.alm_plugin.URLRequest.POST)
-
             except APIError, err:
                 raise AlmException('Unable to create tag info from Rally. Reason: %s' % err)
-            print tag_result
+
             if tag_result['CreateResult']['Errors']:
                 raise AlmException('Unable to add label "%s" to Rally. Reason: %s' %
                                (self.config['alm_issue_label'], str(tag_result['CreateResult']['Errors'])[:200]))
