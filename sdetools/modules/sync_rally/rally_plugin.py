@@ -99,6 +99,7 @@ class RallyConnector(AlmConnector):
                                  default='Completed,Accepted')
         config.opts.add('rally_workspace', 'Rally Workspace', default=None)
         config.opts.add('rally_card_type', 'IDs for issues raised in Rally', default='Story')
+        config.opts.add('alm_issue_label', 'Label applied to issue in Rally', default='Label5')
         config.opts.add('alm_parent_issue', 'Parent Story for new Tasks', default='')
 
     def initialize(self):
@@ -141,6 +142,7 @@ class RallyConnector(AlmConnector):
         self.project_ref = None
         self.workspace_ref = None
         self.alm_parent_issue_ref = None
+        self.tag_ref = None
 
         self.mark_down_converter = markdown.Markdown(safe_mode="escape")
 
@@ -187,6 +189,46 @@ class RallyConnector(AlmConnector):
         if not num_results:
             raise AlmException('Rally project not found: %s' % self.config['alm_project'])
         self.project_ref = project_ref['QueryResult']['Results'][0]['_ref']
+
+        self._setup_rally_label()
+
+    def _setup_rally_label(self):
+
+        # Find the issue tag
+        query_args = {
+            'query': '(Name = \"%s\")' % self.config['alm_issue_label'],
+            'workspace': self.workspace_ref,
+        }
+        try:
+            tag_result = self.alm_plugin.call_api('tag.js', args=query_args)
+        except APIError, err:
+            raise AlmException('Unable to retrieve tag info from Rally. Reason: %s' % err)
+
+        num_results = tag_result['QueryResult']['TotalResultCount']
+        if not num_results:
+            create_args = {
+                'Tag': {
+                    'Name': self.config['alm_issue_label'],
+                    'Workspace': self.workspace_ref,
+                }
+            }
+
+            try:
+                tag_result = self.alm_plugin.call_api(
+                    'tag/create.js',
+                    args=create_args,
+                    method=self.alm_plugin.URLRequest.POST)
+
+            except APIError, err:
+                raise AlmException('Unable to create tag info from Rally. Reason: %s' % err)
+            print tag_result
+            if tag_result['CreateResult']['Errors']:
+                raise AlmException('Unable to add label "%s" to Rally. Reason: %s' %
+                               (self.config['alm_issue_label'], str(tag_result['CreateResult']['Errors'])[:200]))
+
+            self.tag_ref = tag_result['CreateResult']['Object']['_ref']
+        else:
+            self.tag_ref = tag_result['QueryResult']['Results'][0]['_ref']
 
     def alm_validate_configurations(self):
 
@@ -293,6 +335,7 @@ class RallyConnector(AlmConnector):
         create_args = {
             card_type_details['type']: {
                 'Name': task['title'],
+                'Tags': [{'_ref': self.tag_ref}],
                 'Description': self.sde_get_task_content(task),
                 'Workspace': self.workspace_ref,
                 'Project': self.project_ref
