@@ -99,7 +99,7 @@ class RallyConnector(AlmConnector):
                                  default='Completed,Accepted')
         config.opts.add('rally_workspace', 'Rally Workspace', default=None)
         config.opts.add('rally_card_type', 'IDs for issues raised in Rally', default='Story')
-        config.opts.add('alm_issue_label', 'Label applied to issue in Rally', default='Label5')
+        config.opts.add('alm_issue_label', 'Label applied to issue in Rally', default='SD-Elements')
         config.opts.add('alm_parent_issue', 'Parent Story for new Tasks', default='')
 
     def initialize(self):
