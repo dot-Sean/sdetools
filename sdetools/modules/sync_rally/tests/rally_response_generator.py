@@ -9,6 +9,7 @@ class RallyResponseGenerator(ResponseGenerator):
         resource_templates = ['card.json']
         rest_api_targets = {
             '%s/task\.js' % base_path: 'get_tasks',
+            '%s/tag\.js' % base_path: 'get_tags',
             '%s/subscription\.js' % base_path: 'get_subscription',
             '%s/project\.js' % base_path: 'get_project',
             '%s/hierarchicalrequirement\.js' % base_path: 'get_requirements',
@@ -52,6 +53,12 @@ class RallyResponseGenerator(ResponseGenerator):
 
                 return response
             self.raise_error('405')
+        else:
+            self.raise_error('401')
+
+    def get_tags(self, target, flag, data, method):
+        if not flag:
+            return self.get_json_from_file('tags')
         else:
             self.raise_error('401')
 
