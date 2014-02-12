@@ -106,7 +106,12 @@ class RallyConnector(AlmConnector):
         super(RallyConnector, self).initialize()
 
         #Verify that the configuration options are set properly
-        for item in ['rally_done_statuses', 'rally_card_type', 'rally_new_status', 'rally_workspace']:
+        for item in ['rally_done_statuses',
+                     'rally_card_type',
+                     'rally_new_status',
+                     'rally_workspace',
+                     'alm_issue_label']:
+
             if not self.config[item]:
                 raise AlmException('Missing %s in configuration' % item)
 
@@ -205,29 +210,30 @@ class RallyConnector(AlmConnector):
             raise AlmException('Unable to retrieve tag info from Rally. Reason: %s' % err)
 
         num_results = tag_result['QueryResult']['TotalResultCount']
-        if not num_results:
-            create_args = {
-                'Tag': {
-                    'Name': self.config['alm_issue_label'],
-                    'Workspace': self.workspace_ref,
-                }
-            }
-
-            try:
-                tag_result = self.alm_plugin.call_api(
-                    'tag/create.js',
-                    args=create_args,
-                    method=self.alm_plugin.URLRequest.POST)
-            except APIError, err:
-                raise AlmException('Unable to create tag info from Rally. Reason: %s' % err)
-
-            if tag_result['CreateResult']['Errors']:
-                raise AlmException('Unable to add label "%s" to Rally. Reason: %s' %
-                               (self.config['alm_issue_label'], str(tag_result['CreateResult']['Errors'])[:200]))
-
-            self.tag_ref = tag_result['CreateResult']['Object']['_ref']
-        else:
+        if num_results:
             self.tag_ref = tag_result['QueryResult']['Results'][0]['_ref']
+            return
+
+        create_args = {
+            'Tag': {
+                'Name': self.config['alm_issue_label'],
+                'Workspace': self.workspace_ref,
+            }
+        }
+
+        try:
+            tag_result = self.alm_plugin.call_api(
+                'tag/create.js',
+                args=create_args,
+                method=self.alm_plugin.URLRequest.POST)
+        except APIError, err:
+            raise AlmException('Unable to create tag info from Rally. Reason: %s' % err)
+
+        if tag_result['CreateResult']['Errors']:
+            raise AlmException('Unable to add label "%s" to Rally. Reason: %s' %
+                              (self.config['alm_issue_label'], str(tag_result['CreateResult']['Errors'])[:200]))
+
+        self.tag_ref = tag_result['CreateResult']['Object']['_ref']
 
     def alm_validate_configurations(self):
 
