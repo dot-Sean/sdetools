@@ -10,7 +10,7 @@ class RationalResponseGenerator(ResponseGenerator):
         self.username = config['alm_user']
         self.alm_server = config['alm_server']
         #self.alm_project = config['alm_project']
-        resource_templates = ['sde_task.json', 'sde_proj.json', 'sde_app.json', 'rootservices.json', 'catalog.json', 'services.json', 'resourceshape.json', 'priorities.json', 'count.json', 'workitem.json']
+        resource_templates = ['sde_task1.json', 'sde_task.json', 'sde_proj.json', 'sde_app.json', 'rootservices.json', 'catalog.json', 'services.json', 'resourceshape.json', 'priorities.json', 'count.json', 'workitem.json']
         rest_api_targets = {
             '.*/rootservices': 'get_rootservices',
             '.*/oslc/workitems/catalog': 'get_catalog',
@@ -20,24 +20,27 @@ class RationalResponseGenerator(ResponseGenerator):
             '.*/oslc/contexts/_gkmCkniWEeOI1P1pr3yq5Q/workitems/workitems\\?oslc.where=dcterms:title=.*': 'get_count',
             '.*/resource/itemName/com.ibm.team.workitem.WorkItem/\\d*': 'get_workitem',
             '.*/oslc/contexts/_gkmCkniWEeOI1P1pr3yq5Q/workitems/task': 'post_workitem',
-            '.*/api/applications.*': 'sde_app',
-            '.*/api/projects.*': 'sde_proj',
-            '.*/api/tasks.*': 'sde_task'
+            #'.*/api/applications.*': 'sde_app',
+            #'.*/api/projects.*': 'sde_proj',
+            #'.*/api/tasks/.*': 'sde_task',
+            #'.*/api/tasks(?!/).*': 'sde_tasks',
+            #response doesn't matter, reusing sde_task response for simplicity
+            #'.*/api/tasknotes/ide.*': 'sde_task'
         }
         super(RationalResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir)
 
     def init_with_resources(self):
-        #self.generator_add_resource('user', resource_data={'login': self.username})
-        self.generator_add_resource('sde_task', resource_data=json.loads(open('./response/sde_task.json').read()))
-        self.generator_add_resource('sde_proj', resource_data=json.loads(open('./response/sde_proj.json').read()))
-        self.generator_add_resource('sde_app', resource_data=json.loads(open('./response/sde_app.json').read()))
-        self.generator_add_resource('rootservices', resource_data=json.loads(open('./response/rootservices.json').read()))
-        self.generator_add_resource('catalog', resource_data=json.loads(open('./response/catalog.json').read()))
-        self.generator_add_resource('services', resource_data=json.loads(open('./response/services.json').read()))
-        self.generator_add_resource('resourceshape', resource_data=json.loads(open('./response/resourceshape.json').read()))
-        self.generator_add_resource('priorities', resource_data=json.loads(open('./response/priorities.json').read()))
-        self.generator_add_resource('count', resource_data=json.loads(open('./response/count.json').read()))
-        self.generator_add_resource('workitem', resource_data=json.loads(open('./response/workitem.json').read()))
+        #self.generator_add_resource('sde_task', resource_data=json.loads(open('./response/sde_task.json').read()))
+        #self.generator_add_resource('sde_task1', resource_data=json.loads(open('./response/sde_task1.json').read()))
+        #self.generator_add_resource('sde_proj', resource_data=json.loads(open('./response/sde_proj.json').read()))
+        #self.generator_add_resource('sde_app', resource_data=json.loads(open('./response/sde_app.json').read()))
+        self.generator_add_resource('rootservices', resource_data=json.loads(open('c:/users/securitycompass/documents/sdetools/sdetools/modules/sync_rational/tests/response/rootservices.json').read()))
+        self.generator_add_resource('catalog', resource_data=json.loads(open('c:/users/securitycompass/documents/sdetools/sdetools/modules/sync_rational/tests/response/catalog.json').read()))
+        self.generator_add_resource('services', resource_data=json.loads(open('c:/users/securitycompass/documents/sdetools/sdetools/modules/sync_rational/tests/response/services.json').read()))
+        self.generator_add_resource('resourceshape', resource_data=json.loads(open('c:/users/securitycompass/documents/sdetools/sdetools/modules/sync_rational/tests/response/resourceshape.json').read()))
+        self.generator_add_resource('priorities', resource_data=json.loads(open('c:/users/securitycompass/documents/sdetools/sdetools/modules/sync_rational/tests/response/priorities.json').read()))
+        self.generator_add_resource('count', resource_data=json.loads(open('c:/users/securitycompass/documents/sdetools/sdetools/modules/sync_rational/tests/response/count.json').read()))
+        self.generator_add_resource('workitem', resource_data=json.loads(open('c:/users/securitycompass/documents/sdetools/sdetools/modules/sync_rational/tests/response/workitem.json').read()))
 
     def raise_error(self, error_code, message=None):
         if message is None:
@@ -62,7 +65,7 @@ class RationalResponseGenerator(ResponseGenerator):
                 message = {
                     "message": "Error",
                 }
-        super(RationalResponseGenerator, self).raise_error(error_code, message)
+        super(RationalResponseGenerator, self).raise_error(error_code, message['message'])
 
     """
        Response functions
@@ -106,30 +109,22 @@ class RationalResponseGenerator(ResponseGenerator):
 
     def get_workitem(self, target, flag, data, method):
         if not flag:
-            return self.generator_get_all_resource('workitem')[0]
+            res = self.generator_get_all_resource('workitem')[0]
+            #print res
+            return res
         else:
             self.raise_error('404')
 
     def post_workitem(self, target, flag, data, method):
-        if True:
-            if not flag:
-                res = self.generator_get_all_resource('workitem')[0]
-                print data
-                print res
-                for x in data:
-                    res[x] = data[x]
-                print res
-                return res
-            else:
-                self.raise_error('404')
-        elif method == 'PUT':
-            if not flag:
-                res = self.generator_get_all_resource('workitem')[0]
-                for x in data:
-                    res[x] = data[x]
-                return res
-            else:
-                self.raise_error('404')
+        #print method
+        if not flag:
+            res = self.generator_get_all_resource('workitem')[0]
+            for x in data:
+                res[x] = data[x]
+            self.generator_update_resource('workitem', '0', update_args=res)
+            return res
+        else:
+            self.raise_error('404')
 
 
     def sde_app(self, target, flag, data, method):
@@ -144,8 +139,24 @@ class RationalResponseGenerator(ResponseGenerator):
         else:
             self.raise_error('404')
 
-    def sde_task(self, target, flag, data, method):
+    def sde_tasks(self, target, flag, data, method):
         if not flag:
             return self.generator_get_all_resource('sde_task')[0]
         else:
             self.raise_error('404')
+
+    def sde_task(self, target, flag, data, method):
+        if method == 'PUT':
+            if not flag:
+                res = self.generator_get_all_resource('sde_task1')[0]
+                for x in data:
+                    res[x] = data[x]
+                self.generator_update_resource('sde_task1', '0', update_args=res)
+                return res
+            else:
+                self.raise_error('404')
+        else:
+            if not flag:
+                return self.generator_get_all_resource('sde_task1')[0]
+            else:
+                self.raise_error('404')
