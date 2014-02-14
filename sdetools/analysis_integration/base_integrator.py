@@ -375,8 +375,6 @@ class BaseIntegrator(object):
         project_tasks is an array of maps. Each map contains a key 'id' with a corresponding integer value
         """
         for task in project_tasks:
-            if task_id == 203:
-                print task['id']
             task_search = re.search('^(\d+)-T(\d+)$', task['id'])
             if task_search:
                 project_task_id = task_search.group(2)
