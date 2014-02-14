@@ -7,7 +7,7 @@ __all__ = [
     'extlib',
 ]
 
-VERSION = '4.2.2'
+VERSION = '4.2.3'
 
 from sdetools.sdelib import mod_mgr
 
