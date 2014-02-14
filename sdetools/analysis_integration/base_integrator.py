@@ -375,7 +375,9 @@ class BaseIntegrator(object):
         project_tasks is an array of maps. Each map contains a key 'id' with a corresponding integer value
         """
         for task in project_tasks:
-            task_search = re.search('^(\d+)-[^\d]+(\d+)$', task['id'])
+            if task_id == 203:
+                print task['id']
+            task_search = re.search('^(\d+)-T(\d+)$', task['id'])
             if task_search:
                 project_task_id = task_search.group(2)
                 if project_task_id == task_id:
@@ -419,7 +421,7 @@ class BaseIntegrator(object):
         for task_id in task_ids:
             finding = unique_findings[task_id]
 
-            if not self.task_exists_in_project_tasks( task_id, task_list):
+            if not self.task_exists_in_project_tasks(task_id, task_list):
                 logger.debug("Task %s not found in project tasks" % task_id)
                 mapped_tasks = self.lookup_task("*")
                 if mapped_tasks:
@@ -506,16 +508,16 @@ class BaseIntegrator(object):
         affected_tasks = []
         noflaw_tasks = []
         for task in task_list:
-            if(task['phase'] in self.phase_exceptions):
+            if task['phase'] in self.phase_exceptions:
                 stats_test_tasks += 1
                 continue
-            task_search = re.search('^(\d+)-[^\d]+(\d+)$', task['id'])
+            task_search = re.search('^(\d+)-T(\d+)$', task['id'])
             if task_search:
                 task_id = task_search.group(2)
-                if(unique_findings.has_key(task_id)):
+                if unique_findings.has_key(task_id):
                     affected_tasks.append(task_id)
                     continue
-            noflaw_tasks.append(task_id)
+                noflaw_tasks.append(task_id)
 
         if not self.config['flaws_only']:
             for task_id in noflaw_tasks:
