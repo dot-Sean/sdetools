@@ -23,6 +23,8 @@ class TestRationalCase(AlmPluginTestBase):
             raise AssertionError(error_msg)
 
     def test_update_task_status_to_done(self):
+        """TEST: Update SDE Task Status to DONE"""
+
         self.connector.config['conflict_policy'] = 'alm'
         self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
         self.connector.alm_connect()
@@ -37,19 +39,35 @@ class TestRationalCase(AlmPluginTestBase):
 
     def test_update_task_status_to_na(self):
         """TEST NOT APPLICABLE"""
+        pass
 
     def test_update_task_status_to_todo(self):
+        """TEST: Update SDE Task Status to TODO"""
+
         self.connector.config['conflict_policy'] = 'alm'
         self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task(priority=8)
         test_task['status'] = 'TODO'
-        print test_task
+        #print test_task
         self.connector.alm_add_task(test_task)
         self.connector.synchronize()
         the_task = self.connector.sde_get_task(test_task['id'])
         print the_task
         self.assertEqual(the_task['status'], 'TODO', 'Failed to update SDE task to TODO')
+
+    def test_sync_no_alm_task(self):
+        """TEST: Synchronize Task present only in SDE"""
+
+        self.connector.config['conflict_policy'] = 'alm'
+        self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
+        self.connector.alm_connect()
+        test_task = self.mock_sde_response.generate_sde_task(priority=8)
+        print test_task
+        self.connector.synchronize()
+        alm_task = self.connector.alm_get_task(test_task['id'])
+        self.assertEqual(alm_task, test_task, 'Files don\'t match')
+
 
 """
     def test_parsing_alm_task(self):
