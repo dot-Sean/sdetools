@@ -3,9 +3,10 @@ import re
 import os
 import socket
 import urllib2
-import base64
 import tempfile
 import atexit
+
+from urllib2 import HTTPError
 
 try:
     import ssl
@@ -59,11 +60,11 @@ def compile_certs():
     crtf = os.fdopen(crtfd, 'w')
 
     candidates = OS_ROOT_BUNDLES[:]
-    """
+
     for fname in os.listdir(CERT_PATH_NAME):
         if fname.endswith('.crt'):
             candidates.append(os.path.join(CERT_PATH_NAME, fname))
-    """
+
     for fpath in candidates:
         if not os.path.isfile(fpath):
             continue
