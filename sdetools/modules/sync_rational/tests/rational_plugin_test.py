@@ -53,7 +53,6 @@ class TestRationalCase(AlmPluginTestBase):
         self.connector.alm_add_task(test_task)
         self.connector.synchronize()
         the_task = self.connector.sde_get_task(test_task['id'])
-        print the_task
         self.assertEqual(the_task['status'], 'TODO', 'Failed to update SDE task to TODO')
 
     def test_sync_no_alm_task(self):
@@ -63,10 +62,10 @@ class TestRationalCase(AlmPluginTestBase):
         self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task(priority=8)
-        print test_task
         self.connector.synchronize()
-        alm_task = self.connector.alm_get_task(test_task['id'])
-        self.assertEqual(alm_task, test_task, 'Files don\'t match')
+        alm_task = self.connector.alm_get_task(test_task)
+        self.assertEqual(test_task['id'][test_task['id'].find('T'):], alm_task.get_task_id(), 'Files don\'t match, mismatch: %s - %s' % (test_task['id'][test_task['id'].find('T'):], alm_task.get_task_id()))
+        self.assertEqual(test_task['status'], alm_task.get_status(), 'Files don\'t match, mismatch: %s - %s' % (test_task['status'], alm_task.get_status()))
 
 
 """
