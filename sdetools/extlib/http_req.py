@@ -59,11 +59,11 @@ def compile_certs():
     crtf = os.fdopen(crtfd, 'w')
 
     candidates = OS_ROOT_BUNDLES[:]
-    """
+
     for fname in os.listdir(CERT_PATH_NAME):
         if fname.endswith('.crt'):
             candidates.append(os.path.join(CERT_PATH_NAME, fname))
-    """
+
     for fpath in candidates:
         if not os.path.isfile(fpath):
             continue
@@ -223,7 +223,7 @@ def get_http_handler(mode, debuglevel=0):
                 ssl_warned = True
             return urllib2.HTTPSHandler(debuglevel=debuglevel)
         else:
-            return VerifiedHTTPSHandler(debuglevel=debuglevel)#, ca_certs=CA_CERTS_FILE)
+            return VerifiedHTTPSHandler(debuglevel=debuglevel, ca_certs=CA_CERTS_FILE)
     raise KeyError, mode
 
 def get_opener(method, server, proxy=None, debuglevel=0):
