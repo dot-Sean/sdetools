@@ -103,7 +103,7 @@ class MockResponse(object):
 class MockSDEResponse(MockResponse):
     def initialize(self, config):
         global SDE_SERVER
-        if config['authmode'] == 'api_token':
+        if '@' in config['sde_api_token']:
             SDE_SERVER = config['sde_api_token'][config['sde_api_token'].find('@')+1:]
         else:
             SDE_SERVER = config['sde_server']
