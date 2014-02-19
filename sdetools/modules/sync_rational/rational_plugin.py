@@ -5,7 +5,7 @@ import re, json
 from datetime import datetime
 
 from sdetools.sdelib.restclient import RESTBase
-from sdetools.sdelib.restclient import URLRequest, APIError, APIFormatError
+from sdetools.sdelib.restclient import URLRequest, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from sdetools.alm_integration.alm_plugin_base import AlmException
 
@@ -38,38 +38,27 @@ class RationalAPI(RESTBase):
         super(RationalAPI, self).post_conf_init()
 
     def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}, auth_mode=None):
-
         call_headers['Accept'] = 'application/json'
         call_headers['OSLC-Core-Version'] = '2.0'
 
-        if method == URLRequest.PUT:
-            call_headers['Content-Type'] = 'application/json'
-
-        return super(RationalAPI, self).call_api(target, method, args, call_headers, auth_mode)
-
-    def parse_response(self, result, headers):
         try:
-            result = json.loads(result)
-        except:
-            raise APIFormatError('Unable to process JSON data: %s' % str(result)[:200])
-        return result, headers
+            result = super(RationalAPI, self).call_api(target, method, args, call_headers, auth_mode)
+        except Exception as e:
+            raise AlmException('API Call failed. Target: %s ; Error: %s' % (target, e))
 
-    def parse_error(self, result):
-        #print result
-        return super(RationalAPI, self).parse_error(result)
+        return result
+
 
 class RationalTask(AlmTask):
     """ Representation of a task in Rational"""
 
-    def __init__(self, task_id, alm_url, alm_id, status, timestamp, done_statuses, etag, obj):
+    def __init__(self, task_id, alm_url, alm_id, status, timestamp, done_statuses):
         self.task_id = task_id
         self.alm_url = alm_url
         self.alm_id = alm_id
         self.status = status
         self.timestamp = timestamp
         self.done_statuses = done_statuses
-        self.etag = etag
-        self.obj = obj
 
     def get_task_id(self):
         return self.task_id
@@ -92,10 +81,8 @@ class RationalTask(AlmTask):
 
     def get_timestamp(self):
         """ Returns a datetime object """
-        return datetime.strptime(self.timestamp, '%Y-%m-%dT%H:%M:%SZ')
+        return datetime.strptime(self.timestamp[:-5]+'Z', '%Y-%m-%dT%H:%M:%SZ')
 
-    def get_etag(self):
-        return self.etag
 
 class RationalConnector(AlmConnector):
     alm_name = 'Rational'
@@ -130,6 +117,9 @@ class RationalConnector(AlmConnector):
 
         self.config[self.ALM_DONE_STATUSES] = self.config[self.ALM_DONE_STATUSES].split(',')
 
+        if self.config['conflict_policy'] != 'alm':
+            raise AlmException('Conflict policy not supported. Only Rational is supported as master. Current conflict policy: %s' % self.config['conflict_policy'])
+
         self.config.process_json_str_dict(self.ALM_PRIORITY_MAP)
 
         if not self.config[self.ALM_PRIORITY_MAP]:
@@ -149,7 +139,7 @@ class RationalConnector(AlmConnector):
         # Check if user can successfully authenticate and retrieve service catalog
         
         try:
-            catalog, headers = self.alm_plugin.call_api('rootservices')
+            catalog = self.alm_plugin.call_api('rootservices')
         except APIError, err:
             raise AlmException('Unable to connect retrieve root services (Check server URL, user, pass).'
                                'Reason: %s' % str(err))
@@ -165,7 +155,7 @@ class RationalConnector(AlmConnector):
         self.cm_service_provider_target = self.cm_service_provider.replace(self.alm_plugin.base_uri+'/', '')
 
         try:
-            self.service_catalog, headers = self.alm_plugin.call_api(self.cm_service_provider_target)
+            self.service_catalog = self.alm_plugin.call_api(self.cm_service_provider_target)
         except APIError, err:
             raise AlmException('Unable to connect retrieve Rational service catalog (Check server URL, user, pass).'
                                'Reason: %s' % str(err))
@@ -182,7 +172,7 @@ class RationalConnector(AlmConnector):
                                self.config['alm_project'])
         
         self.cm_resource_service = self.resource_url.replace(self.alm_plugin.base_uri+'/', '')
-        self.services, headers = self.alm_plugin.call_api(self.cm_resource_service)
+        self.services = self.alm_plugin.call_api(self.cm_resource_service)
 
         query_url = self.services['oslc:service'][1]['oslc:queryCapability'][0]['oslc:queryBase']['rdf:resource']
 
@@ -203,7 +193,7 @@ class RationalConnector(AlmConnector):
     def _rtc_get_priorities(self):
 
         try:
-            resource_shapes, headers = self.alm_plugin.call_api(self.resource_shape_url)
+            resource_shapes = self.alm_plugin.call_api(self.resource_shape_url)
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get resource shapes from Rational')
@@ -217,14 +207,14 @@ class RationalConnector(AlmConnector):
         return priorities
 
     def _rtc_get_priority_details(self, priority_resource_url):
-
+        #print priority_resource_url
         priority_resource_url = priority_resource_url.replace(self.alm_plugin.base_uri+'/', '')
 
         try:
-            priority_details, headers = self.alm_plugin.call_api(priority_resource_url)
+            priority_details = self.alm_plugin.call_api(priority_resource_url)
         except APIError, err:
             logger.error(err)
-            raise AlmException('Unable to get priority details from Rational' % priority_resource_url)
+            raise AlmException('Unable to get priority details from Rational. Url: %s' % priority_resource_url)
 
         return priority_details
 
@@ -251,8 +241,8 @@ class RationalConnector(AlmConnector):
 
         try:
             # Fields parameter will filter response data to only contain story status, name, timestamp and id
-            work_items, headers = self.alm_plugin.call_api('%s/workitems?oslc.where=dcterms:title="%s:*"' %
-                                                           (self.query_url, task_id))
+            work_items = self.alm_plugin.call_api('%s/workitems?oslc.where=dcterms:title="%s:*"' %
+                                                  (self.query_url, task_id))
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get task %s from Rational' % task_id)
@@ -263,7 +253,7 @@ class RationalConnector(AlmConnector):
         work_item_url = work_items['oslc:results'][0]['rdf:resource']
         work_item_target = work_item_url.replace(self.alm_plugin.base_uri+'/', '')
         try:
-            work_item, headers = self.alm_plugin.call_api(work_item_target)
+            work_item = self.alm_plugin.call_api(work_item_target)
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get task %s from Rational' % task_id)
@@ -274,78 +264,85 @@ class RationalConnector(AlmConnector):
                                   work_item['dcterms:identifier'],
                                   work_item['oslc_cm:status'],
                                   work_item['dcterms:modified'],
-                                  self.config[self.ALM_DONE_STATUSES],
-                                  headers['etag'], work_item)
+                                  self.config[self.ALM_DONE_STATUSES])
 
     def alm_add_task(self, task):
 
         priority_name = self.translate_priority(task['priority'])
         priority_literal_resource = self._get_priority_literal(priority_name)
-
-        create_args = {
-            'dcterms:title': task['title'],
-            'dcterms:description': "This is content",
-            'oslc_cmx:priority': priority_literal_resource,
-        }
+        #print task['status']
+        if (self.config['alm_standard_workflow'] and
+                (task['status'] == 'DONE' or task['status'] == 'NA')):
+            create_args = {
+                'dcterms:title': task['title'],
+                'dcterms:description': "This is content",
+                'oslc_cmx:priority': priority_literal_resource,
+                'oslc_cm:status': self.config[self.ALM_DONE_STATUSES][0]
+            }
+        else:
+            create_args = {
+                'dcterms:title': task['title'],
+                'dcterms:description': "This is content",
+                'oslc_cmx:priority': priority_literal_resource,
+            }
 
         try:
-            work_item, headers = self.alm_plugin.call_api(self.creation_url,
+            work_item = self.alm_plugin.call_api(self.creation_url,
                                                  method=self.alm_plugin.URLRequest.POST,
                                                  args=create_args)
+            #print work_item
             logger.debug('Task %s added to Rational Project', task['id'])
         except APIError, err:
             raise AlmException('Unable to add task %s to Rational because of %s'
                                % (task['id'], err))
 
         # API returns JSON of the new issue
-        alm_task = RationalTask(task['title'],
-                                      None, # try to fill this in later
-                                      work_item['dcterms:identifier'],
-                                      work_item['oslc_cm:status'],
-                                      work_item['dcterms:modified'],
-                                      self.config[self.ALM_DONE_STATUSES])
+        #alm_task = RationalTask(task['title'],
+        #                              None, # try to fill this in later
+        #                              work_item['dcterms:identifier'],
+        #                              work_item['oslc_cm:status'],
+        #                              work_item['dcterms:modified'],
+        #                              self.config[self.ALM_DONE_STATUSES])
+        alm_task = self.alm_get_task(task)
 
-        if (self.config['alm_standard_workflow'] and
-                (task['status'] == 'DONE' or task['status'] == 'NA')):
-            self.alm_update_task_status(alm_task, task['status'])
+        #if (self.config['alm_standard_workflow'] and
+        #        (task['status'] == 'DONE' or task['status'] == 'NA')):
+        #    self.alm_update_task_status(alm_task, task['status'])
 
         return 'Project: %s, Task: %s' % (self.config['alm_project'], alm_task.get_alm_id())
 
     def alm_update_task_status(self, task, status):
-        if not task or not self.config['alm_standard_workflow']:
-            logger.debug('Status synchronization disabled')
-            return
+        pass
 
-        if status == 'DONE' or status == 'NA':
-            alm_state = self.config[self.ALM_DONE_STATUSES][0]
-        elif status == 'TODO':
-            alm_state = self.config[self.ALM_NEW_STATUS]
+# CURRENTLY NOT SUPPORTED
 
-        update_args = {
-            'state': 'Open'
-        }
-
-        if not task.get_alm_url():
-            raise AlmException("Missing Rational reference for task %s" % task.get_task_id())
-
-        work_item_target = task.get_alm_url().replace(self.alm_plugin.base_uri+'/', '')
-        m = re.search('\"([^"]+)\"', task.get_etag())
-
-        try:
-            update_headers = {
-                'If-Match': task.get_etag()
-            }
-            result, headers = self.alm_plugin.call_api("%s" % work_item_target,
-                                                       args=update_args,
-                                                       method=URLRequest.PUT,
-                                                       call_headers=update_headers)
-        except APIError, err:
-            raise AlmException('Unable to update status to %s '
-                               'for task: %s in Rational because of %s' %
-                               (status, task.get_alm_id(), err))
-
-        logger.debug('Task changed to %s for task %s in Rational' %
-                     (status, task.get_alm_id()))
+#        if not task or not self.config['alm_standard_workflow']:
+#            logger.debug('Status synchronization disabled')
+#            return
+#
+#       if status == 'DONE' or status == 'NA':
+#            alm_state = self.config[self.ALM_DONE_STATUSES][0]
+#        elif status == 'TODO':
+#            alm_state = self.config[self.ALM_NEW_STATUS]
+#
+#        update_args = {
+#            'oslc_cm:status': alm_state
+#        }
+#
+#        if not task.get_alm_url():
+#            raise AlmException("Missing Rational reference for task %s" % task.get_task_id())
+#
+#        work_item_target = task.get_alm_url().replace(self.alm_plugin.base_uri+'/', '')
+#
+#        try:
+#            result = self.alm_plugin.call_api(work_item_target, args=update_args, method=URLRequest.PUT)
+#        except APIError, err:
+#            raise AlmException('Unable to update status to %s '
+#                               'for task: %s in Rational because of %s' %
+#                               (status, task.get_alm_id(), err))
+#
+#        logger.debug('Task changed to %s for task %s in Rational' %
+#                     (status, task.get_alm_id()))
 
     def alm_disconnect(self):
         pass
@@ -374,3 +371,101 @@ class RationalConnector(AlmConnector):
             else:
                 if int(key) == priority:
                     return pmap[key]
+
+    def synchronize(self):
+        """ Synchronizes SDE project with ALM project.
+
+        Reviews every task in the SDE project:
+        - if the task exists in both SDE & ALM and the status is the same
+          in both, nothing happens
+        - if the task exists in both SDE & ALM and the status differs, then
+          the conflict policy takes effect. Either the newest status based on
+          timestamp is used, or the SDE status is used in every case, or
+          the ALM tool status is used in every case. Default is ALM tool
+          status
+        - if the task only exists in SDE, the task is added to the ALM
+          tool
+        - NOTE: if a task that was previously imported from SDE into the
+          ALM is later removed in the same SDE project, then the task is
+          effectively orphaned. The task must be removed manually from the
+          ALM tool
+
+        Raises an AlmException on encountering an error
+        """
+        try:
+            if not self.sde_plugin:
+                raise AlmException('Requires initialization')
+
+            if self.config['test_alm']:
+                self.alm_connect()
+                return
+
+            #Attempt to connect to SDE & ALM
+            progress = 0
+
+            self.sde_connect()
+            progress += 2
+            self.output_progress(progress)
+
+            self.alm_connect()
+            progress += 2
+            self.output_progress(progress)
+
+            #Attempt to get all tasks
+            tasks = self.sde_get_tasks()
+            #print tasks
+            logger.info('Retrieved all tasks from SDE')
+
+            #Prune unnecessary tasks - progress must match reality
+            tasks = self.prune_tasks(tasks)
+
+            logger.info('Pruned tasks out of scope')
+
+            total_work = (progress+len(tasks))
+
+            for task in tasks:
+                tid = task['id'].split('-', 1)[-1]
+                progress += 1
+                self.output_progress(100*progress/total_work)
+
+                alm_task = self.alm_get_task(task)
+                #print task
+                #print alm_task
+                if alm_task:
+                    if not self.config['alm_standard_workflow']:
+                        continue
+
+                    # Exists in both SDE & ALM
+                    if not self.status_match(alm_task.get_status(), task['status']):
+                        # What takes precedence in case of a conflict of
+                        # status. Start with ALM
+                        updated_system = 'SD Elements'
+
+                        if self.config['conflict_policy'] != 'alm':
+                            raise AlmException('Conflict policy not supported. Only Rational is supported as master. Current conflict policy: %s' % self.config['conflict_policy'])
+
+                        status = alm_task.get_status()
+
+                        self.sde_update_task_status(task, status)
+
+                        self.emit.info('Updated status of task %s in %s to %s' % (tid, updated_system, status))
+                else:
+                    # Only exists in SD Elements
+                    # Skip if this task should not be added to ALM
+                    if ((not self.config['selected_tasks'] and task['status'] not in self.config['sde_statuses_in_scope']) or
+                            task['id'] in self.ignored_tasks):
+                        continue
+                    ref = self.alm_add_task(task)
+                    self.emit.info('Added task %s to %s' % (tid, self.alm_name))
+                    note_msg = 'Task synchronized in %s. Reference: %s' % (self.alm_name, ref)
+                    self._add_note(task['id'], note_msg, '', task['status'])
+                    logger.debug(note_msg)
+
+            logger.info('Synchronization complete')
+
+            self.alm_disconnect()
+
+        except AlmException as e:
+            self.alm_disconnect()
+            raise AlmException('Synchronization error: %s' % e)
+
