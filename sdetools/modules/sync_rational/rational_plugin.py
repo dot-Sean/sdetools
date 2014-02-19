@@ -1,7 +1,7 @@
 # Copyright SDElements Inc
 # Extensible two way integration with Rational
 
-import re, json
+import re
 from datetime import datetime
 
 from sdetools.sdelib.restclient import RESTBase
@@ -287,7 +287,7 @@ class RationalConnector(AlmConnector):
             }
 
         try:
-            work_item = self.alm_plugin.call_api(self.creation_url,
+            self.alm_plugin.call_api(self.creation_url,
                                                  method=self.alm_plugin.URLRequest.POST,
                                                  args=create_args)
             #print work_item

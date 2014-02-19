@@ -1,11 +1,11 @@
 # NOTE: Before running ensure that the options are set properly in the
 #       configuration file
 
-import unittest
+
 
 from rational_response_generator import RationalResponseGenerator
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
-from sdetools.modules.sync_rational.rational_plugin import RationalConnector, RationalAPI, AlmException
+from sdetools.modules.sync_rational.rational_plugin import RationalConnector, RationalAPI
 
 
 class TestRationalCase(AlmPluginTestBase):

@@ -1,6 +1,4 @@
 from sdetools.sdelib.testlib.response_generator import ResponseGenerator
-from sdetools.sdelib.commons import urlencode_str
-import json
 
 
 class RationalResponseGenerator(ResponseGenerator):
