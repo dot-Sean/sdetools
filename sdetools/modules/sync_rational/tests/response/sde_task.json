@@ -1,0 +1,50 @@
+{
+    "tasks": [
+        {
+            "status": "DONE", 
+            "priority": 10, 
+            "weakness": {
+                "content": "Many communication channels can be \"sniffed\" by attackers during data transmission. For example, network traffic can often be sniffed by any attacker who has access to a network interface. This significantly lowers the difficulty of exploitation by attackers.\r\n\r\n### Training\r\n* Learn about [clear text credentials](http://securitycompass.com/training/free/course-demos/modules/ClearText/player.html)", 
+                "cwe": [
+                    {
+                        "url": "http://cwe.mitre.org/data/definitions/319", 
+                        "title": "Cleartext Transmission of Sensitive Information", 
+                        "cwe_id": 319
+                    }
+                ], 
+                "id": "P216", 
+                "title": "P216: Cleartext Transmission of Sensitive Information"
+            }, 
+            "title": "T21: Ensure confidential data is sent over an encrypted channel", 
+            "url": "https://m1.sdelements.com/library/tasks/T21/", 
+            "timestamp": 1390510518, 
+            "note_count": 5, 
+            "tags": [], 
+            "implementations": [
+                {
+                    "contextrulesets": [], 
+                    "url": "https://m1.sdelements.com/library/tasks/T21/django/", 
+                    "title": "I176: Django", 
+                    "id": "I176", 
+                    "content": "## Description\r\n\r\nDjango does not include its own production-grade HTTP server, and therefore does not provide SSL. To comply with this standard, see the accompanying implementation for your HTTP server software.\r\n", 
+                    "slug": "django"
+                }
+            ], 
+            "project": 1438, 
+            "age": "current", 
+            "assigned_to": [], 
+            "phase": "requirements", 
+            "contextrulesets": [], 
+            "content": "Confidential data must always be sent over an encrypted channel for a security-sensitive application. Use TLS (Transport Layer Security) version 1.2 to establish a secure channel. Enforce this requirement by explicitly refusing plain-text requests for the login and authenticated portions of an application.\r\n\r\nThe classification of confidential data is dependent on application context, applicable laws, regulations and relevant security policies. Data including, but not limited to, authentication credentials, session ID, credit card information, and health data are confidential and must always be secured while in transit.\r\n\r\nNote: TLS is often generically referred to as SSL (Secure Socket Layer) since TLS is based on the SSL protocol. TLS, and specifically TLS v1.2, is much stronger since it addresses weaknesses found in earlier versions of TLS and SSL in general.", 
+            "id": "1438-T21", 
+            "categories": [
+                "Cryptography", 
+                "Session Management", 
+                "Authentication"
+            ], 
+            "verification_coverage": [
+                "No Automated Dynamic Analysis Coverage"
+            ]
+        }
+    ]
+}
