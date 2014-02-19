@@ -34,13 +34,13 @@ class RationalResponseGenerator(ResponseGenerator):
         #self.generator_add_resource('sde_task1', resource_data=json.loads(open('./response/sde_task1.json').read()))
         #self.generator_add_resource('sde_proj', resource_data=json.loads(open('./response/sde_proj.json').read()))
         #self.generator_add_resource('sde_app', resource_data=json.loads(open('./response/sde_app.json').read()))
-        self.generator_add_resource('rootservices', resource_data=json.loads(open('./response/rootservices.json').read()))
-        self.generator_add_resource('catalog', resource_data=json.loads(open('./response/catalog.json').read()))
-        self.generator_add_resource('services', resource_data=json.loads(open('./response/services.json').read()))
-        self.generator_add_resource('resourceshape', resource_data=json.loads(open('./response/resourceshape.json').read()))
-        self.generator_add_resource('priorities', resource_data=json.loads(open('./response/priorities.json').read()))
-        self.generator_add_resource('count', resource_data=json.loads(open('./response/count.json').read()))
-        self.generator_add_resource('workitem', resource_data=json.loads(open('./response/workitem.json').read()))
+        self.generator_add_resource('rootservices', resource_data=self.get_json_from_file('rootservices'))
+        self.generator_add_resource('catalog', resource_data=self.get_json_from_file('catalog'))
+        self.generator_add_resource('services', resource_data=self.get_json_from_file('services'))
+        self.generator_add_resource('resourceshape', resource_data=self.get_json_from_file('resourceshape'))
+        self.generator_add_resource('priorities', resource_data=self.get_json_from_file('priorities'))
+        self.generator_add_resource('count', resource_data=self.get_json_from_file('count'))
+        self.generator_add_resource('workitem', resource_data=self.get_json_from_file('workitem'))
 
     def raise_error(self, error_code, message=None):
         if message is None:
