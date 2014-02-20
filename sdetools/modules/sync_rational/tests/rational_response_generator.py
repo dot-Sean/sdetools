@@ -3,12 +3,9 @@ from sdetools.sdelib.testlib.response_generator import ResponseGenerator
 
 class RationalResponseGenerator(ResponseGenerator):
     def __init__(self, config, test_dir=None):
-        #project_uri = '%s/%s' % (urlencode_str(config['github_repo_owner']), urlencode_str(config['alm_project']))
-        #self.project_milestone = config['alm_project_version']
         self.username = config['alm_user']
         self.alm_server = config['alm_server']
-        #self.alm_project = config['alm_project']
-        resource_templates = ['sde_task1.json', 'sde_task.json', 'sde_proj.json', 'sde_app.json', 'rootservices.json', 'catalog.json', 'services.json', 'resourceshape.json', 'priorities.json', 'count.json', 'workitem.json']
+        resource_templates = ['rootservices.json', 'catalog.json', 'services.json', 'resourceshape.json', 'priorities.json', 'count.json', 'workitem.json']
         rest_api_targets = {
             '.*/rootservices': 'get_rootservices',
             '.*/oslc/workitems/catalog': 'get_catalog',
@@ -18,27 +15,12 @@ class RationalResponseGenerator(ResponseGenerator):
             '.*/oslc/contexts/_gkmCkniWEeOI1P1pr3yq5Q/workitems/workitems\\?oslc.where=dcterms:title=.*': 'get_count',
             '.*/resource/itemName/com.ibm.team.workitem.WorkItem/\\d*': 'get_workitem',
             '.*/oslc/contexts/_gkmCkniWEeOI1P1pr3yq5Q/workitems/task': 'post_workitem',
-            #'.*/api/applications.*': 'sde_app',
-            #'.*/api/projects.*': 'sde_proj',
-            #'.*/api/tasks/.*': 'sde_task',
-            #'.*/api/tasks(?!/).*': 'sde_tasks',
-            #response doesn't matter, reusing sde_task response for simplicity
-            #'.*/api/tasknotes/ide.*': 'sde_task'
         }
         super(RationalResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir)
 
     def init_with_resources(self):
-        #self.generator_add_resource('sde_task', resource_data=json.loads(open('./response/sde_task.json').read()))
-        #self.generator_add_resource('sde_task1', resource_data=json.loads(open('./response/sde_task1.json').read()))
-        #self.generator_add_resource('sde_proj', resource_data=json.loads(open('./response/sde_proj.json').read()))
-        #self.generator_add_resource('sde_app', resource_data=json.loads(open('./response/sde_app.json').read()))
-        self.generator_add_resource('rootservices', resource_data=self.get_json_from_file('rootservices'))
-        self.generator_add_resource('catalog', resource_data=self.get_json_from_file('catalog'))
-        self.generator_add_resource('services', resource_data=self.get_json_from_file('services'))
-        self.generator_add_resource('resourceshape', resource_data=self.get_json_from_file('resourceshape'))
-        self.generator_add_resource('priorities', resource_data=self.get_json_from_file('priorities'))
-        self.generator_add_resource('count', resource_data=self.get_json_from_file('count'))
-        self.generator_add_resource('workitem', resource_data=self.get_json_from_file('workitem'))
+        for x in ['rootservices', 'catalog', 'services', 'resourceshape', 'priorities', 'count', 'workitem']:
+            self.generator_add_resource(x, resource_data=self.get_json_from_file(x))
 
     def raise_error(self, error_code, message=None):
         if message is None:
