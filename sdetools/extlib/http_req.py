@@ -3,9 +3,10 @@ import re
 import os
 import socket
 import urllib2
-import base64
 import tempfile
 import atexit
+
+from urllib2 import HTTPError
 
 try:
     import ssl
