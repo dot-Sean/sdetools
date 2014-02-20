@@ -19,10 +19,14 @@ class RationalResponseGenerator(ResponseGenerator):
         super(RationalResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir)
 
     def init_with_resources(self):
+        """Loads the default responses"""
+
         for x in ['rootservices', 'catalog', 'services', 'resourceshape', 'priorities', 'count', 'workitem']:
             self.generator_add_resource(x, resource_data=self.get_json_from_file(x))
 
     def raise_error(self, error_code, message=None):
+        """Raises an error based on the error code or message"""
+
         if message is None:
             if error_code == '401':
                 message = {

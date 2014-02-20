@@ -85,6 +85,8 @@ class RationalTask(AlmTask):
 
 
 class RationalConnector(AlmConnector):
+    """Connector for RTC"""
+
     alm_name = 'Rational'
     cm_service_provider = None
     resource_url = None
@@ -235,6 +237,8 @@ class RationalConnector(AlmConnector):
         return task_id
 
     def alm_get_task(self, task):
+        """Returns a RationalTask object that has the same ID as the given task"""
+
         task_id = self._extract_task_id(task['id'])
         if not task_id:
             return None
@@ -267,6 +271,7 @@ class RationalConnector(AlmConnector):
                                   self.config[self.ALM_DONE_STATUSES])
 
     def alm_add_task(self, task):
+        """Adds a task with the specified status if provided, otherwise status is set to new"""
 
         priority_name = self.translate_priority(task['priority'])
         priority_literal_resource = self._get_priority_literal(priority_name)
@@ -296,18 +301,7 @@ class RationalConnector(AlmConnector):
             raise AlmException('Unable to add task %s to Rational because of %s'
                                % (task['id'], err))
 
-        # API returns JSON of the new issue
-        #alm_task = RationalTask(task['title'],
-        #                              None, # try to fill this in later
-        #                              work_item['dcterms:identifier'],
-        #                              work_item['oslc_cm:status'],
-        #                              work_item['dcterms:modified'],
-        #                              self.config[self.ALM_DONE_STATUSES])
         alm_task = self.alm_get_task(task)
-
-        #if (self.config['alm_standard_workflow'] and
-        #        (task['status'] == 'DONE' or task['status'] == 'NA')):
-        #    self.alm_update_task_status(alm_task, task['status'])
 
         return 'Project: %s, Task: %s' % (self.config['alm_project'], alm_task.get_alm_id())
 
