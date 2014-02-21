@@ -6,8 +6,6 @@ import urllib2
 import tempfile
 import atexit
 
-from urllib2 import HTTPError
-
 try:
     import ssl
     ssl_lib_found = True
@@ -130,7 +128,7 @@ class ExtendedMethodHTTPRedirectHandler(urllib2.HTTPRedirectHandler):
                            unverifiable=True, 
                            method=req.get_method())
         else:
-            raise HTTPError(req.get_full_url(), code, msg, headers, fp)
+            raise urllib2.HTTPError(req.get_full_url(), code, msg, headers, fp)
 
 class InvalidCertificateException(httplib.HTTPException, urllib2.URLError):
     def __init__(self, host, cert, reason):

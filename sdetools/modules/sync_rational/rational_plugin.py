@@ -19,10 +19,6 @@ RATIONAL_DEFAULT_PRIORITY_MAP = {
     '1-3': 'Low',
     }
 
-OSLC_PREFIX = 'oslc'
-PURL_PREFIX = 'dcterms'
-RDF_PREFIX = 'rdf'
-
 OSLC_CM_SERVICE_PROVIDER ='http://open-services.net/xmlns/cm/1.0/cmServiceProviders'
 OSLC_CR_TYPE = "http://open-services.net/ns/cm#task"
 
@@ -74,10 +70,8 @@ class RationalTask(AlmTask):
 
     def get_status(self):
         """ Translates Rational status into SDE status """
-        if self.status in self.done_statuses:
-            return 'DONE'
-        else:
-            return 'TODO'
+        return 'DONE' if self.status in self.done_statuses else 'TODO'
+
 
     def get_timestamp(self):
         """ Returns a datetime object """
@@ -85,7 +79,6 @@ class RationalTask(AlmTask):
 
 
 class RationalConnector(AlmConnector):
-    """Connector for RTC"""
 
     alm_name = 'Rational'
     cm_service_provider = None
@@ -120,8 +113,8 @@ class RationalConnector(AlmConnector):
         self.config[self.ALM_DONE_STATUSES] = self.config[self.ALM_DONE_STATUSES].split(',')
 
         if self.config['conflict_policy'] != 'alm':
-            raise AlmException('Conflict policy not supported. Only Rational is supported as master. Current conflict policy: %s' % self.config['conflict_policy'])
-
+            raise AlmException('Expected "alm" for configuration conflict_policy but got "%s". '
+                               'Currently only Rational Team Concert can be setup as authoritative server' % self.config['conflict_policy'])
         self.config.process_json_str_dict(self.ALM_PRIORITY_MAP)
 
         if not self.config[self.ALM_PRIORITY_MAP]:
@@ -132,18 +125,13 @@ class RationalConnector(AlmConnector):
                 raise AlmException('Unable to process %s (not a JSON dictionary). Reason: Invalid range key %s'
                                    % (self.ALM_PRIORITY_MAP, key))
 
-    def process_rdf_url(self, url):
-        """ Remove the base url so we can pass the new url into call api """
-        return url.remove(self.baseUri, '')
-        
     def alm_connect_server(self):
-        """ Verifies that Rational connection works """
-        # Check if user can successfully authenticate and retrieve service catalog
-        
+        """Check if user can successfully authenticate and retrieve service catalog"""
+
         try:
             catalog = self.alm_plugin.call_api('rootservices')
         except APIError, err:
-            raise AlmException('Unable to connect retrieve root services (Check server URL, user, pass).'
+            raise AlmException('Unable to connect retrieve root services (Check server URL, user, pass). '
                                'Reason: %s' % str(err))
 
         root_services = catalog[self.alm_plugin.base_uri + '/rootservices']
@@ -152,14 +140,15 @@ class RationalConnector(AlmConnector):
             raise AlmException('Change management service provider not found (Check server URL, user, pass)')
                                
         cm_service_providers = root_services[OSLC_CM_SERVICE_PROVIDER]
+        # There should be only one service provider. It is still stored in a list, so using the first item.
         self.cm_service_provider = cm_service_providers[0]['value']
         
-        self.cm_service_provider_target = self.cm_service_provider.replace(self.alm_plugin.base_uri+'/', '')
+        self.cm_service_provider_target = self.cm_service_provider.replace(self.alm_plugin.base_uri + '/', '')
 
         try:
             self.service_catalog = self.alm_plugin.call_api(self.cm_service_provider_target)
         except APIError, err:
-            raise AlmException('Unable to connect retrieve Rational service catalog (Check server URL, user, pass).'
+            raise AlmException('Unable to connect retrieve Rational service catalog (Check server URL, user, pass). '
                                'Reason: %s' % str(err))
                                
         if not self.service_catalog:
@@ -173,22 +162,26 @@ class RationalConnector(AlmConnector):
             raise AlmException('Unable to retrieve resource url for project "%s" (Check project name).' %
                                self.config['alm_project'])
         
-        self.cm_resource_service = self.resource_url.replace(self.alm_plugin.base_uri+'/', '')
+        self.cm_resource_service = self.resource_url.replace(self.alm_plugin.base_uri + '/', '')
         self.services = self.alm_plugin.call_api(self.cm_resource_service)
 
         query_url = self.services['oslc:service'][1]['oslc:queryCapability'][0]['oslc:queryBase']['rdf:resource']
 
-        self.query_url = query_url.replace(self.alm_plugin.base_uri+'/', '')
-        for service in self.services['oslc:service']:
-            if 'oslc:creationFactory' in service:
-                for factory in service['oslc:creationFactory']:
-                    if 'oslc:usage' in factory:
-                        for resource in factory['oslc:usage']:
-                            if resource['rdf:resource'] == OSLC_CR_TYPE:
-                                creation_url = factory['oslc:creation']['rdf:resource']
-                                resource_shape_url = factory['oslc:resourceShape']['rdf:resource']
-                                self.creation_url = creation_url.replace(self.alm_plugin.base_uri+'/', '')
-                                self.resource_shape_url = resource_shape_url.replace(self.alm_plugin.base_uri+'/', '')
+        self.query_url = query_url.replace(self.alm_plugin.base_uri + '/', '')
+        # Search the services for the proper creation factory and retrieve the creation and resource shape urls
+        try:
+           for service in self.services['oslc:service']:
+                if 'oslc:creationFactory' in service:
+                    for factory in service['oslc:creationFactory']:
+                        if 'oslc:usage' in factory:
+                            for resource in factory['oslc:usage']:
+                                if resource['rdf:resource'] == OSLC_CR_TYPE:
+                                    creation_url = factory['oslc:creation']['rdf:resource']
+                                    resource_shape_url = factory['oslc:resourceShape']['rdf:resource']
+                                    self.creation_url = creation_url.replace(self.alm_plugin.base_uri+'/', '')
+                                    self.resource_shape_url = resource_shape_url.replace(self.alm_plugin.base_uri+'/', '')
+        except KeyError as e:
+            raise AlmException('Unable to retrieve creation url or resource shape. Error msg: %s' % e)
 
         self.priorities = self._rtc_get_priorities()
 
@@ -209,7 +202,7 @@ class RationalConnector(AlmConnector):
         return priorities
 
     def _rtc_get_priority_details(self, priority_resource_url):
-        #print priority_resource_url
+
         priority_resource_url = priority_resource_url.replace(self.alm_plugin.base_uri+'/', '')
 
         try:
