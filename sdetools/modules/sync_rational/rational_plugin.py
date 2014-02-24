@@ -2,12 +2,14 @@
 # Extensible two way integration with Rational
 
 import re
+import urllib
 from datetime import datetime
 
 from sdetools.sdelib.restclient import RESTBase
 from sdetools.sdelib.restclient import URLRequest, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from sdetools.alm_integration.alm_plugin_base import AlmException
+from sdetools.extlib import markdown
 
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
@@ -45,6 +47,41 @@ class RationalAPI(RESTBase):
         return result
 
 
+class RationalFormsLogin(RESTBase):
+    """ Base plugin for Rational """
+
+    def __init__(self, config):
+        super(RationalFormsLogin, self).__init__('alm', 'Rational Forms Login', config)
+
+    def post_conf_init(self):
+        self.base_path = self.config['rational_context_root']
+        super(RationalFormsLogin, self).post_conf_init()
+
+    def encode_post_args(self, args):
+        return urllib.urlencode(args)
+
+    def parse_response(self, result, headers):
+        return result
+
+    def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}, auth_mode=None):
+
+        if method == URLRequest.POST:
+            call_headers['Content-Type'] = 'application/x-www-form-urlencoded'
+
+        for cookie in self.cookiejar:
+            if cookie.name == 'JSESSIONID':
+                call_headers[cookie.name] = cookie.value
+            elif cookie.name == 'JSESSIONIDSSO':
+                call_headers[cookie.name] = cookie.value
+
+        try:
+            result = super(RationalFormsLogin, self).call_api(target, method, args, call_headers, auth_mode)
+        except Exception as e:
+            raise AlmException('API Call failed. Target: %s ; Error: %s' % (target, e))
+
+        return result
+
+
 class RationalTask(AlmTask):
     """ Representation of a task in Rational"""
 
@@ -70,8 +107,10 @@ class RationalTask(AlmTask):
 
     def get_status(self):
         """ Translates Rational status into SDE status """
-        return 'DONE' if self.status in self.done_statuses else 'TODO'
-
+        if self.status in self.done_statuses:
+            return 'DONE'
+        else:
+            return 'TODO'
 
     def get_timestamp(self):
         """ Returns a datetime object """
@@ -105,6 +144,9 @@ class RationalConnector(AlmConnector):
     def initialize(self):
         super(RationalConnector, self).initialize()
 
+        self.COOKIE_JSESSIONID = None
+        self.mark_down_converter = markdown.Markdown(safe_mode="escape")
+
         # Verify that the configuration options are set properly
         for item in [self.ALM_NEW_STATUS, self.ALM_DONE_STATUSES]:
             if not self.config[item]:
@@ -125,8 +167,47 @@ class RationalConnector(AlmConnector):
                 raise AlmException('Unable to process %s (not a JSON dictionary). Reason: Invalid range key %s'
                                    % (self.ALM_PRIORITY_MAP, key))
 
+    def _rtc_forms_login(self):
+
+        forms_credentials = {
+            'j_username': self.config['alm_user'],
+            'j_password': self.config['alm_pass']
+        }
+
+        login_client = RationalFormsLogin(self.config)
+        login_client.set_auth_mode('cookie')
+
+        #RTC does not allow direct login - get a cookie first
+        try:
+            login_client.call_api('authenticated/identity')
+        except APIError, err:
+            raise AlmException('Unable to connect to RTC (Check server URL, '
+                               'user, pass). Reason: %s' % str(err))
+
+        #Check to make sure that we can login
+        try:
+            login_client.call_api('authenticated/j_security_check', args=forms_credentials, method=URLRequest.POST)
+        except APIError, err:
+            raise AlmException('Unable to connect to RTC (Check server URL, '
+                               'user, pass). Reason: %s' % str(err))
+
+        for cookie in login_client.cookiejar:
+            if cookie.name == 'JSESSIONID':
+                self.COOKIE_JSESSIONID = cookie.value
+
     def alm_connect_server(self):
         """Check if user can successfully authenticate and retrieve service catalog"""
+
+        """ Verifies that Rational connection works """
+        # Check if user can successfully authenticate and retrieve service catalog
+
+        # We will authenticate via cookie
+        self.alm_plugin.set_auth_mode('cookie')
+
+        self._rtc_forms_login()
+
+        if not self.COOKIE_JSESSIONID:
+            raise AlmException('Unable to connect to HP Alm service (Check server URL, user, pass)')
 
         try:
             catalog = self.alm_plugin.call_api('rootservices')
@@ -146,7 +227,7 @@ class RationalConnector(AlmConnector):
         self.cm_service_provider_target = self.cm_service_provider.replace(self.alm_plugin.base_uri + '/', '')
 
         try:
-            self.service_catalog = self.alm_plugin.call_api(self.cm_service_provider_target)
+            self.service_catalog = self._call_api(self.cm_service_provider_target)
         except APIError, err:
             raise AlmException('Unable to connect retrieve Rational service catalog (Check server URL, user, pass). '
                                'Reason: %s' % str(err))
@@ -162,8 +243,8 @@ class RationalConnector(AlmConnector):
             raise AlmException('Unable to retrieve resource url for project "%s" (Check project name).' %
                                self.config['alm_project'])
         
-        self.cm_resource_service = self.resource_url.replace(self.alm_plugin.base_uri + '/', '')
-        self.services = self.alm_plugin.call_api(self.cm_resource_service)
+        self.cm_resource_service = self.resource_url.replace(self.alm_plugin.base_uri+'/', '')
+        self.services = self._call_api(self.cm_resource_service)
 
         query_url = self.services['oslc:service'][1]['oslc:queryCapability'][0]['oslc:queryBase']['rdf:resource']
 
@@ -185,10 +266,19 @@ class RationalConnector(AlmConnector):
 
         self.priorities = self._rtc_get_priorities()
 
+    def _call_api(self, target, args=None, method=URLRequest.GET):
+
+        headers = {}
+
+        if self.COOKIE_JSESSIONID:
+            headers = {'Cookie': 'JSESSIONID=%s' % self.COOKIE_JSESSIONID}
+
+        return self.alm_plugin.call_api(target, method=method, args=args, call_headers=headers)
+
     def _rtc_get_priorities(self):
 
         try:
-            resource_shapes = self.alm_plugin.call_api(self.resource_shape_url)
+            resource_shapes = self._call_api(self.resource_shape_url)
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get resource shapes from Rational')
@@ -206,7 +296,7 @@ class RationalConnector(AlmConnector):
         priority_resource_url = priority_resource_url.replace(self.alm_plugin.base_uri+'/', '')
 
         try:
-            priority_details = self.alm_plugin.call_api(priority_resource_url)
+            priority_details = self._call_api(priority_resource_url)
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get priority details from Rational. Url: %s' % priority_resource_url)
@@ -238,7 +328,7 @@ class RationalConnector(AlmConnector):
 
         try:
             # Fields parameter will filter response data to only contain story status, name, timestamp and id
-            work_items = self.alm_plugin.call_api('%s/workitems?oslc.where=dcterms:title="%s:*"' %
+            work_items = self._call_api('%s/workitems?oslc.where=dcterms:title="%s:*"' %
                                                   (self.query_url, task_id))
         except APIError, err:
             logger.error(err)
@@ -250,7 +340,7 @@ class RationalConnector(AlmConnector):
         work_item_url = work_items['oslc:results'][0]['rdf:resource']
         work_item_target = work_item_url.replace(self.alm_plugin.base_uri+'/', '')
         try:
-            work_item = self.alm_plugin.call_api(work_item_target)
+            work_item = self._call_api(work_item_target)
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get task %s from Rational' % task_id)
@@ -268,26 +358,21 @@ class RationalConnector(AlmConnector):
 
         priority_name = self.translate_priority(task['priority'])
         priority_literal_resource = self._get_priority_literal(priority_name)
-        #print task['status']
+
+        create_args = {
+            'dcterms:title': task['title'],
+            'dcterms:description': self.sde_get_task_content(task),
+            'oslc_cmx:priority': priority_literal_resource,
+        }
+
         if (self.config['alm_standard_workflow'] and
                 (task['status'] == 'DONE' or task['status'] == 'NA')):
-            create_args = {
-                'dcterms:title': task['title'],
-                'dcterms:description': "This is content",
-                'oslc_cmx:priority': priority_literal_resource,
-                'oslc_cm:status': self.config[self.ALM_DONE_STATUSES][0]
-            }
-        else:
-            create_args = {
-                'dcterms:title': task['title'],
-                'dcterms:description': "This is content",
-                'oslc_cmx:priority': priority_literal_resource,
-            }
+            create_args['oslc_cm:status'] = self.config[self.ALM_DONE_STATUSES][0]
 
         try:
-            self.alm_plugin.call_api(self.creation_url,
-                                                 method=self.alm_plugin.URLRequest.POST,
-                                                 args=create_args)
+            self._call_api(self.creation_url,
+                           method=self.alm_plugin.URLRequest.POST,
+                           args=create_args)
             #print work_item
             logger.debug('Task %s added to Rational Project', task['id'])
         except APIError, err:
@@ -301,38 +386,11 @@ class RationalConnector(AlmConnector):
     def alm_update_task_status(self, task, status):
         pass
 
-# CURRENTLY NOT SUPPORTED
-
-#        if not task or not self.config['alm_standard_workflow']:
-#            logger.debug('Status synchronization disabled')
-#            return
-#
-#       if status == 'DONE' or status == 'NA':
-#            alm_state = self.config[self.ALM_DONE_STATUSES][0]
-#        elif status == 'TODO':
-#            alm_state = self.config[self.ALM_NEW_STATUS]
-#
-#        update_args = {
-#            'oslc_cm:status': alm_state
-#        }
-#
-#        if not task.get_alm_url():
-#            raise AlmException("Missing Rational reference for task %s" % task.get_task_id())
-#
-#        work_item_target = task.get_alm_url().replace(self.alm_plugin.base_uri+'/', '')
-#
-#        try:
-#            result = self.alm_plugin.call_api(work_item_target, args=update_args, method=URLRequest.PUT)
-#        except APIError, err:
-#            raise AlmException('Unable to update status to %s '
-#                               'for task: %s in Rational because of %s' %
-#                               (status, task.get_alm_id(), err))
-#
-#        logger.debug('Task changed to %s for task %s in Rational' %
-#                     (status, task.get_alm_id()))
-
     def alm_disconnect(self):
         pass
+
+    def convert_markdown_to_alm(self, content, ref):
+        return self.mark_down_converter.convert(content)
 
     def translate_priority(self, priority):
         """ Translates an SDE priority into a GitHub label """
