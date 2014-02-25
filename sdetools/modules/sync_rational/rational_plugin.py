@@ -235,37 +235,6 @@ class RationalConnector(AlmConnector):
         if not self.service_catalog:
             raise AlmException('Unable to connect retrieve service catalog (Check connection settings).')
 
-        for service_provider in self.service_catalog['oslc:serviceProvider']:
-            if service_provider['dcterms:title'] == self.config['alm_project']:
-                self.resource_url = service_provider['rdf:about']
-
-        if not self.resource_url:
-            raise AlmException('Unable to retrieve resource url for project "%s" (Check project name).' %
-                               self.config['alm_project'])
-        
-        self.cm_resource_service = self.resource_url.replace(self.alm_plugin.base_uri+'/', '')
-        self.services = self._call_api(self.cm_resource_service)
-
-        query_url = self.services['oslc:service'][1]['oslc:queryCapability'][0]['oslc:queryBase']['rdf:resource']
-
-        self.query_url = query_url.replace(self.alm_plugin.base_uri + '/', '')
-        # Search the services for the proper creation factory and retrieve the creation and resource shape urls
-        try:
-           for service in self.services['oslc:service']:
-                if 'oslc:creationFactory' in service:
-                    for factory in service['oslc:creationFactory']:
-                        if 'oslc:usage' in factory:
-                            for resource in factory['oslc:usage']:
-                                if resource['rdf:resource'] == OSLC_CR_TYPE:
-                                    creation_url = factory['oslc:creation']['rdf:resource']
-                                    resource_shape_url = factory['oslc:resourceShape']['rdf:resource']
-                                    self.creation_url = creation_url.replace(self.alm_plugin.base_uri+'/', '')
-                                    self.resource_shape_url = resource_shape_url.replace(self.alm_plugin.base_uri+'/', '')
-        except KeyError as e:
-            raise AlmException('Unable to retrieve creation url or resource shape. Error msg: %s' % e)
-
-        self.priorities = self._rtc_get_priorities()
-
     def _call_api(self, target, args=None, method=URLRequest.GET):
 
         headers = {}
@@ -310,7 +279,39 @@ class RationalConnector(AlmConnector):
         return None
 
     def alm_connect_project(self):
-        """ Verifies that the Rational project exists """
+        for service_provider in self.service_catalog['oslc:serviceProvider']:
+            if service_provider['dcterms:title'] == self.config['alm_project']:
+                self.resource_url = service_provider['rdf:about']
+
+        if not self.resource_url:
+            raise AlmException('Unable to retrieve resource url for project "%s" (Check project name).' %
+                               self.config['alm_project'])
+
+        self.cm_resource_service = self.resource_url.replace(self.alm_plugin.base_uri+'/', '')
+        self.services = self._call_api(self.cm_resource_service)
+
+        query_url = self.services['oslc:service'][1]['oslc:queryCapability'][0]['oslc:queryBase']['rdf:resource']
+
+        self.query_url = query_url.replace(self.alm_plugin.base_uri + '/', '')
+        # Search the services for the proper creation factory and retrieve the creation and resource shape urls
+        try:
+           for service in self.services['oslc:service']:
+                if 'oslc:creationFactory' in service:
+                    for factory in service['oslc:creationFactory']:
+                        if 'oslc:usage' in factory:
+                            for resource in factory['oslc:usage']:
+                                if resource['rdf:resource'] == OSLC_CR_TYPE:
+                                    creation_url = factory['oslc:creation']['rdf:resource']
+                                    resource_shape_url = factory['oslc:resourceShape']['rdf:resource']
+                                    self.creation_url = creation_url.replace(self.alm_plugin.base_uri+'/', '')
+                                    self.resource_shape_url = resource_shape_url.replace(self.alm_plugin.base_uri+'/', '')
+        except KeyError as e:
+            raise AlmException('Unable to retrieve creation url or resource shape. Error msg: %s' % e)
+
+        self.priorities = self._rtc_get_priorities()
+
+    def alm_validate_configurations(self):
+        pass
 
     def _extract_task_id(self, full_task_id):
         task_id = None
