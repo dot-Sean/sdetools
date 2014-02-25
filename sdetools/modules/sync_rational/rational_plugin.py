@@ -3,6 +3,7 @@
 
 import re
 import urllib
+import json
 from datetime import datetime
 
 from sdetools.sdelib.restclient import RESTBase
@@ -31,11 +32,14 @@ class RationalAPI(RESTBase):
     def __init__(self, config):
         super(RationalAPI, self).__init__('alm', 'Rational', config)
 
+    def parse_response(self, result, headers):
+        return (result, headers)
+
     def post_conf_init(self):
         self.base_path = self.config['rational_context_root']
         super(RationalAPI, self).post_conf_init()
 
-    def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}, auth_mode=None):
+    def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}, auth_mode=None, show_headers=False):
         call_headers['Accept'] = 'application/json'
         call_headers['OSLC-Core-Version'] = '2.0'
 
@@ -43,8 +47,10 @@ class RationalAPI(RESTBase):
             result = super(RationalAPI, self).call_api(target, method, args, call_headers, auth_mode)
         except Exception as e:
             raise AlmException('API Call failed. Target: %s ; Error: %s' % (target, e))
-
-        return result
+        if show_headers:
+            return result
+        else:
+            return json.loads(result[0])
 
 
 class RationalFormsLogin(RESTBase):
@@ -60,8 +66,8 @@ class RationalFormsLogin(RESTBase):
     def encode_post_args(self, args):
         return urllib.urlencode(args)
 
-    def parse_response(self, result, headers):
-        return result
+    def parse_response(self, result, headers, show_headers=False):
+        return (result, headers)
 
     def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}, auth_mode=None):
 
@@ -135,7 +141,7 @@ class RationalConnector(AlmConnector):
                                  'tasks in Rational', default='New')
         config.opts.add(self.ALM_DONE_STATUSES, 'Statuses that '
                                  'signify a task is Done in Rational',
-                                 default='Complete,Done')
+                                 default='Completed,Done')
         config.opts.add(self.ALM_PRIORITY_MAP, 'Customized map from priority in SDE to RTC '
                                  '(JSON encoded dictionary of strings)', default='')
         config.opts.add('rational_context_root', 'Application context root: the part of the URL that accesses '
@@ -198,16 +204,23 @@ class RationalConnector(AlmConnector):
     def alm_connect_server(self):
         """Check if user can successfully authenticate and retrieve service catalog"""
 
-        """ Verifies that Rational connection works """
-        # Check if user can successfully authenticate and retrieve service catalog
+        try:
+            cookie = self.alm_plugin.call_api('authenticated/identity', show_headers=True)[1]['set-cookie']
+        except APIError, err:
+            raise AlmException('Unable to connect to RTC (Check server URL, '
+                               'user, pass). Reason: %s' % str(err))
+        auth = cookie[cookie.find('JazzFormAuth=')+len('JazzFormAuth='):cookie.find('JazzFormAuth=')+len('JazzFormAuth=')+4]
 
-        # We will authenticate via cookie
-        self.alm_plugin.set_auth_mode('cookie')
+        if auth == 'Form':
+            # We will authenticate via cookie
+            self.alm_plugin.set_auth_mode('cookie')
 
-        self._rtc_forms_login()
+            self._rtc_forms_login()
 
-        if not self.COOKIE_JSESSIONID:
-            raise AlmException('Unable to connect to HP Alm service (Check server URL, user, pass)')
+            if not self.COOKIE_JSESSIONID:
+                raise AlmException('Unable to connect to HP Alm service (Check server URL, user, pass)')
+        else:
+            pass
 
         try:
             catalog = self.alm_plugin.call_api('rootservices')
@@ -279,6 +292,7 @@ class RationalConnector(AlmConnector):
         return None
 
     def alm_connect_project(self):
+
         for service_provider in self.service_catalog['oslc:serviceProvider']:
             if service_provider['dcterms:title'] == self.config['alm_project']:
                 self.resource_url = service_provider['rdf:about']
