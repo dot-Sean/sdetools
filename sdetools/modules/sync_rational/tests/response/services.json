@@ -1,1 +1,566 @@
-{"prefixes":{"rdf":"http:\/\/www.w3.org\/1999\/02\/22-rdf-syntax-ns#","dcterms":"http:\/\/purl.org\/dc\/terms\/","oslc":"http:\/\/open-services.net\/ns\/core#","calm":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/"},"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#ServiceProvider"}],"oslc:details":[{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/process\/project-areas\/_gkmCkniWEeOI1P1pr3yq5Q"}],"oslc:service":[{"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#Service"}],"oslc:domain":{"rdf:resource":"http:\/\/open-services.net\/ns\/cm-x#"},"oslc:selectionDialog":[{"oslc:hintWidth":"550px","rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#Dialog"}],"oslc:usage":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#default"}],"oslc:label":"Plan","dcterms:title":"Plan","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm-x#Plan"}],"oslc:dialog":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/_ajax-modules\/com.ibm.team.apt.PlanSelectionDialog?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true"},"oslc:hintHeight":"360px"}],"calm:home":[{"rdf:type":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/Home"}],"dcterms:title":"Plans Home","calm:webHome":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/web\/projects\/elknar%27s%20Project%20%28Change%20and%20Configuration%20Management%29#action=com.ibm.team.apt.welcome"}}]},{"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#Service"}],"oslc:queryCapability":[{"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#QueryCapability"}],"oslc:usage":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#default"}],"oslc:resourceShape":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/query"},"dcterms:title":"Change request queries","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"}],"oslc:queryBase":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems"}}],"calm:filter":[{"rdf:type":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/Filter"}],"oslc:usage":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/openItems"}],"calm:filterBase":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/calm-filter\/_gkmCkniWEeOI1P1pr3yq5Q\/openItems"},"dcterms:title":"Open Change Requests Filter","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"}]},{"rdf:type":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/Filter"}],"oslc:usage":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/resolvedItems"}],"calm:filterBase":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/calm-filter\/_gkmCkniWEeOI1P1pr3yq5Q\/resolvedItems"},"dcterms:title":"Resolved Change Requests Filter","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"}]},{"rdf:type":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/Filter"}],"oslc:usage":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/readyForTesting"}],"calm:filterBase":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/calm-filter\/_gkmCkniWEeOI1P1pr3yq5Q\/readyForTesting"},"dcterms:title":"Ready for Testing Change Requests Filter","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"}]}],"oslc:domain":{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#"},"oslc:selectionDialog":[{"oslc:hintWidth":"550px","rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#Dialog"}],"oslc:usage":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#default"}],"oslc:label":"Change Request","dcterms:title":"Select Change Request","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"}],"oslc:dialog":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/_ajax-modules\/com.ibm.team.workitem.WIPicker?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true"},"oslc:hintHeight":"460px"},{"oslc:hintWidth":"550px","rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#Dialog"}],"oslc:usage":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#defect"}],"oslc:label":"Defect","dcterms:title":"Select Defect","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"}],"oslc:dialog":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/_ajax-modules\/com.ibm.team.workitem.WIPicker?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true&dc%3Atype=defect"},"oslc:hintHeight":"460px"},{"oslc:hintWidth":"550px","rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#Dialog"}],"oslc:usage":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#planItem"}],"oslc:label":"Plan Item","dcterms:title":"Select Plan Item","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"}],"oslc:dialog":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/_ajax-modules\/com.ibm.team.workitem.WIPicker?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true&dc%3Atype=com.ibm.team.apt.workItemType.story"},"oslc:hintHeight":"460px"},{"oslc:hintWidth":"550px","rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#Dialog"}],"oslc:usage":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#task"}],"oslc:label":"Task","dcterms:title":"Select Task","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"}],"oslc:dialog":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/_ajax-modules\/com.ibm.team.workitem.WIPicker?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true&dc%3Atype=task"},"oslc:hintHeight":"460px"},{"oslc:hintWidth":"550px","rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#Dialog"}],"oslc:usage":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#requirementsChangeRequest"}],"oslc:label":"Requirement Change Request","dcterms:title":"Requirement Change Request","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"}],"oslc:dialog":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/_ajax-modules\/com.ibm.team.workitem.WIPicker?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true&dc%3Atype=task"},"oslc:hintHeight":"460px"}],"oslc:creationDialog":[{"oslc:hintWidth":"680px","rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#Dialog"}],"oslc:usage":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#default"},{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#defect"}],"oslc:label":"Defect","dcterms:title":"New Defect","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"}],"oslc:dialog":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/modules\/com.ibm.team.workitem.WICreationDialog?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true&dc%3Atype=defect"},"oslc:hintHeight":"505px"},{"oslc:hintWidth":"680px","rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#Dialog"}],"oslc:usage":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#planItem"}],"oslc:label":"Plan Item","dcterms:title":"New Plan Item","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"}],"oslc:dialog":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/modules\/com.ibm.team.workitem.WICreationDialog?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true&dc%3Atype=com.ibm.team.apt.workItemType.story"},"oslc:hintHeight":"545px"},{"oslc:hintWidth":"680px","rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#Dialog"}],"oslc:usage":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#task"}],"oslc:label":"Task","dcterms:title":"New Task","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"}],"oslc:dialog":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/modules\/com.ibm.team.workitem.WICreationDialog?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true&dc%3Atype=task"},"oslc:hintHeight":"505px"},{"oslc:hintWidth":"680px","rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#Dialog"}],"oslc:usage":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#requirementsChangeRequest"}],"oslc:label":"Requirement Change Request","dcterms:title":"New Requirement Change Request","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"}],"oslc:dialog":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/modules\/com.ibm.team.workitem.WICreationDialog?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true&dc%3Atype=task"},"oslc:hintHeight":"505px"}],"calm:module":[{"rdf:type":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/Module"}],"oslc:usage":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/embedded-cm"}],"dcterms:title":"Embeddable Work Item Web Module","calm:moduleDefinition":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/web\/com.ibm.team.workitem.web\/ui\/internal\/module\/WorkItemGadget.xml?projectAreaItemId=_gkmCkniWEeOI1P1pr3yq5Q"}}],"calm:rpc":[{"rdf:type":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/OpenSocialRPC"}],"oslc:usage":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/home"}],"dcterms:title":"Work Items Home","calm:rpcService":"OSLC_requestAction","calm:rpcArg":"action=com.ibm.team.workitem.viewWelcome"},{"rdf:type":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/OpenSocialRPC"}],"oslc:usage":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#defect"}],"dcterms:title":"Create Defect","calm:rpcService":"OSLC_requestAction","calm:rpcArg":"action=com.ibm.team.workitem.newWorkItem&type=defect"},{"rdf:type":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/OpenSocialRPC"}],"oslc:usage":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#task"}],"dcterms:title":"Create Task","calm:rpcService":"OSLC_requestAction","calm:rpcArg":"action=com.ibm.team.workitem.newWorkItem&type=task"},{"rdf:type":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/OpenSocialRPC"}],"oslc:usage":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/query-page"}],"dcterms:title":"Queries","calm:rpcService":"OSLC_requestAction","calm:rpcArg":"action=com.ibm.team.workitem.viewQueries"}],"calm:home":[{"rdf:type":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/Home"}],"dcterms:title":"Work Items Home","calm:webHome":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/web\/projects\/elknar%27s%20Project%20%28Change%20and%20Configuration%20Management%29#action=com.ibm.team.workitem.viewWelcome"}}],"oslc:creationFactory":[{"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#CreationFactory"}],"oslc:usage":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#default"},{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#defect"}],"oslc:resourceShape":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/defect"},"dcterms:title":"Location for creation of Defect change requests ","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"},{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/types\/_gkmCkniWEeOI1P1pr3yq5Q\/defect"}],"oslc:creation":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/defect"}},{"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#CreationFactory"}],"oslc:usage":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#task"},{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#requirementsChangeRequest"}],"oslc:resourceShape":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/task"},"dcterms:title":"Location for creation of Task change requests ","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"},{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/types\/_gkmCkniWEeOI1P1pr3yq5Q\/task"}],"oslc:creation":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/task"}},{"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#CreationFactory"}],"oslc:usage":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#planItem"}],"oslc:resourceShape":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/com.ibm.team.apt.workItemType.story"},"dcterms:title":"Location for creation of Story change requests ","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"},{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/types\/_gkmCkniWEeOI1P1pr3yq5Q\/com.ibm.team.apt.workItemType.story"}],"oslc:creation":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/com.ibm.team.apt.workItemType.story"}},{"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#CreationFactory"}],"oslc:usage":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/rtc\/cm\/1.0\/com.ibm.team.apt.workItemType.epic"}],"oslc:resourceShape":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/com.ibm.team.apt.workItemType.epic"},"dcterms:title":"Location for creation of Epic change requests ","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"},{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/types\/_gkmCkniWEeOI1P1pr3yq5Q\/com.ibm.team.apt.workItemType.epic"}],"oslc:creation":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/com.ibm.team.apt.workItemType.epic"}},{"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#CreationFactory"}],"oslc:usage":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/rtc\/cm\/1.0\/com.ibm.team.workItemType.buildtrackingitem"}],"oslc:resourceShape":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/com.ibm.team.workItemType.buildtrackingitem"},"dcterms:title":"Location for creation of Track Build Item change requests ","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"},{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/types\/_gkmCkniWEeOI1P1pr3yq5Q\/com.ibm.team.workItemType.buildtrackingitem"}],"oslc:creation":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/com.ibm.team.workItemType.buildtrackingitem"}},{"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#CreationFactory"}],"oslc:usage":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/rtc\/cm\/1.0\/com.ibm.team.workitem.workItemType.impediment"}],"oslc:resourceShape":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/com.ibm.team.workitem.workItemType.impediment"},"dcterms:title":"Location for creation of Impediment change requests ","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"},{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/types\/_gkmCkniWEeOI1P1pr3yq5Q\/com.ibm.team.workitem.workItemType.impediment"}],"oslc:creation":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/com.ibm.team.workitem.workItemType.impediment"}},{"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#CreationFactory"}],"oslc:usage":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/rtc\/cm\/1.0\/com.ibm.team.workItemType.adoption"}],"oslc:resourceShape":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/com.ibm.team.workItemType.adoption"},"dcterms:title":"Location for creation of Adoption Item change requests ","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"},{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/types\/_gkmCkniWEeOI1P1pr3yq5Q\/com.ibm.team.workItemType.adoption"}],"oslc:creation":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/com.ibm.team.workItemType.adoption"}},{"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#CreationFactory"}],"oslc:usage":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/rtc\/cm\/1.0\/com.ibm.team.workitem.workItemType.retrospective"}],"oslc:resourceShape":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/com.ibm.team.workitem.workItemType.retrospective"},"dcterms:title":"Location for creation of Retrospective change requests ","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"},{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/types\/_gkmCkniWEeOI1P1pr3yq5Q\/com.ibm.team.workitem.workItemType.retrospective"}],"oslc:creation":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/com.ibm.team.workitem.workItemType.retrospective"}},{"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#CreationFactory"}],"oslc:resourceShape":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/defect"},"dcterms:title":"Location for creation of change requests","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"}],"oslc:creation":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems"}},{"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#CreationFactory"}],"oslc:usage":[{"rdf:resource":"http:\/\/jazz.net\/xmlns\/prod\/jazz\/rtc\/cm\/1.0\/drafts"}],"dcterms:title":"Location for creation of draft change requests","oslc:resourceType":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#ChangeRequest"}],"oslc:creation":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/drafts\/workitems"}}]}],"dcterms:title":"elknar's Project (Change and Configuration Management)","rdf:about":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/services","dcterms:publisher":{"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#Publisher"}],"dcterms:title":"IBM Rational Team Concert Work Items","oslc:icon":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/web\/com.ibm.team.rtc.web\/ui\/graphics\/UICustomizations\/RationalTeamConcert.ico"},"dcterms:identifier":"com.ibm.team.workitem"}}
+{
+	"prefixes": {
+		"rdf": "http:\/\/www.w3.org\/1999\/02\/22-rdf-syntax-ns#",
+		"dcterms": "http:\/\/purl.org\/dc\/terms\/",
+		"oslc": "http:\/\/open-services.net\/ns\/core#",
+		"calm": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/"
+	},
+	"rdf:type": [{
+		"rdf:resource": "http:\/\/open-services.net\/ns\/core#ServiceProvider"
+	}],
+	"oslc:details": [{
+		"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/process\/project-areas\/_gkmCkniWEeOI1P1pr3yq5Q"
+	}],
+	"oslc:service": [{
+		"rdf:type": [{
+			"rdf:resource": "http:\/\/open-services.net\/ns\/core#Service"
+		}],
+		"oslc:domain": {
+			"rdf:resource": "http:\/\/open-services.net\/ns\/cm-x#"
+		},
+		"oslc:selectionDialog": [{
+			"oslc:hintWidth": "550px",
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#Dialog"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#default"
+			}],
+			"oslc:label": "Plan",
+			"dcterms:title": "Plan",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm-x#Plan"
+			}],
+			"oslc:dialog": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/_ajax-modules\/com.ibm.team.apt.PlanSelectionDialog?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true"
+			},
+			"oslc:hintHeight": "360px"
+		}],
+		"calm:home": [{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/Home"
+			}],
+			"dcterms:title": "Plans Home",
+			"calm:webHome": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/web\/projects\/elknar%27s%20Project%20%28Change%20and%20Configuration%20Management%29#action=com.ibm.team.apt.welcome"
+			}
+		}]
+	},
+	{
+		"rdf:type": [{
+			"rdf:resource": "http:\/\/open-services.net\/ns\/core#Service"
+		}],
+		"oslc:queryCapability": [{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#QueryCapability"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#default"
+			}],
+			"oslc:resourceShape": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/query"
+			},
+			"dcterms:title": "Change request queries",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			}],
+			"oslc:queryBase": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems"
+			}
+		}],
+		"calm:filter": [{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/Filter"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/openItems"
+			}],
+			"calm:filterBase": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/calm-filter\/_gkmCkniWEeOI1P1pr3yq5Q\/openItems"
+			},
+			"dcterms:title": "Open Change Requests Filter",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			}]
+		},
+		{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/Filter"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/resolvedItems"
+			}],
+			"calm:filterBase": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/calm-filter\/_gkmCkniWEeOI1P1pr3yq5Q\/resolvedItems"
+			},
+			"dcterms:title": "Resolved Change Requests Filter",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			}]
+		},
+		{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/Filter"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/readyForTesting"
+			}],
+			"calm:filterBase": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/calm-filter\/_gkmCkniWEeOI1P1pr3yq5Q\/readyForTesting"
+			},
+			"dcterms:title": "Ready for Testing Change Requests Filter",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			}]
+		}],
+		"oslc:domain": {
+			"rdf:resource": "http:\/\/open-services.net\/ns\/cm#"
+		},
+		"oslc:selectionDialog": [{
+			"oslc:hintWidth": "550px",
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#Dialog"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#default"
+			}],
+			"oslc:label": "Change Request",
+			"dcterms:title": "Select Change Request",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			}],
+			"oslc:dialog": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/_ajax-modules\/com.ibm.team.workitem.WIPicker?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true"
+			},
+			"oslc:hintHeight": "460px"
+		},
+		{
+			"oslc:hintWidth": "550px",
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#Dialog"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#defect"
+			}],
+			"oslc:label": "Defect",
+			"dcterms:title": "Select Defect",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			}],
+			"oslc:dialog": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/_ajax-modules\/com.ibm.team.workitem.WIPicker?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true&dc%3Atype=defect"
+			},
+			"oslc:hintHeight": "460px"
+		},
+		{
+			"oslc:hintWidth": "550px",
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#Dialog"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#planItem"
+			}],
+			"oslc:label": "Plan Item",
+			"dcterms:title": "Select Plan Item",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			}],
+			"oslc:dialog": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/_ajax-modules\/com.ibm.team.workitem.WIPicker?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true&dc%3Atype=com.ibm.team.apt.workItemType.story"
+			},
+			"oslc:hintHeight": "460px"
+		},
+		{
+			"oslc:hintWidth": "550px",
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#Dialog"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#task"
+			}],
+			"oslc:label": "Task",
+			"dcterms:title": "Select Task",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			}],
+			"oslc:dialog": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/_ajax-modules\/com.ibm.team.workitem.WIPicker?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true&dc%3Atype=task"
+			},
+			"oslc:hintHeight": "460px"
+		},
+		{
+			"oslc:hintWidth": "550px",
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#Dialog"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#requirementsChangeRequest"
+			}],
+			"oslc:label": "Requirement Change Request",
+			"dcterms:title": "Requirement Change Request",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			}],
+			"oslc:dialog": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/_ajax-modules\/com.ibm.team.workitem.WIPicker?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true&dc%3Atype=task"
+			},
+			"oslc:hintHeight": "460px"
+		}],
+		"oslc:creationDialog": [{
+			"oslc:hintWidth": "680px",
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#Dialog"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#default"
+			},
+			{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#defect"
+			}],
+			"oslc:label": "Defect",
+			"dcterms:title": "New Defect",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			}],
+			"oslc:dialog": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/modules\/com.ibm.team.workitem.WICreationDialog?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true&dc%3Atype=defect"
+			},
+			"oslc:hintHeight": "505px"
+		},
+		{
+			"oslc:hintWidth": "680px",
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#Dialog"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#planItem"
+			}],
+			"oslc:label": "Plan Item",
+			"dcterms:title": "New Plan Item",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			}],
+			"oslc:dialog": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/modules\/com.ibm.team.workitem.WICreationDialog?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true&dc%3Atype=com.ibm.team.apt.workItemType.story"
+			},
+			"oslc:hintHeight": "545px"
+		},
+		{
+			"oslc:hintWidth": "680px",
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#Dialog"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#task"
+			}],
+			"oslc:label": "Task",
+			"dcterms:title": "New Task",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			}],
+			"oslc:dialog": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/modules\/com.ibm.team.workitem.WICreationDialog?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true&dc%3Atype=task"
+			},
+			"oslc:hintHeight": "505px"
+		},
+		{
+			"oslc:hintWidth": "680px",
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#Dialog"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#requirementsChangeRequest"
+			}],
+			"oslc:label": "Requirement Change Request",
+			"dcterms:title": "New Requirement Change Request",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			}],
+			"oslc:dialog": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/modules\/com.ibm.team.workitem.WICreationDialog?projectAreaId=_gkmCkniWEeOI1P1pr3yq5Q&showLoginLink=true&dc%3Atype=task"
+			},
+			"oslc:hintHeight": "505px"
+		}],
+		"calm:module": [{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/Module"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/embedded-cm"
+			}],
+			"dcterms:title": "Embeddable Work Item Web Module",
+			"calm:moduleDefinition": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/web\/com.ibm.team.workitem.web\/ui\/internal\/module\/WorkItemGadget.xml?projectAreaItemId=_gkmCkniWEeOI1P1pr3yq5Q"
+			}
+		}],
+		"calm:rpc": [{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/OpenSocialRPC"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/home"
+			}],
+			"dcterms:title": "Work Items Home",
+			"calm:rpcService": "OSLC_requestAction",
+			"calm:rpcArg": "action=com.ibm.team.workitem.viewWelcome"
+		},
+		{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/OpenSocialRPC"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#defect"
+			}],
+			"dcterms:title": "Create Defect",
+			"calm:rpcService": "OSLC_requestAction",
+			"calm:rpcArg": "action=com.ibm.team.workitem.newWorkItem&type=defect"
+		},
+		{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/OpenSocialRPC"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#task"
+			}],
+			"dcterms:title": "Create Task",
+			"calm:rpcService": "OSLC_requestAction",
+			"calm:rpcArg": "action=com.ibm.team.workitem.newWorkItem&type=task"
+		},
+		{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/OpenSocialRPC"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/query-page"
+			}],
+			"dcterms:title": "Queries",
+			"calm:rpcService": "OSLC_requestAction",
+			"calm:rpcArg": "action=com.ibm.team.workitem.viewQueries"
+		}],
+		"calm:home": [{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/calm\/1.0\/Home"
+			}],
+			"dcterms:title": "Work Items Home",
+			"calm:webHome": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/web\/projects\/elknar%27s%20Project%20%28Change%20and%20Configuration%20Management%29#action=com.ibm.team.workitem.viewWelcome"
+			}
+		}],
+		"oslc:creationFactory": [{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#CreationFactory"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#default"
+			},
+			{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#defect"
+			}],
+			"oslc:resourceShape": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/defect"
+			},
+			"dcterms:title": "Location for creation of Defect change requests ",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			},
+			{
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/types\/_gkmCkniWEeOI1P1pr3yq5Q\/defect"
+			}],
+			"oslc:creation": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/defect"
+			}
+		},
+		{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#CreationFactory"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#task"
+			},
+			{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#requirementsChangeRequest"
+			}],
+			"oslc:resourceShape": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/task"
+			},
+			"dcterms:title": "Location for creation of Task change requests ",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			},
+			{
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/types\/_gkmCkniWEeOI1P1pr3yq5Q\/task"
+			}],
+			"oslc:creation": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/task"
+			}
+		},
+		{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#CreationFactory"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#planItem"
+			}],
+			"oslc:resourceShape": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/com.ibm.team.apt.workItemType.story"
+			},
+			"dcterms:title": "Location for creation of Story change requests ",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			},
+			{
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/types\/_gkmCkniWEeOI1P1pr3yq5Q\/com.ibm.team.apt.workItemType.story"
+			}],
+			"oslc:creation": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/com.ibm.team.apt.workItemType.story"
+			}
+		},
+		{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#CreationFactory"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/rtc\/cm\/1.0\/com.ibm.team.apt.workItemType.epic"
+			}],
+			"oslc:resourceShape": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/com.ibm.team.apt.workItemType.epic"
+			},
+			"dcterms:title": "Location for creation of Epic change requests ",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			},
+			{
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/types\/_gkmCkniWEeOI1P1pr3yq5Q\/com.ibm.team.apt.workItemType.epic"
+			}],
+			"oslc:creation": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/com.ibm.team.apt.workItemType.epic"
+			}
+		},
+		{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#CreationFactory"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/rtc\/cm\/1.0\/com.ibm.team.workItemType.buildtrackingitem"
+			}],
+			"oslc:resourceShape": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/com.ibm.team.workItemType.buildtrackingitem"
+			},
+			"dcterms:title": "Location for creation of Track Build Item change requests ",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			},
+			{
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/types\/_gkmCkniWEeOI1P1pr3yq5Q\/com.ibm.team.workItemType.buildtrackingitem"
+			}],
+			"oslc:creation": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/com.ibm.team.workItemType.buildtrackingitem"
+			}
+		},
+		{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#CreationFactory"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/rtc\/cm\/1.0\/com.ibm.team.workitem.workItemType.impediment"
+			}],
+			"oslc:resourceShape": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/com.ibm.team.workitem.workItemType.impediment"
+			},
+			"dcterms:title": "Location for creation of Impediment change requests ",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			},
+			{
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/types\/_gkmCkniWEeOI1P1pr3yq5Q\/com.ibm.team.workitem.workItemType.impediment"
+			}],
+			"oslc:creation": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/com.ibm.team.workitem.workItemType.impediment"
+			}
+		},
+		{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#CreationFactory"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/rtc\/cm\/1.0\/com.ibm.team.workItemType.adoption"
+			}],
+			"oslc:resourceShape": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/com.ibm.team.workItemType.adoption"
+			},
+			"dcterms:title": "Location for creation of Adoption Item change requests ",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			},
+			{
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/types\/_gkmCkniWEeOI1P1pr3yq5Q\/com.ibm.team.workItemType.adoption"
+			}],
+			"oslc:creation": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/com.ibm.team.workItemType.adoption"
+			}
+		},
+		{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#CreationFactory"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/rtc\/cm\/1.0\/com.ibm.team.workitem.workItemType.retrospective"
+			}],
+			"oslc:resourceShape": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/com.ibm.team.workitem.workItemType.retrospective"
+			},
+			"dcterms:title": "Location for creation of Retrospective change requests ",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			},
+			{
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/types\/_gkmCkniWEeOI1P1pr3yq5Q\/com.ibm.team.workitem.workItemType.retrospective"
+			}],
+			"oslc:creation": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/com.ibm.team.workitem.workItemType.retrospective"
+			}
+		},
+		{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#CreationFactory"
+			}],
+			"oslc:resourceShape": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/context\/_gkmCkniWEeOI1P1pr3yq5Q\/shapes\/workitems\/defect"
+			},
+			"dcterms:title": "Location for creation of change requests",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			}],
+			"oslc:creation": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems"
+			}
+		},
+		{
+			"rdf:type": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/core#CreationFactory"
+			}],
+			"oslc:usage": [{
+				"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/rtc\/cm\/1.0\/drafts"
+			}],
+			"dcterms:title": "Location for creation of draft change requests",
+			"oslc:resourceType": [{
+				"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+			}],
+			"oslc:creation": {
+				"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/drafts\/workitems"
+			}
+		}]
+	}],
+	"dcterms:title": "elknar's Project (Change and Configuration Management)",
+	"rdf:about": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/services",
+	"dcterms:publisher": {
+		"rdf:type": [{
+			"rdf:resource": "http:\/\/open-services.net\/ns\/core#Publisher"
+		}],
+		"dcterms:title": "IBM Rational Team Concert Work Items",
+		"oslc:icon": {
+			"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/web\/com.ibm.team.rtc.web\/ui\/graphics\/UICustomizations\/RationalTeamConcert.ico"
+		},
+		"dcterms:identifier": "com.ibm.team.workitem"
+	}
+}
