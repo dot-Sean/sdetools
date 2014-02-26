@@ -16,11 +16,21 @@ from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
 RE_MAP_RANGE_KEY = re.compile('^\d+(-\d+)?$')
+MAX_CONTENT_SIZE = 30000
 RATIONAL_DEFAULT_PRIORITY_MAP = {
     '7-10': 'High',
     '4-6': 'Medium',
     '1-3': 'Low',
-    }
+}
+
+RATIONAL_HTML_CONVERT = [
+    (re.compile('<h[1-6]>'), '<br><strong>'),
+    (re.compile('</h[1-6]>'), '</strong><br>'),
+    ('<p>', ''),
+    ('</p>', '<br><br>'),
+    ('<pre><code>', '<span style="font-family: courier new,monospace;"><pre>'),
+    ('</code></pre>', '</pre></span>'),
+]
 
 OSLC_CM_SERVICE_PROVIDER ='http://open-services.net/xmlns/cm/1.0/cmServiceProviders'
 OSLC_CR_TYPE = "http://open-services.net/ns/cm#task"
@@ -31,6 +41,19 @@ class RationalAPI(RESTBase):
 
     def __init__(self, config):
         super(RationalAPI, self).__init__('alm', 'Rational', config)
+
+    def parse_error(self, result):
+        result = json.loads(result)
+
+        error_msg = None
+        if 'oslc:message' in result:
+            error_msg = result['oslc:message']
+
+        if not error_msg:
+            logger.error('Could not parse error message')
+            raise AlmException('Could not parse error message')
+
+        return error_msg
 
     def parse_response(self, result, headers):
         return (result, headers)
@@ -405,7 +428,29 @@ class RationalConnector(AlmConnector):
         pass
 
     def convert_markdown_to_alm(self, content, ref):
-        return self.mark_down_converter.convert(content)
+        s = self.mark_down_converter.convert(content)
+
+        # We do some jumping through hoops to add <br> at end of each
+        # line for segments between code tags
+        sliced = s.split('<code>')
+        s = [sliced[0]]
+        for item in sliced[1:]:
+            item = item.split('</code>')
+            item[0] = item[0].replace('\n', '<br>\n')
+            s.append('</code>'.join(item))
+        s = '<code>'.join(s)
+
+        for before, after in RATIONAL_HTML_CONVERT:
+            if type(before) is str:
+                s = s.replace(before, after)
+            else:
+                s = before.sub(after, s)
+
+        if len(s) > MAX_CONTENT_SIZE:
+            logger.warning('Content too long for %s - Truncating.' % ref)
+            s = s[:MAX_CONTENT_SIZE]
+
+        return s
 
     def translate_priority(self, priority):
         """ Translates an SDE priority into a GitHub label """
