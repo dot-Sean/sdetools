@@ -85,12 +85,11 @@ class RationalFormsLogin(RESTBase):
     def parse_response(self, result, headers):
         for header, value in headers.items():
             if header == AUTH_MSG and value == MSG_FAIL:
-                raise AlmException('Authenticated failed: Check username or password')
+                raise AlmException('Authentication failed: Check username or password')
 
         return result
 
     def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}, auth_mode=None):
-
         if method == URLRequest.POST:
             call_headers['Content-Type'] = 'application/x-www-form-urlencoded'
 
@@ -201,7 +200,6 @@ class RationalConnector(AlmConnector):
                                    % (self.ALM_PRIORITY_MAP, key))
 
     def _rtc_forms_login(self, forms_client):
-
         forms_credentials = {
             'j_username': self.config['alm_user'],
             'j_password': self.config['alm_pass']
@@ -273,7 +271,6 @@ class RationalConnector(AlmConnector):
             raise AlmException('Unable to connect retrieve service catalog (Check connection settings).')
 
     def _call_api(self, target, args=None, method=URLRequest.GET):
-
         headers = {}
 
         if self.COOKIE_JSESSIONID:
@@ -282,7 +279,6 @@ class RationalConnector(AlmConnector):
         return self.alm_plugin.call_api(target, method=method, args=args, call_headers=headers)
 
     def _rtc_get_priorities(self):
-
         try:
             resource_shapes = self._call_api(self.resource_shape_url)
         except APIError, err:
@@ -298,7 +294,6 @@ class RationalConnector(AlmConnector):
         return priorities
 
     def _rtc_get_priority_details(self, priority_resource_url):
-
         priority_resource_url = priority_resource_url.replace(self.alm_plugin.base_uri+'/', '')
 
         try:
@@ -316,7 +311,6 @@ class RationalConnector(AlmConnector):
         return None
 
     def alm_connect_project(self):
-
         for service_provider in self.service_catalog['oslc:serviceProvider']:
             if service_provider['dcterms:title'] == self.config['alm_project']:
                 self.resource_url = service_provider['rdf:about']

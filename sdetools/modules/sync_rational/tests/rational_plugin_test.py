@@ -18,7 +18,6 @@ class TestRationalCase(AlmPluginTestBase, unittest.TestCase):
         pass
 
     def test_update_task_status_to_done(self):
-
         self.connector.config['conflict_policy'] = 'alm'
         self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
         self.connector.alm_connect()
@@ -36,7 +35,6 @@ class TestRationalCase(AlmPluginTestBase, unittest.TestCase):
         pass
 
     def test_update_task_status_to_todo(self):
-
         self.connector.config['conflict_policy'] = 'alm'
         self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
         self.connector.alm_connect()
@@ -49,7 +47,6 @@ class TestRationalCase(AlmPluginTestBase, unittest.TestCase):
         self.assertEqual(the_task['status'], 'TODO', 'Failed to update SDE task to TODO')
 
     def test_sync_no_alm_task(self):
-
         self.connector.config['conflict_policy'] = 'alm'
         self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
         self.connector.alm_connect()
