@@ -82,7 +82,6 @@ class AlmPluginTestBase(object):
         self.mock_sde_response.teardown()
 
     def test_parsing_alm_task(self):
-
         # Verify that none of the abstract methods inherited from AlmTask will break.
         # This test can be extended to verify the contents of task.
         self.connector.alm_connect()
@@ -104,11 +103,9 @@ class AlmPluginTestBase(object):
         return [test_task, test_task_result]
 
     def test_alm_connect(self):
-
         self.connector.alm_connect()
 
     def test_add_and_get_task(self):
-
         # The plugin may initialize variables during alm_connect() so we need
         # to call alm_connect() before proceeding
         self.connector.alm_connect()
@@ -119,12 +116,10 @@ class AlmPluginTestBase(object):
         self.assertNotNone(test_task_result, 'Failed retrieve newly added task')
 
     def test_alm_test_connect(self):
-
         self.connector.config['test_alm'] = 'project'
         self.connector.synchronize()
 
     def test_update_existing_task_sde(self):
-
         # The plugin may initialize variables during alm_connect() so we need
         # to call alm_connect() before proceeding
         self.connector.config['conflict_policy'] = 'sde'
@@ -136,7 +131,6 @@ class AlmPluginTestBase(object):
         self.connector.alm_update_task_status(alm_task, 'DONE')
 
     def test_update_task_status_to_done(self):
-
         self.connector.config['conflict_policy'] = 'alm'
         self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
         self.connector.alm_connect()
@@ -158,7 +152,6 @@ class AlmPluginTestBase(object):
         self.assertEqual(the_task['status'], 'DONE', 'Failed to update SDE task to DONE')
 
     def test_update_task_status_to_na(self):
-
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
         self.connector.alm_add_task(test_task)
@@ -172,7 +165,6 @@ class AlmPluginTestBase(object):
         self.assertIn(test_task_result.get_status(), ['DONE', 'NA'], 'Failed to update task status to NA')
 
     def test_update_task_status_to_todo(self):
-
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
         test_task['status'] = 'DONE'
@@ -188,12 +180,10 @@ class AlmPluginTestBase(object):
         self.assertEqual(test_task_result.get_status(), 'TODO', 'Failed to update task status to TODO')
 
     def test_synchronize(self):
-
         # Verify no exceptions are thrown
         self.connector.synchronize()
 
     def test_api_exceptions_are_handled(self):
-
         # Check that all api exceptions are properly handled
         for api_target, mock_flag in self.response_generator.rest_api_targets.items():
             self.tearDown()
