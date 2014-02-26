@@ -5,7 +5,18 @@ class RationalResponseGenerator(ResponseGenerator):
     def __init__(self, config, test_dir=None):
         self.username = config['alm_user']
         self.alm_server = config['alm_server']
-        resource_templates = ['rootservices.json', 'identity.json', 'catalog.json', 'services.json', 'resourceshape.json', 'priorities.json', 'count.json', 'workitem.json']
+        self.alm_project = config['alm_project']
+
+        resource_templates = [
+            'rootservices.json',
+            'identity.json',
+            'catalog.json',
+            'services.json',
+            'resourceshape.json',
+            'priorities.json',
+            'count.json',
+            'workitem.json'
+        ]
         rest_api_targets = {
             '.*/rootservices': 'get_rootservices',
             '.*/oslc/workitems/catalog': 'get_catalog',
@@ -54,7 +65,9 @@ class RationalResponseGenerator(ResponseGenerator):
 
     def get_catalog(self, target, flag, data, method):
         if not flag:
-            return self.generator_get_all_resource('catalog')[0]
+            catalog = self.generator_get_all_resource('catalog')[0]
+            catalog['oslc:serviceProvider'][0]['dcterms:title'] = self.alm_project
+            return catalog
         else:
             self.raise_error('404')
 

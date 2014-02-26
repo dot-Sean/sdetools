@@ -1,1 +1,35 @@
-{"prefixes":{"rdf":"http:\/\/www.w3.org\/1999\/02\/22-rdf-syntax-ns#","dcterms":"http:\/\/purl.org\/dc\/terms\/","oslc":"http:\/\/open-services.net\/ns\/core#"},"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#ServiceProviderCatalog"}],"oslc:domain":[{"rdf:resource":"http:\/\/open-services.net\/ns\/cm#"}],"dcterms:title":"Project Areas","oslc:serviceProvider":[{"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#ServiceProvider"}],"oslc:details":[{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/process\/project-areas\/_Za0OwkC3EeOXqfekCy-yFA"}],"dcterms:title":"clancampbell's Project (Change and Configuration Management)","rdf:about":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_Za0OwkC3EeOXqfekCy-yFA\/workitems\/services"},{"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#ServiceProvider"}],"oslc:details":[{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/process\/project-areas\/_gpLqwmNlEeO52ZqFPThsGw"}],"dcterms:title":"klgarrison's Project (Change and Configuration Management)","rdf:about":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gpLqwmNlEeO52ZqFPThsGw\/workitems\/services"},{"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#ServiceProvider"}],"oslc:details":[{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/process\/project-areas\/_gkmCkniWEeOI1P1pr3yq5Q"}],"dcterms:title":"elknar's Project (Change and Configuration Management)","rdf:about":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/services"}],"rdf:about":"https:\/\/jazz.net\/sandbox02-ccm\/oslc\/workitems\/catalog","dcterms:publisher":{"rdf:type":[{"rdf:resource":"http:\/\/open-services.net\/ns\/core#Publisher"}],"dcterms:title":"IBM Rational Team Concert Work Items","oslc:icon":{"rdf:resource":"https:\/\/jazz.net\/sandbox02-ccm\/web\/com.ibm.team.rtc.web\/ui\/graphics\/UICustomizations\/RationalTeamConcert.ico"},"dcterms:identifier":"com.ibm.team.workitem"}}
+{
+	"prefixes": {
+		"rdf": "http:\/\/www.w3.org\/1999\/02\/22-rdf-syntax-ns#",
+		"dcterms": "http:\/\/purl.org\/dc\/terms\/",
+		"oslc": "http:\/\/open-services.net\/ns\/core#"
+	},
+	"rdf:type": [{
+		"rdf:resource": "http:\/\/open-services.net\/ns\/core#ServiceProviderCatalog"
+	}],
+	"oslc:domain": [{
+		"rdf:resource": "http:\/\/open-services.net\/ns\/cm#"
+	}],
+	"dcterms:title": "Project Areas",
+	"oslc:serviceProvider": [{
+		"rdf:type": [{
+			"rdf:resource": "http:\/\/open-services.net\/ns\/core#ServiceProvider"
+		}],
+		"oslc:details": [{
+			"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/process\/project-areas\/_gkmCkniWEeOI1P1pr3yq5Q"
+		}],
+		"dcterms:title": "elknar's Project (Change and Configuration Management)",
+		"rdf:about": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/services"
+	}],
+	"rdf:about": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/workitems\/catalog",
+	"dcterms:publisher": {
+		"rdf:type": [{
+			"rdf:resource": "http:\/\/open-services.net\/ns\/core#Publisher"
+		}],
+		"dcterms:title": "IBM Rational Team Concert Work Items",
+		"oslc:icon": {
+			"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/web\/com.ibm.team.rtc.web\/ui\/graphics\/UICustomizations\/RationalTeamConcert.ico"
+		},
+		"dcterms:identifier": "com.ibm.team.workitem"
+	}
+}

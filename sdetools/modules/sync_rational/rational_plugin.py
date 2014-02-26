@@ -17,13 +17,13 @@ logger = log_mgr.mods.add_mod(__name__)
 
 RE_MAP_RANGE_KEY = re.compile('^\d+(-\d+)?$')
 MAX_CONTENT_SIZE = 30000
-RATIONAL_DEFAULT_PRIORITY_MAP = {
+RTC_DEFAULT_PRIORITY_MAP = {
     '7-10': 'High',
     '4-6': 'Medium',
     '1-3': 'Low',
 }
 
-RATIONAL_HTML_CONVERT = [
+RTC_HTML_CONVERT = [
     (re.compile('<h[1-6]>'), '<br><strong>'),
     (re.compile('</h[1-6]>'), '</strong><br>'),
     ('<p>', ''),
@@ -42,7 +42,7 @@ class RationalAPI(RESTBase):
     """ Base plugin for Rational """
 
     def __init__(self, config):
-        super(RationalAPI, self).__init__('alm', 'Rational', config)
+        super(RationalAPI, self).__init__('alm', 'Rational Team Concert', config)
 
     def parse_error(self, result):
         result = json.loads(result)
@@ -56,7 +56,7 @@ class RationalAPI(RESTBase):
         return error_msg
 
     def post_conf_init(self):
-        self.base_path = self.config['rational_context_root']
+        self.base_path = self.config['rtc_context_root']
         super(RationalAPI, self).post_conf_init()
 
     def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}, auth_mode=None):
@@ -76,7 +76,7 @@ class RationalFormsLogin(RESTBase):
         super(RationalFormsLogin, self).__init__('alm', 'Rational Forms Login', config)
 
     def post_conf_init(self):
-        self.base_path = self.config['rational_context_root']
+        self.base_path = self.config['rtc_context_root']
         super(RationalFormsLogin, self).post_conf_init()
 
     def encode_post_args(self, args):
@@ -146,8 +146,8 @@ class RationalConnector(AlmConnector):
     cm_service_provider = None
     resource_url = None
     priorities = None
-    ALM_NEW_STATUS = 'rational_new_status'
-    ALM_DONE_STATUSES = 'rational_done_statuses'
+    ALM_NEW_STATUS = 'rtc_new_status'
+    ALM_DONE_STATUSES = 'rtc_done_statuses'
     ALM_PRIORITY_MAP = 'alm_priority_map'
 
     def __init__(self, config, alm_plugin):
@@ -161,9 +161,9 @@ class RationalConnector(AlmConnector):
                                  default='Completed,Done')
         config.opts.add(self.ALM_PRIORITY_MAP, 'Customized map from priority in SDE to RTC '
                                  '(JSON encoded dictionary of strings)', default='')
-        config.opts.add('rational_context_root', 'Application context root: the part of the URL that accesses '
+        config.opts.add('rtc_context_root', 'Application context root: the part of the URL that accesses '
                                  'each application and Jazz Team Server', default='')
-        config.opts.add('alm_issue_label', 'Tag applied to tasks in Rational', default='SD-Elements')
+        config.opts.add('alm_issue_label', 'Tags applied to tasks in RTC (space separated)', default='SD-Elements')
 
     def initialize(self):
         super(RationalConnector, self).initialize()
@@ -173,7 +173,7 @@ class RationalConnector(AlmConnector):
 
         for item in [self.ALM_NEW_STATUS,
                      self.ALM_DONE_STATUSES,
-                     'rational_context_root',
+                     'rtc_context_root',
                      'alm_issue_label']:
 
             if not self.config[item]:
@@ -192,7 +192,7 @@ class RationalConnector(AlmConnector):
         self.config.process_json_str_dict(self.ALM_PRIORITY_MAP)
 
         if not self.config[self.ALM_PRIORITY_MAP]:
-            self.config[self.ALM_PRIORITY_MAP] = RATIONAL_DEFAULT_PRIORITY_MAP
+            self.config[self.ALM_PRIORITY_MAP] = RTC_DEFAULT_PRIORITY_MAP
 
         for key in self.config[self.ALM_PRIORITY_MAP]:
             if not RE_MAP_RANGE_KEY.match(key):
@@ -264,8 +264,8 @@ class RationalConnector(AlmConnector):
         try:
             self.service_catalog = self._call_api(self.cm_service_provider_target)
         except APIError, err:
-            raise AlmException('Unable to connect retrieve Rational service catalog (Check server URL, user, pass). '
-                               'Reason: %s' % str(err))
+            raise AlmException('Unable to connect retrieve RTC service catalog'
+                               '(Check server URL, user, pass). Reason: %s' % str(err))
                                
         if not self.service_catalog:
             raise AlmException('Unable to connect retrieve service catalog (Check connection settings).')
@@ -283,7 +283,7 @@ class RationalConnector(AlmConnector):
             resource_shapes = self._call_api(self.resource_shape_url)
         except APIError, err:
             logger.error(err)
-            raise AlmException('Unable to get resource shapes from Rational')
+            raise AlmException('Unable to get resource shapes from RTC')
 
         priorities = []
         for rs in resource_shapes['oslc:property']:
@@ -300,7 +300,7 @@ class RationalConnector(AlmConnector):
             priority_details = self._call_api(priority_resource_url)
         except APIError, err:
             logger.error(err)
-            raise AlmException('Unable to get priority details from Rational. Url: %s' % priority_resource_url)
+            raise AlmException('Unable to get priority details from RTC. Url: %s' % priority_resource_url)
 
         return priority_details
 
@@ -365,7 +365,7 @@ class RationalConnector(AlmConnector):
                                                   (self.query_url, task_id))
         except APIError, err:
             logger.error(err)
-            raise AlmException('Unable to get task %s from Rational' % task_id)
+            raise AlmException('Unable to get task %s from RTC' % task_id)
 
         if work_items['oslc:responseInfo']['oslc:totalCount'] == 0:
             return None
@@ -376,7 +376,7 @@ class RationalConnector(AlmConnector):
             work_item = self._call_api(work_item_target)
         except APIError, err:
             logger.error(err)
-            raise AlmException('Unable to get task %s from Rational' % task_id)
+            raise AlmException('Unable to get task %s from RTC' % task_id)
 
         logger.info('Found task: %s', task_id)
         return RationalTask(task_id,
@@ -408,9 +408,9 @@ class RationalConnector(AlmConnector):
                            method=self.alm_plugin.URLRequest.POST,
                            args=create_args)
             #print work_item
-            logger.debug('Task %s added to Rational Project', task['id'])
+            logger.debug('Task %s added to Rational Team Concert Project', task['id'])
         except APIError, err:
-            raise AlmException('Unable to add task %s to Rational because of %s'
+            raise AlmException('Unable to add task %s to RTC because of %s'
                                % (task['id'], err))
 
         alm_task = self.alm_get_task(task)
@@ -436,7 +436,7 @@ class RationalConnector(AlmConnector):
             s.append('</code>'.join(item))
         s = '<code>'.join(s)
 
-        for before, after in RATIONAL_HTML_CONVERT:
+        for before, after in RTC_HTML_CONVERT:
             if type(before) is str:
                 s = s.replace(before, after)
             else:
@@ -458,7 +458,7 @@ class RationalConnector(AlmConnector):
             priority = int(priority)
         except TypeError:
             logger.error('Could not coerce %s into an integer' % priority)
-            raise AlmException("Error in translating SDE priority to Rational label: "
+            raise AlmException("Error in translating SDE priority to RTC priority: "
                                "%s is not an integer priority" % priority)
 
         for key in pmap:
