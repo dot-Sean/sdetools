@@ -1,14 +1,13 @@
 # NOTE: Before running ensure that the options are set properly in the
 #       configuration file
-
-
+import unittest
 
 from rational_response_generator import RationalResponseGenerator
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_rational.rational_plugin import RationalConnector, RationalAPI
 
 
-class TestRationalCase(AlmPluginTestBase):
+class TestRationalCase(AlmPluginTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         alm_classes = [RationalConnector, RationalAPI, RationalResponseGenerator]
@@ -17,10 +16,6 @@ class TestRationalCase(AlmPluginTestBase):
     def test_update_existing_task_sde(self):
         """NOT SUPPORTED"""
         pass
-
-    def assertEqual(self, item1, item2, error_msg):
-        if item1 != item2:
-            raise AssertionError(error_msg)
 
     def test_update_task_status_to_done(self):
 

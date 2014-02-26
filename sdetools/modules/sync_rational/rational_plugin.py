@@ -455,7 +455,6 @@ class RationalConnector(AlmConnector):
         return s
 
     def translate_priority(self, priority):
-        """ Translates an SDE priority into a GitHub label """
         pmap = self.config[self.ALM_PRIORITY_MAP]
 
         if not pmap:
