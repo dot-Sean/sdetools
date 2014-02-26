@@ -1,0 +1,14 @@
+{
+	"prefixes": {
+		"rdf": "http:\/\/www.w3.org\/1999\/02\/22-rdf-syntax-ns#",
+		"rtc_cm": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/rtc\/cm\/1.0\/",
+		"dcterms": "http:\/\/purl.org\/dc\/terms\/"
+	},
+	"rdf:type": [{
+		"rdf:resource": "http:\/\/jazz.net\/xmlns\/prod\/jazz\/rtc\/cm\/1.0\/Literal"
+	}],
+	"rtc_cm:iconUrl": "https:\/\/jazz.net\/sandbox02-ccm\/service\/com.ibm.team.workitem.common.internal.model.IImageContentService\/processattachment\/_gkmCkniWEeOI1P1pr3yq5Q\/enumeration\/unassigned.gif",
+	"dcterms:title": "Unassigned",
+	"rdf:about": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/enumerations\/_gkmCkniWEeOI1P1pr3yq5Q\/priority\/priority.literal.l01",
+	"dcterms:identifier": "priority.literal.l01"
+}

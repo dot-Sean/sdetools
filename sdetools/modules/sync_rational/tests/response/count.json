@@ -1,0 +1,19 @@
+{
+	"prefixes": {
+		"rdf": "http:\/\/www.w3.org\/1999\/02\/22-rdf-syntax-ns#",
+		"oslc": "http:\/\/open-services.net\/ns\/core#"
+	},
+	"rdf:about": "https:\/\/jazz.net\/sandbox02-ccm\/oslc\/contexts\/_gkmCkniWEeOI1P1pr3yq5Q\/workitems\/workitems",
+	"oslc:results": [{
+		"rdf:type": [{
+			"rdf:resource": "http:\/\/open-services.net\/ns\/cm#ChangeRequest"
+		}],
+		"rdf:resource": "https:\/\/jazz.net\/sandbox02-ccm\/resource\/itemName\/com.ibm.team.workitem.WorkItem\/11371"
+	}],
+	"oslc:responseInfo": {
+		"rdf:type": [{
+			"rdf:resource": "http:\/\/open-services.net\/ns\/core#ResponseInfo"
+		}],
+		"oslc:totalCount": 1
+	}
+}
