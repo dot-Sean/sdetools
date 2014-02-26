@@ -26,7 +26,7 @@ class MingleAPIBase(RESTBase):
         encoded_args = dict((key.encode('utf-8'), val.encode('utf-8')) for key, val in args.items())
         return urllib.urlencode(encoded_args)
 
-    def parse_response(self, result): 
+    def parse_response(self, result, headers):
         if result:
             try:
                 result = minidom.parseString(result)

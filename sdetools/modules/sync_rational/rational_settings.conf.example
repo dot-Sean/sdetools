@@ -98,12 +98,12 @@ conflict_policy = alm
 alm_standard_workflow = True
 
 #Initial 'status' to set for a new work item
-rtc_new_status = New
+rational_new_status = New
 
 #a comma delimited list of statuses that signify a task is Done in Rally
 #Note the first one will be used by SD Elements when representing a Done task
 #in SD Elements inside of Rally
-rtc_done_statuses = Completed,Done
+rational_done_statuses = Completed,Done
 
 #[Optional] Specify a custom priority map
 #This is a JSON representation of a list of ranges mapped to certain

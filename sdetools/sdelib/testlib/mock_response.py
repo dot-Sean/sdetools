@@ -103,7 +103,10 @@ class MockResponse(object):
 class MockSDEResponse(MockResponse):
     def initialize(self, config):
         global SDE_SERVER
-        SDE_SERVER = config['sde_server']
+        if '@' in config['sde_api_token']:
+            SDE_SERVER = config['sde_api_token'][config['sde_api_token'].find('@')+1:]
+        else:
+            SDE_SERVER = config['sde_server']
         response_generator = SdeResponseGenerator(config)
         super(MockSDEResponse, self).initialize(response_generator)
 

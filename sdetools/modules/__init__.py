@@ -13,6 +13,7 @@ __all__ = [
     'sync_hp_alm',
     'sync_pt',
     'sync_github',
+    'sync_rational',
     'api_proxy',
     'list_projects',
     'sync_trac',
