@@ -16,14 +16,26 @@ from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
 RE_MAP_RANGE_KEY = re.compile('^\d+(-\d+)?$')
+MAX_CONTENT_SIZE = 30000
 RATIONAL_DEFAULT_PRIORITY_MAP = {
     '7-10': 'High',
     '4-6': 'Medium',
     '1-3': 'Low',
-    }
+}
+
+RATIONAL_HTML_CONVERT = [
+    (re.compile('<h[1-6]>'), '<br><strong>'),
+    (re.compile('</h[1-6]>'), '</strong><br>'),
+    ('<p>', ''),
+    ('</p>', '<br><br>'),
+    ('<pre><code>', '<span style="font-family: courier new,monospace;"><pre>'),
+    ('</code></pre>', '</pre></span>'),
+]
 
 OSLC_CM_SERVICE_PROVIDER ='http://open-services.net/xmlns/cm/1.0/cmServiceProviders'
 OSLC_CR_TYPE = "http://open-services.net/ns/cm#task"
+AUTH_MSG = 'x-com-ibm-team-repository-web-auth-msg'
+MSG_FAIL = 'authfailed'
 
 
 class RationalAPI(RESTBase):
@@ -32,25 +44,29 @@ class RationalAPI(RESTBase):
     def __init__(self, config):
         super(RationalAPI, self).__init__('alm', 'Rational', config)
 
-    def parse_response(self, result, headers):
-        return (result, headers)
+    def parse_error(self, result):
+        result = json.loads(result)
+
+        error_msg = None
+        if 'oslc:message' in result:
+            error_msg = result['oslc:message']
+        else:
+            error_msg = result
+
+        return error_msg
 
     def post_conf_init(self):
         self.base_path = self.config['rational_context_root']
         super(RationalAPI, self).post_conf_init()
 
-    def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}, auth_mode=None, show_headers=False):
+    def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}, auth_mode=None):
         call_headers['Accept'] = 'application/json'
         call_headers['OSLC-Core-Version'] = '2.0'
 
         try:
-            result = super(RationalAPI, self).call_api(target, method, args, call_headers, auth_mode)
+            return super(RationalAPI, self).call_api(target, method, args, call_headers, auth_mode)
         except Exception as e:
             raise AlmException('API Call failed. Target: %s ; Error: %s' % (target, e))
-        if show_headers:
-            return result
-        else:
-            return json.loads(result[0])
 
 
 class RationalFormsLogin(RESTBase):
@@ -66,8 +82,12 @@ class RationalFormsLogin(RESTBase):
     def encode_post_args(self, args):
         return urllib.urlencode(args)
 
-    def parse_response(self, result, headers, show_headers=False):
-        return (result, headers)
+    def parse_response(self, result, headers):
+        for header, value in headers.items():
+            if header == AUTH_MSG and value == MSG_FAIL:
+                raise AlmException('Authenticated failed: Check username or password')
+
+        return result
 
     def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}, auth_mode=None):
 
@@ -76,8 +96,6 @@ class RationalFormsLogin(RESTBase):
 
         for cookie in self.cookiejar:
             if cookie.name == 'JSESSIONID':
-                call_headers[cookie.name] = cookie.value
-            elif cookie.name == 'JSESSIONIDSSO':
                 call_headers[cookie.name] = cookie.value
 
         try:
@@ -146,12 +164,21 @@ class RationalConnector(AlmConnector):
                                  '(JSON encoded dictionary of strings)', default='')
         config.opts.add('rational_context_root', 'Application context root: the part of the URL that accesses '
                                  'each application and Jazz Team Server', default='')
+        config.opts.add('alm_issue_label', 'Tag applied to tasks in Rational', default='SD-Elements')
 
     def initialize(self):
         super(RationalConnector, self).initialize()
 
         self.COOKIE_JSESSIONID = None
         self.mark_down_converter = markdown.Markdown(safe_mode="escape")
+
+        for item in [self.ALM_NEW_STATUS,
+                     self.ALM_DONE_STATUSES,
+                     'rational_context_root',
+                     'alm_issue_label']:
+
+            if not self.config[item]:
+                raise AlmException('Missing %s in configuration' % item)
 
         # Verify that the configuration options are set properly
         for item in [self.ALM_NEW_STATUS, self.ALM_DONE_STATUSES]:
@@ -173,57 +200,54 @@ class RationalConnector(AlmConnector):
                 raise AlmException('Unable to process %s (not a JSON dictionary). Reason: Invalid range key %s'
                                    % (self.ALM_PRIORITY_MAP, key))
 
-    def _rtc_forms_login(self):
+    def _rtc_forms_login(self, forms_client):
 
         forms_credentials = {
             'j_username': self.config['alm_user'],
             'j_password': self.config['alm_pass']
         }
 
-        login_client = RationalFormsLogin(self.config)
-        login_client.set_auth_mode('cookie')
-
-        #RTC does not allow direct login - get a cookie first
-        try:
-            login_client.call_api('authenticated/identity')
-        except APIError, err:
-            raise AlmException('Unable to connect to RTC (Check server URL, '
-                               'user, pass). Reason: %s' % str(err))
-
         #Check to make sure that we can login
         try:
-            login_client.call_api('authenticated/j_security_check', args=forms_credentials, method=URLRequest.POST)
+            forms_client.call_api('authenticated/j_security_check', args=forms_credentials, method=URLRequest.POST)
         except APIError, err:
             raise AlmException('Unable to connect to RTC (Check server URL, '
                                'user, pass). Reason: %s' % str(err))
 
-        for cookie in login_client.cookiejar:
+        for cookie in forms_client.cookiejar:
             if cookie.name == 'JSESSIONID':
                 self.COOKIE_JSESSIONID = cookie.value
 
     def alm_connect_server(self):
         """Check if user can successfully authenticate and retrieve service catalog"""
 
+
+        forms_client = RationalFormsLogin(self.config)
+        forms_client.set_auth_mode('cookie')
+
         try:
-            cookie = self.alm_plugin.call_api('authenticated/identity', show_headers=True)[1]['set-cookie']
+            forms_client.call_api(target='authenticated/identity')
         except APIError, err:
             raise AlmException('Unable to connect to RTC (Check server URL, '
                                'user, pass). Reason: %s' % str(err))
-        auth = cookie[cookie.find('JazzFormAuth=')+len('JazzFormAuth='):cookie.find('JazzFormAuth=')+len('JazzFormAuth=')+4]
+
+        auth = 'Basic'
+
+        for cookie in forms_client.cookiejar:
+            if cookie.name == 'JazzFormAuth' and cookie.value == 'Form':
+                auth = 'Form'
 
         if auth == 'Form':
-            # We will authenticate via cookie
             self.alm_plugin.set_auth_mode('cookie')
-
-            self._rtc_forms_login()
+            self._rtc_forms_login(forms_client)
 
             if not self.COOKIE_JSESSIONID:
-                raise AlmException('Unable to connect to HP Alm service (Check server URL, user, pass)')
+                raise AlmException('Unable to connect to RTC (Check server URL, user, pass)')
         else:
-            pass
+            self.alm_plugin.set_auth_mode('basic')
 
         try:
-            catalog = self.alm_plugin.call_api('rootservices')
+            catalog = self._call_api('rootservices')
         except APIError, err:
             raise AlmException('Unable to connect retrieve root services (Check server URL, user, pass). '
                                'Reason: %s' % str(err))
@@ -378,6 +402,7 @@ class RationalConnector(AlmConnector):
             'dcterms:title': task['title'],
             'dcterms:description': self.sde_get_task_content(task),
             'oslc_cmx:priority': priority_literal_resource,
+            'dcterms:subject': self.config['alm_issue_label'],
         }
 
         if (self.config['alm_standard_workflow'] and
@@ -405,7 +430,29 @@ class RationalConnector(AlmConnector):
         pass
 
     def convert_markdown_to_alm(self, content, ref):
-        return self.mark_down_converter.convert(content)
+        s = self.mark_down_converter.convert(content)
+
+        # We do some jumping through hoops to add <br> at end of each
+        # line for segments between code tags
+        sliced = s.split('<code>')
+        s = [sliced[0]]
+        for item in sliced[1:]:
+            item = item.split('</code>')
+            item[0] = item[0].replace('\n', '<br>\n')
+            s.append('</code>'.join(item))
+        s = '<code>'.join(s)
+
+        for before, after in RATIONAL_HTML_CONVERT:
+            if type(before) is str:
+                s = s.replace(before, after)
+            else:
+                s = before.sub(after, s)
+
+        if len(s) > MAX_CONTENT_SIZE:
+            logger.warning('Content too long for %s - Truncating.' % ref)
+            s = s[:MAX_CONTENT_SIZE]
+
+        return s
 
     def translate_priority(self, priority):
         """ Translates an SDE priority into a GitHub label """
