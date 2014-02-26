@@ -5,7 +5,7 @@ class RationalResponseGenerator(ResponseGenerator):
     def __init__(self, config, test_dir=None):
         self.username = config['alm_user']
         self.alm_server = config['alm_server']
-        resource_templates = ['rootservices.json', 'catalog.json', 'services.json', 'resourceshape.json', 'priorities.json', 'count.json', 'workitem.json']
+        resource_templates = ['rootservices.json', 'identity.json', 'catalog.json', 'services.json', 'resourceshape.json', 'priorities.json', 'count.json', 'workitem.json']
         rest_api_targets = {
             '.*/rootservices': 'get_rootservices',
             '.*/oslc/workitems/catalog': 'get_catalog',
@@ -15,23 +15,36 @@ class RationalResponseGenerator(ResponseGenerator):
             '.*/oslc/contexts/[^/]+/workitems/workitems\\?oslc.where=dcterms:title=.*': 'get_count',
             '.*/resource/itemName/com.ibm.team.workitem.WorkItem/\\d*': 'get_workitem',
             '.*/oslc/contexts/[^/]+/workitems/task': 'post_workitem',
+            '.*/authenticated/identity': 'authenticate_identity',
         }
         super(RationalResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir)
 
     def init_with_resources(self):
         """Loads the default responses"""
 
-        for x in ['rootservices', 'catalog', 'services', 'resourceshape', 'priorities', 'count', 'workitem']:
+        for x in ['rootservices',
+                  'catalog',
+                  'services',
+                  'identity',
+                  'resourceshape',
+                  'priorities',
+                  'count',
+                  'workitem']:
             self.generator_add_resource(x, resource_data=self.get_json_from_file(x))
-
-    def raise_error(self, error_code, message=None):
-        """Raises an error based on the error code or message"""
-
-        super(RationalResponseGenerator, self).raise_error(error_code, message['message'])
 
     """
        Response functions
     """
+
+    def authenticate_identity(self, target, flag, data, method):
+        if not flag:
+            response = self.generator_get_all_resource('identity')
+            headers = [
+                {'set-cookie': 'JazzFormAuth=Form'}
+            ]
+            return response, headers
+        else:
+            self.raise_error('404')
 
     def get_rootservices(self, target, flag, data, method):
         if not flag:

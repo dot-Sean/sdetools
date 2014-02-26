@@ -33,6 +33,7 @@ class ResponseGenerator(object):
         if test_dir is None:
             test_dir = get_directory_of_current_module(self)
 
+        self.target = None
         self.resources = {}
         self.test_dir = test_dir
         self.rest_api_targets = rest_api_targets
