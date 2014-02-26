@@ -164,12 +164,21 @@ class RationalConnector(AlmConnector):
                                  '(JSON encoded dictionary of strings)', default='')
         config.opts.add('rational_context_root', 'Application context root: the part of the URL that accesses '
                                  'each application and Jazz Team Server', default='')
+        config.opts.add('alm_issue_label', 'Tag applied to tasks in Rational', default='SD-Elements')
 
     def initialize(self):
         super(RationalConnector, self).initialize()
 
         self.COOKIE_JSESSIONID = None
         self.mark_down_converter = markdown.Markdown(safe_mode="escape")
+
+        for item in [self.ALM_NEW_STATUS,
+                     self.ALM_DONE_STATUSES,
+                     'rational_context_root',
+                     'alm_issue_label']:
+
+            if not self.config[item]:
+                raise AlmException('Missing %s in configuration' % item)
 
         # Verify that the configuration options are set properly
         for item in [self.ALM_NEW_STATUS, self.ALM_DONE_STATUSES]:
@@ -393,6 +402,7 @@ class RationalConnector(AlmConnector):
             'dcterms:title': task['title'],
             'dcterms:description': self.sde_get_task_content(task),
             'oslc_cmx:priority': priority_literal_resource,
+            'dcterms:subject': self.config['alm_issue_label'],
         }
 
         if (self.config['alm_standard_workflow'] and
