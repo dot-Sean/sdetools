@@ -1,0 +1,71 @@
+{ 
+    "https://jazz.net/sandbox02-ccm/oslc/workitems/catalog" : { 
+        "http://open-services.net/ns/core#domain" : [ { "type" : "uri" , "value" : "http://open-services.net/ns/cm#" } ], 
+        "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" : [ { "type" : "uri" , "value" : "http://open-services.net/ns/core#ServiceProviderCatalog" } ]
+     }, 
+    "_:-2665a658_143e90b47a3_bfd" : { 
+        "http://jazz.net/ns/trs#trackedResourceSet" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/oslc/workitems/trs" } ], 
+        "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" : [ { "type" : "uri" , "value" : "http://jazz.net/ns/trs#TrackedResourceSetProvider" } ]
+     }, 
+    "https://jazz.net/sandbox02-ccm/rootservices" : { 
+        "http://jazz.net/xmlns/prod/jazz/process/0.6/processAbout" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/process-about" } ], 
+        "http://jazz.net/xmlns/prod/jazz/discovery/1.0/registration" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/service/com.ibm.team.repository.service.internal.setup.IRegistrationHandlerService" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/oauthDomain" : [ { "type" : "literal" , "value" : "https:\/\/jazz.net\/sandbox02-ccm" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jtp/0.6/associations" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/process-authoring/associations" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/bulkOperations" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/bulk" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/oauthUserAuthorizationUrl" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/oauth-authorize" } ], 
+        "http://open-services.net/xmlns/scm/1.0/scmServiceProviders" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/oslc-scm/catalog" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/serverRenameStatus" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/appServerRenameStatus" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/jauthRevokeTokenUrl" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/jauth-revoke-token" } ], 
+        "http://jazz.net/xmlns/prod/jazz/discovery/1.0/friends" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/friends" } ], 
+        "http://jazz.net/xmlns/prod/jazz/process/0.6/processSecurity" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/process-security" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/indexing" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/indexing" } ], 
+        "http://jazz.net/xmlns/prod/jazz/discovery/1.0/discovery" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/discovery" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/query" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/query" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jtp/0.6/processDescriptions" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/process-authoring/descriptions" } ], 
+        "http://jazz.net/ns/ui#widgetCatalog" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/jfs/WidgetCatalog" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/adminWebUI" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/admin" } ], 
+        "http://purl.org/dc/terms/title" : [ { "type" : "literal" , "value" : "Change and Configuration Management", "lang" : "en" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/search" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/search" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/mailer" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/mailer" } ], 
+        "http://jazz.net/xmlns/prod/jazz/dashboard/1.0/dashboards" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/dashboards" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/storage" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/storage" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/jauthIssueTokenUrl" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/jauth-issue-token" } ], 
+        "http://jazz.net/xmlns/prod/jazz/discovery/1.0/oslcCatalogs" : [ 
+            { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/oslc/workitems/catalog" }, 
+            { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/oslc-scm/catalog" }
+         ], 
+        "http://jazz.net/xmlns/prod/jazz/jtp/0.6/license" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/process-authoring/license" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/history" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/history" } ], 
+        "http://open-services.net/xmlns/cm/1.0/cmServiceProviders" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/oslc/workitems/catalog" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/oauthAccessTokenUrl" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/oauth-access-token" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/jauthCheckAuthUrl" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/jauth-check-auth" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/baselines" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/baselines" } ], 
+        "http://jazz.net/xmlns/prod/jazz/process/0.6/projectAreas" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/process/project-areas" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jtp/0.6/practices" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/process-authoring/practices" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/oauthRequestTokenUrl" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/oauth-request-token" } ], 
+        "http://jazz.net/xmlns/prod/jazz/process/0.6/processTemplates" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/process/templates" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/users" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-jts/users" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jtp/0.6/file" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/process-authoring/file" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/oauthRealmName" : [ { "type" : "literal" , "value" : "Jazz" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/oauthRequestConsumerKeyUrl" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/oauth-request-consumer" } ], 
+        "http://jazz.net/xmlns/prod/jazz/discovery/1.0/viewletWebUIRoot" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/setupWizardDescriptor" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/service/com.ibm.team.repository.service.internal.setup.ISetupWizardDescriptorService" } ], 
+        "http://jazz.net/xmlns/prod/jazz/process/1.0/manageProjectAreas" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/process/manageProjectAreas" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/jauthProxyUrl" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/jauth-proxy" } ], 
+        "http://jazz.net/xmlns/prod/jazz/process/1.0/manageProcessTemplates" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/process/manageProcessTemplates" } ], 
+        "http://open-services.net/ns/core#publisher" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/application-about" } ], 
+        "http://jazz.net/xmlns/prod/jazz/discovery/1.0/infocenterRoot" : [ { "type" : "uri" , "value" : "https://jazz.net/clmhelp" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/jauthCheckTokenUrl" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/jauth-check-token" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/oauthApprovalModuleUrl" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/_ajax-modules/com.ibm.team.repository.AuthorizeOAuth" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/currentUser" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/whoami" } ], 
+        "http://jazz.net/xmlns/prod/jazz/discovery/1.0/viewletServiceRoot" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jtp/0.6/defaultPracticeLibraryUrl" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/process-authoring/libraries/shared" } ], 
+        "http://jazz.net/xmlns/prod/jazz/jfs/1.0/changes" : [ { "type" : "uri" , "value" : "https://jazz.net/sandbox02-ccm/changes" } ], 
+        "http://jazz.net/xmlns/prod/jazz/rtc/cm/1.0/trackedResourceSetProvider" : [ { "type" : "bnode" , "value" : "_:-2665a658_143e90b47a3_bfd" } ]
+     }, 
+    "https://jazz.net/sandbox02-ccm/oslc-scm/catalog" : { 
+        "http://open-services.net/ns/core#domain" : [ { "type" : "uri" , "value" : "http://open-services.net/ns/scm#" } ], 
+        "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" : [ { "type" : "uri" , "value" : "http://open-services.net/ns/core#ServiceProviderCatalog" } ]
+     }
+ }

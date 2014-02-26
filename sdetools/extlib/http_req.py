@@ -3,7 +3,6 @@ import re
 import os
 import socket
 import urllib2
-import base64
 import tempfile
 import atexit
 
@@ -129,7 +128,7 @@ class ExtendedMethodHTTPRedirectHandler(urllib2.HTTPRedirectHandler):
                            unverifiable=True, 
                            method=req.get_method())
         else:
-            raise HTTPError(req.get_full_url(), code, msg, headers, fp)
+            raise urllib2.HTTPError(req.get_full_url(), code, msg, headers, fp)
 
 class InvalidCertificateException(httplib.HTTPException, urllib2.URLError):
     def __init__(self, host, cert, reason):
