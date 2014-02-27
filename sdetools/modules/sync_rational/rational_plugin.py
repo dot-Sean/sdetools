@@ -309,7 +309,6 @@ class RationalConnector(AlmConnector):
                                self.config['alm_project'])
 
         self.cm_resource_service = self.resource_url.replace(self.alm_plugin.base_uri+'/', '')
-        print "##################################################### %s" % self.cm_resource_service
         self.services = self._call_api(self.cm_resource_service)
 
         query_url = self.services['oslc:service'][1]['oslc:queryCapability'][0]['oslc:queryBase']['rdf:resource']
