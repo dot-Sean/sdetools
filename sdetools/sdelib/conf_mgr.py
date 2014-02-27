@@ -276,7 +276,7 @@ class Config(object):
         if self.use_conf_file:
             parser.add_option('-c', '--config', metavar='CONFIG_FILE', dest='conf_file', 
                 default=self.DEFAULTS['conf_file'], type='string',
-                help = "Configuration file ignored if -C is used. (Default is %s)" % (self.DEFAULTS['conf_file']))
+                help = "Specify the configuration file to be used. (Default is %s)" % (self.DEFAULTS['conf_file']))
             parser.add_option('-C', '--skipconfig', dest='skip_conf_file', default=False, action='store_true',
                 help = "Do NOT use any configuration file")
         parser.add_option('-I', '--noninteractive', dest='interactive', default=True, action='store_false', 
