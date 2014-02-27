@@ -42,7 +42,7 @@ class RationalAPI(RESTBase):
     """ Base plugin for Rational """
 
     def __init__(self, config):
-        super(RationalAPI, self).__init__('alm', 'Rational Team Concert', config)
+        super(RationalAPI, self).__init__('alm', 'Rational', config)
 
     def parse_error(self, result):
         result = json.loads(result)
@@ -177,7 +177,7 @@ class RationalConnector(AlmConnector):
 
         if self.config['conflict_policy'] != 'alm':
             raise AlmException('Expected "alm" for configuration conflict_policy but got "%s". '
-                               'Currently only Rational Team Concert can be setup as authoritative server' % self.config['conflict_policy'])
+                               'Currently only Rational can be setup as authoritative server' % self.config['conflict_policy'])
         self.config.process_json_str_dict(self.ALM_PRIORITY_MAP)
 
         if not self.config[self.ALM_PRIORITY_MAP]:
@@ -198,7 +198,7 @@ class RationalConnector(AlmConnector):
         try:
             forms_client.call_api('authenticated/j_security_check', args=forms_credentials, method=URLRequest.POST)
         except APIError, err:
-            raise AlmException('Unable to connect to Rational(Check server URL, '
+            raise AlmException('Unable to connect to Rational (Check server URL, '
                                'user, pass). Reason: %s' % str(err))
 
         for cookie in forms_client.cookiejar:
@@ -215,7 +215,7 @@ class RationalConnector(AlmConnector):
         try:
             forms_client.call_api(target='authenticated/identity')
         except APIError, err:
-            raise AlmException('Unable to connect to Rational(Check server URL, '
+            raise AlmException('Unable to connect to Rational (Check server URL, '
                                'user, pass). Reason: %s' % str(err))
 
         auth = 'Basic'
@@ -229,7 +229,7 @@ class RationalConnector(AlmConnector):
             self._rational_forms_login(forms_client)
 
             if not self.COOKIE_JSESSIONID:
-                raise AlmException('Unable to connect to Rational(Check server URL, user, pass)')
+                raise AlmException('Unable to connect to Rational (Check server URL, user, pass)')
         else:
             self.alm_plugin.set_auth_mode('basic')
 
@@ -253,7 +253,7 @@ class RationalConnector(AlmConnector):
         try:
             self.service_catalog = self._call_api(self.cm_service_provider_target)
         except APIError, err:
-            raise AlmException('Unable to connect retrieve Rationalservice catalog'
+            raise AlmException('Unable to connect retrieve service catalog'
                                '(Check server URL, user, pass). Reason: %s' % str(err))
                                
         if not self.service_catalog:
@@ -397,9 +397,9 @@ class RationalConnector(AlmConnector):
                            method=self.alm_plugin.URLRequest.POST,
                            args=create_args)
             #print work_item
-            logger.debug('Task %s added to Rational Team Concert Project', task['id'])
+            logger.debug('Task %s added to Rational Project', task['id'])
         except APIError, err:
-            raise AlmException('Unable to add task %s to Rationalbecause of %s'
+            raise AlmException('Unable to add task %s to Rational because of %s'
                                % (task['id'], err))
 
         alm_task = self.alm_get_task(task)
@@ -447,7 +447,7 @@ class RationalConnector(AlmConnector):
             priority = int(priority)
         except TypeError:
             logger.error('Could not coerce %s into an integer' % priority)
-            raise AlmException("Error in translating SDE priority to Rationalpriority: "
+            raise AlmException("Error in translating SDE priority to Rational priority: "
                                "%s is not an integer priority" % priority)
 
         for key in pmap:
