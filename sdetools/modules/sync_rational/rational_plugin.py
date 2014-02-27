@@ -146,7 +146,6 @@ class RationalConnector(AlmConnector):
     cm_service_provider = None
     resource_url = None
     priorities = None
-    ALM_NEW_STATUS = 'rtc_new_status'
     ALM_DONE_STATUSES = 'rtc_done_statuses'
     ALM_PRIORITY_MAP = 'alm_priority_map'
 
@@ -154,8 +153,6 @@ class RationalConnector(AlmConnector):
         """ Initializes connection to Rational """
         super(RationalConnector, self).__init__(config, alm_plugin)
 
-        config.opts.add(self.ALM_NEW_STATUS, 'Status to set for new '
-                                 'tasks in Rational', default='New')
         config.opts.add(self.ALM_DONE_STATUSES, 'Statuses that '
                                  'signify a task is Done in Rational',
                                  default='Completed,Done')
@@ -171,16 +168,8 @@ class RationalConnector(AlmConnector):
         self.COOKIE_JSESSIONID = None
         self.mark_down_converter = markdown.Markdown(safe_mode="escape")
 
-        for item in [self.ALM_NEW_STATUS,
-                     self.ALM_DONE_STATUSES,
-                     'rtc_context_root',
-                     'alm_issue_label']:
+        for item in [self.ALM_DONE_STATUSES, 'rtc_context_root', 'alm_issue_label']:
 
-            if not self.config[item]:
-                raise AlmException('Missing %s in configuration' % item)
-
-        # Verify that the configuration options are set properly
-        for item in [self.ALM_NEW_STATUS, self.ALM_DONE_STATUSES]:
             if not self.config[item]:
                 raise AlmException('Missing %s in configuration' % item)
 
@@ -320,6 +309,7 @@ class RationalConnector(AlmConnector):
                                self.config['alm_project'])
 
         self.cm_resource_service = self.resource_url.replace(self.alm_plugin.base_uri+'/', '')
+        print "##################################################### %s" % self.cm_resource_service
         self.services = self._call_api(self.cm_resource_service)
 
         query_url = self.services['oslc:service'][1]['oslc:queryCapability'][0]['oslc:queryBase']['rdf:resource']
