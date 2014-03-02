@@ -58,6 +58,7 @@ def compile_certs():
     crtf = os.fdopen(crtfd, 'w')
 
     candidates = OS_ROOT_BUNDLES[:]
+    candidates.append(CUSTOM_CA_FILE)
 
     for fname in os.listdir(CERT_PATH_NAME):
         if fname.endswith('.crt'):
