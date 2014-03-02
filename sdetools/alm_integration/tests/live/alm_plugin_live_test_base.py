@@ -4,6 +4,7 @@ from sdetools.sdelib.mod_mgr import ReturnChannel, load_modules
 from sdetools.sdelib.conf_mgr import Config
 from sdetools.sdelib.commons import abc, Error, get_directory_of_current_module
 from sdetools.alm_integration.alm_plugin_base import AlmException
+from testconfig import config
 
 abstractmethod = abc.abstractmethod
 CONF_FILE_LOCATION = 'test_settings.conf'
@@ -14,13 +15,14 @@ def stdout_callback(obj):
 
 class AlmPluginLiveTestBase(object):
     @classmethod
-    def setUpClass(cls, connector, api, test_dir=None, conf_file_location=CONF_FILE_LOCATION):
-        if test_dir is None:
-            cls.test_dir = get_directory_of_current_module(cls)
+    def setUpClass(cls, connector, api):
+
+        if 'sdetools' not in config:
+            raise Exception("Missing configuration for sdetools config_path")
 
         cls.connector_cls = connector
         cls.api_cls = api
-        cls.conf_path = os.path.join(cls.test_dir, conf_file_location)
+        cls.conf_path = config['sdetools']['config_path']
         cls.ret_chn = ReturnChannel(stdout_callback, {})
 
     def setUp(self):
