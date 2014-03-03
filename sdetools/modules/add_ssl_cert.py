@@ -20,8 +20,8 @@ class Command(BaseCommand):
                              default='443')
         self.config.opts.add('custom_cert', "Certificate to import",
                              default='')
-        self.config.opts.add('cert_loc', "Location of the Custom Certificate bundle",
-                             default='')
+        #self.config.opts.add('cert_loc', "Location of the Custom Certificate bundle",
+        #                     default='')
 
     def validate_pem(self, certs):
         for x in certs:
@@ -71,6 +71,8 @@ class Command(BaseCommand):
 
         if not candidates:
             raise ValueError('No valid certificate(s) found')
+
+        open(http_req.CUSTOM_CA_FILE, 'a').close()
 
         custom_bundle = open(http_req.CUSTOM_CA_FILE).read()
 

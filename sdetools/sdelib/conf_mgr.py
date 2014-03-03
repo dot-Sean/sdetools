@@ -124,6 +124,7 @@ class Config(object):
             'debug_mods': '',
             'args': None,
             'proxy_auth': '',
+            'cert_loc': '',
         }
 
     def __init__(self, cmd_name, sub_cmd_name, command_list, args, ret_chn, call_src, call_options={}):
@@ -240,7 +241,7 @@ class Config(object):
                     return False, 'Config file not found.'
 
         config_keys = ['log_level', 'debug_mods', 'application', 'project', 
-            'authmode', 'args', 'proxy_auth']
+            'authmode', 'args', 'proxy_auth', 'cert_loc']
 
         for name, optlist in self.custom_options:
             for item in optlist:
@@ -283,7 +284,7 @@ class Config(object):
             help="Run in Non-Interactive mode")
         parser.add_option('-d', '--debug', dest='debug', action='store_true', 
             help = "Set logging to debug level")
-        parser.add_option('-v', '--verbose', dest='verbose', action='store_true', help = "Verbose output")
+        parser.add_option('-v', '--verbose', dest='verbose', action='store_true', help="Verbose output")
         parser.add_option('-q', '--quiet', dest='quiet', action='store_true', 
             help = "Silent output (except for unrecoverable errors)")
         parser.add_option('--proxy_auth', metavar='USERNAME:PASSWORD', dest='proxy_auth', default='', type='string',
@@ -291,6 +292,7 @@ class Config(object):
         parser.add_option('--debugmods', metavar='MOD_NAME1,[MOD_NAME2,[...]]', dest='debug_mods', 
             default='', type='string',
             help = "Comma-seperated List of modules to debug, e.g. sdetools.sdelib.sdeapi)")
+        parser.add_option('-s', '--cert_loc', metavar='FILE_PATH', help='Custom certificate bundle', default='')
 
         for group_name, optslist in self.custom_options:
             group = optparse.OptionGroup(parser, group_name)
@@ -364,6 +366,8 @@ class Config(object):
             self['proxy_auth'] = opts.proxy_auth
         if self['proxy_auth']:
             self.fix_proxy_env()
+        if opts.cert_loc:
+            self['cert_loc'] = opts.cert_loc
 
         for group_name, optlist in self.custom_options:
             for item in optlist:
