@@ -149,13 +149,13 @@ class HPAlmConnector(AlmConnector):
             _tasks = []
 
             for task in tasks:
-                if task['phase'] == 'testing':
-                    _tasks.append(task)
-                else:
+                if self.in_scope(task) and task['phase'] != 'testing':
+                    _tasks.insert(0, task)
                     self.requirement_to_test_mapping[task['weakness']['id']] = []
+                    for test_task in tasks:
+                        if test_task['phase'] == 'testing' and test_task['weakness']['id'] == task['weakness']['id']:
+                            _tasks.append(test_task)
 
-                    if self.in_scope(task):
-                        _tasks.insert(0, task)
             return _tasks
         else:
             return super(HPAlmConnector, self).prune_tasks(tasks)
