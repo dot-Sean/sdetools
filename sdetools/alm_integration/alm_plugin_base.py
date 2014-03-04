@@ -316,13 +316,16 @@ class AlmConnector(object):
             logger.error(err)
             raise AlmException('Unable to get task in SD Elements. Reason: %s' % (str(err)))
 
+    def backreference_note(self, id):
+        pass
+
     def _add_note(self, task_id, note_msg, filename, status):
         """ Convenience method to add note """
         if not self.sde_plugin:
             raise AlmException('Requires initialization')
 
         try:
-            self.sde_plugin.api.add_task_ide_note(task_id, note_msg, filename, status)
+            self.sde_plugin.api.add_task_ide_note(task_id, self.backreference_note(task_id) or note_msg, filename, status)
             logger.debug('Successfully set note for task %s' % task_id)
 
         except APIError, err:
