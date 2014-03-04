@@ -33,9 +33,6 @@ class Command(BaseCommand):
 
 
     def handle(self):
-        if self.config['cert_loc'] != '':
-            http_req.CUSTOM_CA_FILE = self.config['cert_loc']
-
         if self.config['custom_cert'] == '' or not self.config['custom_cert']:
             # If no custom_cert specified, try fetching the cert from the server
             if self.config['server'] == '' or not self.config['server']:

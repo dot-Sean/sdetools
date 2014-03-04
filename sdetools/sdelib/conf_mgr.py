@@ -169,6 +169,11 @@ class Config(object):
     def __setitem__(self, key, val):
         if key not in self.settings:
             raise KeyError, 'Unknown configuration item: %s' % (key)
+        if key == 'cert_loc':
+            from sdetools.extlib import http_req
+            if http_req.custom_ca_file != val:
+                http_req.custom_ca_file = val
+                http_req.compile_certs()
         self.settings[key] = val
 
     def has_key(self, key):
