@@ -170,10 +170,7 @@ class Config(object):
         if key not in self.settings:
             raise KeyError, 'Unknown configuration item: %s' % (key)
         if key == 'cert_loc':
-            from sdetools.extlib import http_req
-            if http_req.custom_ca_file != val:
-                http_req.custom_ca_file = val
-                http_req.compile_certs()
+            self.set_custom_cert_loc(val)
         self.settings[key] = val
 
     def has_key(self, key):
@@ -432,3 +429,12 @@ class Config(object):
             self[key] = datetime.datetime.strptime(self[key], '%Y-%m-%d').date()
         except ValueError, err:
             raise UsageError('Unable to read date field %s. Reason: %s' % (key, str(err)))
+
+        def set_custom_cert_loc(self, cert_loc)
+            if os.path.isfile(cert_loc):
+                logger.warning('Custom certificate file %s not found. Skipping the option ...' % cert_loc)
+                return
+            from sdetools.extlib import http_req
+            if http_req.custom_ca_file != cert_loc:
+                http_req.custom_ca_file = cert_loc
+                http_req.compile_certs()
