@@ -154,6 +154,18 @@ class RallyConnector(AlmConnector):
     def carriage_return(self):
         return '<br//>'
 
+    def get_project_url(self, alm_task=None):
+        if alm_task:
+            self.project_url = self.config['alm_method'] + '://' + self.config['alm_server'] + '/#' + \
+                self.project_ref[self.project_ref.rfind('/'):self.project_ref.rfind('.')]
+
+        return self.project_url
+
+    def get_url(self, alm_task):
+        url = self.get_project_url(alm_task) + 'd/detail/userstory' + \
+                alm_task.alm_task_ref[alm_task.get_alm_task_ref().rfind('/'):alm_task.get_alm_task_ref().rfind('.')]
+        return url
+
     def alm_connect_server(self):
         """ Verifies that Rally connection works """
         #Check to make sure that we can do a simple API call
@@ -384,12 +396,9 @@ class RallyConnector(AlmConnector):
             self.alm_update_task_status(alm_task, task['status'])
 
         # Manually stitching together the url for the new Rally task object
-        url = self.config['alm_method'] + '://' + self.config['alm_server'] + '/#' + \
-              self.project_ref[self.project_ref.rfind('/'):self.project_ref.rfind('.')] + 'd/detail/userstory' + \
-              alm_task.alm_task_ref[alm_task.get_alm_task_ref().rfind('/'):alm_task.get_alm_task_ref().rfind('.')]
 
         return 'Project: %s, %s: %s; URL: %s' % (self.config['alm_project'], card_type_details['name'],
-                                        alm_task.get_alm_id(), url)
+                                        alm_task.get_alm_id(), self.get_url(alm_task))
 
     def alm_update_task_status(self, task, status):
         card_type_details = self.card_types[self.config['rally_card_type']]
