@@ -188,20 +188,6 @@ class RationalConnector(AlmConnector):
                 raise AlmException('Unable to process %s (not a JSON dictionary). Reason: Invalid range key %s'
                                    % (self.ALM_PRIORITY_MAP, key))
 
-    def backreference_note(self, id):
-        try:
-            # Fields parameter will filter response data to only contain story status, name, timestamp and id
-            work_items = self._call_api('%s/workitems?oslc.where=dcterms:title="%s:*"' %
-                                                 (self.query_url, id[id.find('T'):]))
-        except APIError, err:
-            logger.error(err)
-            raise AlmException('Unable to get task %s from Rational' % id)
-        if work_items['oslc:responseInfo']['oslc:totalCount'] == 0:
-            return None
-        work_item_url = work_items['oslc:results'][0]['rdf:resource']
-
-        return 'Task synchronized in %s. Reference: %s' % (self.alm_name, work_item_url)
-
     def _rational_forms_login(self, forms_client):
         forms_credentials = {
             'j_username': self.config['alm_user'],
@@ -418,7 +404,8 @@ class RationalConnector(AlmConnector):
 
         alm_task = self.alm_get_task(task)
 
-        return 'Project: %s, Task: %s' % (self.config['alm_project'], alm_task.get_alm_id())
+        return 'Project: %s; Task: %s; URL: %s' % \
+               (self.config['alm_project'], alm_task.get_alm_id(), alm_task.get_alm_url())
 
     def alm_update_task_status(self, task, status):
         pass

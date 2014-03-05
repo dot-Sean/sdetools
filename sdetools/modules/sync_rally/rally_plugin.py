@@ -383,8 +383,8 @@ class RallyConnector(AlmConnector):
                 (task['status'] == 'DONE' or task['status'] == 'NA')):
             self.alm_update_task_status(alm_task, task['status'])
 
-        return 'Project: %s, %s: %s' % (self.config['alm_project'], card_type_details['name'],
-                                        alm_task.get_alm_id())
+        return 'Project: %s, %s: %s; URL: %s' % (self.config['alm_project'], card_type_details['name'],
+                                        alm_task.get_alm_id(), alm_task.get_alm_task_ref())
 
     def alm_update_task_status(self, task, status):
         card_type_details = self.card_types[self.config['rally_card_type']]
