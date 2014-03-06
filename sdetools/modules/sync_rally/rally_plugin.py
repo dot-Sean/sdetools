@@ -154,15 +154,9 @@ class RallyConnector(AlmConnector):
     def carriage_return(self):
         return '<br//>'
 
-    def get_project_url(self, alm_task=None):
-        if alm_task:
-            self.project_url = self.config['alm_method'] + '://' + self.config['alm_server'] + '/#' + \
-                self.project_ref[self.project_ref.rfind('/'):self.project_ref.rfind('.')]
-
-        return self.project_url
-
     def get_url(self, alm_task):
-        url = self.get_project_url(alm_task) + 'd/detail/userstory' + \
+        url = self.config['alm_method'] + '://' + self.config['alm_server'] + '/#' + \
+                self.project_ref[self.project_ref.rfind('/'):self.project_ref.rfind('.')] + 'd/detail/userstory' + \
                 alm_task.alm_task_ref[alm_task.get_alm_task_ref().rfind('/'):alm_task.get_alm_task_ref().rfind('.')]
         return url
 
