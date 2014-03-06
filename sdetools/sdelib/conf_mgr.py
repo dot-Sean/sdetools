@@ -170,10 +170,7 @@ class Config(object):
         if key not in self.settings:
             raise KeyError, 'Unknown configuration item: %s' % (key)
         if key == 'cert_loc':
-            from sdetools.extlib import http_req
-            if http_req.custom_ca_file != val:
-                http_req.custom_ca_file = val
-                http_req.compile_certs()
+            self.set_custom_cert_loc(val)
         self.settings[key] = val
 
     def has_key(self, key):
@@ -296,7 +293,7 @@ class Config(object):
             help = "Proxy authentication credentials, in <username>:<password> format [optional]")
         parser.add_option('--debugmods', metavar='MOD_NAME1,[MOD_NAME2,[...]]', dest='debug_mods', 
             default='', type='string',
-            help = "Comma-seperated List of modules to debug, e.g. sdetools.sdelib.sdeapi)")
+            help = "Comma-separated List of modules to debug, e.g. sdetools.sdelib.sdeapi)")
         parser.add_option('-s', '--cert_loc', metavar='FILE_PATH', help='Custom certificate bundle', default='')
 
         for group_name, optslist in self.custom_options:
@@ -432,3 +429,12 @@ class Config(object):
             self[key] = datetime.datetime.strptime(self[key], '%Y-%m-%d').date()
         except ValueError, err:
             raise UsageError('Unable to read date field %s. Reason: %s' % (key, str(err)))
+
+    def set_custom_cert_loc(self, cert_loc):
+        if not os.path.isfile(cert_loc):
+            logger.warning('Custom certificate file %s not found. Skipping the option ...' % cert_loc)
+            return
+        from sdetools.extlib import http_req
+        if http_req.custom_ca_file != cert_loc:
+            http_req.custom_ca_file = cert_loc
+            http_req.compile_certs()

@@ -20,8 +20,6 @@ class Command(BaseCommand):
                              default='443')
         self.config.opts.add('custom_cert', "Certificate to import",
                              default='')
-        #self.config.opts.add('cert_loc', "Location of the Custom Certificate bundle",
-        #                     default='')
 
     def validate_pem(self, certs):
         for x in certs:
