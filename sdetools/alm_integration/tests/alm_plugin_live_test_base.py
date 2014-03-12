@@ -2,12 +2,10 @@ import os
 
 from sdetools.sdelib.mod_mgr import ReturnChannel, load_modules
 from sdetools.sdelib.conf_mgr import Config
-from sdetools.sdelib.commons import abc, Error, get_directory_of_current_module
+from sdetools.sdelib.commons import Error
 from sdetools.alm_integration.alm_plugin_base import AlmException
 from testconfig import config
 
-abstractmethod = abc.abstractmethod
-CONF_FILE_LOCATION = 'test_settings.conf'
 
 def stdout_callback(obj):
     print obj
