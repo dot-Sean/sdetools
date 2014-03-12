@@ -77,6 +77,9 @@ class JIRAConnector(AlmConnector):
             'close': None,
             'reopen': None}
 
+    def _get_issue_url(self, issue_key):
+        return self.config['alm_method'] + '://' + self.config['alm_server'] + '/browse/' + issue_key
+
     def alm_connect_server(self):
         self.alm_plugin.connect_server()
 
@@ -128,8 +131,10 @@ class JIRAConnector(AlmConnector):
             alm_task = self.alm_get_task(task)
             self.alm_update_task_status(alm_task, task['status'])
 
+        url = self._get_issue_url(new_issue['key'])
+
         #Return a unique identifier to this task in JIRA
-        return 'Issue %s' % new_issue['key']
+        return 'Issue %s, URL: %s' % (new_issue['key'], url)
 
     def alm_update_task_status(self, task, status):
         if not task or not self.config['alm_standard_workflow']:
@@ -138,7 +143,7 @@ class JIRAConnector(AlmConnector):
         alm_id = task.get_alm_id()
 
         # This is an unexpected situation
-        if (task.get_status() == status):
+        if task.get_status() == status:
             logger.debug('Status update in JIRA not required for issue %s' % alm_id)
             return
 
@@ -161,7 +166,7 @@ class JIRAConnector(AlmConnector):
 
     def alm_get_version(self, version_name):
         for v in self.alm_plugin.versions:
-            if v['name']==version_name:
+            if v['name'] == version_name:
                 return v
         return None
  
