@@ -32,15 +32,6 @@ class AlmPluginLiveTestBase(object):
         Config.parse_config_file(self.config, self.conf_path)
         self.post_parse_config()
 
-    def tearDown(self):
-        pass
-
-    def pre_parse_config(self):
-        pass
-
-    def post_parse_config(self):
-        pass
-
     def init_alm_connector(self):
         if self.connector_cls is None:
             raise Error('No alm connector found')
