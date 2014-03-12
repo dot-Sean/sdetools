@@ -403,8 +403,9 @@ class RationalConnector(AlmConnector):
 
         alm_task = self.alm_get_task(task)
 
-        return 'Project: %s; Task: %s; URL: %s' % \
-               (self.config['alm_project'], alm_task.get_alm_id(), alm_task.get_alm_url())
+        return 'Project: %s; Task: %s; URL: %s' % (
+               self.config['alm_project'], alm_task.get_alm_id(), alm_task.get_alm_url()
+        )
 
     def alm_update_task_status(self, task, status):
         pass
