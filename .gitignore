@@ -42,3 +42,6 @@ info.log
 
 #ides
 .idea
+
+#custom cert bundle
+ my_root_certs.crt

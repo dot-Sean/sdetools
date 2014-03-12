@@ -125,6 +125,7 @@ class RallyConnector(AlmConnector):
                 'api': 'hierarchicalrequirement',
                 'field_state': 'ScheduleState',
                 'requires_parent': False,
+                'url_component_name': 'userstory',
                 'field_validation_state': 'Schedule State'
             },
             'Task': {
@@ -134,6 +135,7 @@ class RallyConnector(AlmConnector):
                 'api': 'task',
                 'field_state': 'State',
                 'requires_parent': True,
+                'url_component_name': 'task',
                 'field_validation_state': 'State'
             }
         }
@@ -153,6 +155,18 @@ class RallyConnector(AlmConnector):
 
     def carriage_return(self):
         return '<br//>'
+
+    def _get_issue_url(self, alm_task):
+
+        card_type_details = self.card_types[self.config['rally_card_type']]
+
+        return "%s://%s/#%sd/detail/%s%s" % (
+            self.config['alm_method'],
+            self.config['alm_server'],
+            self.project_ref[self.project_ref.rfind('/'):self.project_ref.rfind('.')],
+            card_type_details['url_component_name'],
+            alm_task.alm_task_ref[alm_task.get_alm_task_ref().rfind('/'):alm_task.get_alm_task_ref().rfind('.')],
+        )
 
     def alm_connect_server(self):
         """ Verifies that Rally connection works """
@@ -383,8 +397,14 @@ class RallyConnector(AlmConnector):
                 (task['status'] == 'DONE' or task['status'] == 'NA')):
             self.alm_update_task_status(alm_task, task['status'])
 
-        return 'Project: %s, %s: %s' % (self.config['alm_project'], card_type_details['name'],
-                                        alm_task.get_alm_id())
+        # Manually stitch the url of the new Rally task
+
+        return 'Project: %s, %s: %s; URL: %s' % (
+            self.config['alm_project'],
+            card_type_details['name'],
+            alm_task.get_alm_id(),
+            self._get_issue_url(alm_task)
+        )
 
     def alm_update_task_status(self, task, status):
         card_type_details = self.card_types[self.config['rally_card_type']]

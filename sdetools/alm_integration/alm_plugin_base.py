@@ -101,8 +101,8 @@ class AlmConnector(object):
         self.config.opts.add('show_progress', 'Show progress',
                 default='False')
         self.config.opts.add('test_alm', 'Test Alm "server", "project" or "settings" '
-                                      'configuration only',
-                                      default='')
+                'configuration only',
+                default='')
         self.config.opts.add('alm_standard_workflow', 'Standard workflow in ALM?',
                 default='True')
         self.config.opts.add('alm_custom_fields', 
