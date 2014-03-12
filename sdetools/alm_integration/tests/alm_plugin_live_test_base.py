@@ -1,5 +1,3 @@
-import os
-
 from sdetools.sdelib.mod_mgr import ReturnChannel, load_modules
 from sdetools.sdelib.conf_mgr import Config
 from sdetools.sdelib.commons import Error
@@ -27,10 +25,8 @@ class AlmPluginLiveTestBase(object):
         command_list = load_modules()
         self.config = Config('help', '', command_list, [], self.ret_chn, 'shell')
         self.init_alm_connector()
-        self.pre_parse_config()
         self.config.import_custom_options()
         Config.parse_config_file(self.config, self.conf_path)
-        self.post_parse_config()
 
     def init_alm_connector(self):
         if self.connector_cls is None:
