@@ -396,7 +396,6 @@ class RationalConnector(AlmConnector):
             self._call_api(self.creation_url,
                            method=self.alm_plugin.URLRequest.POST,
                            args=create_args)
-            #print work_item
             logger.debug('Task %s added to Rational Project', task['id'])
         except APIError, err:
             raise AlmException('Unable to add task %s to Rational because of %s'
