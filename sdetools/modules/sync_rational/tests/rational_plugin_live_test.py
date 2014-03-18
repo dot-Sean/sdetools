@@ -12,4 +12,7 @@ class TestRationalLiveCase(AlmPluginLiveTestBase, unittest.TestCase):
         super(TestRationalLiveCase, self).setUpClass(RationalConnector, RationalAPI)
 
     def test_synchronize_sde_as_master(self):
+        """
+        We do not support SDE->Rational sync - continue without failure here
+        """
         pass

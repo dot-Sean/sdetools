@@ -78,7 +78,7 @@ class AlmPluginLiveTestBase(object):
         self.connector.config = self.config
         self.connector.initialize()
 
-        for i in range(2):
+        for i in xrange(2):
             # synchronize the two systems
             self.connector.synchronize()
 
