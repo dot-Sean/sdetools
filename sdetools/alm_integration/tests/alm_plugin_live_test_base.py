@@ -100,10 +100,7 @@ class AlmPluginLiveTestBase(object):
         self.synchronize('alm')
 
     def _inverted_status(self, status):
-        if status == 'DONE':
-            return 'TODO'
-        else:
-            return 'DONE'
+        return 'DONE' if status == 'TODO' else 'TODO'
 
     @staticmethod
     def assertNotNone(obj, msg=None):
