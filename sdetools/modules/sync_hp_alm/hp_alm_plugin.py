@@ -146,17 +146,20 @@ class HPAlmConnector(AlmConnector):
         test tasks.
         """
         if 'testing' in self.config['alm_phases']:
-            _tasks = []
+            # Extract non-testing in-scope tasks
+            dev_tasks = [task for task in tasks if self.in_scope(task) and task['phase'] != 'testing']
 
-            for task in tasks:
-                if task['phase'] == 'testing':
-                    _tasks.append(task)
-                else:
-                    self.requirement_to_test_mapping[task['weakness']['id']] = []
+            # Extract those task's weakness IDs.
+            weakness_ids = set(t['weakness']['id'] for t in dev_tasks)
 
-                    if self.in_scope(task):
-                        _tasks.insert(0, task)
-            return _tasks
+            # Update our requirements to tests mapping
+            for weakness_id in weakness_ids:
+                self.requirement_to_test_mapping[weakness_id] = []
+
+            # Extract corresponding test tasks.
+            test_tasks = [t for t in tasks if t['phase'] == 'testing' and t['weakness']['id'] in weakness_ids]
+
+            return dev_tasks + test_tasks
         else:
             return super(HPAlmConnector, self).prune_tasks(tasks)
 

@@ -13,7 +13,7 @@ from sdetools.sdelib.commons import UsageError, json
 
 __all__ = ['Config']
 
-DEFAULT_CONFIG_FILE = os.path.join("~", ".sdelint.cnf")
+DEFAULT_CONFIG_FILE = os.path.join("~", ".sdetools.cnf")
 
 LOG_LEVELS = {
     'debug': logging.DEBUG,
@@ -21,7 +21,8 @@ LOG_LEVELS = {
     'default': logging.WARNING,
     'error': logging.ERROR,
     'quiet': logging.CRITICAL,
-    }
+}
+
 
 class Option(object):
     """
@@ -293,7 +294,7 @@ class Config(object):
             help = "Proxy authentication credentials, in <username>:<password> format [optional]")
         parser.add_option('--debugmods', metavar='MOD_NAME1,[MOD_NAME2,[...]]', dest='debug_mods', 
             default='', type='string',
-            help = "Comma-separated List of modules to debug, e.g. sdetools.sdelib.sdeapi)")
+            help = "Comma-separated list of modules to debug, e.g. sdetools.sdelib.sdeapi)")
         parser.add_option('-s', '--cert_loc', metavar='FILE_PATH', help='Custom certificate bundle', default='')
 
         for group_name, optslist in self.custom_options:
