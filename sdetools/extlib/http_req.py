@@ -33,7 +33,9 @@ OS_ROOT_BUNDLES = [
 
 CERT_PATH_NAME = os.path.join(commons.media_path, 'ssl')
 CA_CERTS_FILE = os.path.join(CERT_PATH_NAME, DEFAULT_ROOT_BUNDLE)
-CUSTOM_CA_FILE = os.path.join(CERT_PATH_NAME, CUSTOM_ROOT_BUNDLE)
+DEFAULT_CUSTOM_CA_FILE = os.path.join(CERT_PATH_NAME, CUSTOM_ROOT_BUNDLE)
+
+custom_ca_file = DEFAULT_CUSTOM_CA_FILE
 
 def compile_certs():
     global CA_CERTS_FILE
@@ -58,6 +60,7 @@ def compile_certs():
     crtf = os.fdopen(crtfd, 'w')
 
     candidates = OS_ROOT_BUNDLES[:]
+    candidates.append(custom_ca_file)
 
     for fname in os.listdir(CERT_PATH_NAME):
         if fname.endswith('.crt'):
