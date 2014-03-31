@@ -369,7 +369,6 @@ class RallyConnector(AlmConnector):
 
         task_data = self.rally_get_artifact(task_id, artifact_query, card_type_details['type'],
                                             card_type_details['type'], card_type_details['api'])
-
         if not task_data:
             return task_data
 
