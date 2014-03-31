@@ -337,6 +337,7 @@ class RallyConnector(AlmConnector):
         for tag in artifact_data['Tags']:
             if tag['_refObjectName'] == self.config['alm_issue_label']:
                 tag_found = True
+                break
 
         if tag_found:
             return
