@@ -332,10 +332,10 @@ class RallyConnector(AlmConnector):
             raise AlmException('Unable to get artifact from Rally. Reason: %s' % (str(err)))
         return task_data[artifact_type]
 
-    def _apply_tag_if_needed(self, artifact_data):
+    def _apply_label_if_needed(self, artifact_data):
         tag_found = False
         for tag in artifact_data['Tags']:
-            if tag['_refObjectName'] == self.config['alm_issue_label']:
+            if '_refObjectName' in tag and tag['_refObjectName'] == self.config['alm_issue_label']:
                 tag_found = True
                 break
 
@@ -373,7 +373,7 @@ class RallyConnector(AlmConnector):
         if not task_data:
             return task_data
 
-        self._apply_tag_if_needed(task_data)
+        self._apply_label_if_needed(task_data)
 
         return RallyTask(task_id,
                          task_data['FormattedID'],
