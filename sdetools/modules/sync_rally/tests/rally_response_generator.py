@@ -113,9 +113,10 @@ class RallyResponseGenerator(ResponseGenerator):
 
                 return task
             elif method == 'POST':
-                self.generator_update_resource('card', task_number, data)
+                task['HierarchicalRequirement'].update(data['HierarchicalRequirement'])
+                self.generator_update_resource('card', task_number, task)
 
-                return None
+                return data
         else:
             self.raise_error('404')
 
