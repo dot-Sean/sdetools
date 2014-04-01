@@ -28,7 +28,7 @@ class Command(BaseCommand):
         else:
             app_list = sde_api.get_applications()
 
-        task_keys_to_remove = ['project', 'id']
+        task_keys_to_remove = ['project', 'id', 'url', 'timestamp', 'tags']
         normalized_host = 'https://example.com/'  # normalized host name
 
         app_count = 0
@@ -59,9 +59,6 @@ class Command(BaseCommand):
                     for impl in t['implementations']:
                         impl['url'] = re.sub('https://([^/]+)/', normalized_host, impl['url'])
 
-                    # normalize task url
-                    t['url'] = re.sub('https://([^/]+)/', normalized_host, t['url'])
-
                 projects[prj['name']] = {'tasks': tasks}
 
             content[app['name']] = projects
@@ -75,6 +72,19 @@ class Command(BaseCommand):
         if base_content == other_content:
             print "Same content"
         else:
-            print "Differences detected"
+            print "Differences detected:\n"
+            for ba in base_content.keys():
+                if ba not in other_content.keys():
+                    print "App %s missing in other content" % ba
+                base_projects = base_content[ba]
+                other_projects = other_content[ba]
+                for bp in base_projects.keys():
+                    if bp not in other_projects.keys():
+                        print "App %s Project %s missing in other content" % (ba, bp)
+                    base_tasks = base_projects[bp]['tasks']
+                    other_tasks = other_projects[bp]['tasks']
+                    for bt in base_tasks:
+                        if bt not in other_tasks:
+                            print "App %s Project %s Task %s missing or different in other content" % (ba, bp, bt['title'])
 
         return True
