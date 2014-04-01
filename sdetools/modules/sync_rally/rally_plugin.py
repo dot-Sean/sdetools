@@ -333,14 +333,12 @@ class RallyConnector(AlmConnector):
         return task_data[artifact_type]
 
     def _apply_label_if_needed(self, artifact_data):
-        tag_found = False
+        if 'Tags' not in artifact_data:
+            artifact_data['Tags'] = []
+
         for tag in artifact_data['Tags']:
             if '_refObjectName' in tag and tag['_refObjectName'] == self.config['alm_issue_label']:
-                tag_found = True
-                break
-
-        if tag_found:
-            return
+                return
 
         card_type_details = self.card_types[self.config['rally_card_type']]
 
