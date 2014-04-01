@@ -332,6 +332,30 @@ class RallyConnector(AlmConnector):
             raise AlmException('Unable to get artifact from Rally. Reason: %s' % (str(err)))
         return task_data[artifact_type]
 
+    def _apply_label_if_needed(self, artifact_data):
+        if 'Tags' not in artifact_data:
+            artifact_data['Tags'] = []
+
+        for tag in artifact_data['Tags']:
+            if '_refObjectName' in tag and tag['_refObjectName'] == self.config['alm_issue_label']:
+                return
+
+        card_type_details = self.card_types[self.config['rally_card_type']]
+
+        artifact_data['Tags'].append({'_ref': self.tag_ref})
+        tag_update = {
+            card_type_details['type']: {
+                'Tags': artifact_data['Tags'],
+            }
+        }
+
+        artifact_id = self._split_ref_link(artifact_data['_ref'])
+        try:
+            self.alm_plugin.call_api(artifact_id, args=tag_update, method=self.alm_plugin.URLRequest.POST)
+        except APIError, err:
+            raise AlmException('Unable to update tag %s for artifact %s in Rally because of %s' %
+                               (self.config['alm_issue_label'], artifact_data['FormattedID'], err))
+
     def alm_get_task(self, task):
         card_type_details = self.card_types[self.config['rally_card_type']]
         task_id = self._extract_task_id(task['id'])
@@ -346,6 +370,8 @@ class RallyConnector(AlmConnector):
                                             card_type_details['type'], card_type_details['api'])
         if not task_data:
             return task_data
+
+        self._apply_label_if_needed(task_data)
 
         return RallyTask(task_id,
                          task_data['FormattedID'],
@@ -430,7 +456,7 @@ class RallyConnector(AlmConnector):
         try:
             self.alm_plugin.call_api(task.get_alm_task_ref(), args=trans_args, method=self.alm_plugin.URLRequest.POST)
         except APIError, err:
-            raise AlmException('Unable to update task status to %s for user story %s in Rally because of %s' %
+            raise AlmException('Unable to update task status to %s for artifact %s in Rally because of %s' %
                                (status, task.get_alm_id(), err))
 
         logger.debug('Status changed to %s for task %s in Rally' % (status, task.get_alm_id()))
