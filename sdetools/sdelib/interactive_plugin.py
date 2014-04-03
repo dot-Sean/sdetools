@@ -21,7 +21,7 @@ class PlugInExperience:
         self.api = sdeapi.APIBase(self.config)
         self.app_id = None
         self.prj_id = None
-        config.opts.add('sde_application', "SDE Application to use", 
+        config.opts.add('sde_application', "SDE Application to use",
             default='', group_name="SD Elements Connector")
         config.opts.add('sde_project', "SDE Project to use",
             default='', group_name="SD Elements Connector")
@@ -165,5 +165,5 @@ class PlugInExperience:
         return self.api.add_project_analysis_note(self.prj_id, analysis_ref, analysis_type)
 
     @_verify_connect
-    def add_analysis_note(self, task_id, analysis_ref, confidence, findings):
-        return self.api.add_analysis_note("%d-%s" % (self.prj_id, task_id), analysis_ref, confidence, findings)
+    def add_analysis_note(self, task_id, analysis_ref, confidence, findings, behaviour):
+        return self.api.add_analysis_note("%d-%s" % (self.prj_id, task_id), analysis_ref, confidence, findings, behaviour)
