@@ -141,11 +141,7 @@ class GitHubConnector(AlmConnector):
 
         if not self.config[self.ALM_PRIORITY_MAP]:
             self.config[self.ALM_PRIORITY_MAP] = GITHUB_DEFAULT_PRIORITY_MAP
-
-        for key in self.config[self.ALM_PRIORITY_MAP]:
-            if not RE_MAP_RANGE_KEY.match(key):
-                raise AlmException('Unable to process %s (not a JSON dictionary). Reason: Invalid range key %s'
-                                   % (self.ALM_PRIORITY_MAP, key))
+        self._validate_alm_priority_map()
 
     def alm_connect_server(self):
         """ Verifies that GitHub connection works """
@@ -176,6 +172,9 @@ class GitHubConnector(AlmConnector):
 
         """ Validate project configurations """
         self.milestone_id = self.github_get_milestone_id(self.config[self.ALM_PROJECT_VERSION])
+
+    def alm_validate_configurations(self):
+        pass
 
     def github_get_milestone_id(self, milestone_name):
         if not milestone_name:

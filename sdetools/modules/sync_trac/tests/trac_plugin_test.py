@@ -53,3 +53,7 @@ class TestTracCase(AlmPluginTestBase, unittest.TestCase):
 
     def test_api_exceptions_are_handled(self):
         pass
+
+    def test_alm_priority_map(self):
+        # Custom priority maps are unsupported in this integration
+        pass

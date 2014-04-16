@@ -115,6 +115,103 @@ class AlmPluginTestBase(object):
 
         self.assertNotNone(test_task_result, 'Failed retrieve newly added task')
 
+    def test_alm_priority_map(self):
+        priority_map_tests = [
+            {
+                'description': 'Single mapping',
+                'map': {
+                    '1-10': 'Simple'
+                },
+                'expected_pass': True
+            },
+            {
+                'description': 'Three mappings',
+                'map': {
+                    '1-3': 'Low',
+                    '4-6': 'Medium',
+                    '7-10': 'High',
+                },
+                'expected_pass': True
+            },
+            {
+                'description': 'Four mappings, out of order',
+                'map': {
+                    '1-3': 'Low',
+                    '7-8': 'High',
+                    '4-6': 'Medium',
+                    '9-10': 'Critical',
+                },
+                'expected_pass': True
+            },
+            {
+                'description': 'Priority 3 duplicated',
+                'map': {
+                    '1-3': 'Low',
+                    '3-10': 'High',
+                },
+                'expected_pass': False
+            },
+            {
+                'description': 'Priority 3 duplicated',
+                'map': {
+                    '1-3': 'Low',
+                    '3': 'Medium',
+                    '4-10': 'High',
+                },
+                'expected_pass': False
+            },
+            {
+                'description': 'Priority 2 in wrong order',
+                'map': {
+                    '2-1': 'Low',
+                    '3-10': 'High',
+                },
+                'expected_pass': False
+            },
+            {
+                'description': 'Missing priority 3',
+                'map': {
+                    '1-2': 'Low',
+                    '4-10': 'High',
+                },
+                'expected_pass': False
+            },
+            {
+                'description': 'Priority 12 is out of range 1-10',
+                'map': {
+                    '1-12': 'Low',
+                    '4-10': 'High',
+                },
+                'expected_pass': False
+            },
+            {
+                'description': 'Priority 0 is out of range 1-10',
+                'map': {
+                    '0': 'Low',
+                    '4-10': 'High',
+                },
+                'expected_pass': False
+            },
+            {
+                'description': 'Priority 11 is out of range 1-10',
+                'map': {
+                    '1-10': 'Low',
+                    '11': 'Super High',
+                },
+                'expected_pass': False
+            }
+        ]
+        for priority_map_test in priority_map_tests:
+            self.connector.config['test_alm'] = 'project'
+            self.connector.config['alm_priority_map'] = priority_map_test['map']
+            try:
+                self.connector.initialize()
+                if not priority_map_test['expected_pass']:
+                    raise AssertionError('Error not detected for %s' % priority_map_test['description'])
+            except AlmException:
+                if priority_map_test['expected_pass']:
+                    raise AssertionError('Unexpected exception thrown for %s' % priority_map_test['description'])
+
     def test_alm_test_connect(self):
         self.connector.config['test_alm'] = 'project'
         self.connector.synchronize()

@@ -75,3 +75,7 @@ class TestMingleCase(AlmPluginTestBase, unittest.TestCase):
         description = self.connector._get_value_of_element_with_tag(card, 'description')
         self.assertEqual(description, PUBLIC_TASK_CONTENT, 'Expected description to be %s, got %s' %
                                                            (PUBLIC_TASK_CONTENT, description))
+
+    def test_alm_priority_map(self):
+        # Custom priority maps are unsupported in this integration
+        pass

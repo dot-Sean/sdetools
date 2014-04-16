@@ -15,6 +15,7 @@ logger = log_mgr.mods.add_mod(__name__)
 
 RE_CODE_DOWNLOAD = re.compile(r'\{\{ USE_MEDIA_URL \}\}([^\)]+\))\{@class=code-download\}')
 RE_TASK_IDS = re.compile('^C?T\d+$')
+RE_MAP_RANGE_KEY = re.compile('^\d+(-\d+)?$')
 
 
 class AlmException(Error):
@@ -274,6 +275,49 @@ class AlmConnector(object):
         if not self.sde_plugin:
             return False
         return self.sde_plugin.connected
+
+    def _validate_alm_priority_map(self):
+        if 'alm_priority_map' not in self.config:
+            return
+
+        priority_mapping = {}
+        for key in self.config['alm_priority_map']:
+            value = self.config['alm_priority_map'][key]
+
+            if not RE_MAP_RANGE_KEY.match(key):
+                raise AlmException('Unable to process alm_priority_map (not a JSON dictionary). '
+                        'Reason: Invalid range key %s' % key)
+            if '-' in key:
+                lrange, hrange = key.split('-')
+                lrange = int(lrange)
+                hrange = int(hrange)
+                if lrange < 1 or lrange > 10:
+                    raise AlmException('Invalid alm_priority_map entry %s => %s: Priority value %d is out of range '
+                                       '1-10' % (key, value, lrange))
+                if hrange < 1 or hrange > 10:
+                    raise AlmException('Invalid alm_priority_map entry %s => %s: Priority value %d is out of range '
+                                       '1-10' % (key, value, hrange))
+                if lrange >= hrange:
+                    raise AlmException('Invalid alm_priority_map entry %s => %s: Priority %d should be less than %d' %
+                                       (key, value, lrange, hrange))
+                for mapped_priority in range(lrange, hrange+1):
+                    if mapped_priority in priority_mapping:
+                        raise AlmException('Invalid alm_priority_map entry %s => %s: Priority %d is duplicated' %
+                                       (key, value, mapped_priority))
+                    priority_mapping[mapped_priority] = True
+            else:
+                key_value = int(key)
+                if key_value < 1 or key_value > 10:
+                    raise AlmException('Invalid alm_priority_map entry for %s. Priority value %d is out of range 1-10' %
+                                       (value, key_value))
+                if key_value in priority_mapping:
+                    raise AlmException('Invalid alm_priority_map entry %s => %s: Priority %d is duplicated' %
+                                   (key, value, mapped_priority))
+                priority_mapping[key_value] = True
+
+        for mapped_priority in range(1, 11):
+            if mapped_priority not in priority_mapping:
+                raise AlmException('Invalid alm_priority_map: missing a value mapping for priority %d' % mapped_priority)
 
     def _extract_task_id(self, full_task_id):
         """
