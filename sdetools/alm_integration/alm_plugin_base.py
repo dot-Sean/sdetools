@@ -302,7 +302,7 @@ class AlmConnector(object):
         if 'alm_priority_map' not in self.config:
             return
 
-        priority_set = []
+        priority_set = set()
         for key, value in self.config['alm_priority_map'].iteritems():
             if not RE_MAP_RANGE_KEY.match(key):
                 raise AlmException('Unable to process alm_priority_map (not a JSON dictionary). '
@@ -325,7 +325,7 @@ class AlmConnector(object):
                     if mapped_priority in priority_set:
                         raise AlmException('Invalid alm_priority_map entry %s => %s: Priority %d is duplicated' %
                                        (key, value, mapped_priority))
-                    priority_set.append(mapped_priority)
+                    priority_set.add(mapped_priority)
             else:
                 key_value = int(key)
                 if key_value < 1 or key_value > 10:
@@ -334,7 +334,7 @@ class AlmConnector(object):
                 if key_value in priority_set:
                     raise AlmException('Invalid alm_priority_map entry %s => %s: Priority %d is duplicated' %
                                    (key, value, key_value))
-                priority_set.append(key_value)
+                priority_set.add(key_value)
 
         for mapped_priority in range(1, 11):
             if mapped_priority not in priority_set:
