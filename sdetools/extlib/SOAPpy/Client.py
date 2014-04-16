@@ -168,8 +168,8 @@ class HTTPTransport:
             return original_namespace
     
     def __addcookies(self, r):
-        '''Add cookies from self.cookies to request r
-        '''
+        """Add cookies from self.cookies to request r
+        """
         for cname, morsel in self.cookies.items():
             attrs = []
             value = morsel.get('version', '')
@@ -341,7 +341,7 @@ class SOAPProxy:
                  header = None, methodattrs = None, transport = HTTPTransport,
                  encoding = 'UTF-8', throw_faults = 1, unwrap_results = None,
                  http_proxy=None, config = Config, noroot = 0,
-                 simplify_objects=None, timeout=None):
+                 simplify_objects=None, timeout=None, **kw):
 
         # Test the encoding, raising an exception if it's not known
         if encoding != None:
@@ -370,6 +370,7 @@ class SOAPProxy:
         self.http_proxy     = http_proxy
         self.config         = config
         self.noroot         = noroot
+        self.kw             = kw
         self.timeout        = timeout
 
         # GSI Additions
@@ -413,7 +414,7 @@ class SOAPProxy:
 
         m = buildSOAP(args = args, kw = kw, method = name, namespace = ns,
             header = hd, methodattrs = ma, encoding = self.encoding,
-            config = self.config, noroot = self.noroot)
+            config = self.config, noroot = self.noroot, **self.kw)
 
 
         call_retry = 0

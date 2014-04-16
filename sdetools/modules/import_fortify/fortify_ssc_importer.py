@@ -9,6 +9,7 @@ import tempfile
 import xml.parsers.expat
 import socket
 from suds.plugin import MessagePlugin
+from suds.transport.https import HttpAuthenticated
 
 logging.getLogger('suds').setLevel(logging.WARNING)
 
@@ -54,7 +55,9 @@ class FortifySSCImporter(BaseImporter):
             client = suds.client.Client("%s/fws.wsdl" % self.soap_endpoint, 
                 autoblend=True,
                 location=self.soap_endpoint,
-                wsse=security,plugins=suds_plugins)
+                wsse=security,
+                plugins=suds_plugins,
+                transport=HttpAuthenticated())
         except (xml.parsers.expat.ExpatError, socket.error, urllib2.URLError), err:
             raise FortifyIntegrationError('Error talking to Fortify SSC service. Please check server URL. Reason: %s' % err)
 

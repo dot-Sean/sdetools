@@ -72,7 +72,7 @@ class SOAPBuilder:
 
     def __init__(self, args = (), kw = {}, method = None, namespace = None,
         header = None, methodattrs = None, envelope = 1, encoding = 'UTF-8',
-        use_refs = 0, config = Config, noroot = 0):
+        use_refs = 0, config = Config, noroot = 0, **kwargs):
 
         # Test the encoding, raising an exception if it's not known
         if encoding != None:
@@ -80,6 +80,7 @@ class SOAPBuilder:
 
         self.args       = args
         self.kw         = kw
+        self.kwargs     = kwargs
         self.envelope   = envelope
         self.encoding   = encoding
         self.method     = method
@@ -111,6 +112,11 @@ class SOAPBuilder:
             # Create a header.
             self.dump(self.header, "Header", typed = typed)
             #self.header = None # Wipe it out so no one is using it.
+
+            #add securityHeader for AlfrescoPythonApi jpells
+            for x in self.kwargs:
+                if x.contains('header'):
+                    self.out.append(self.kwargs[x])
 
         if self.body:
             # Call genns to record that we've used SOAP-ENV.
@@ -641,8 +647,8 @@ class SOAPBuilder:
 
 def buildSOAP(args=(), kw={}, method=None, namespace=None,
               header=None, methodattrs=None, envelope=1, encoding='UTF-8',
-              config=Config, noroot = 0):
+              config=Config, noroot = 0, **kwargs):
     t = SOAPBuilder(args=args, kw=kw, method=method, namespace=namespace,
                     header=header, methodattrs=methodattrs,envelope=envelope,
-                    encoding=encoding, config=config,noroot=noroot)
+                    encoding=encoding, config=config,noroot=noroot, **kwargs)
     return t.build()
