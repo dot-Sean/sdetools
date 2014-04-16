@@ -1,7 +1,5 @@
-import sys
 import suds
 import os
-import re
 import urllib2
 import httplib
 import logging
@@ -14,7 +12,6 @@ from suds.transport.https import HttpAuthenticated
 logging.getLogger('suds').setLevel(logging.WARNING)
 
 from sdetools.extlib import http_req
-from sdetools.sdelib import commons
 from sdetools.analysis_integration.base_integrator import BaseImporter
 from sdetools.modules.import_fortify.fortify_integration_error import FortifyIntegrationError
 from sdetools.modules.import_fortify.fortify_fpr_importer import FortifyFPRImporter
@@ -36,7 +33,8 @@ class FortifySSCImporter(BaseImporter):
     def __init__(self, config):
         super(FortifySSCImporter, self).__init__()
         self.config = config
-        self.soap_endpoint = "%s://%s/ssc/fm-ws/services" %  (self.config['ssc_method'], self.config['ssc_server'])
+        self.soap_endpoint = "%s://%s/ssc/fm-ws/services" % (self.config['ssc_method'], self.config['ssc_server'])
+        self.importer = None
 
     def _get_ssc_client(self):
 
@@ -52,12 +50,12 @@ class FortifySSCImporter(BaseImporter):
         security.tokens.append(token)
         
         try:
-            client = suds.client.Client("%s/fws.wsdl" % self.soap_endpoint, 
-                autoblend=True,
-                location=self.soap_endpoint,
-                wsse=security,
-                plugins=suds_plugins,
-                transport=HttpAuthenticated())
+            client = suds.client.Client("%s/fws.wsdl" % self.soap_endpoint,
+                                        autoblend=True,
+                                        location=self.soap_endpoint,
+                                        wsse=security,
+                                        plugins=suds_plugins,
+                                        transport=HttpAuthenticated())
         except (xml.parsers.expat.ExpatError, socket.error, urllib2.URLError), err:
             raise FortifyIntegrationError('Error talking to Fortify SSC service. Please check server URL. Reason: %s' % err)
 
@@ -76,7 +74,7 @@ class FortifySSCImporter(BaseImporter):
             raise FortifyIntegrationError('Unable to retrieve project list')
         elif ret['code'] != 0:
             raise FortifyIntegrationError('Unable to retrieve project list. Reason: %s (%d)' % 
-                                          ret['msg'], ret['code'])
+                                          (ret['msg'], ret['code']))
 
         project_version_id = None
         proj_id = None
@@ -101,7 +99,7 @@ class FortifySSCImporter(BaseImporter):
             raise FortifyIntegrationError('Unable to retrieve project versions')
         elif ret['code'] != 0:
             raise FortifyIntegrationError('Unable to retrieve project versions. Reason: %s (%d)' % 
-                                          ret['msg'], ret['code'])
+                                          (ret['msg'], ret['code']))
 
         active_project_version_list = ret['ProjectVersion']
         for proj in active_project_version_list:
@@ -121,7 +119,8 @@ class FortifySSCImporter(BaseImporter):
                 chunk = stream.read()
             except httplib.IncompleteRead as e:
                 chunk = e.partial
-            if not chunk: break
+            if not chunk:
+                break
             fp.write(chunk)
         fp.close()
     
@@ -130,11 +129,11 @@ class FortifySSCImporter(BaseImporter):
         logger.info('Initiating connection to Fortify SSC service')    
         client = self._get_ssc_client()
 
-        project_version_id = self._get_project_version_id(client, self.config['ssc_project_name'], 
-                                             self.config['ssc_project_version'])
+        project_version_id = self._get_project_version_id(client, self.config['ssc_project_name'],
+                                                          self.config['ssc_project_version'])
         if not project_version_id:
             raise FortifyIntegrationError("Version %s of project %s not found in SSC" % 
-                         (self.config['ssc_project_version'], self.config['ssc_project_name']))
+                                          (self.config['ssc_project_version'], self.config['ssc_project_name']))
 
         if self.config['ssc_test_connection']:
             return
@@ -151,7 +150,7 @@ class FortifySSCImporter(BaseImporter):
         token = ret.getChild('Envelope').getChild('Body').getChild('GetAuthenticationTokenResponse').getChild('token').text
 
         req = urllib2.Request('%s://%s/ssc/download/currentStateFprDownload.html?id=%s&mat=%s&clientVersion=3.60.0065' %
-                (self.config['ssc_method'], self.config['ssc_server'], project_version_id, token))
+                              (self.config['ssc_method'], self.config['ssc_server'], project_version_id, token))
 
         opener = http_req.get_opener(self.config['ssc_method'], self.config['ssc_server'])
         stream = opener.open(req)
