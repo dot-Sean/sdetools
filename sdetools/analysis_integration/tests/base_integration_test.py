@@ -102,7 +102,7 @@ class BaseIntegrationTest(object):
         try:
             self.init_data()
             self.assertTrue(False, 'Invalid import_behaviour %s not detected' % self.config['import_behaviour'])
-        except UsageError, ue:
+        except UsageError:
             self.assertTrue(True)
 
     def test_valid_import_behaviour(self):
@@ -112,7 +112,7 @@ class BaseIntegrationTest(object):
             try:
                 self.init_data()
                 self.assertTrue(True)
-            except UsageError, ue:
+            except UsageError:
                 self.assertTrue(False, 'Valid import_behaviour %s improperly disallowed' % behaviour)
 
     def test_expected_number_of_findings(self):
