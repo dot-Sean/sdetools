@@ -100,3 +100,7 @@ class TestHPAlmCase(AlmPluginTestBase, unittest.TestCase):
         test_task_result = self.connector.alm_get_task(test_task)
 
         self.assertEqual(test_task_result.get_status(), 'TODO', 'Should not have been able to update the status of a test plan')
+
+    def test_alm_priority_map(self):
+        # Custom priority maps are unsupported in this integration
+        pass

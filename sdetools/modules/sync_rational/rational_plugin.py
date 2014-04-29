@@ -169,24 +169,19 @@ class RationalConnector(AlmConnector):
         self.mark_down_converter = markdown.Markdown(safe_mode="escape")
 
         for item in [self.ALM_DONE_STATUSES, 'rational_context_root', 'alm_issue_label']:
-
             if not self.config[item]:
                 raise AlmException('Missing %s in configuration' % item)
 
-        self.config[self.ALM_DONE_STATUSES] = self.config[self.ALM_DONE_STATUSES].split(',')
+        self.config.process_list_config(self.ALM_DONE_STATUSES)
 
         if self.config['conflict_policy'] != 'alm':
             raise AlmException('Expected "alm" for configuration conflict_policy but got "%s". '
                                'Currently only Rational can be setup as authoritative server' % self.config['conflict_policy'])
-        self.config.process_json_str_dict(self.ALM_PRIORITY_MAP)
 
+        self.config.process_json_str_dict(self.ALM_PRIORITY_MAP)
         if not self.config[self.ALM_PRIORITY_MAP]:
             self.config[self.ALM_PRIORITY_MAP] = RATIONAL_DEFAULT_PRIORITY_MAP
-
-        for key in self.config[self.ALM_PRIORITY_MAP]:
-            if not RE_MAP_RANGE_KEY.match(key):
-                raise AlmException('Unable to process %s (not a JSON dictionary). Reason: Invalid range key %s'
-                                   % (self.ALM_PRIORITY_MAP, key))
+        self._validate_alm_priority_map()
 
     def _rational_forms_login(self, forms_client):
         forms_credentials = {

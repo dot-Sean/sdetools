@@ -120,15 +120,12 @@ class PivotalTrackerConnector(AlmConnector):
             if not self.config[item]:
                 raise AlmException('Missing %s in configuration' % item)
 
-        self.config[self.ALM_DONE_STATUSES] = self.config[self.ALM_DONE_STATUSES].split(',')
+        self.config.process_list_config(self.ALM_DONE_STATUSES)
 
+        self.config.process_json_str_dict('alm_priority_map')
         if not self.config[self.ALM_PRIORITY_MAP]:
             self.config[self.ALM_PRIORITY_MAP] = PT_DEFAULT_PRIORITY_MAP
-
-        for key in self.config[self.ALM_PRIORITY_MAP]:
-            if not RE_MAP_RANGE_KEY.match(key):
-                raise AlmException('Unable to process %s (not a JSON dictionary). Reason: Invalid range key %s'
-                                   % (self.ALM_PRIORITY_MAP, key))
+        self._validate_alm_priority_map()
 
     def alm_connect_server(self):
         """ Verifies that PivotalTracker connection works """

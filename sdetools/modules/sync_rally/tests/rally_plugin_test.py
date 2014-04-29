@@ -63,3 +63,7 @@ class TestRallyCase(AlmPluginTestBase, unittest.TestCase):
 
         self.config['alm_custom_fields'] = {"Package": "Package Value"}
         self.test_update_task_status_to_done()
+
+    def test_alm_priority_map(self):
+        # Custom priority maps are unsupported in this integration
+        pass

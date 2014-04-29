@@ -15,6 +15,7 @@ logger = log_mgr.mods.add_mod(__name__)
 
 RE_CODE_DOWNLOAD = re.compile(r'\{\{ USE_MEDIA_URL \}\}([^\)]+\))\{@class=code-download\}')
 RE_TASK_IDS = re.compile('^C?T\d+$')
+RE_MAP_RANGE_KEY = re.compile('^([1-9]|10)(-([1-9]|10))?$')
 
 
 class AlmException(Error):
@@ -274,6 +275,61 @@ class AlmConnector(object):
         if not self.sde_plugin:
             return False
         return self.sde_plugin.connected
+
+    def _validate_alm_priority_map(self):
+        """
+        Validate a priority mapping dictionary. The mapping specifies which value to use in another system
+        based on the SD Elements task's priority numeric value. Priorities are numeric values from the range 1 to 10.
+
+        This method ensures that:
+
+         1. Keys represent a single priority {'10':'Critical'} or a range of priorities {'7-10':'High'}
+         2. Priorities 1 to 10 are represented exactly once in the dictionary keys
+         3. Mappings containing a range of priorities {'7-10':'High'} must have their values ordered from low to high.
+
+        Valid example:
+        {'1-3': 'Low', '4-6': 'Medium', '7-10': 'High'}
+
+        All SD Elements tasks with priority 1 to 3 are to be mapped to the value "Low" in the other system.
+        All SD Elements tasks with priority 4 to 6 are to be mapped to the value "Medium" in the other system.
+        All SD Elements tasks with priority 7 to 10 are to be mapped to the value "High" in the other system.
+
+        Invalid examples:
+        {'1-3': 'Low', '4-6': 'Medium', '7-9': 'High'}
+        {'1-3': 'Low', '4-6': 'Medium', '6-10': 'High'}
+        {'3-1': 'Low', '6-4': 'Medium', '10-7': 'High'}
+        """
+        if 'alm_priority_map' not in self.config:
+            return
+
+        priority_set = set()
+        for key, value in self.config['alm_priority_map'].iteritems():
+            if not RE_MAP_RANGE_KEY.match(key):
+                raise AlmException('Unable to process alm_priority_map (not a JSON dictionary). '
+                        'Reason: Invalid range key %s' % key)
+
+            if '-' in key:
+                lrange, hrange = key.split('-')
+                lrange = int(lrange)
+                hrange = int(hrange)
+                if lrange >= hrange:
+                    raise AlmException('Invalid alm_priority_map entry %s => %s: Priority %d should be less than %d' %
+                                       (key, value, lrange, hrange))
+                for mapped_priority in range(lrange, hrange+1):
+                    if mapped_priority in priority_set:
+                        raise AlmException('Invalid alm_priority_map entry %s => %s: Priority %d is duplicated' %
+                                          (key, value, mapped_priority))
+                    priority_set.add(mapped_priority)
+            else:
+                key_value = int(key)
+                if key_value in priority_set:
+                    raise AlmException('Invalid alm_priority_map entry %s => %s: Priority %d is duplicated' %
+                                      (key, value, key_value))
+                priority_set.add(key_value)
+
+        for mapped_priority in xrange(1, 11):
+            if mapped_priority not in priority_set:
+                raise AlmException('Invalid alm_priority_map: missing a value mapping for priority %d' % mapped_priority)
 
     def _extract_task_id(self, full_task_id):
         """

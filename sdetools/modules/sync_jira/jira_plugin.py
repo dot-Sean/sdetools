@@ -1,15 +1,12 @@
 # Copyright SDElements Inc
 # Extensible two way integration with JIRA
 
-import re
-
 from sdetools.alm_integration.alm_plugin_base import AlmConnector, AlmException
 from sdetools.modules.sync_jira.jira_markdown import convert_markdown
 
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
-RE_MAP_RANGE_KEY = re.compile('^\d+(-\d+)?$')
 JIRA_DEFAULT_PRIORITY_MAP = {
     '10': 'Blocker',
     '7-9': 'Critical',
@@ -64,10 +61,7 @@ class JIRAConnector(AlmConnector):
         self.config.process_json_str_dict('alm_priority_map')
         if not self.config['alm_priority_map']:
             self.config['alm_priority_map'] = JIRA_DEFAULT_PRIORITY_MAP
-        for key in self.config['alm_priority_map']:
-            if not RE_MAP_RANGE_KEY.match(key):
-                raise AlmException('Unable to process alm_priority_map (not a JSON dictionary). '
-                        'Reason: Invalid range key %s' % key)
+        self._validate_alm_priority_map()
 
         if self.config['alm_custom_fields'] and self.config.jira_api_ver == 4 and not self.config['jira_existing_issue']:
             raise AlmException('Unable to process alm_custom_fields. '
@@ -105,6 +99,9 @@ class JIRAConnector(AlmConnector):
             raise AlmException('Version %s not found in the project' % (self.config['alm_project_version']))
 
         self.alm_plugin.setup_fields(self.jira_issue_type_id)
+
+    def alm_validate_configurations(self):
+        pass
 
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])
