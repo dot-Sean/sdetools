@@ -53,7 +53,7 @@ class ExtAPI(restclient.RESTBase):
         Available Filters:
             name -> application name to be searched for
         """
-        result = self.call_api('applications', args=filters, 
+        result = self.call_api('applications', args=filters,
                 call_headers=_encode_options(options))
         return result['applications']
 
@@ -70,12 +70,12 @@ class ExtAPI(restclient.RESTBase):
         """
         args = {'application': application}
         args.update(filters)
-        result = self.call_api('projects', args=args, 
+        result = self.call_api('projects', args=args,
                 call_headers=_encode_options(options))
         return result['projects']
 
     def get_tasks(self, project, options={}, **filters):
-        """ 
+        """
         Get all tasks for a project indicated by the ID of the project
         """
         args = {'project': project}
@@ -84,7 +84,7 @@ class ExtAPI(restclient.RESTBase):
         return result['tasks']
 
     def get_task(self, task, options={}, **filters):
-        """ 
+        """
         Get an individual task with parameter task id
         <task> = <project_id>-<task_id> (e.g. 127-T21)
         """
@@ -93,15 +93,15 @@ class ExtAPI(restclient.RESTBase):
 
     def add_task_text_note(self, task, text):
         note = {
-            'text': text, 
+            'text': text,
             'task': task}
         return self.call_api('tasknotes/text', self.URLRequest.POST, args=note)
 
     def add_task_ide_note(self, task, text, filename, status):
         note = {
-            'text': text, 
-            'filename': filename, 
-            'status': status, 
+            'text': text,
+            'filename': filename,
+            'status': status,
             'task': task}
         return self.call_api('tasknotes/ide', self.URLRequest.POST, args=note)
 
@@ -115,18 +115,19 @@ class ExtAPI(restclient.RESTBase):
         args.update(filters)
         return self.call_api(end_point, args=args, call_headers=_encode_options(options))
 
-    def add_analysis_note(self, task, analysis_ref, confidence, findings):
+    def add_analysis_note(self, task, analysis_ref, confidence, findings, behaviour):
         note = {
-            'task': task, 
-            'project_analysis_note': analysis_ref, 
-            'confidence': confidence, 
-            'findings': findings}
+            'task': task,
+            'project_analysis_note': analysis_ref,
+            'confidence': confidence,
+            'findings': findings,
+            'behaviour': behaviour}
         return self.call_api('tasknotes/analysis', self.URLRequest.POST, args=note)
 
     def add_project_analysis_note(self, project_id, analysis_ref, analysis_type):
         project_analysis = {
-            'project': project_id, 
-            'analysis_ref': analysis_ref, 
+            'project': project_id,
+            'analysis_ref': analysis_ref,
             'analysis_type': analysis_type}
         return self.call_api('projectnotes/analysis', self.URLRequest.POST, args=project_analysis)
 

@@ -3,7 +3,9 @@ import os
 from sdetools.sdelib import conf_mgr
 from sdetools.sdelib.mod_mgr import ReturnChannel, load_modules
 from sdetools.sdelib.testlib.mock_response import MOCK_SDE_RESPONSE
-from sdetools.sdelib.commons import abc, Error, get_directory_of_current_module
+from sdetools.sdelib.commons import abc, Error, UsageError, get_directory_of_current_module
+from sdetools.analysis_integration.base_integrator import BaseIntegrator
+
 abstractmethod = abc.abstractmethod
 TEST_FILES_DIR = 'files'
 
@@ -94,6 +96,24 @@ class BaseIntegrationTest(object):
     @abstractmethod
     def expected_number_of_findings(self):
         pass
+
+    def test_invalid_import_behaviour(self):
+        self.config['import_behaviour'] = 'unknown'
+        try:
+            self.init_data()
+            self.assertTrue(False, 'Invalid import_behaviour %s not detected' % self.config['import_behaviour'])
+        except UsageError, ue:
+            self.assertTrue(True)
+
+    def test_valid_import_behaviour(self):
+        for behaviour in BaseIntegrator.VALID_IMPORT_BEHAVIOUR:
+            self.init_integrator()
+            self.config['import_behaviour'] = behaviour
+            try:
+                self.init_data()
+                self.assertTrue(True)
+            except UsageError, ue:
+                self.assertTrue(False, 'Valid import_behaviour %s improperly disallowed' % behaviour)
 
     def test_expected_number_of_findings(self):
         self.init_data()
