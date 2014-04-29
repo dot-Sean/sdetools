@@ -15,7 +15,7 @@ logger = log_mgr.mods.add_mod(__name__)
 
 RE_CODE_DOWNLOAD = re.compile(r'\{\{ USE_MEDIA_URL \}\}([^\)]+\))\{@class=code-download\}')
 RE_TASK_IDS = re.compile('^C?T\d+$')
-RE_MAP_RANGE_KEY = re.compile('^\d+(-\d+)?$')
+RE_MAP_RANGE_KEY = re.compile('^([1-9]|10)(-([1-9]|10))?$')
 
 
 class AlmException(Error):
@@ -312,31 +312,22 @@ class AlmConnector(object):
                 lrange, hrange = key.split('-')
                 lrange = int(lrange)
                 hrange = int(hrange)
-                if lrange < 1 or lrange > 10:
-                    raise AlmException('Invalid alm_priority_map entry %s => %s: Priority value %d is out of range '
-                                       '1-10' % (key, value, lrange))
-                if hrange < 1 or hrange > 10:
-                    raise AlmException('Invalid alm_priority_map entry %s => %s: Priority value %d is out of range '
-                                       '1-10' % (key, value, hrange))
                 if lrange >= hrange:
                     raise AlmException('Invalid alm_priority_map entry %s => %s: Priority %d should be less than %d' %
                                        (key, value, lrange, hrange))
                 for mapped_priority in range(lrange, hrange+1):
                     if mapped_priority in priority_set:
                         raise AlmException('Invalid alm_priority_map entry %s => %s: Priority %d is duplicated' %
-                                       (key, value, mapped_priority))
+                                          (key, value, mapped_priority))
                     priority_set.add(mapped_priority)
             else:
                 key_value = int(key)
-                if key_value < 1 or key_value > 10:
-                    raise AlmException('Invalid alm_priority_map entry for %s. Priority value %d is out of range 1-10' %
-                                       (value, key_value))
                 if key_value in priority_set:
                     raise AlmException('Invalid alm_priority_map entry %s => %s: Priority %d is duplicated' %
-                                   (key, value, key_value))
+                                      (key, value, key_value))
                 priority_set.add(key_value)
 
-        for mapped_priority in range(1, 11):
+        for mapped_priority in xrange(1, 11):
             if mapped_priority not in priority_set:
                 raise AlmException('Invalid alm_priority_map: missing a value mapping for priority %d' % mapped_priority)
 
