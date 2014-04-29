@@ -1,7 +1,6 @@
 # Copyright SDElements Inc
 # Extensible two way integration with GitHub
 
-import re
 import json
 from datetime import datetime
 
@@ -15,7 +14,6 @@ from sdetools.sdelib import log_mgr
 
 logger = log_mgr.mods.add_mod(__name__)
 
-RE_MAP_RANGE_KEY = re.compile('^\d+(-\d+)?$')
 GITHUB_DEFAULT_PRIORITY_MAP = {
     '7-10': 'High',
     '4-6': 'Medium',
