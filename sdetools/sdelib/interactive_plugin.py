@@ -167,3 +167,7 @@ class PlugInExperience:
     @_verify_connect
     def add_analysis_note(self, task_id, analysis_ref, confidence, findings, behaviour):
         return self.api.add_analysis_note("%d-%s" % (self.prj_id, task_id), analysis_ref, confidence, findings, behaviour)
+
+    @_verify_connect
+    def get_phases(self):
+        return self.api.get_phases()

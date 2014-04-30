@@ -1,0 +1,28 @@
+{
+    "phases": [
+        {
+            "tip": "One-time tasks that you can verify. Similar to traditional functional requirements or user stories.",
+            "slug": "requirements",
+            "name": "Requirements",
+            "description": "Application security requirements, generally used to assist requirements analysts."
+        },
+        {
+            "tip": "Principles or other tasks that you can\u2019t verify with testing.",
+            "slug": "architecture-design",
+            "name": "Architecture & Design",
+            "description": "Design advice on how to build secure applications, generally used to assist architects & lead developers."
+        },
+        {
+            "tip": "Cross-cutting tasks / coding standards that occur in multiple places throughout the application.",
+            "slug": "development",
+            "name": "Development",
+            "description": "Secure development tasks, generally used to assist developers."
+        },
+        {
+            "tip": "Tasks that verify the absence or presence of requirements or development tasks through runtime testing.",
+            "slug": "testing",
+            "name": "Testing",
+            "description": "Step by step testing instructions for security vulnerabilities, generally used to assist software Quality Assurance (QA) testers."
+        }
+    ]
+}

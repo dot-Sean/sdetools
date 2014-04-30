@@ -216,6 +216,17 @@ class AlmPluginTestBase(object):
         self.connector.config['test_alm'] = 'project'
         self.connector.synchronize()
 
+    def test_sde_valid_phases(self):
+        self.connector.initialize()
+        self.connector.config['alm_phases'] = ['development', 'requirements']
+        self.connector.synchronize()
+
+    def test_sde_invalid_phases(self):
+        self.connector.initialize()
+        self.connector.config['alm_phases'] = ['development', 'invalid_phase']
+        exception_msg = 'Incorrect alm_phase configuration: invalid_phase is not a valid phase'
+        self.assert_exception(AlmException, '', exception_msg, self.connector.synchronize)
+
     def test_update_existing_task_sde(self):
         # The plugin may initialize variables during alm_connect() so we need
         # to call alm_connect() before proceeding
