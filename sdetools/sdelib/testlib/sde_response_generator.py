@@ -12,14 +12,15 @@ class SdeResponseGenerator(ResponseGenerator):
         self.app_name = config['sde_application']
         self.project_name = config['sde_project']
         resource_templates = ['application.json', 'project.json', 'task.json', 'text_note.json', 'ide_note.json',
-                              'analysis_note.json', 'project_analysis_note.json']
+                              'analysis_note.json', 'project_analysis_note.json', 'phases.json']
         rest_api_targets = {
             '/api/applications': 'call_applications',
             '/api/projects': 'get_projects',
             '/api/tasks/[0-9]+-[0-9a-zA-z]+': 'call_task',
             '/api/tasks': 'get_tasks',
             '/api/tasknotes.*': 'call_task_notes',
-            '/api/projectnotes/analysis$': 'add_project_analysis_note'
+            '/api/projectnotes/analysis$': 'add_project_analysis_note',
+            '/api/phases$': 'get_phases'
         }
 
         super(SdeResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir)
@@ -32,6 +33,7 @@ class SdeResponseGenerator(ResponseGenerator):
         self.generator_add_resource('task', '40', self.get_json_from_file('T40'))
         self.generator_add_resource('task', '36', self.get_json_from_file('T36'))
         self.generator_add_resource('task', '38', self.get_json_from_file('T38'))
+        self.generator_add_resource('phases', '', self.get_json_from_file('phases'))
 
     def generate_sde_task(self, task_number=None, project_id=None, status=None, priority=7, phase='requirements'):
         if task_number is None:
@@ -56,6 +58,20 @@ class SdeResponseGenerator(ResponseGenerator):
     """
        Response functions 
     """
+    def get_phases(self, target, flag, data, method):
+        if not flag:
+            if method == 'GET':
+                params = self.get_url_parameters(target)
+                if params:
+                    phases = self.generator_get_filtered_resource('phases', params)
+                else:
+                    phases = self.generator_get_all_resource('phases')
+                return phases[0]
+            else:
+                self.raise_error('400')
+        else:
+            self.raise_error('401')
+
     def call_applications(self, target, flag, data, method):
         if not flag:
             if method == 'GET':

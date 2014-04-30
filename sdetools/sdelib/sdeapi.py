@@ -141,5 +141,11 @@ class ExtAPI(restclient.RESTBase):
             args={'status': status})
         return result['status']
 
+    def get_phases(self, options={}, **filters):
+        """
+        Get all phases for an organization
+        """
+        return self.call_api('phases', args=filters, call_headers=_encode_options(options))
+
 APIBase = ExtAPI
 
