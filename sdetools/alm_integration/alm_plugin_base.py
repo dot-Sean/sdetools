@@ -282,7 +282,6 @@ class AlmConnector(object):
                 raise AlmException('Unable to retrieve phases from SD Elements')
 
             all_phases_slugs = [phase['slug'] for phase in result['phases']]
-            print self.config['alm_phases']
             for selected_phase in self.config['alm_phases']:
                 if selected_phase not in all_phases_slugs:
                     raise AlmException('Incorrect alm_phase configuration: %s is not a valid phase' % selected_phase)
