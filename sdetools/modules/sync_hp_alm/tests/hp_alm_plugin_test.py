@@ -61,7 +61,7 @@ class TestHPAlmCase(AlmPluginTestBase, unittest.TestCase):
                               ([_status[0]], valid_statuses), self.connector.alm_connect)
 
     def test_add_test_plan(self):
-        self.config['alm_phases'] = 'requirement,testing'
+        self.config['alm_phases'] = ['requirement', 'testing']
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task(phase='testing')
         self.connector.alm_add_task(test_task)
@@ -75,7 +75,7 @@ class TestHPAlmCase(AlmPluginTestBase, unittest.TestCase):
         self.assertEqual(result_alm_id, alm_id, 'Expected alm_id %s, got %s' % (alm_id, result_alm_id))
 
     def test_add_requirement_coverage(self):
-        self.config['alm_phases'] = 'requirements,testing'
+        self.config['alm_phases'] = ['requirements', 'testing']
         test_task = self.mock_sde_response.generate_sde_task(phase='testing')
         requirement_task = self.mock_sde_response.generate_sde_task(phase='requirements')
         self.connector.synchronize()

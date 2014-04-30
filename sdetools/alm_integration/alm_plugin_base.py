@@ -64,6 +64,8 @@ class AlmConnector(object):
     """
     # This needs to be overwritten
     alm_name = 'ALM Module'
+    TEST_OPTIONS = ['server', 'project', 'settings']
+    STANDARD_STATUS_LIST = ['TODO', 'DONE', 'NA']
 
     #This is an abstract base class
     __metaclass__ = abc.ABCMeta
@@ -83,10 +85,11 @@ class AlmConnector(object):
 
     def _add_alm_config_options(self):
         """ Adds ALM config options to the config file"""
-        self.config.opts.add('alm_phases', 'Phases of the ALM',
+        self.config.opts.add('alm_phases', 'Phases to sync '
+                '(comma separated list, e.g. requirements,testing)',
                 default='requirements,architecture-design,development')
         self.config.opts.add('sde_statuses_in_scope', 'SDE statuses for adding to ALM '
-                '(comma separated DONE,TODO,NA)',
+                '(comma separated %s)' % (','.join(AlmConnector.STANDARD_STATUS_LIST)),
                 default='TODO')
         self.config.opts.add('sde_min_priority', 'Minimum SDE priority in scope',
                 default='7')
@@ -124,17 +127,16 @@ class AlmConnector(object):
                 raise UsageError('Invalid Task ID: %s' % task)
 
         if not self.config['selected_tasks']:
+            self.config.process_list_config('alm_phases')
             if not self.config['alm_phases']:
                 raise AlmException('Missing alm_phases in configuration')
 
-            self.config.process_list_config('alm_phases')
-
+            self.config.process_list_config('sde_statuses_in_scope')
             if not self.config['sde_statuses_in_scope']:
                 raise AlmException('Missing the SD Elements statuses in scope')
 
-            self.config.process_list_config('sde_statuses_in_scope')
             for status in self.config['sde_statuses_in_scope']:
-                if status not in('TODO', 'DONE', 'NA'):
+                if status not in AlmConnector.STANDARD_STATUS_LIST:
                     raise AlmException('Invalid status specified in sde_statuses_in_scope')
 
         if (not self.config['conflict_policy'] or
@@ -159,9 +161,9 @@ class AlmConnector(object):
         else:
             self.config['sde_min_priority'] = 1
 
-        if self.config['test_alm'] and self.config['test_alm'] not in ['server', 'project', 'settings']:
+        if self.config['test_alm'] and self.config['test_alm'] not in AlmConnector.TEST_OPTIONS:
             raise AlmException('Incorrect test_alm configuration setting. '
-                               'Valid values are: server, project, or settings.')
+                               'Valid values are: %s' % ','.join(AlmConnector.TEST_OPTIONS))
 
         self.config.process_boolean_config('show_progress')
         self.config.process_boolean_config('how_tos_in_scope')
@@ -269,6 +271,20 @@ class AlmConnector(object):
         except APIError, err:
             raise AlmException('Unable to connect to SD Elements. Please review URL, id,'
                     ' and password in configuration file. Reason: %s' % (str(err)))
+
+        self.sde_validate_configuration()
+
+    def sde_validate_configuration(self):
+        """ Validate selected phases, if applicable """
+        if not self.config['selected_tasks']:
+            result = self.sde_plugin.get_phases()
+            if not result:
+                raise AlmException('Unable to retrieve phases from SD Elements')
+
+            all_phases_slugs = [phase['slug'] for phase in result['phases']]
+            for selected_phase in self.config['alm_phases']:
+                if selected_phase not in all_phases_slugs:
+                    raise AlmException('Incorrect alm_phase configuration: %s is not a valid phase' % selected_phase)
 
     def is_sde_connected(self):
         """ Returns true if currently connected to SD Elements"""
