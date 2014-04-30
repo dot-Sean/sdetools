@@ -272,9 +272,9 @@ class AlmConnector(object):
             raise AlmException('Unable to connect to SD Elements. Please review URL, id,'
                     ' and password in configuration file. Reason: %s' % (str(err)))
 
-        self.sde_validation_configuration()
+        self.sde_validate_configuration()
 
-    def sde_validation_configuration(self):
+    def sde_validate_configuration(self):
         """ Validate selected phases, if applicable """
         if not self.config['selected_tasks']:
             result = self.sde_plugin.get_phases()
