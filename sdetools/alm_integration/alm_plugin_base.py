@@ -82,7 +82,6 @@ class AlmConnector(object):
         self.alm_plugin = alm_plugin
         self._add_alm_config_options()
         self.emit = self.config.emit
-        self.task_phases = []
 
     def _add_alm_config_options(self):
         """ Adds ALM config options to the config file"""
