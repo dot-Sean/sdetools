@@ -92,7 +92,7 @@ class AlmPluginTestBase(object):
         alm_id = test_task_result.get_alm_id()
         alm_status = test_task_result.get_status()
         alm_timestamp = test_task_result.get_timestamp()
-        task_id_regex = 'C?T\d+$'
+        task_id_regex = '^[^\d]+\d+$'
 
         self.assertMatch(task_id_regex, task_id, 'Task id does not match the expected pattern. pattern:%s, task_id:%s' %
                                                 (task_id_regex, task_id))
