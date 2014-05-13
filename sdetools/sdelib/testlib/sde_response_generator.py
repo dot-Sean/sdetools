@@ -112,7 +112,7 @@ class SdeResponseGenerator(ResponseGenerator):
     def call_task(self, target, flag, data, method):
         if not flag:
             task_id = target.split('/')[-1].split('-')[1]
-            task_number = re.sub('C?T', '', task_id)
+            task_number = re.sub('[^\d]+', '', task_id)
 
             if not self.generator_resource_exists('task', task_number):
                 self.raise_error('404', {'error': 'Not Found'})

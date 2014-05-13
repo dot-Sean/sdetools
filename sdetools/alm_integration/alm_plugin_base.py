@@ -14,7 +14,7 @@ from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
 RE_CODE_DOWNLOAD = re.compile(r'\{\{ USE_MEDIA_URL \}\}([^\)]+\))\{@class=code-download\}')
-RE_TASK_IDS = re.compile('^C?T\d+$')
+RE_TASK_IDS = re.compile('^[^\d]+\d+$')
 RE_MAP_RANGE_KEY = re.compile('^([1-9]|10)(-([1-9]|10))?$')
 
 
