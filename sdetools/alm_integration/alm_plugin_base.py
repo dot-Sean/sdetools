@@ -408,7 +408,7 @@ class AlmConnector(object):
         """
         tid = task['id'].split('-', 1)[-1]
         if self.config['selected_tasks']:
-            return (tid in self.config['selected_tasks'])
+            return tid in self.config['selected_tasks']
         return (task['phase'] in self.config['alm_phases'] and
                 task['priority'] >= self.config['sde_min_priority'])
 
