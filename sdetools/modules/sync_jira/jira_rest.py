@@ -4,10 +4,14 @@ from sdetools.modules.sync_jira.jira_shared import JIRATask
 
 class JIRARestAPI(RESTBase):
     """ Base plugin for JIRA """
+    # the fields we set at a minimum
+    BASE_FIELDS = ['project', 'summary', 'description', 'issuetype', 'reporter']
 
     def __init__(self, config):
         super(JIRARestAPI, self).__init__('alm', 'JIRA', config, 'rest/api/2')
         self.versions = None
+        self.custom_fields = []
+        self.fields = []
 
     def parse_response(self, result, headers):
         if result == "":
@@ -33,37 +37,58 @@ class JIRARestAPI(RESTBase):
 
     def setup_fields(self, issue_type_id):
 
-        self.custom_fields = []
-        self.fields = []
-
         try:
             meta_info = self.call_api('issue/createmeta', method=self.URLRequest.GET,
-                                      args = {'projectKeys': self.config['alm_project'],
+                                      args={'projectKeys': self.config['alm_project'],
                                       'expand': 'projects.issuetypes.fields'})
         except APIError:
             raise AlmException('Could not retrieve fields for JIRA project: %s' % self.config['alm_project'])
 
-        if meta_info:        
-            for item in meta_info['projects'][0]['issuetypes']:
-                if item['name'] == self.config['jira_issue_type']:
-                    for key in item['fields']:
-                        self.fields.append({'id':key,'name':item['fields'][key]['name']})
+        for item in meta_info['projects'][0]['issuetypes']:
+            if item['name'] == self.config['jira_issue_type']:
+                for key in item['fields']:
+                    self.fields.append({
+                        'id': key,
+                        'name': item['fields'][key]['name'],
+                        'required': item['fields'][key]['required'],
+                        'schema': item['fields'][key]['schema'],
+                    })
+                break
+
+        assigned_fields = []
+        assigned_fields.extend(JIRARestAPI.BASE_FIELDS)
+
+        missing_fields = []
+        required_fields = {}
+
+        for field in self.fields:
+            if field['required']:
+                required_fields[field['id']] = field
 
         if self.config['alm_custom_fields']:
             for key in self.config['alm_custom_fields']:
                 for field in self.fields:
-                    if (key == field['name']):
-                        self.custom_fields.append({'field': field['id'],'value':self.config['alm_custom_fields'][key]})
+                    if key == field['name']:
+                        self.custom_fields.append({
+                            'field': field['id'],
+                            'value': self.config['alm_custom_fields'][key],
+                            'schema': field['schema']
+                        })
+                        assigned_fields.append(field['id'])
 
-            if len(self.custom_fields) != len(self.config['alm_custom_fields']):
-                raise AlmException('At least one custom field could not be found')            
+        for field in required_fields.keys():
+            if field not in assigned_fields:
+                missing_fields.append(required_fields[field]['name'])
+
+        if len(missing_fields) > 0:
+            raise AlmException('The following fields are missing values: %s' % ', '.join(missing_fields))
         
     def has_field(self, field_name):
         if not self.fields:
-             return False
+            return False
              
         for field in self.fields:
-            if (field_name == field['id']):
+            if field_name == field['id']:
                 return True
                 
         return False
@@ -117,9 +142,9 @@ class JIRARestAPI(RESTBase):
     def set_version(self, task, project_version):
         # REST allows us to add versions ad hoc
         try:
-            remoteurl_url = 'issue/%s' % task.get_alm_id()
-            version_update = {'update':{'versions':[{'add':{'name':project_version}}]}}
-            self.call_api(remoteurl_url, method=self.URLRequest.PUT, args=version_update)
+            remote_url = 'issue/%s' % task.get_alm_id()
+            version_update = {'update': {'versions': [{'add': {'name': project_version}}]}}
+            self.call_api(remote_url, method=self.URLRequest.PUT, args=version_update)
         except APIError:
             raise AlmException('Unable to update issue %s with new version %s' % (task.get_alm_id(), project_version))
 
@@ -138,6 +163,9 @@ class JIRARestAPI(RESTBase):
                'description': task['formatted_content'],
                'issuetype': {
                    'id': issue_type_id
+               },
+               'reporter': {
+                   'name': self.config['alm_user']
                }
            }
         }
@@ -145,28 +173,33 @@ class JIRARestAPI(RESTBase):
             args['fields']['labels'] = ['SD-Elements']
 
         if self.has_field('priority'):
-            args['fields']['priority'] = {'name':task['alm_priority']}
+            args['fields']['priority'] = {'name': task['alm_priority']}
 
         if affected_versions:
             args['fields']['versions'] = affected_versions
 
         if self.config['alm_parent_issue']:
-            args['fields']['parent'] = {'key':self.config['alm_parent_issue']}
+            args['fields']['parent'] = {'key': self.config['alm_parent_issue']}
 
         for field in self.custom_fields:
-            args['fields'][field['field']] = {'value':field['value']}
-                
+            if field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:textfield':
+                args['fields'][field['field']] = field['value']
+            elif field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:select':
+                args['fields'][field['field']] = {'value': field['value']}
+            elif field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:multiselect':
+                args['fields'][field['field']] = [{'value': field['value']}]
+
         try:
             issue = self.call_api('issue', method=self.URLRequest.POST, args=args)
             
             # Add a link back to SD Elements
-            remoteurl_url = 'issue/%s/remotelink' % issue['key']
-            args = {"object": {"url":task['url'],"title":task['title']}}
-            self.call_api(remoteurl_url, method=self.URLRequest.POST, args=args)
+            remote_url = 'issue/%s/remotelink' % issue['key']
+            args = {"object": {"url": task['url'], "title": task['title']}}
+            self.call_api(remote_url, method=self.URLRequest.POST, args=args)
             
             return issue
         except APIError, err:
-            raise AlmException('Unable to add issue to JIRA. Reason: %s' % (err))
+            raise AlmException('Unable to add issue to JIRA. Reason: %s' % err)
 
     def get_available_transitions(self, task_id):
         trans_url = 'issue/%s/transitions' % task_id
