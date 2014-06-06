@@ -12,6 +12,7 @@
         "status": {},
         "labels":"SD-Elements",
         "assignee":{},
+        "reporter":{},
         "sub-tasks": [],
 		"versions" : [],
         "project": {

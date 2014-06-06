@@ -15,4 +15,5 @@ class TestJIRASoapLiveCase(AlmPluginLiveTestBase, unittest.TestCase):
 
     def setUp(self):
         super(TestJIRASoapLiveCase, self).setUp()
+        self.connector.config.jira_api_ver = 4
         self.connector.alm_plugin = JIRASoapAPI(self.config)

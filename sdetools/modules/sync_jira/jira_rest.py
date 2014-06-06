@@ -46,7 +46,7 @@ class JIRARestAPI(RESTBase):
 
         for item in meta_info['projects'][0]['issuetypes']:
             if item['name'] == self.config['jira_issue_type']:
-                for key in item['fields']:
+                for key in item['fields'].keys():
                     self.fields.append({
                         'id': key,
                         'name': item['fields'][key]['name'],
