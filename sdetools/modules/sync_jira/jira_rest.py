@@ -55,8 +55,7 @@ class JIRARestAPI(RESTBase):
                     })
                 break
 
-        assigned_fields = []
-        assigned_fields.extend(JIRARestAPI.BASE_FIELDS)
+        assigned_fields = JIRARestAPI.BASE_FIELDS[:]
 
         missing_fields = []
         required_fields = {}
