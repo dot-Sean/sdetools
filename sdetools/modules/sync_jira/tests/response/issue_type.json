@@ -9,11 +9,20 @@
         "issuetype": {
             "required": true,
             "name": "Issue Type",
-            "operations": ["set"]
+            "operations": ["set"],
+			"schema": {
+				"type": "issuetype",
+				"system": "issuetype"
+			}
         },
         "customField": {
             "required": false,
-            "name": "Custom Field"
+            "name": "Custom Field",
+            "schema": {
+                "customId": 10000,
+                "type": "string",
+                "custom": "com.atlassian.jira.plugin.system.customfieldtypes:textfield"
+            }
         }
     }
 }
