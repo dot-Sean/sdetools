@@ -27,6 +27,7 @@ class MingleAPIBase(RESTBase):
         return urllib.urlencode(encoded_args)
 
     def parse_response(self, result, headers):
+        """ Override's parent return value to include also include the headers """
         if result:
             try:
                 result = minidom.parseString(result)
