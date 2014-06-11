@@ -2,7 +2,7 @@ import re
 import urllib
 
 from urlparse import parse_qsl
-from sdetools.sdelib.testlib.response_generator import ResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator, RESPONSE_HEADERS
 from sdetools.sdelib.commons import urlencode_str
 
 
@@ -45,7 +45,7 @@ class MingleResponseGenerator(ResponseGenerator):
 
         if not flag:
             if property_id == '114':
-                return self.get_xml_from_file('status_definition')
+                return RESPONSE_HEADERS, self.get_xml_from_file('status_definition')
             else:
                 self.raise_error('404')
         else:
@@ -53,37 +53,37 @@ class MingleResponseGenerator(ResponseGenerator):
 
     def get_property_definitions(self, target, flag, data, method):
         if not flag:
-            return self.get_xml_from_file('property_definitions')
+            return RESPONSE_HEADERS, self.get_xml_from_file('property_definitions')
         else:
             self.raise_error('401')
 
     def get_card_types(self, target, flag, data, method):
         if not flag:
-            return self.get_xml_from_file('card_types')
+            return RESPONSE_HEADERS, self.get_xml_from_file('card_types')
         else:
             self.raise_error('401')
 
     def get_project(self, target, flag, data, method):
         if not flag:
-            return self.get_xml_from_file('project')
+            return RESPONSE_HEADERS, self.get_xml_from_file('project')
         elif flag == 'anonymous_accessible':
             xml = self.get_xml_from_file('project')
             element = xml.getElementsByTagName('anonymous_accessible')[0]
             element.firstChild.nodeValue = 'true'
 
-            return xml
+            return RESPONSE_HEADERS, xml
         else:
             self.raise_error('401')
 
     def get_projects(self, target, flag, data, method):
         if not flag:
-            return self.get_xml_from_file('projects')
+            return RESPONSE_HEADERS, self.get_xml_from_file('projects')
         elif flag == 'anonymous_accessible':
             xml = self.get_xml_from_file('projects')
             element = xml.getElementsByTagName('anonymous_accessible')[0]
             element.firstChild.nodeValue = 'true'
 
-            return xml
+            return RESPONSE_HEADERS, xml
         else:
             self.raise_error('401')
 
@@ -107,7 +107,7 @@ class MingleResponseGenerator(ResponseGenerator):
                 for task in _mingle_tasks:
                     cards.documentElement.appendChild(task.documentElement)
 
-                return cards
+                return RESPONSE_HEADERS, cards
             elif method == 'POST':
                 resource_data = {
                     'id': self.extract_task_number_from_title(data['card[name]']),
@@ -117,7 +117,8 @@ class MingleResponseGenerator(ResponseGenerator):
                     'status': data['card[properties][][value]']
                 }
                 self.generator_add_resource('card', resource_data['id'], resource_data)
-                return None
+                headers = [('location', '%s/cards/%s.xml' % (self.project_uri, resource_data['id']))]
+                return headers, None
         else:
             self.raise_error('401')
 
@@ -126,14 +127,14 @@ class MingleResponseGenerator(ResponseGenerator):
             card_number = re.search('[0-9]+(?=\.xml)', target).group(0)
 
             if method == 'GET':
-                return self.generator_get_resource('card', card_number)
+                return RESPONSE_HEADERS, self.generator_get_resource('card', card_number)
             elif method == 'PUT':
                 status = data['card[properties][][value]']
 
                 if self.generator_get_resource('card', card_number):
                     self.generator_update_resource('card', card_number, {'status': status})
 
-            return None
+            return RESPONSE_HEADERS, None
         else:
             self.raise_error('401')
 

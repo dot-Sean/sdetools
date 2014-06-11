@@ -7,7 +7,6 @@ from sdetools.sdelib.testlib.sde_response_generator import SdeResponseGenerator
 
 SDE_SERVER = None
 
-
 class MockRequest(object):
     """ Mock Request object """
     def __init__(self, req, handles):
@@ -26,18 +25,18 @@ class MockRequest(object):
         self.handles = handles
 
         if self.host == SDE_SERVER:
-            self.code, self.msg = MOCK_SDE_RESPONSE.get_response(self.selector, self.data, self.method, self.headers)
+            self.code, self.headers, self.response = MOCK_SDE_RESPONSE.get_response(self.selector, self.data, self.method, self.headers)
         else:
-            self.code, self.msg = MOCK_ALM_RESPONSE.get_response(self.selector, self.data, self.method, self.headers)
-        if isinstance(self.msg, Cookie) and self.handles['cookiehandle']:
-            self.handles['cookiehandle'].cookiejar.set_cookie(self.msg)
-            self.msg = ''
+            self.code, self.headers, self.response = MOCK_ALM_RESPONSE.get_response(self.selector, self.data, self.method, self.headers)
+        if isinstance(self.response, Cookie) and self.handles['cookiehandle']:
+            self.handles['cookiehandle'].cookiejar.set_cookie(self.response)
+            self.response = ''
 
     def read(self):
-        msg = self.msg
-        self.msg = ''
+        response = self.response
+        self.response = ''
 
-        return msg
+        return response
 
     def close(self):
         pass

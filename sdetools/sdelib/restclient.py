@@ -212,7 +212,7 @@ class RESTBase(object):
             pass
         elif auth_mode == 'basic':
             encoded_auth = base64.encodestring('%s:%s' % (self._get_conf('user'), self._get_conf('pass')))[:-1]
-            authheader =  "Basic %s" % (encoded_auth)
+            authheader = "Basic %s" % (encoded_auth)
             req.add_header("Authorization", authheader)
         elif auth_mode == 'session':
             if not self.session_info:
@@ -267,7 +267,6 @@ class RESTBase(object):
                 break
             result += res_buf
         handle.close()
-
         result = self.parse_response(result, dict(handle.headers))
 
         return result

@@ -24,15 +24,16 @@ class TestMingleCase(AlmPluginTestBase, unittest.TestCase):
     def test_mingle_cached_cards(self):
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
+        sde_task_id = self.connector._extract_task_id(test_task['id'])
+        alm_id = test_task['id'].split('T')[1]
+
         self.connector.alm_add_task(test_task)
         cached_cards = self.connector.cached_cards
 
-        self.assertEqual(cached_cards, None)
+        self.assertEqual(cached_cards, {sde_task_id: alm_id})
 
         self.connector._cache_all_sde_mingle_cards()
         cached_cards = self.connector.cached_cards
-        sde_task_id = self.connector._extract_task_id(test_task['id'])
-        alm_id = test_task['id'].split('T')[1]
 
         self.assertNotNone(cached_cards)
         self.assertNotNone(cached_cards.get(sde_task_id))
@@ -42,21 +43,21 @@ class TestMingleCase(AlmPluginTestBase, unittest.TestCase):
     def test_invalid_config_card_type(self):
         self.connector.config['mingle_card_type'] = 'INVALID-CARD-TYPE'
         exception_msg = ("The given mingle card type 'INVALID-CARD-TYPE' is not one of the valid card types: "
-                         "[u'Story', u'Bug']")
+                         "Story, Bug")
 
         self.assert_exception(AlmException, '', exception_msg, self.connector.alm_connect)
 
     def test_invalid_config_new_status(self):
         self.connector.config['mingle_new_status'] = 'BAD_NEW_STATUS'
         exception_msg = ("Invalid mingle_new_status BAD_NEW_STATUS. Expected one of"
-                         " ['New', 'Open', 'Closed']")
+                         " New, Open, Closed")
 
         self.assert_exception(AlmException, '', exception_msg, self.connector.alm_connect)
 
     def test_invalid_config_done_statuses(self):
         self.connector.config['mingle_done_statuses'] = ['BAD_DONE_STATUS_1', 'New']
-        exception_msg = ("Invalid mingle_done_statuses set(['BAD_DONE_STATUS_1']). Expected one of"
-                         " ['New', 'Open', 'Closed']")
+        exception_msg = ("Invalid mingle_done_statuses: BAD_DONE_STATUS_1. Expected one of"
+                         " New, Open, Closed")
 
         self.assert_exception(AlmException, '', exception_msg, self.connector.alm_connect)
 
@@ -69,7 +70,7 @@ class TestMingleCase(AlmPluginTestBase, unittest.TestCase):
         test_task = self.mock_sde_response.generate_sde_task()
         self.connector.alm_add_task(test_task)
         alm_id = int(test_task['id'].split('T')[1])
-        card = self.connector.alm_plugin.call_api('%s/cards/%s.xml' % (self.connector.project_uri, alm_id))
+        headers, card = self.connector.alm_plugin.call_api('%s/cards/%s.xml' % (self.connector.project_uri, alm_id))
 
         self.assertNotNone(card.getElementsByTagName('description'), 'Failed to find the description field')
         description = self.connector._get_value_of_element_with_tag(card, 'description')

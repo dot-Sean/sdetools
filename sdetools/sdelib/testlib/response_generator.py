@@ -11,6 +11,8 @@ from datetime import datetime
 from sdetools.extlib.defusedxml import minidom
 from sdetools.sdelib.commons import get_directory_of_current_module
 
+RESPONSE_HEADERS = [('Server', 'Mock')]
+
 
 class ResponseGenerator(object):
     """Base response generator class, used in unittests"""
@@ -96,13 +98,13 @@ class ResponseGenerator(object):
             if not callable(func):
                 self.raise_error('500', 'Response generator error: Uncallable response method: %s' % func_name)
 
-            response = func(target, flags.get(func_name), data, method)
+            headers, response = func(target, flags.get(func_name), data, method)
             try:
                 response = self.encode_response(response)
             except:
                 # Failed to encode the response, return raw data
                 pass
-            return 200, response
+            return 200, headers, response
         self.raise_error('404')
 
     def raise_error(self, error_code, message=None):
