@@ -187,6 +187,8 @@ class JIRARestAPI(RESTBase):
                 args['fields'][field['field']] = field['value']
             elif field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:select':
                 args['fields'][field['field']] = {'value': field['value']}
+            elif field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:radiobuttons':
+                args['fields'][field['field']] = {'value': field['value']}
             elif field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:multiselect':
                 args['fields'][field['field']] = [{'value': field['value']}]
             elif field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:multicheckboxes':
