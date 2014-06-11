@@ -183,9 +183,13 @@ class JIRARestAPI(RESTBase):
         for field in self.custom_fields:
             if field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:textfield':
                 args['fields'][field['field']] = field['value']
+            if field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:textarea':
+                args['fields'][field['field']] = field['value']
             elif field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:select':
                 args['fields'][field['field']] = {'value': field['value']}
             elif field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:multiselect':
+                args['fields'][field['field']] = [{'value': field['value']}]
+            elif field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:multicheckboxes':
                 args['fields'][field['field']] = [{'value': field['value']}]
 
         try:
