@@ -4,7 +4,7 @@ from sdetools.modules.sync_jira.jira_shared import JIRATask
 
 class JIRARestAPI(RESTBase):
     """ Base plugin for JIRA """
-    # the fields we set at a minimum
+    # the fields we are ready to set, at a minimum
     BASE_FIELDS = ['project', 'summary', 'description', 'issuetype', 'reporter']
 
     def __init__(self, config):
@@ -150,7 +150,7 @@ class JIRARestAPI(RESTBase):
     def add_task(self, task, issue_type_id, project_version):
         affected_versions = []
         if self.config['alm_project_version']:
-            affected_versions.append({'name':self.config['alm_project_version']})
+            affected_versions.append({'name': self.config['alm_project_version']})
 
         #Add task
         args = {
@@ -159,15 +159,17 @@ class JIRARestAPI(RESTBase):
                    'key': self.config['alm_project']
                },
                'summary': task['title'],
-               'description': task['formatted_content'],
                'issuetype': {
                    'id': issue_type_id
                },
-               'reporter': {
-                   'name': self.config['alm_user']
-               }
            }
         }
+        if self.has_field('description'):
+            args['fields']['description'] = task['formatted_content']
+
+        if self.has_field('reporter'):
+            args['fields']['reporter'] = {'name': self.config['alm_user']}
+
         if self.has_field('labels'):
             args['fields']['labels'] = ['SD-Elements']
 
@@ -194,17 +196,24 @@ class JIRARestAPI(RESTBase):
             elif field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:multicheckboxes':
                 args['fields'][field['field']] = [{'value': field['value']}]
 
+        # Create the issue in JIRA
         try:
             issue = self.call_api('issue', method=self.URLRequest.POST, args=args)
-            
+        except APIError, err:
+            raise AlmException('Unable to add issue to JIRA. Reason: %s' % err)
+
+        try:
             # Add a link back to SD Elements
             remote_url = 'issue/%s/remotelink' % issue['key']
             args = {"object": {"url": task['url'], "title": task['title']}}
             self.call_api(remote_url, method=self.URLRequest.POST, args=args)
             
-            return issue
-        except APIError, err:
-            raise AlmException('Unable to add issue to JIRA. Reason: %s' % err)
+        except APIError:
+            # This is not a terrible thing, the user may not have permission
+            # and I don't think we should enforce that they do
+            pass
+
+        return issue
 
     def get_available_transitions(self, task_id):
         trans_url = 'issue/%s/transitions' % task_id
