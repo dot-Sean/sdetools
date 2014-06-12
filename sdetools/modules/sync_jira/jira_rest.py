@@ -5,7 +5,8 @@ from sdetools.modules.sync_jira.jira_shared import JIRATask
 class JIRARestAPI(RESTBase):
     """ Base plugin for JIRA """
     # the fields we are ready to set, at a minimum
-    BASE_FIELDS = ['project', 'summary', 'description', 'issuetype', 'reporter']
+    BASE_FIELDS = ['project', 'summary', 'labels', 'priority', 'versions', 'parent',
+                   'description', 'issuetype', 'reporter']
 
     def __init__(self, config):
         super(JIRARestAPI, self).__init__('alm', 'JIRA', config, 'rest/api/2')
@@ -183,6 +184,9 @@ class JIRARestAPI(RESTBase):
             args['fields']['parent'] = {'key': self.config['alm_parent_issue']}
 
         for field in self.custom_fields:
+            if 'custom' not in field['schema']:
+                continue
+
             if field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:textfield':
                 args['fields'][field['field']] = field['value']
             elif field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:textarea':
