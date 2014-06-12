@@ -5,7 +5,7 @@ from sdetools.modules.sync_jira.jira_shared import JIRATask
 class JIRARestAPI(RESTBase):
     """ Base plugin for JIRA """
     # the fields we are ready to set, at a minimum
-    BASE_FIELDS = ['project', 'summary', 'description', 'issuetype', 'reporter']
+    BASE_FIELDS = ['project', 'summary', 'labels', 'priority', 'description', 'issuetype', 'reporter']
 
     def __init__(self, config):
         super(JIRARestAPI, self).__init__('alm', 'JIRA', config, 'rest/api/2')
