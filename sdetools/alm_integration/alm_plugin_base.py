@@ -277,7 +277,14 @@ class AlmConnector(object):
     def sde_validate_configuration(self):
         """ Validate selected phases, if applicable """
         if not self.config['selected_tasks']:
-            result = self.sde_plugin.get_phases()
+            result = {
+                'phases': [
+                    {'slug': 'requirements'},
+                    {'slug': 'architecture-design'},
+                    {'slug': 'development'},
+                    {'slug': 'testing'},
+                ]
+            }
             if not result:
                 raise AlmException('Unable to retrieve phases from SD Elements')
 
