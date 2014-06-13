@@ -147,9 +147,9 @@ class AlmConnector(object):
                                'in configuration. Valid values are '
                                'alm, sde, or timestamp.')
 
-        if self.config['sde_min_priority']:
+        if self.config['sde_min_priority'] is not None:
             bad_priority_msg = 'Incorrect sde_min_priority specified in configuration. Valid values are > 0 '
-            bad_priority_msg += ' and <= 10'
+            bad_priority_msg += 'and <= 10'
 
             try:
                 self.config['sde_min_priority'] = int(self.config['sde_min_priority'])

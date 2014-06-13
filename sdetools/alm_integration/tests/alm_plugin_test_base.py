@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 from sdetools.sdelib.mod_mgr import ReturnChannel, load_modules
 from sdetools.sdelib.conf_mgr import Config
-from sdetools.sdelib.commons import abc, Error, get_directory_of_current_module
+from sdetools.sdelib.commons import abc, Error, get_directory_of_current_module, UsageError
 from sdetools.sdelib.testlib.mock_response import MOCK_ALM_RESPONSE, MOCK_SDE_RESPONSE
 from sdetools.alm_integration.alm_plugin_base import AlmException
 
@@ -226,6 +226,30 @@ class AlmPluginTestBase(object):
         self.connector.config['alm_phases'] = ['development', 'invalid_phase']
         exception_msg = 'Incorrect alm_phase configuration: invalid_phase is not a valid phase'
         self.assert_exception(AlmException, '', exception_msg, self.connector.synchronize)
+
+    def test_sde_invalid_selected_tasks(self):
+        self.connector.config['selected_tasks'] = ['T123', '123']
+
+        try:
+            self.connector.initialize()
+            raise Exception('Expected an exception to be thrown')
+        except UsageError:
+            pass
+
+    def test_sde_invalid_min_priority(self):
+        self.connector.config['sde_min_priority'] = 'BAD'
+        exception_msg = 'Incorrect sde_min_priority specified in configuration. Valid values are > 0 and <= 10'
+        self.assert_exception(AlmException, '', exception_msg, self.connector.initialize)
+
+    def test_sde_too_small_min_priority(self):
+        self.connector.config['sde_min_priority'] = 0
+        exception_msg = 'Incorrect sde_min_priority specified in configuration. Valid values are > 0 and <= 10'
+        self.assert_exception(AlmException, '', exception_msg, self.connector.initialize)
+
+    def test_sde_too_large_min_priority(self):
+        self.connector.config['sde_min_priority'] = 11
+        exception_msg = 'Incorrect sde_min_priority specified in configuration. Valid values are > 0 and <= 10'
+        self.assert_exception(AlmException, '', exception_msg, self.connector.initialize)
 
     def test_update_existing_task_sde(self):
         # The plugin may initialize variables during alm_connect() so we need
