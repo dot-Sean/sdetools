@@ -1,7 +1,7 @@
 import re
 
 from urllib2 import HTTPError
-from sdetools.sdelib.testlib.response_generator import ResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator, RESPONSE_HEADERS
 from sdetools.extlib.SOAPpy.Types import structType, faultType
 
 
@@ -41,7 +41,7 @@ class JiraResponseGenerator(ResponseGenerator):
         self.generator_add_resource('project', self.PROJECT_ID, project_data)
 
     def jira_soap_service(self, target, flag, data, method):
-        return ''
+        return RESPONSE_HEADERS, ''
 
     def get_proxy_response(self, args):
         """
@@ -57,29 +57,36 @@ class JiraResponseGenerator(ResponseGenerator):
                 self.raise_error('401')
             if method_name == 'getProjectByKey':
                 flag = flags.get('get_projects')
-                return self.get_projects('', flag, None, None)[0]
+                headers, response = self.get_projects('', flag, None, None)
+                return response[0]
             elif method_name == 'getIssueTypes':
                 flag = flags.get('get_issue_types')
-                return self.get_issue_types('', flag, None, None)
+                headers, response = self.get_issue_types('', flag, None, None)
+                return response
             elif method_name == 'login':
                 flag = flags.get('get_auth_token')
-                return self.get_auth_token(flag)
+                headers, response = self.get_auth_token(flag)
+                return response
             elif method_name == 'getStatuses':
                 flag = flags.get('get_statuses')
-                return self.get_statuses(flag)
+                headers, response = self.get_statuses(flag)
+                return response
             elif method_name == 'getPriorities':
                 flag = flags.get('get_priorities')
-                return self.get_priorities(flag)
+                headers, response = self.get_priorities(flag)
+                return response
             elif method_name == 'getVersions':
                 flag = flags.get('get_project_versions')
-                return self.get_project_versions('', flag, None, None)
+                headers, response = self.get_project_versions('', flag, None, None)
+                return response
             elif method_name == 'getFieldsForCreate':
                 flag = flags.get('get_fields_for_create')
-                return self.get_fields_for_create(flag)
+                headers, response = self.get_fields_for_create(flag)
+                return response
             elif method_name == 'getIssuesFromJqlSearch':
                 flag = flags.get('get_issue')
                 task_name = re.sub(r".*summary~", '', args[3])
-                rest_response = self.get_issue('', flag, None, 'GET', task_name)
+                headers, rest_response = self.get_issue('', flag, None, 'GET', task_name)
                 issues = rest_response.get('issues')
 
                 if not issues:
@@ -92,7 +99,8 @@ class JiraResponseGenerator(ResponseGenerator):
                     return [structType(data=issue)]
             elif method_name == 'createIssue':
                 flag = flags.get('post_issue')
-                return self.post_issue('', flag, args[3], 'GET')
+                headers, response = self.post_issue('', flag, args[3], 'GET')
+                return response
             elif method_name == 'updateIssue':
                 flag = flags.get('update_issue') or flags.get('update_version')
                 if not flag:
@@ -101,14 +109,17 @@ class JiraResponseGenerator(ResponseGenerator):
                     self.raise_error('401')
             elif method_name == 'getAvailableActions':
                 flag = flags.get('update_status')
-                return self.update_status(args[3], flag, '{}', 'GET').get('transitions')
+                headers, response = self.update_status(args[3], flag, '{}', 'GET')
+                return response.get('transitions')
             elif method_name == 'progressWorkflowAction':
                 flag = flags.get('update_status')
                 transition_data = {"transition": {"id": args[4]}}
-                return self.update_status(args[3], flag, transition_data, 'POST')
+                headers, response = self.update_status(args[3], flag, transition_data, 'POST')
+                return response
             elif method_name == 'getFieldsForEdit':
                 flag = flags.get('get_fields_for_edit')
-                return self.get_fields_for_edit(flag)
+                headers, response = self.get_fields_for_edit(flag)
+                return response
             else:
                 self.raise_error('404')
         except HTTPError as err:
@@ -127,7 +138,7 @@ class JiraResponseGenerator(ResponseGenerator):
             if task_number:
                 self.generator_update_resource('issue', task_number, {'version': version_name})
 
-                return {
+                return RESPONSE_HEADERS, {
                     "id": "10000",
                     "key": "TEST-24",
                     "self": "http://www.example.com/jira/rest/api/2/issue/10000"
@@ -138,25 +149,25 @@ class JiraResponseGenerator(ResponseGenerator):
 
     def get_fields_for_create(self, flag):
         if not flag:
-            return self.get_json_from_file('createFields')
+            return RESPONSE_HEADERS, self.get_json_from_file('createFields')
         else:
             self.raise_error('401')
 
     def get_fields_for_edit(self, flag):
         if not flag:
-            return self.get_json_from_file('editFields')
+            return RESPONSE_HEADERS, self.get_json_from_file('editFields')
         else:
             self.raise_error('401')
 
     def get_auth_token(self, flag):
         if not flag:
-            return 'authToken12345'
+            return RESPONSE_HEADERS, 'authToken12345'
         else:
             self.raise_error('401')
 
     def get_projects(self, target, flag, data, method):
         if not flag:
-            return self.generator_get_all_resource('project')
+            return RESPONSE_HEADERS, self.generator_get_all_resource('project')
         else:
             self.raise_error('500')
 
@@ -166,8 +177,7 @@ class JiraResponseGenerator(ResponseGenerator):
         if not flag:
             for i in range(1, len(self.JIRA_ISSUE_TYPES) + 1):
                 response.append(self.generate_issue_type(i))
-
-        return response
+        return RESPONSE_HEADERS, response
 
     def get_project_versions(self, target, flag, data, method):
         if not flag:
@@ -177,7 +187,7 @@ class JiraResponseGenerator(ResponseGenerator):
             if self.project_version is not None:
                 response.append(self.generate_project_version())
 
-            return response
+            return RESPONSE_HEADERS, response
         else:
             self.raise_error('404')
 
@@ -186,10 +196,10 @@ class JiraResponseGenerator(ResponseGenerator):
             response = {'expands': 'projects'}
             _project = self.generate_project()
 
-            _project['issuetypes'] = self.get_issue_types(flag=flag)
+            headers, _project['issuetypes'] = self.get_issue_types(flag=flag)
             response['projects'] = [_project]
 
-            return response
+            return RESPONSE_HEADERS, response
         else:
             self.raise_error('403')
 
@@ -214,7 +224,7 @@ class JiraResponseGenerator(ResponseGenerator):
                 response['issues'].append(task)
                 response['total'] = 1
 
-            return response
+            return RESPONSE_HEADERS, response
         else:
             self.raise_error('400')
 
@@ -227,7 +237,7 @@ class JiraResponseGenerator(ResponseGenerator):
                 transitions.append(self.generate_transition(i))
             response['transitions'] = transitions
 
-            return response
+            return RESPONSE_HEADERS, response
         elif not flag and data and method == 'POST':
             transition_id = data['transition']['id']
             task_number = re.search('(?<=%s-)[0-9a-zA-z]+' % self.project_key, target).group(0)
@@ -238,7 +248,7 @@ class JiraResponseGenerator(ResponseGenerator):
             updated_status = {'fields': {'status': self.generate_status(int(transition_id) + 1)}}
             self.generator_update_resource('issue', task_number, updated_status)
 
-            return None
+            return RESPONSE_HEADERS, None
         else:
             self.raise_error(flag)
 
@@ -263,7 +273,7 @@ class JiraResponseGenerator(ResponseGenerator):
 
                 self.generator_add_resource('issue', task_id, data)
 
-                return self.generate_resource_from_template('issue', data)
+                return RESPONSE_HEADERS, self.generate_resource_from_template('issue', data)
         self.raise_error('400', '{"errorMessages":["Missing field"],"errors":{}}')
 
     def post_remote_link(self, target, flag, data, method):
@@ -277,7 +287,7 @@ class JiraResponseGenerator(ResponseGenerator):
                     'self': ('%s/rest/api/issue/%s/remotelink/%s' % (self.base_url, task_id, task_number))
                 }
 
-                return response
+                return RESPONSE_HEADERS, response
             else:
                 self.raise_error('400', '{"errorMessage": [], "errors": {"title": "missing field"}}')
         else:
@@ -290,7 +300,7 @@ class JiraResponseGenerator(ResponseGenerator):
             for i in range(1, len(self.JIRA_STATUS_NAMES)):
                 response.append(self.generate_status(i))
 
-        return response
+        return RESPONSE_HEADERS, response
 
     def get_priorities(self, flag):
         response = []
@@ -298,7 +308,7 @@ class JiraResponseGenerator(ResponseGenerator):
             for i in range(1, len(self.JIRA_PRIORITY_NAMES) + 1):
                 response.append(self.generate_priority(i))
 
-        return response
+        return RESPONSE_HEADERS, response
 
     """
        JSON Generator 

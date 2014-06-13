@@ -3,7 +3,7 @@ import re
 
 from cookielib import Cookie
 from sdetools.sdelib.commons import urlencode_str
-from sdetools.sdelib.testlib.response_generator import ResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator, RESPONSE_HEADERS
 
 
 class HPAlmResponseGenerator(ResponseGenerator):
@@ -44,7 +44,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
                 query, _ = self.get_url_parameters(target)
                 entities = self.generator_get_filtered_resource('requirement-coverage', query)
 
-                return self.generate_collection_entity(entities)
+                return RESPONSE_HEADERS, self.generate_collection_entity(entities)
             elif method == 'POST':
                 if not self.is_data_valid(data, ['test-id', 'requirement-id']):
                     self.raise_error('405')
@@ -58,7 +58,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
                 if not entities:
                     self.generator_add_resource('requirement-coverage', resource_data=data)
 
-                    return self.generate_resource_from_template('requirement-coverage', data)
+                    return RESPONSE_HEADERS, self.generate_resource_from_template('requirement-coverage', data)
                 else:
                     self.raise_error('405', 'Duplicate requirement-coverage for test %s and requirement %s' %
                                      (data.get('test-id'), data.get('requirement-id')))
@@ -70,7 +70,8 @@ class HPAlmResponseGenerator(ResponseGenerator):
             if method == 'GET':
                 query, fields = self.get_url_parameters(target)
 
-                return self.generate_collection_entity(self.generator_get_filtered_resource('test', query))
+                return RESPONSE_HEADERS, self.generate_collection_entity(
+                    self.generator_get_filtered_resource('test', query))
             elif method == 'POST':
                 task_number = self.extract_task_number_from_title(data['name'].replace('-', ':'))
                 data['id'] = task_number
@@ -78,7 +79,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
                 data['last-modified'] = self.get_current_timestamp()
                 self.generator_add_resource('test', task_number, data)
 
-                return self.generate_resource_from_template('test', data)
+                return RESPONSE_HEADERS, self.generate_resource_from_template('test', data)
             else:
                 self.raise_error('403')
         else:
@@ -90,7 +91,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
                 queries, fields = self.get_url_parameters(target)
                 entities = self.generator_get_filtered_resource('test-folder', queries)
 
-                return self.generate_collection_entity(entities)
+                return RESPONSE_HEADERS, self.generate_collection_entity(entities)
             elif method == 'POST':
                 if self.is_data_valid(data, ['parent-id', 'name']):
                     if self.generator_get_filtered_resource('test-folder', {'name': data['name']}):
@@ -99,7 +100,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
                     data['id'] = self.generator_add_resource('test-folder', resource_data=data)
                     self.generator_update_resource('test-folder', data['id'], data)
 
-                    return self.generate_resource_from_template('test-folder', data)
+                    return RESPONSE_HEADERS, self.generate_resource_from_template('test-folder', data)
                 self.raise_error('405')
         else:
             self.raise_error('401')
@@ -109,7 +110,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
             c = Cookie(None, 'LWSSO_COOKIE_KEY', 'cookieValue', '80', '80', 'www.foo.bar', None, None, '/',
                        None, False, False, 'TestCookie', None, None, None)
 
-            return c
+            return RESPONSE_HEADERS, c
         else:
             self.raise_error('401')
 
@@ -117,7 +118,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
         queries, fields = self.get_url_parameters(target)
         entities = self.generator_get_filtered_resource('requirement', queries)
 
-        return self.generate_collection_entity(entities)
+        return RESPONSE_HEADERS, self.generate_collection_entity(entities)
 
     def post_requirements(self, flag, data):
         if not flag:
@@ -130,7 +131,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
 
             self.generator_add_resource('requirement', task_number, resource_data=data)
 
-            return self.generate_resource_from_template('requirement', data)
+            return RESPONSE_HEADERS, self.generate_resource_from_template('requirement', data)
         else:
             self.raise_error('500')
 
@@ -139,6 +140,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
             self.raise_error('405')
 
         self.generator_update_resource('requirement', data['id'], {'status': data['status']})
+        return RESPONSE_HEADERS, None
 
     def call_requirements(self, target, flag, data, method):
         if not flag:
@@ -154,7 +156,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
 
     def get_user(self, target, flag, data, method):
         if not flag:
-            return self.generator_get_all_resource('user')[0]
+            return RESPONSE_HEADERS, self.generator_get_all_resource('user')[0]
         else:
             self.raise_error('401')
 
@@ -162,7 +164,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
         if not flag:
             response = {'types': self.generate_task_types(self.REQUIREMENT_TYPES)}
 
-            return response
+            return RESPONSE_HEADERS, response
         else:
             self.raise_error('401')
 
@@ -170,13 +172,13 @@ class HPAlmResponseGenerator(ResponseGenerator):
         if not flag:
             response = {'types': self.generate_task_types(self.TEST_TYPES)}
 
-            return response
+            return RESPONSE_HEADERS, response
         else:
             self.raise_error('401')
 
     def get_status_types(self, target, flag, data, method):
         if not flag:
-            return {
+            return RESPONSE_HEADERS, {
                 'lists': [
                     {
                         'Items': [
@@ -194,7 +196,7 @@ class HPAlmResponseGenerator(ResponseGenerator):
 
     def logout(self, target, flag, data, method):
         if not flag:
-            return ''
+            return RESPONSE_HEADERS, ''
         else:
             self.raise_error('500')
 

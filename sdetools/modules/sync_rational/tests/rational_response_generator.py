@@ -1,4 +1,4 @@
-from sdetools.sdelib.testlib.response_generator import ResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator, RESPONSE_HEADERS
 
 
 class RationalResponseGenerator(ResponseGenerator):
@@ -59,7 +59,7 @@ class RationalResponseGenerator(ResponseGenerator):
 
     def get_rootservices(self, target, flag, data, method):
         if not flag:
-            return self.generator_get_all_resource('rootservices')[0]
+            return RESPONSE_HEADERS, self.generator_get_all_resource('rootservices')[0]
         else:
             self.raise_error('404')
 
@@ -67,38 +67,38 @@ class RationalResponseGenerator(ResponseGenerator):
         if not flag:
             catalog = self.generator_get_all_resource('catalog')[0]
             catalog['oslc:serviceProvider'][0]['dcterms:title'] = self.alm_project
-            return catalog
+            return RESPONSE_HEADERS, catalog
         else:
             self.raise_error('404')
 
     def get_services(self, target, flag, data, method):
         if not flag:
-            return self.generator_get_all_resource('services')[0]
+            return RESPONSE_HEADERS, self.generator_get_all_resource('services')[0]
         else:
             self.raise_error('404')
 
     def get_resourceshape(self, target, flag, data, method):
         if not flag:
-            return self.generator_get_all_resource('resourceshape')[0]
+            return RESPONSE_HEADERS, self.generator_get_all_resource('resourceshape')[0]
         else:
             self.raise_error('404')
 
     def get_priorities(self, target, flag, data, method):
         if not flag:
-            return self.generator_get_all_resource('priorities')[0]
+            return RESPONSE_HEADERS, self.generator_get_all_resource('priorities')[0]
         else:
             self.raise_error('404')
 
     def get_count(self, target, flag, data, method):
         if not flag:
-            return self.generator_get_all_resource('count')[0]
+            return RESPONSE_HEADERS, self.generator_get_all_resource('count')[0]
         else:
             self.raise_error('404')
 
     def get_workitem(self, target, flag, data, method):
         if not flag:
             res = self.generator_get_all_resource('workitem')[0]
-            return res
+            return RESPONSE_HEADERS, res
         else:
             self.raise_error('404')
 
@@ -108,6 +108,6 @@ class RationalResponseGenerator(ResponseGenerator):
             for x in data:
                 res[x] = data[x]
             self.generator_update_resource('workitem', '0', update_args=res)
-            return res
+            return RESPONSE_HEADERS, res
         else:
             self.raise_error('404')

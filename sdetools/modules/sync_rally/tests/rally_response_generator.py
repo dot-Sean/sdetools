@@ -1,6 +1,6 @@
 import re
 
-from sdetools.sdelib.testlib.response_generator import ResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator, RESPONSE_HEADERS
 
 
 class RallyResponseGenerator(ResponseGenerator):
@@ -29,7 +29,7 @@ class RallyResponseGenerator(ResponseGenerator):
                 definition_id = re.search('[0-9]+(?=\.js$)', target).group(0)
 
                 if definition_id == '14409160065':
-                    return self.get_json_from_file('hierarchical_requirement_definition')
+                    return RESPONSE_HEADERS, self.get_json_from_file('hierarchical_requirement_definition')
                 else:
                     self.raise_error('404')
             self.raise_error('405')
@@ -51,32 +51,32 @@ class RallyResponseGenerator(ResponseGenerator):
                         response['QueryResult']['TotalResultCount'] = 1
                         response['QueryResult']['Results'].append(result)
 
-                return response
+                return RESPONSE_HEADERS, response
             self.raise_error('405')
         else:
             self.raise_error('401')
 
     def get_tags(self, target, flag, data, method):
         if not flag:
-            return self.get_json_from_file('tags')
+            return RESPONSE_HEADERS, self.get_json_from_file('tags')
         else:
             self.raise_error('401')
 
     def get_tasks(self, target, flag, data, method):
         if not flag:
-            return self.get_json_from_file('task')
+            return RESPONSE_HEADERS, self.get_json_from_file('task')
         else:
             self.raise_error('401')
 
     def get_subscription(self, target, flag, data, method):
         if not flag:
-            return self.get_json_from_file('subscription')
+            return RESPONSE_HEADERS, self.get_json_from_file('subscription')
         else:
             self.raise_error('401')
 
     def get_project(self, target, flag, data, method):
         if not flag:
-            return self.get_json_from_file('project')
+            return RESPONSE_HEADERS, self.get_json_from_file('project')
         else:
             self.raise_error('401')
 
@@ -96,7 +96,7 @@ class RallyResponseGenerator(ResponseGenerator):
                 requirements['QueryResult']['TotalResultCount'] = 0
                 requirements['QueryResult']['Results'] = []
 
-            return requirements
+            return RESPONSE_HEADERS, requirements
         else:
             self.raise_error('401')
 
@@ -111,12 +111,12 @@ class RallyResponseGenerator(ResponseGenerator):
                 new_ref = re.sub('[0-9]+(?=\.js$)', task_number, task['HierarchicalRequirement']['_ref'])
                 task['HierarchicalRequirement']['_ref'] = new_ref
 
-                return task
+                return RESPONSE_HEADERS, task
             elif method == 'POST':
                 task['HierarchicalRequirement'].update(data['HierarchicalRequirement'])
                 self.generator_update_resource('card', task_number, task)
 
-                return data
+                return RESPONSE_HEADERS, data
         else:
             self.raise_error('404')
 
@@ -130,7 +130,7 @@ class RallyResponseGenerator(ResponseGenerator):
                 data_h_reqs['_refObjectName'] = data_h_reqs['Name']
                 self.generator_add_resource('card', task_number, data)
 
-                return self.get_json_from_file('create_result')
+                return RESPONSE_HEADERS, self.get_json_from_file('create_result')
             else:
                 self.raise_error('405')
         else:
