@@ -104,6 +104,9 @@ class JIRAConnector(AlmConnector):
     def alm_validate_configurations(self):
         pass
 
+    def alm_supports_delete(self):
+        return True
+
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])
 
@@ -133,6 +136,11 @@ class JIRAConnector(AlmConnector):
 
         #Return a unique identifier to this task in JIRA
         return 'Issue %s, URL: %s' % (new_issue['key'], url)
+
+    def alm_remove_task(self, task):
+
+        self.alm_plugin.remove_task(task)
+        logger.info('Removed task in JIRA: %s' % task.get_task_id())
 
     def alm_update_task_status(self, task, status):
         if not task or not self.config['alm_standard_workflow']:

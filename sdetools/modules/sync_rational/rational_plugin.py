@@ -200,6 +200,12 @@ class RationalConnector(AlmConnector):
             if cookie.name == 'JSESSIONID':
                 self.COOKIE_JSESSIONID = cookie.value
 
+    def alm_remove_task(self, task):
+        return
+
+    def alm_supports_delete(self):
+        return False
+
     def alm_connect_server(self):
         """Check if user can successfully authenticate and retrieve service catalog"""
 

@@ -83,6 +83,7 @@ class GitHubTask(AlmTask):
         self.timestamp = timestamp
         self.priority = None
 
+
     def get_task_id(self):
         return self.task_id
 
@@ -140,6 +141,12 @@ class GitHubConnector(AlmConnector):
         if not self.config[self.ALM_PRIORITY_MAP]:
             self.config[self.ALM_PRIORITY_MAP] = GITHUB_DEFAULT_PRIORITY_MAP
         self._validate_alm_priority_map()
+
+    def alm_remove_task(self, task):
+        return
+
+    def alm_supports_delete(self):
+        return False
 
     def alm_connect_server(self):
         """ Verifies that GitHub connection works """

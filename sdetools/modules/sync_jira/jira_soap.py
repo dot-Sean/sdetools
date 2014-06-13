@@ -262,6 +262,12 @@ class JIRASoapAPI:
             raise AlmException('Unable to add issue to JIRA. Reason: %s' % (err.faultstring))
         return ref
 
+    def remove_task(self, task):
+        try:
+            self.proxy.deleteIssue(self.auth, task.get_alm_id())
+        except SOAPpy.Types.faultType, err:
+            raise AlmException("Unable to delete task %s. Reason: %s" % (task.get_task_id(), err))
+
     def get_available_transitions(self, task_id):
         try:
             transitions = self.proxy.getAvailableActions(self.auth, task_id)

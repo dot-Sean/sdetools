@@ -26,7 +26,7 @@ class JiraResponseGenerator(ResponseGenerator):
             '/rest/api/2/search\?jql=project%%3D\'%s\'%%20AND%%20summary~.*' % self.project_key: 'get_issue',
             '/rest/api/2/issue/%s-\S.*/remotelink$' % self.project_key: 'post_remote_link',
             '/rest/api/2/issue$': 'post_issue',
-            '/rest/api/2/issue/%s-[0-9]*$' % self.project_key: 'update_version',
+            '/rest/api/2/issue/%s-[0-9]*$' % self.project_key: 'update_issue',
             '/rest/api/2/issue/%s-\S.*/transitions$' % self.project_key: 'update_status',
             'https://jira-server:5000/rpc/soap/jirasoapservice-v2': 'jira_soap_service'
         }
@@ -107,6 +107,12 @@ class JiraResponseGenerator(ResponseGenerator):
                     pass
                 else:
                     self.raise_error('401')
+            elif method_name == 'deleteIssue':
+                flag = flags.get('delete_issue') or flags.get('delete_issue')
+                if not flag:
+                    pass
+                else:
+                    self.raise_error('401')
             elif method_name == 'getAvailableActions':
                 flag = flags.get('update_status')
                 headers, response = self.update_status(args[3], flag, '{}', 'GET')
@@ -129,20 +135,24 @@ class JiraResponseGenerator(ResponseGenerator):
     """
        Response functions 
     """
-    def update_version(self, target, flag, data, method):
+    def update_issue(self, target, flag, data, method):
         if not flag:
             task_id = target.split('/')[5]
-            version_name = data['update']['versions'][0]['add']['name']
             task_number = task_id.split('-')[1]
 
             if task_number:
-                self.generator_update_resource('issue', task_number, {'version': version_name})
+                if method == 'POST':
+                    version_name = data['update']['versions'][0]['add']['name']
+                    self.generator_update_resource('issue', task_number, {'version': version_name})
 
-                return RESPONSE_HEADERS, {
-                    "id": "10000",
-                    "key": "TEST-24",
-                    "self": "http://www.example.com/jira/rest/api/2/issue/10000"
-                }
+                    return RESPONSE_HEADERS, {
+                        "id": "10000",
+                        "key": "TEST-24",
+                        "self": "http://www.example.com/jira/rest/api/2/issue/10000"
+                    }
+                elif method == 'DELETE':
+                    return RESPONSE_HEADERS, ''
+
             self.raise_error('500')
         else:
             self.raise_error('400')

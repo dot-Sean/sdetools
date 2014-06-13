@@ -32,6 +32,7 @@ class TracXMLRPCAPI(RESTBase):
             self.post_conf_init()
             self.proxy = xmlrpclib.ServerProxy(self.base_uri)
 
+
 class TracTask(AlmTask):
     """ Representation of a task in Trac"""
 
@@ -109,6 +110,11 @@ class TracConnector(AlmConnector):
                 raise UsageError('Invalid action argument: %s' % repr(action_args))
             self.config[action_type] = (action_to_take, action_args)
             
+    def alm_remove_task(self, task):
+        return
+
+    def alm_supports_delete(self):
+        return False
 
     def alm_connect_server(self):
         """ Perform initial connect and verify that Trac connection works """
