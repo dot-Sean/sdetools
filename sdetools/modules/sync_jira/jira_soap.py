@@ -11,6 +11,7 @@ from sdetools.modules.sync_jira.jira_shared import JIRATask
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
+
 class SOAPProxyWrap:
     """
     This is a wrapper for proxy calls so that we don't repeat the exception handling code everywhere
@@ -43,6 +44,9 @@ class JIRASoapAPI:
         self.priorities = None
         self.auth = None
         self.versions = None
+        self.custom_fields = []
+        self.fields = []
+        self.proxy = None
 
     def connect_server(self):
         config = SOAPpy.Config
@@ -149,14 +153,11 @@ class JIRASoapAPI:
 
     def get_version(self, version_name):
         for v in self.versions:
-            if v['name']==version_name:
+            if v['name'] == version_name:
                 return v
         return None
          
     def setup_fields(self, jira_issue_type_id):
-
-        self.custom_fields = []
-        self.fields = []
 
         create_fields = []
 
@@ -172,8 +173,8 @@ class JIRASoapAPI:
                                    fault))
 
         if create_fields:
-            for f in create_fields:
-                self.fields.append({'name':f['name'], 'id':f['id']})
+            for field in create_fields:
+                self.fields.append({'name': field['name'], 'id': field['id']})
 
         if self.config['alm_custom_fields'] and self.config['jira_existing_issue']:
             try:
@@ -184,7 +185,7 @@ class JIRASoapAPI:
 
             for key in self.config['alm_custom_fields']:
                 for field in issue_fields:
-                    if (key == field['name']):
+                    if key == field['name']:
                         self.custom_fields.append({'field': field['id'],'value':self.config['alm_custom_fields'][key]})
 
             if len(self.custom_fields) != len(self.config['alm_custom_fields']):
@@ -193,10 +194,10 @@ class JIRASoapAPI:
     def has_field(self, field_name):
         # We assume all fields are fair game for Jira versions prior to 4.4 (see comment in 'setup_fields' above)
         if not self.fields:
-             return True
+            return True
              
         for field in self.fields:
-            if (field_name == field['id']):
+            if field_name == field['id']:
                 return True
                 
         return False
@@ -213,7 +214,7 @@ class JIRASoapAPI:
         return affected_versions
 
     def set_version(self, task, project_version):
-        update = [{'id':'versions', 'values':self.get_affected_versions(task)}]
+        update = [{'id': 'versions', 'values': self.get_affected_versions(task)}]
         try:
             self.proxy.updateIssue(self.auth, task.get_alm_id(), update)
         except (SOAPpy.Types.faultType, AlmException):

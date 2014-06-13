@@ -134,7 +134,7 @@ class MingleConnector(AlmConnector):
 
         if self.config['mingle_card_type'] not in types:
             raise AlmException("The given mingle card type '%s' is not one of the valid card types: %s" %
-                               (self.config['mingle_card_type'], types))
+                               (self.config['mingle_card_type'], ', '.join(types)))
 
         # Check if new and done statuses are valid
         try:
@@ -157,11 +157,11 @@ class MingleConnector(AlmConnector):
 
                 if self.config['mingle_new_status'] not in statuses:
                     raise AlmException('Invalid mingle_new_status %s. Expected one of %s' %
-                                       (self.config['mingle_new_status'], statuses))
+                                       (self.config['mingle_new_status'], ', '.join(statuses)))
 
                 difference_set = set(self.config['mingle_done_statuses']).difference(statuses)
                 if difference_set:
-                    raise AlmException('Invalid mingle_done_statuses: %s. Expected one of: %s' %
+                    raise AlmException('Invalid mingle_done_statuses: %s. Expected one of %s' %
                                       (', '.join(difference_set), ', '.join(statuses)))
 
                 return
@@ -197,7 +197,7 @@ class MingleConnector(AlmConnector):
                     self.cached_cards[_task_id.group(1)] = card_num
 
     def _alm_get_task_by_task_id(self, task_id):
-        if self.cached_cards is None:
+        if not self.cached_cards:
             self._cache_all_sde_mingle_cards()
 
         card_num = self.cached_cards.get(task_id)
@@ -266,6 +266,8 @@ class MingleConnector(AlmConnector):
         # Mingle stores the new card URL in the location header
         card_re = re.search('%s/cards/(\d+).xml' % self.project_uri, headers['location'])
         if card_re:
+            if not self.cached_cards:
+                self.cached_cards = {}
             self.cached_cards[task_id] = card_re.group(1)
         else:
             raise AlmException('Alm task not added successfully for %s: could not find card number' % task['id'])

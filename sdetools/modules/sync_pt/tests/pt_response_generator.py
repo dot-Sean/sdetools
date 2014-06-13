@@ -1,7 +1,7 @@
 import re
 import random
 
-from sdetools.sdelib.testlib.response_generator import ResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator, RESPONSE_HEADERS
 from sdetools.sdelib.commons import urlencode_str
 
 
@@ -47,13 +47,13 @@ class PivotalTrackerResponseGenerator(ResponseGenerator):
     """
     def get_user(self, target, flag, data, method):
         if not flag:
-            return self.generator_get_resource('me', self.project_id)
+            return RESPONSE_HEADERS, self.generator_get_resource('me', self.project_id)
         else:
             self.raise_error('401')
 
     def get_projects(self, target, flag, data, method):
         if not flag:
-            return self.generator_get_all_resource('project')
+            return RESPONSE_HEADERS, self.generator_get_all_resource('project')
         else:
             self.raise_error('401')
 
@@ -65,7 +65,7 @@ class PivotalTrackerResponseGenerator(ResponseGenerator):
 
             story_id = re.search('(?<=T)[0-9]+(?=:)', params['filter'][0]).group(0)
 
-            return self.generator_get_filtered_resource('story', {'id': story_id})
+            return RESPONSE_HEADERS, self.generator_get_filtered_resource('story', {'id': story_id})
         else:
             self.raise_error('401')
 
@@ -73,7 +73,9 @@ class PivotalTrackerResponseGenerator(ResponseGenerator):
         if not flag:
             release_marker_name = re.search('(?<=type:release,).*(?=&fields)', target).group(0)
 
-            return self.generator_get_filtered_resource('story', {'story_type': 'release', 'name': release_marker_name})
+            return RESPONSE_HEADERS, self.generator_get_filtered_resource('story', {
+                'story_type': 'release', 'name': release_marker_name
+            })
         else:
             self.raise_error('401')
 
@@ -81,7 +83,7 @@ class PivotalTrackerResponseGenerator(ResponseGenerator):
         if not flag:
             epic_name = re.search('(?<=filter=).*(?=&fields)', target).group(0)
 
-            return self.generator_get_filtered_resource('epic', {'name': epic_name})
+            return RESPONSE_HEADERS, self.generator_get_filtered_resource('epic', {'name': epic_name})
         else:
             self.raise_error('401')
 
@@ -95,7 +97,7 @@ class PivotalTrackerResponseGenerator(ResponseGenerator):
                 resource_data['id'] = random.randint(1, 999999999)
                 self.generator_add_resource('epic', resource_data['id'], resource_data)
 
-                return self.generate_resource_from_template('epic', resource_data)
+                return RESPONSE_HEADERS, self.generate_resource_from_template('epic', resource_data)
             else:
                 self.raise_error('500', 'Epic %s already exists!' % data['name'])
         else:
@@ -112,7 +114,7 @@ class PivotalTrackerResponseGenerator(ResponseGenerator):
                 data['project_id'] = self.project_id
                 self.generator_add_resource('story', story_id, data)
 
-                return self.generate_resource_from_template('story', data)
+                return RESPONSE_HEADERS, self.generate_resource_from_template('story', data)
             else:
                 self.raise_error('500', 'Story %s already exists!' % data['name'])
         else:
@@ -131,7 +133,7 @@ class PivotalTrackerResponseGenerator(ResponseGenerator):
                 self.generator_update_resource('story', story_id, {'current_state': data['current_state']})
                 task['current'] = data['current_state']
 
-                return task
+                return RESPONSE_HEADERS, task
             self.raise_error('404')
         else:
             self.raise_error('401')
