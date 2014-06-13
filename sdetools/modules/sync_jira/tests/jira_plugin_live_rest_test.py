@@ -11,3 +11,7 @@ class TestJIRARestLiveCase(AlmPluginLiveTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(self):
         super(TestJIRARestLiveCase, self).setUpClass(JIRAConnector, JIRARestAPI)
+
+    def setUp(self):
+        super(TestJIRARestLiveCase, self).setUp()
+        self.connector.config.jira_api_ver = 5

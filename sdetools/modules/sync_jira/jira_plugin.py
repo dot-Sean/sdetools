@@ -40,6 +40,11 @@ class JIRAConnector(AlmConnector):
         config.opts.add('alm_priority_map', 'Customized map from priority in SDE to JIRA '
                 '(JSON encoded dictionary of strings)',
                 default='')
+        self.jira_issue_type_id = None
+        self.project_version = None
+        self.transition_id = {
+            'close': None,
+            'reopen': None}
 
     def initialize(self):
         super(JIRAConnector, self).initialize()
@@ -66,10 +71,6 @@ class JIRAConnector(AlmConnector):
         if self.config['alm_custom_fields'] and self.config.jira_api_ver == 4 and not self.config['jira_existing_issue']:
             raise AlmException('Unable to process alm_custom_fields. '
                     'Reason: jira_existing_issue must be specified')
-        
-        self.transition_id = {
-            'close': None,
-            'reopen': None}
 
     def _get_issue_url(self, issue_key):
         return self.config['alm_method'] + '://' + self.config['alm_server'] + '/browse/' + issue_key
@@ -85,7 +86,7 @@ class JIRAConnector(AlmConnector):
         
         self.jira_issue_type_id = None
         for issue_type in issue_types:
-            if (issue_type['name'] == self.config['jira_issue_type']):
+            if issue_type['name'] == self.config['jira_issue_type']:
                 self.jira_issue_type_id = issue_type['id']
                 break
         if self.jira_issue_type_id is None:

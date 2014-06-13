@@ -331,7 +331,7 @@ class Config(object):
         try:
             (opts, args) = self.parser.parse_args()
         except:
-            if (str(sys.exc_info()[1]) == '0'):
+            if str(sys.exc_info()[1]) == '0':
                 # This happens when -h is used
                 sys.exit(0)
             else:
@@ -344,7 +344,7 @@ class Config(object):
 
         ret_stat, ret_val = self.parse_config_file(self['conf_file'])
         if not ret_stat:
-            raise UsageError("Unable to read or process configuration file.\n Reason: %s" % (ret_val))
+            raise UsageError("Unable to read or process configuration file.\n Reason: %s" % ret_val)
 
         # No more errors, lets apply the changes
         if opts.quiet:
