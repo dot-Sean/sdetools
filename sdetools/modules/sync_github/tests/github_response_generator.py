@@ -1,4 +1,4 @@
-from sdetools.sdelib.testlib.response_generator import ResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator, RESPONSE_HEADERS
 from sdetools.sdelib.commons import urlencode_str
 
 
@@ -28,13 +28,13 @@ class GitHubResponseGenerator(ResponseGenerator):
         if message is None:
             if error_code == '401':
                 message = {
-                    "message":"Requires authentication",
-                    "documentation_url":"http://developer.github.com/v3"
+                    "message": "Requires authentication",
+                    "documentation_url": "http://developer.github.com/v3"
                 }
             elif error_code == '404':
                 message = {
-                    "message":"Not found",
-                    "documentation_url":"http://developer.github.com/v3"
+                    "message": "Not found",
+                    "documentation_url": "http://developer.github.com/v3"
                 }
             elif error_code == '422':
                 message = {
@@ -56,28 +56,28 @@ class GitHubResponseGenerator(ResponseGenerator):
     """
     def get_user(self, target, flag, data, method):
         if not flag:
-            return self.generator_get_all_resource('user')[0]
+            return RESPONSE_HEADERS, self.generator_get_all_resource('user')[0]
         else:
             self.raise_error('401')
 
     def get_repo(self, target, flag, data, method):
         if not flag:
-            return self.generator_get_all_resource('repo')[0]
+            return RESPONSE_HEADERS, self.generator_get_all_resource('repo')[0]
         elif flag == 'private-false':
             repo = self.generator_get_all_resource('repo')[0]
             repo['private'] = False
 
-            return repo
+            return RESPONSE_HEADERS, repo
         else:
             self.raise_error('404')
 
     def get_milestones(self, target, flag, data, method):
         if not flag:
-            return self.generator_get_all_resource('milestone')
+            return RESPONSE_HEADERS, self.generator_get_all_resource('milestone')
         elif flag == '401':
             self.raise_error('401')
         else:
-            return []
+            return RESPONSE_HEADERS, []
 
     def get_issue(self, target, flag, data, method):
         if flag:
@@ -87,7 +87,9 @@ class GitHubResponseGenerator(ResponseGenerator):
         state = params[-2]
         task_number = self.extract_task_number_from_title(params[-1])
 
-        return {"issues": self.generator_get_filtered_resource('issue', {'number': task_number, 'state': state})}
+        return RESPONSE_HEADERS, {
+            "issues": self.generator_get_filtered_resource('issue', {'number': task_number, 'state': state})
+        }
 
     def post_issue(self, target, flag, data, method):
         if not flag:
@@ -97,7 +99,7 @@ class GitHubResponseGenerator(ResponseGenerator):
             data['id'] = task_number
             self.generator_add_resource('issue', task_number, data)
 
-            return self.generate_resource_from_template('issue', data)
+            return RESPONSE_HEADERS, self.generate_resource_from_template('issue', data)
         elif flag == '422':
             self.raise_error('422')
         else:
@@ -110,7 +112,7 @@ class GitHubResponseGenerator(ResponseGenerator):
             if self.generator_resource_exists('issue', task_number) and self.is_data_valid(data, ['state']):
                 self.generator_update_resource('issue', task_number, {'state': data['state']})
 
-                return self.generator_get_resource('issue', task_number)
+                return RESPONSE_HEADERS, self.generator_get_resource('issue', task_number)
             else:
                 self.raise_error('404')
         else:

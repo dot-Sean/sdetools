@@ -1,7 +1,7 @@
 from urllib2 import HTTPError
 from xmlrpclib import Fault
 
-from sdetools.sdelib.testlib.response_generator import ResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator, RESPONSE_HEADERS
 
 
 class TracResponseGenerator(ResponseGenerator):
@@ -44,7 +44,7 @@ class TracResponseGenerator(ResponseGenerator):
         if len(args) > 2:
             data = args[2:]
 
-        success_code, response = super(TracResponseGenerator, self).get_response(target, flags, data, None)
+        success_code, headers, response = super(TracResponseGenerator, self).get_response(target, flags, data, None)
 
         return response
 
@@ -53,14 +53,14 @@ class TracResponseGenerator(ResponseGenerator):
     """
     def get_api_version(self, target, flag, data, method):
         if not flag:
-            return [0, 1, 0]
+            return RESPONSE_HEADERS, [0, 1, 0]
         else:
             self.raise_error('404')
 
     def get_ticket_by_id(self, target, flag, data, method):
         if not flag:
             if data:
-                return self.generator_get_resource('ticket', data[0])
+                return RESPONSE_HEADERS, self.generator_get_resource('ticket', data[0])
             self.raise_error('405')
         else:
             self.raise_error('401')
@@ -72,8 +72,8 @@ class TracResponseGenerator(ResponseGenerator):
                 task = self.generator_get_resource('ticket', task_number)
 
                 if task:
-                    return task
-                return []
+                    return RESPONSE_HEADERS, task
+                return RESPONSE_HEADERS, []
 
             self.raise_error('405')
         else:
@@ -92,7 +92,7 @@ class TracResponseGenerator(ResponseGenerator):
                         'milestone': None,
                         'status': data[2]['status']
                     })
-                    return task_number
+                    return RESPONSE_HEADERS, task_number
 
             self.raise_error('405')
         else:
@@ -118,7 +118,7 @@ class TracResponseGenerator(ResponseGenerator):
                     if update_values:
                         self.generator_update_resource('ticket', task_number, update_values)
 
-                    return self.generator_get_resource('ticket', task_number)
+                    return RESPONSE_HEADERS, self.generator_get_resource('ticket', task_number)
                 else:
                     self.raise_error('405')
         else:
@@ -133,7 +133,7 @@ class TracResponseGenerator(ResponseGenerator):
                     for transition in self.ACTIONS:
                         action_set.append([transition, 'Label', 'Hints', ['Name', 'Value']])
 
-                return action_set
+                return RESPONSE_HEADERS, action_set
             else:
                 self.raise_error('405')
         else:

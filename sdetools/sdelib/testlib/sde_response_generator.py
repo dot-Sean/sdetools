@@ -1,7 +1,7 @@
 import re
 import random
 
-from sdetools.sdelib.testlib.response_generator import ResponseGenerator
+from sdetools.sdelib.testlib.response_generator import ResponseGenerator, RESPONSE_HEADERS
 
 
 class SdeResponseGenerator(ResponseGenerator):
@@ -66,7 +66,7 @@ class SdeResponseGenerator(ResponseGenerator):
                     phases = self.generator_get_filtered_resource('phases', params)
                 else:
                     phases = self.generator_get_all_resource('phases')
-                return phases[0]
+                return RESPONSE_HEADERS, phases[0]
             else:
                 self.raise_error('400')
         else:
@@ -81,12 +81,12 @@ class SdeResponseGenerator(ResponseGenerator):
                 else:
                     applications = self.generator_get_all_resource('application')
 
-                return {'applications': applications}
+                return RESPONSE_HEADERS, {'applications': applications}
             elif method == 'POST':
                 if data:
                     self.generator_add_resource('application', resource_data=data)
 
-                    return ''
+                    return RESPONSE_HEADERS, ''
             self.raise_error('405')
         else:
             self.raise_error('401')
@@ -95,7 +95,7 @@ class SdeResponseGenerator(ResponseGenerator):
         if not flag:
             projects = self.generator_get_filtered_resource('project', self.get_url_parameters(target))
 
-            return {'projects': projects}
+            return RESPONSE_HEADERS, {'projects': projects}
         else:
             self.raise_error('401')
 
@@ -104,7 +104,7 @@ class SdeResponseGenerator(ResponseGenerator):
             params = self.get_url_parameters(target)
 
             if params.get('project'):
-                return {'tasks': self.generator_get_filtered_resource('task', params)}
+                return RESPONSE_HEADERS, {'tasks': self.generator_get_filtered_resource('task', params)}
             self.raise_error('500', {"error": "A GET request on the Tasks resource must be filtered by project."})
         else:
             self.raise_error('401')
@@ -127,7 +127,7 @@ class SdeResponseGenerator(ResponseGenerator):
             else:
                 self.raise_error('400', {'error': 'Bad Request'})
 
-            return self.generator_get_resource('task', task_number)
+            return RESPONSE_HEADERS, self.generator_get_resource('task', task_number)
         else:
             self.raise_error('401')
 
@@ -140,9 +140,9 @@ class SdeResponseGenerator(ResponseGenerator):
                 note_type = ''
 
             if method == 'GET':
-                return self._get_tasknotes(flag, self.get_url_parameters(target), note_type)
+                return RESPONSE_HEADERS, self._get_tasknotes(flag, self.get_url_parameters(target), note_type)
             elif method == 'POST':
-                return self._post_tasknote(flag, data, note_type)
+                return RESPONSE_HEADERS, self._post_tasknote(flag, data, note_type)
         self.raise_error('401')
 
     def _get_tasknotes(self, flag, data, note_type):
@@ -198,7 +198,7 @@ class SdeResponseGenerator(ResponseGenerator):
                 if self.is_data_valid(data, ['analysis_type']) and data['analysis_type'] in self.analysis_tools:
                     self.generator_add_resource('project_analysis_note', resource_data=data)
 
-                    return self.generate_resource_from_template('project_analysis_note', data)
+                    return RESPONSE_HEADERS, self.generate_resource_from_template('project_analysis_note', data)
             self.raise_error('500')
         else:
             self.raise_error('401')
