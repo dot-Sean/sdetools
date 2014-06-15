@@ -104,12 +104,6 @@ class MingleConnector(AlmConnector):
 
         self.mark_down_converter = markdown.Markdown(safe_mode="escape")
 
-    def alm_remove_task(self, task):
-        return
-
-    def alm_supports_delete(self):
-        return False
-
     def alm_connect_server(self):
         try:
             self.alm_plugin.call_api('projects.xml')

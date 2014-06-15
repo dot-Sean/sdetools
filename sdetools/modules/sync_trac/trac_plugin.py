@@ -110,11 +110,6 @@ class TracConnector(AlmConnector):
                 raise UsageError('Invalid action argument: %s' % repr(action_args))
             self.config[action_type] = (action_to_take, action_args)
             
-    def alm_remove_task(self, task):
-        return
-
-    def alm_supports_delete(self):
-        return False
 
     def alm_connect_server(self):
         """ Perform initial connect and verify that Trac connection works """

@@ -244,22 +244,10 @@ class AlmConnector(object):
         """
         pass
 
-    @abstractmethod
     def alm_supports_delete(self):
-        """ Returns True if Task Delete is supported
+        """ Returns True if Task Delete is supported by the ALM
         """
-        return False
-
-    @abstractmethod
-    def alm_remove_task(self, task):
-        """ Remove ALM task from the ALM tool.
-
-        Raises an AlmException on encountering an error.
-
-        Keyword arguments:
-        task  -- An ALM task
-        """
-        pass
+        return hasattr(self, "alm_remove_task")
 
     @abstractmethod
     def alm_update_task_status(self, task, status):

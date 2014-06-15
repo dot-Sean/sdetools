@@ -168,12 +168,6 @@ class RallyConnector(AlmConnector):
             alm_task.alm_task_ref[alm_task.get_alm_task_ref().rfind('/'):alm_task.get_alm_task_ref().rfind('.')],
         )
 
-    def alm_remove_task(self, task):
-        return
-
-    def alm_supports_delete(self):
-        return False
-
     def alm_connect_server(self):
         """ Verifies that Rally connection works """
         #Check to make sure that we can do a simple API call

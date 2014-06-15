@@ -142,12 +142,6 @@ class GitHubConnector(AlmConnector):
             self.config[self.ALM_PRIORITY_MAP] = GITHUB_DEFAULT_PRIORITY_MAP
         self._validate_alm_priority_map()
 
-    def alm_remove_task(self, task):
-        return
-
-    def alm_supports_delete(self):
-        return False
-
     def alm_connect_server(self):
         """ Verifies that GitHub connection works """
         # Check if user can successfully authenticate and retrieve user profile

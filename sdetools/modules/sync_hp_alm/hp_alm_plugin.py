@@ -140,12 +140,6 @@ class HPAlmConnector(AlmConnector):
         #We will map requirements its associated tests based on the problem id
         self.requirement_to_test_mapping = {}
 
-    def alm_remove_task(self, task):
-        return
-
-    def alm_supports_delete(self):
-        return False
-
     def prune_tasks(self, tasks):
         """ We want to organize the tasks in a way such that we sync all non-test tasks first,
         then sync the test tasks. This allows us to create requirement coverages when we sync the
