@@ -38,7 +38,7 @@ class AlmTask(object):
 
     @abstractmethod
     def get_task_id(self):
-        """ Returns an ID string compatiable with SD Elements """
+        """ Returns an ID string compatible with SD Elements """
         pass
 
     @abstractmethod
@@ -78,6 +78,7 @@ class AlmConnector(object):
         alm_plugin -- A plugin to connect to the ALM tool
         """
         self.config = config
+        self.ignored_tasks = []
         self.sde_plugin = PlugInExperience(self.config)
         self.alm_plugin = alm_plugin
         self._add_alm_config_options()
@@ -102,6 +103,8 @@ class AlmConnector(object):
                 default='')
         self.config.opts.add('conflict_policy', 'Conflict policy to use',
                 default='alm')
+        self.config.opts.add('start_fresh', 'Delete any existing issues in the ALM',
+                default='False')
         self.config.opts.add('show_progress', 'Show progress',
                 default='False')
         self.config.opts.add('test_alm', 'Test Alm "server", "project" or "settings" '
@@ -165,13 +168,16 @@ class AlmConnector(object):
             raise AlmException('Incorrect test_alm configuration setting. '
                                'Valid values are: %s' % ','.join(AlmConnector.TEST_OPTIONS))
 
+        self.config.process_boolean_config('start_fresh')
         self.config.process_boolean_config('show_progress')
         self.config.process_boolean_config('how_tos_in_scope')
         self.config.process_boolean_config('alm_standard_workflow')
         self.config.process_json_str_dict('alm_custom_fields')
 
+        if self.config['start_fresh'] and not self.alm_supports_delete():
+            raise AlmException('Incorrect start_fresh configuration: task deletion is not supported.')
+
         self.alm_plugin.post_conf_init()
-        self.ignored_tasks = []
 
         logger.info('*** AlmConnector initialized ***')
 
@@ -237,6 +243,14 @@ class AlmConnector(object):
         task  -- An SDE task
         """
         pass
+
+    def alm_supports_delete(self):
+        """ Returns True if Task Delete is supported by the ALM
+        """
+        delete_method = getattr(self, "alm_remove_task", None)
+        if delete_method:
+            return callable(delete_method)
+        return False
 
     @abstractmethod
     def alm_update_task_status(self, task, status):
@@ -532,7 +546,18 @@ class AlmConnector(object):
 
             logger.info('Pruned tasks out of scope')
 
-            total_work = (progress+len(tasks))
+            if self.config['start_fresh']:
+                total_work = progress + len(tasks) * 2
+            else:
+                total_work = progress + len(tasks)
+
+            if self.config['start_fresh']:
+                for task in tasks:
+                    alm_task = self.alm_get_task(task)
+                    if alm_task:
+                        self.alm_remove_task(alm_task)
+                    progress += 1
+                    self.output_progress(100*progress/total_work)
 
             for task in tasks:
                 tid = task['id'].split('-', 1)[-1]

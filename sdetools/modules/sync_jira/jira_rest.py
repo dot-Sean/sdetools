@@ -230,6 +230,17 @@ class JIRARestAPI(RESTBase):
             ret_trans[transition['name']] = transition['id']
         return ret_trans
 
+    def remove_task(self, task):
+        delete_url = 'issue/%s' % task.get_alm_id()
+        try:
+            self.call_api(delete_url, method=self.URLRequest.DELETE)
+        except self.APIFormatError:
+            # The response does not have JSON, so it is incorrectly raised as
+            # a JSON formatting error. Ignore this error
+            pass
+        except APIError, err:
+            raise AlmException("Unable to delete task : %s" % err)
+
     def update_task_status(self, task_id, status_id):
         trans_url = 'issue/%s/transitions' % task_id
         trans_args = {'transition': {'id': status_id}}

@@ -15,3 +15,6 @@ class TestJIRARestLiveCase(AlmPluginLiveTestBase, unittest.TestCase):
     def setUp(self):
         super(TestJIRARestLiveCase, self).setUp()
         self.connector.config.jira_api_ver = 5
+
+    def test_alm_supports_delete(self):
+        self.assertTrue(self.connector.alm_supports_delete())
