@@ -17,3 +17,6 @@ class TestJIRASoapLiveCase(AlmPluginLiveTestBase, unittest.TestCase):
         super(TestJIRASoapLiveCase, self).setUp()
         self.connector.config.jira_api_ver = 4
         self.connector.alm_plugin = JIRASoapAPI(self.config)
+
+    def test_alm_supports_delete(self):
+        self.assertTrue(self.connector.alm_supports_delete())
