@@ -247,7 +247,10 @@ class AlmConnector(object):
     def alm_supports_delete(self):
         """ Returns True if Task Delete is supported by the ALM
         """
-        return hasattr(self, "alm_remove_task")
+        delete_method = getattr(self, "alm_remove_task", None)
+        if delete_method:
+            return callable(delete_method)
+        return False
 
     @abstractmethod
     def alm_update_task_status(self, task, status):
