@@ -233,16 +233,18 @@ class JIRASoapAPI:
             raise AlmException('Unable to find priority %s' % task['alm_priority'])
 
         updates = []
-        updates.append({'id':'labels', 'values':['SD-Elements']})
+        updates.append({'id': 'labels', 'values': ['SD-Elements']})
                 
         if project_version:
-            updates.append({'id':'versions', 'values':[project_version['id']]})
+            updates.append({'id': 'versions', 'values': [project_version['id']]})
         args = {
             'project': self.config['alm_project'],
             'summary': task['title'],
-            'description': task['formatted_content'],
             'type': issue_type_id
         }
+
+        if self.has_field('description'):
+            args['description'] = task['formatted_content']
 
         if self.has_field('priority'):
             args['priority'] = selected_priority
@@ -250,7 +252,7 @@ class JIRASoapAPI:
         if self.custom_fields:
             arg_custom_fields = []
             for custom_field in self.custom_fields:
-                arg_custom_fields.append({'customfieldId':custom_field['field'],'values':[custom_field['value']]})
+                arg_custom_fields.append({'customfieldId': custom_field['field'], 'values': [custom_field['value']]})
             args['customFieldValues'] = arg_custom_fields
         try:
             if self.config['alm_parent_issue']:
@@ -259,7 +261,7 @@ class JIRASoapAPI:
                 ref = self.proxy.createIssue(self.auth, args)
             self.proxy.updateIssue(self.auth, ref['key'], updates)
         except SOAPpy.Types.faultType, err:
-            raise AlmException('Unable to add issue to JIRA. Reason: %s' % (err.faultstring))
+            raise AlmException('Unable to add issue to JIRA. Reason: %s' % err.faultstring)
         return ref
 
     def remove_task(self, task):
