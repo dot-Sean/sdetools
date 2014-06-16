@@ -104,9 +104,6 @@ class JIRAConnector(AlmConnector):
     def alm_validate_configurations(self):
         pass
 
-    def alm_supports_delete(self):
-        return True
-
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])
 
