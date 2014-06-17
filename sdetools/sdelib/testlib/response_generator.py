@@ -151,6 +151,10 @@ class ResponseGenerator(object):
 
         return _id
 
+    def generator_remove_resource(self, resource_type, _id):
+        if _id in self.resources[resource_type]['resources'].keys():
+            self.resources[resource_type]['resources'].pop(_id)
+
     def generator_resource_exists(self, resource_type, _id):
         self._check_resource_type_exists(resource_type)
         if _id == IntType:
@@ -309,6 +313,8 @@ class ResponseGenerator(object):
 
         for key, value in resource_data.items():
             if type(value) == DictionaryType:
+                if key not in template.keys():
+                    template[key] = {}
                 template[key] = self._update_template(template[key], value)
             else:
                 template[key] = value
@@ -319,6 +325,8 @@ class ResponseGenerator(object):
         """Update the fields and sub-fields of a json template"""
         for key, value in data.items():
             if type(value) == DictionaryType:
+                if key not in template.keys():
+                    template[key] = {}
                 template[key] = self._update_template(template[key], value)
             else:
                 template[key] = value
