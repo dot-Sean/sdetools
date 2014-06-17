@@ -55,13 +55,13 @@ class JIRARestAPI(RESTBase):
         missing_fields = []
 
         if self.config['alm_custom_fields']:
-            for key, value in self.config['alm_custom_fields'].items():
-                for field_id, field_details in self.fields.items():
+            for key, value in self.config['alm_custom_fields'].iteritems():
+                for field_id, field_details in self.fields.iteritems():
                     if key == field_details['name']:
                         self.custom_fields[field_id] = value
                         assigned_fields.append(field_id)
 
-        for field_id, field_details in self.fields.items():
+        for field_id, field_details in self.fields.iteritems():
             if field_details['required'] and field_id not in assigned_fields:
                 missing_fields.append(field_details['name'])
 
@@ -166,7 +166,7 @@ class JIRARestAPI(RESTBase):
 
         unsupported_fields = []
 
-        for field_id, custom_field_value in self.custom_fields.items():
+        for field_id, custom_field_value in self.custom_fields.iteritems():
             # We covered this field already, skip it
             if field_id in self.BASE_FIELDS:
                 continue

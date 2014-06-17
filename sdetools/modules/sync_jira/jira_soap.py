@@ -158,6 +158,7 @@ class JIRASoapAPI:
          
     def setup_fields(self, jira_issue_type_id):
 
+        self.custom_fields = []
         create_fields = []
 
         # We use self.proxy.getFieldsForCreate to determine which fields are applicable to issues to avoid
