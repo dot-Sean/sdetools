@@ -329,7 +329,7 @@ class AlmPluginTestBase(object):
 
     def test_api_exceptions_are_handled(self):
         # Check that all api exceptions are properly handled
-        for api_target, mock_flag in self.response_generator.rest_api_targets.items():
+        for api_target, mock_flag in self.response_generator.rest_api_targets.iteritems():
             self.tearDown()
             self.setUp()
             self.connector.config['conflict_policy'] = 'sde'

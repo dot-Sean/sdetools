@@ -120,7 +120,7 @@ class TestJiraAPI6Case(JiraBaseCase, unittest.TestCase):
         self.connector.initialize()
         self.connector.alm_connect()
 
-        self.assertTrue('customField' in self.connector.alm_plugin.custom_fields.keys())
+        self.assertTrue('customField' in self.connector.alm_plugin.custom_fields)
         self.assertTrue(self.connector.alm_plugin.custom_fields['customField'] == "value")
 
     def test_required_custom_fields(self):

@@ -72,7 +72,7 @@ class JIRARestAPI(RESTBase):
         if not self.fields:
             return False
              
-        return field_name in self.fields.keys()
+        return field_name in self.fields
         
     def get_issue_types(self):
         try:
