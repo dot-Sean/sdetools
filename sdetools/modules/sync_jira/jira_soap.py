@@ -27,8 +27,7 @@ class SOAPProxyWrap:
             try:
                 return self.__fobj(*args)
             except (xml.parsers.expat.ExpatError, socket.error):
-                raise AlmException('Unable to access JIRA (for %s). '
-                        ' Please check network connectivity.' % (self.__fname))
+                raise AlmException('Unable to access JIRA (for %s). Please check network connectivity.' % self.__fname)
 
     def __init__(self, proxy):
         self.proxy = proxy
@@ -68,7 +67,7 @@ class JIRASoapAPI:
         try:
             proxy = SOAPpy.WSDL.Proxy(stream, config=config)
         except (SOAPpy.Types.faultType, xml.parsers.expat.ExpatError), err:
-            raise AlmException('Error talking to JIRA service. Please check server URL. Reason: %s' % (err))
+            raise AlmException('Error talking to JIRA service. Please check server URL. Reason: %s' % err)
         self.proxy = SOAPProxyWrap(proxy)
 
         # Attempt to login
@@ -186,7 +185,10 @@ class JIRASoapAPI:
             for key in self.config['alm_custom_fields']:
                 for field in issue_fields:
                     if key == field['name']:
-                        self.custom_fields.append({'field': field['id'],'value':self.config['alm_custom_fields'][key]})
+                        self.custom_fields.append({
+                            'field': field['id'],
+                            'value': self.config['alm_custom_fields'][key]
+                        })
 
             if len(self.custom_fields) != len(self.config['alm_custom_fields']):
                 raise AlmException('At least one custom field could not be found')            
@@ -209,8 +211,8 @@ class JIRASoapAPI:
             if jira_version:
                 affected_versions.append(jira_version['id'])
             else:
-                raise AlmException("Version %s could not be found in JIRA. '\
-                        'Check your sync settings or add the version to JIRA" % version_name)
+                raise AlmException('Version %s could not be found in JIRA. '
+                                   'Check your sync settings or add the version to JIRA' % version_name)
         return affected_versions
 
     def set_version(self, task, project_version):
