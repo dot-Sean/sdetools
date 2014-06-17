@@ -4,7 +4,7 @@ import unittest
 
 from mock import patch, MagicMock
 from functools import partial
-from jira_response_generator import JiraResponseGenerator
+from jira_response_generator import JiraResponseGenerator, JiraCustomFieldResponseGenerator
 from sdetools.sdelib.conf_mgr import Config
 from sdetools.sdelib.testlib.mock_response import MOCK_ALM_RESPONSE
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
@@ -116,12 +116,28 @@ class TestJiraAPI6Case(JiraBaseCase, unittest.TestCase):
         self.assert_markdown(content, expected)
 
     def test_custom_fields(self):
-        self.config['alm_custom_fields'] = {"Custom Field":"value"}
+        self.config['alm_custom_fields'] = {"Custom Field": "value"}
         self.connector.initialize()
         self.connector.alm_connect()
 
-        self.assertEqual(self.connector.alm_plugin.custom_fields[0]['field'], "customField")
-        self.assertEqual(self.connector.alm_plugin.custom_fields[0]['value'], "value")
+        self.assertTrue('customField' in self.connector.alm_plugin.custom_fields)
+        self.assertTrue(self.connector.alm_plugin.custom_fields['customField'] == "value")
+
+    def test_required_custom_fields(self):
+        self.response_generator = JiraCustomFieldResponseGenerator(self.config, self.test_dir)
+        self.mock_alm_response.initialize(self.response_generator)
+        try:
+            self.test_update_task_status_to_done()
+            raise AssertionError('Expected an exception to be thrown')
+        except AlmException:
+            pass
+
+        self.config['alm_custom_fields'] = {
+            "custom_text_field": "Text Value",
+            "custom_multi_checkboxes": "option1",
+            "custom_radio_buttons": "radio1",
+        }
+        self.test_update_task_status_to_done()
 
     def assert_markdown(self, content, expected):
         converted_text = self.connector.convert_markdown_to_alm(content, None)

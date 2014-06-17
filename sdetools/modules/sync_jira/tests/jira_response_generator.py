@@ -110,7 +110,9 @@ class JiraResponseGenerator(ResponseGenerator):
             elif method_name == 'deleteIssue':
                 flag = flags.get('delete_issue') or flags.get('delete_issue')
                 if not flag:
-                    pass
+                    task_number = args[3].split('-')[1]
+                    self.generator_remove_resource('issue', task_number)
+                    return ''
                 else:
                     self.raise_error('401')
             elif method_name == 'getAvailableActions':
@@ -151,6 +153,7 @@ class JiraResponseGenerator(ResponseGenerator):
                         "self": "http://www.example.com/jira/rest/api/2/issue/10000"
                     }
                 elif method == 'DELETE':
+                    self.generator_remove_resource('issue', task_number)
                     return RESPONSE_HEADERS, ''
 
             self.raise_error('500')
@@ -385,3 +388,70 @@ class JiraResponseGenerator(ResponseGenerator):
             version['id'] = project_version
 
         return version
+
+
+class JiraCustomFieldResponseGenerator(JiraResponseGenerator):
+
+    def __init__(self, config, test_dir=None):
+        super(JiraCustomFieldResponseGenerator, self).__init__(config, test_dir)
+
+    def get_create_meta(self, target, flag, data, method):
+        if not flag:
+            response = {'expands': 'projects'}
+            _project = self.generate_project()
+
+            headers, _project['issuetypes'] = self.get_issue_types(flag=flag)
+
+            _project['issuetypes'][0]['fields']['customField_10001'] = {
+                "required": True,
+                "name": "custom_text_field",
+                "schema": {
+                    "customId": 10001,
+                    "type": "string",
+                    "custom": "com.atlassian.jira.plugin.system.customfieldtypes:textfield"
+                }
+            }
+            _project['issuetypes'][0]['fields']['customField_10002'] = {
+                "operations": ["add", "set", "remove"],
+                "required": True,
+                "allowedValues": [{
+                    "self": "http://server/rest/api/2/customFieldOption/10119",
+                    "id": "10119",
+                    "value": "option1"
+                }, {
+                    "self": "http://server/rest/api/2/customFieldOption/10120",
+                    "id": "10120",
+                    "value": "option2"
+                }],
+                "name": "custom_multi_checkboxes",
+                "schema": {
+                    "items": "string",
+                    "customId": 10002,
+                    "type": "array",
+                    "custom": "com.atlassian.jira.plugin.system.customfieldtypes:multicheckboxes"
+                }
+            }
+            _project['issuetypes'][0]['fields']['customField_10003'] = {
+                "operations": ["set"],
+                "required": True,
+                "allowedValues": [{
+                    "self": "http://server/rest/api/2/customFieldOption/10139",
+                    "id": "10139",
+                    "value": "radio1"
+                }, {
+                    "self": "http://server/rest/api/2/customFieldOption/10130",
+                    "id": "10130",
+                    "value": "radio2"
+                }],
+                "name": "custom_radio_buttons",
+                "schema": {
+                    "customId": 10003,
+                    "type": "string",
+                    "custom": "com.atlassian.jira.plugin.system.customfieldtypes:radiobuttons"
+                }
+            }
+            response['projects'] = [_project]
+
+            return RESPONSE_HEADERS, response
+        else:
+            self.raise_error('403')

@@ -79,26 +79,21 @@ class AlmPluginLiveTestBase(object):
         self.connector.initialize()
         self.connector.alm_connect()
 
-    def test_alm_remove_task(self):
-        if not self.connector.alm_supports_delete():
-            return
-
-        self.config['start_fresh'] = True
-        self.connector.config = self.config
-        self.connector.initialize()
-        self.connector.alm_connect()
-
     def synchronize(self, master):
         self.config['test_alm'] = ''
         self.config['conflict_policy'] = master
         self.connector.config = self.config
         self.connector.initialize()
+
+        # Only refresh tasks if the configuration has this option explicitly set
+        refresh_tasks = self.connector.config['start_fresh'] and self.connector.alm_supports_delete()
+
         alm_tasks = {}
 
         for i in xrange(2):
 
             # clean out any existing issues on the first run, if possible
-            if i == 1 and self.connector.alm_supports_delete():
+            if i == 1 and refresh_tasks:
                 self.connector.config['start_fresh'] = True
             else:
                 self.connector.config['start_fresh'] = False
@@ -118,7 +113,7 @@ class AlmPluginLiveTestBase(object):
                 self.connector.sde_update_task_status(task, self._inverted_status(task['status']))
 
                 # Remaining tests are only applicable if connector supports delete
-                if not self.connector.alm_supports_delete():
+                if not refresh_tasks:
                     continue
 
                 # Make sure we're creating new ALM tasks

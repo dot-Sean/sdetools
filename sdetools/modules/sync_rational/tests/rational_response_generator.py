@@ -24,7 +24,7 @@ class RationalResponseGenerator(ResponseGenerator):
             '.*/oslc/context/[^/]+/shapes/workitems/task': 'get_resourceshape',
             '.*/oslc/enumerations/[^/]+/priority/priority.literal.l.*': 'get_priorities',
             '.*/oslc/contexts/[^/]+/workitems/workitems\\?oslc.where=dcterms:title=.*': 'get_count',
-            '.*/resource/itemName/com.ibm.team.workitem.WorkItem/\\d*': 'get_workitem',
+            '.*/resource/itemName/com.ibm.team.workitem.WorkItem/\\d*': 'update_workitem',
             '.*/oslc/contexts/[^/]+/workitems/task': 'post_workitem',
             '.*/authenticated/identity': 'authenticate_identity',
         }
@@ -95,9 +95,14 @@ class RationalResponseGenerator(ResponseGenerator):
         else:
             self.raise_error('404')
 
-    def get_workitem(self, target, flag, data, method):
+    def update_workitem(self, target, flag, data, method):
         if not flag:
-            res = self.generator_get_all_resource('workitem')[0]
+            if method == 'GET':
+                res = self.generator_get_all_resource('workitem')[0]
+            elif method == 'DELETE':
+                task_id = target.rsplit('/', 1)[1]
+                self.generator_remove_resource('workitem', task_id)
+                res = ''
             return RESPONSE_HEADERS, res
         else:
             self.raise_error('404')

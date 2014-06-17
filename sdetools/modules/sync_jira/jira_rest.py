@@ -11,8 +11,8 @@ class JIRARestAPI(RESTBase):
     def __init__(self, config):
         super(JIRARestAPI, self).__init__('alm', 'JIRA', config, 'rest/api/2')
         self.versions = None
-        self.custom_fields = []
-        self.fields = []
+        self.custom_fields = {}
+        self.fields = {}
 
     def parse_response(self, result, headers):
         if result == "":
@@ -47,38 +47,23 @@ class JIRARestAPI(RESTBase):
 
         for item in meta_info['projects'][0]['issuetypes']:
             if item['name'] == self.config['jira_issue_type']:
-                for key in item['fields'].keys():
-                    self.fields.append({
-                        'id': key,
-                        'name': item['fields'][key]['name'],
-                        'required': item['fields'][key]['required'],
-                        'schema': item['fields'][key]['schema'],
-                    })
+                self.fields = item['fields']
                 break
 
         assigned_fields = JIRARestAPI.BASE_FIELDS[:]
 
         missing_fields = []
-        required_fields = {}
-
-        for field in self.fields:
-            if field['required']:
-                required_fields[field['id']] = field
 
         if self.config['alm_custom_fields']:
-            for key in self.config['alm_custom_fields']:
-                for field in self.fields:
-                    if key == field['name']:
-                        self.custom_fields.append({
-                            'field': field['id'],
-                            'value': self.config['alm_custom_fields'][key],
-                            'schema': field['schema']
-                        })
-                        assigned_fields.append(field['id'])
+            for key, value in self.config['alm_custom_fields'].iteritems():
+                for field_id, field_details in self.fields.iteritems():
+                    if key == field_details['name']:
+                        self.custom_fields[field_id] = value
+                        assigned_fields.append(field_id)
 
-        for field in required_fields.keys():
-            if field not in assigned_fields:
-                missing_fields.append(required_fields[field]['name'])
+        for field_id, field_details in self.fields.iteritems():
+            if field_details['required'] and field_id not in assigned_fields:
+                missing_fields.append(field_details['name'])
 
         if len(missing_fields) > 0:
             raise AlmException('The following fields are missing values: %s' % ', '.join(missing_fields))
@@ -87,11 +72,7 @@ class JIRARestAPI(RESTBase):
         if not self.fields:
             return False
              
-        for field in self.fields:
-            if field_name == field['id']:
-                return True
-                
-        return False
+        return field_name in self.fields
         
     def get_issue_types(self):
         try:
@@ -155,15 +136,15 @@ class JIRARestAPI(RESTBase):
 
         #Add task
         args = {
-           'fields': {
-               'project': {
-                   'key': self.config['alm_project']
-               },
-               'summary': task['title'],
-               'issuetype': {
-                   'id': issue_type_id
-               },
-           }
+            'fields': {
+                'project': {
+                    'key': self.config['alm_project']
+                },
+                'summary': task['title'],
+                'issuetype': {
+                    'id': issue_type_id
+                },
+            }
         }
         if self.has_field('description'):
             args['fields']['description'] = task['formatted_content']
@@ -183,22 +164,27 @@ class JIRARestAPI(RESTBase):
         if self.config['alm_parent_issue']:
             args['fields']['parent'] = {'key': self.config['alm_parent_issue']}
 
-        for field in self.custom_fields:
-            if 'custom' not in field['schema']:
+        unsupported_fields = []
+
+        for field_id, custom_field_value in self.custom_fields.iteritems():
+            # We covered this field already, skip it
+            if field_id in self.BASE_FIELDS:
                 continue
 
-            if field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:textfield':
-                args['fields'][field['field']] = field['value']
-            elif field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:textarea':
-                args['fields'][field['field']] = field['value']
-            elif field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:select':
-                args['fields'][field['field']] = {'value': field['value']}
-            elif field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:radiobuttons':
-                args['fields'][field['field']] = {'value': field['value']}
-            elif field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:multiselect':
-                args['fields'][field['field']] = [{'value': field['value']}]
-            elif field['schema']['custom'] == 'com.atlassian.jira.plugin.system.customfieldtypes:multicheckboxes':
-                args['fields'][field['field']] = [{'value': field['value']}]
+            mapped_field = self.fields[field_id]
+
+            if mapped_field['schema']['type'] == 'array' and mapped_field['schema']['items'] == 'string':
+                args['fields'][field_id] = [{'value': custom_field_value}]
+            elif mapped_field['schema']['type'] == 'string':
+                if 'allowedValues' in mapped_field:
+                    args['fields'][field_id] = {'value': custom_field_value}
+                else:
+                    args['fields'][field_id] = custom_field_value
+            elif mapped_field['required']:
+                unsupported_fields.append(mapped_field['name'])
+
+        if len(unsupported_fields) > 0:
+            raise AlmException('Unable to add issue due to unsupported fields: %s' % ', '.join(unsupported_fields))
 
         # Create the issue in JIRA
         try:

@@ -144,19 +144,23 @@ class ResponseGenerator(object):
             _id = len(self.resources[resource_type]['resources'])
         if type(_id) == IntType:
             _id = str(_id)
-        if _id not in self.resources[resource_type]['resources'].keys():
+        if _id not in self.resources[resource_type]['resources']:
             if resource_data is None:
                 resource_data = {}
             self.resources[resource_type]['resources'][_id] = resource_data
 
         return _id
 
+    def generator_remove_resource(self, resource_type, _id):
+        if _id in self.resources[resource_type]['resources']:
+            self.resources[resource_type]['resources'].pop(_id)
+
     def generator_resource_exists(self, resource_type, _id):
         self._check_resource_type_exists(resource_type)
         if _id == IntType:
             _id = str(_id)
 
-        return _id in self.resources[resource_type]['resources'].keys()
+        return _id in self.resources[resource_type]['resources']
 
     def generator_get_resource(self, resource_type, _id, data_only=False):
         self._check_resource_type_exists(resource_type)
@@ -268,7 +272,7 @@ class ResponseGenerator(object):
         if data is None:
             return False
         for field in fields:
-            if not field in data.keys():
+            if not field in data:
                 return False
 
         return True
@@ -287,7 +291,7 @@ class ResponseGenerator(object):
 
     def _check_resource_type_exists(self, resource_type):
         """Checks that the resource type is one of the defined types"""
-        if resource_type not in self.resources.keys():
+        if resource_type not in self.resources:
             self.raise_error('500', 'Invalid resource type %s' % resource_type)
 
     #
@@ -309,6 +313,8 @@ class ResponseGenerator(object):
 
         for key, value in resource_data.items():
             if type(value) == DictionaryType:
+                if key not in template:
+                    template[key] = {}
                 template[key] = self._update_template(template[key], value)
             else:
                 template[key] = value
@@ -319,6 +325,8 @@ class ResponseGenerator(object):
         """Update the fields and sub-fields of a json template"""
         for key, value in data.items():
             if type(value) == DictionaryType:
+                if key not in template:
+                    template[key] = {}
                 template[key] = self._update_template(template[key], value)
             else:
                 template[key] = value
