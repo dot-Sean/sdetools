@@ -107,7 +107,7 @@ class JIRAConnector(AlmConnector):
         for key, priority_name in pmap.iteritems():
             if not self.alm_plugin._has_priority(priority_name):
                 missing_priorities.append(priority_name)
-        if len(missing_priorities) > 0:
+        if missing_priorities:
             raise AlmException('Incorrect priority mapping values specified: %s' % ', '.join(missing_priorities))
 
     def alm_get_task(self, task):
