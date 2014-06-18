@@ -306,12 +306,12 @@ class RationalConnector(AlmConnector):
         self.cm_resource_service = self.resource_url.replace(self.alm_plugin.base_uri+'/', '')
         self.services = self._call_api(self.cm_resource_service)
 
-        query_url = self.services['oslc:service'][1]['oslc:queryCapability'][0]['oslc:queryBase']['rdf:resource']
-
-        self.query_url = query_url.replace(self.alm_plugin.base_uri + '/', '')
         # Search the services for the proper creation factory and retrieve the creation and resource shape urls
         try:
-           for service in self.services['oslc:service']:
+            for service in self.services['oslc:service']:
+                if 'oslc:queryCapability' in service:
+                    query_url = service['oslc:queryCapability'][0]['oslc:queryBase']['rdf:resource']
+                    self.query_url = query_url.replace(self.alm_plugin.base_uri + '/', '')
                 if 'oslc:creationFactory' in service:
                     for factory in service['oslc:creationFactory']:
                         if 'oslc:usage' in factory:
@@ -401,6 +401,16 @@ class RationalConnector(AlmConnector):
         return 'Project: %s; Task: %s; URL: %s' % (
                self.config['alm_project'], alm_task.get_alm_id(), alm_task.get_alm_url()
         )
+
+    def alm_remove_task(self, task):
+        work_item_target = task.get_alm_url().replace(self.alm_plugin.base_uri+'/', '')
+
+        try:
+            self.alm_plugin.call_api(work_item_target, args={}, method=URLRequest.DELETE)
+        except APIError, err:
+            raise AlmException('Unable to delete task %s in Rational because of %s' % (task.get_alm_id(), err))
+
+        logger.debug('Task %s deleted in Rational' % task.get_alm_id())
 
     def alm_update_task_status(self, task, status):
         pass

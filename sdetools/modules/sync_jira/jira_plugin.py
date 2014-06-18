@@ -102,7 +102,13 @@ class JIRAConnector(AlmConnector):
         self.alm_plugin.setup_fields(self.jira_issue_type_id)
 
     def alm_validate_configurations(self):
-        pass
+        missing_priorities = []
+        pmap = self.config['alm_priority_map']
+        for key, priority_name in pmap.iteritems():
+            if not self.alm_plugin._has_priority(priority_name):
+                missing_priorities.append(priority_name)
+        if missing_priorities:
+            raise AlmException('Incorrect priority mapping values specified: %s' % ', '.join(missing_priorities))
 
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])
@@ -133,6 +139,11 @@ class JIRAConnector(AlmConnector):
 
         #Return a unique identifier to this task in JIRA
         return 'Issue %s, URL: %s' % (new_issue['key'], url)
+
+    def alm_remove_task(self, task):
+
+        self.alm_plugin.remove_task(task)
+        logger.info('Removed task in JIRA: %s' % task.get_task_id())
 
     def alm_update_task_status(self, task, status):
         if not task or not self.config['alm_standard_workflow']:

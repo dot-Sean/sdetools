@@ -32,6 +32,7 @@ class TracXMLRPCAPI(RESTBase):
             self.post_conf_init()
             self.proxy = xmlrpclib.ServerProxy(self.base_uri)
 
+
 class TracTask(AlmTask):
     """ Representation of a task in Trac"""
 

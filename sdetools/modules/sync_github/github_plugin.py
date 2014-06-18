@@ -83,6 +83,7 @@ class GitHubTask(AlmTask):
         self.timestamp = timestamp
         self.priority = None
 
+
     def get_task_id(self):
         return self.task_id
 

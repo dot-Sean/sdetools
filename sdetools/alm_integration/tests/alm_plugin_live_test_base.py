@@ -54,6 +54,13 @@ class AlmPluginLiveTestBase(object):
         except AlmException:
             pass
 
+    def test_sde_connect(self):
+        self.config['test_alm'] = 'server'
+        self.connector.config = self.config
+        self.connector.initialize()
+        self.connector.sde_connect()
+        self.assertTrue(self.connector.is_sde_connected, True)
+
     def test_alm_connect_server(self):
         self.config['test_alm'] = 'server'
         self.connector.config = self.config
@@ -78,7 +85,19 @@ class AlmPluginLiveTestBase(object):
         self.connector.config = self.config
         self.connector.initialize()
 
+        # Only refresh tasks if the configuration has this option explicitly set
+        refresh_tasks = self.connector.config['start_fresh'] and self.connector.alm_supports_delete()
+
+        alm_tasks = {}
+
         for i in xrange(2):
+
+            # clean out any existing issues on the first run, if possible
+            if i == 1 and refresh_tasks:
+                self.connector.config['start_fresh'] = True
+            else:
+                self.connector.config['start_fresh'] = False
+
             # synchronize the two systems
             self.connector.synchronize()
 
@@ -92,6 +111,16 @@ class AlmPluginLiveTestBase(object):
 
                 # invert the status and get ready to synchronize again
                 self.connector.sde_update_task_status(task, self._inverted_status(task['status']))
+
+                # Remaining tests are only applicable if connector supports delete
+                if not refresh_tasks:
+                    continue
+
+                # Make sure we're creating new ALM tasks
+                if i == 0:
+                    alm_tasks[task['id']] = alm_task.get_alm_id()
+                elif i == 1:
+                    self.assertNotEqual(alm_tasks[task['id']], alm_task.get_alm_id())
 
     def test_synchronize_sde_as_master(self):
         self.synchronize('sde')

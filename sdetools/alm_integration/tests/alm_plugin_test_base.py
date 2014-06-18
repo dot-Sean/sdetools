@@ -311,13 +311,25 @@ class AlmPluginTestBase(object):
 
         self.assertEqual(test_task_result.get_status(), 'TODO', 'Failed to update task status to TODO')
 
+    def test_remove_alm_task(self):
+        if not self.connector.alm_supports_delete():
+            return
+
+        self.connector.alm_connect()
+        test_task = self.mock_sde_response.generate_sde_task()
+        self.connector.alm_add_task(test_task)
+        test_task_result = self.connector.alm_get_task(test_task)
+        self.assertNotNone(test_task_result, 'Task added to ALM')
+        self.connector.alm_remove_task(test_task_result)
+        test_task_result = self.connector.alm_get_task(test_task)
+
     def test_synchronize(self):
         # Verify no exceptions are thrown
         self.connector.synchronize()
 
     def test_api_exceptions_are_handled(self):
         # Check that all api exceptions are properly handled
-        for api_target, mock_flag in self.response_generator.rest_api_targets.items():
+        for api_target, mock_flag in self.response_generator.rest_api_targets.iteritems():
             self.tearDown()
             self.setUp()
             self.connector.config['conflict_policy'] = 'sde'
