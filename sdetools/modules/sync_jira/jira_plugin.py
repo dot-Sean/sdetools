@@ -102,7 +102,13 @@ class JIRAConnector(AlmConnector):
         self.alm_plugin.setup_fields(self.jira_issue_type_id)
 
     def alm_validate_configurations(self):
-        pass
+        missing_priorities = []
+        pmap = self.config['alm_priority_map']
+        for key, priority_name in pmap.iteritems():
+            if not self.alm_plugin._has_priority(priority_name):
+                missing_priorities.append(priority_name)
+        if len(missing_priorities) > 0:
+            raise AlmException('Incorrect priority mapping values specified: %s' % ', '.join(missing_priorities))
 
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])

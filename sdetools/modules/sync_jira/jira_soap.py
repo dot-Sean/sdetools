@@ -93,6 +93,17 @@ class JIRASoapAPI:
         except SOAPpy.Types.faultType:
             raise AlmException('Unable to get project version')
 
+    def _has_priority(self, priority_name):
+        """
+        Check that the priority from the mapping exists in JIRA
+        """
+        if not self.priorities:
+            return False
+        for priority in self.priorities:
+            if priority['name'] == priority_name:
+                return True
+        return False
+
     def get_issue_types(self):
         try:
             return self.proxy.getIssueTypes(self.auth)
@@ -158,6 +169,7 @@ class JIRASoapAPI:
          
     def setup_fields(self, jira_issue_type_id):
 
+        self.custom_fields = []
         create_fields = []
 
         # We use self.proxy.getFieldsForCreate to determine which fields are applicable to issues to avoid

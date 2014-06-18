@@ -36,6 +36,21 @@ class JIRARestAPI(RESTBase):
         except APIError:
             raise AlmException('JIRA project not found: %s' % self.config['alm_project'])
 
+    def _has_priority(self, priority_name):
+        """
+        Check that the priority exists
+        """
+        if not self.fields:
+            return False
+        elif 'priority' not in self.fields:
+            return True
+
+        for priority_option in self.fields['priority']['allowedValues']:
+            if priority_option['name'] == priority_name:
+                return True
+
+        return False
+
     def setup_fields(self, issue_type_id):
 
         try:
