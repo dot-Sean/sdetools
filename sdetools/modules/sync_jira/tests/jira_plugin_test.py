@@ -84,6 +84,15 @@ class JiraBaseCase(AlmPluginTestBase):
 
         self.assertEqual(test_task_result.versions, ['1.0'])
 
+    def test_invalid_priority(self):
+        self.config['alm_priority_map'] = {"1-10": "No Such Priority"}
+        self.connector.initialize()
+
+        try:
+            self.connector.synchronize()
+        except AlmException, e:
+            self.assertEqual(str(e), 'Incorrect priority mapping values specified: No Such Priority')
+
 
 class TestJiraAPI6Case(JiraBaseCase, unittest.TestCase):
     def test_fail_connect_server(self):
