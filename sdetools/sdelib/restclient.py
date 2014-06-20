@@ -154,8 +154,8 @@ class RESTBase(object):
         return json.loads(result)['error']
 
     def set_content_type(self, req, method):
-        if (method != URLRequest.GET):
-            req.add_header('Content-Type','application/json')
+        if method != URLRequest.GET:
+            req.add_header('Content-Type', 'application/json')
 
     def get_custom_headers(self, target, method):
         """
@@ -226,7 +226,7 @@ class RESTBase(object):
             cookie_str = '; '.join(['%s=%s' % (x, cookies[x]) for x in cookies])
             req.add_header('Cookie', cookie_str)
         else:
-            raise UsageError('Unknown Authentication mode "%s".' % (auth_mode))
+            raise UsageError('Unknown Authentication mode "%s".' % auth_mode)
         for item in call_headers:
             req.add_header(item, call_headers[item])
         for item, val in self.get_custom_headers(target, method):
