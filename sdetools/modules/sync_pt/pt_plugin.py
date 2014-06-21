@@ -39,6 +39,12 @@ class PivotalTrackerAPI(RESTBase):
 
         super(PivotalTrackerAPI, self).post_conf_init()
 
+    def parse_response(self, result, headers):
+        if result == "":
+            return "{}"
+        else:
+            return super(PivotalTrackerAPI, self).parse_response(result, headers)
+
 
 class PivotalTrackerTask(AlmTask):
     """ Representation of a task in PivotalTracker """
@@ -75,6 +81,7 @@ class PivotalTrackerTask(AlmTask):
         or it does require estimates and has an estimate. False otherwise
         """
         return self.updateable
+
 
 class PivotalTrackerConnector(AlmConnector):
     alm_name = 'PivotalTracker'
@@ -200,6 +207,13 @@ class PivotalTrackerConnector(AlmConnector):
                 self.config[self.ALM_DONE_STATUSES] = ['accepted']
             else:
                 raise AlmException('Chores only have one completion state - "accepted"')
+
+    def alm_remove_task(self, task):
+        delete_url = '%s/stories/%s' % (self.project_uri, task.get_alm_id())
+        try:
+            self.alm_plugin.call_api(delete_url, method=URLRequest.DELETE)
+        except APIError, err:
+            raise AlmException("Unable to delete task : %s" % err)
 
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])
