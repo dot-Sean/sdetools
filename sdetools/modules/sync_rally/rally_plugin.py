@@ -432,6 +432,12 @@ class RallyConnector(AlmConnector):
             self._get_issue_url(alm_task)
         )
 
+    def alm_remove_task(self, task):
+        try:
+            self.alm_plugin.call_api(task.get_alm_task_ref(), method=self.alm_plugin.URLRequest.DELETE)
+        except APIError, err:
+            raise AlmException("Unable to delete task: %s" % err)
+
     def alm_update_task_status(self, task, status):
         card_type_details = self.card_types[self.config['rally_card_type']]
 
