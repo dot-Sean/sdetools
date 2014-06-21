@@ -20,7 +20,7 @@ class PivotalTrackerResponseGenerator(ResponseGenerator):
             '%s/epics\?filter=(.*)&fields=id' % self.project_uri: 'get_epic',
             '%s/epics$' % self.project_uri: 'add_epic',
             '%s/stories$' % self.project_uri: 'add_story',
-            '%s/stories/[0-9]*' % self.project_uri: 'update_status'
+            '%s/stories/[0-9]*' % self.project_uri: 'update_story'
         }
         super(PivotalTrackerResponseGenerator, self).__init__(rest_api_targets, resource_templates, test_dir)
 
@@ -120,20 +120,23 @@ class PivotalTrackerResponseGenerator(ResponseGenerator):
         else:
             self.raise_error('401')
 
-    def update_status(self, target, flag, data, method):
-        if not flag and data:
+    def update_story(self, target, flag, data, method):
+        if not flag:
             story_id = re.search('(?<=stories/)[0-9]+', target).group(0)
             task = self.generator_get_resource('story', story_id)
 
             if task:
-                if data['current_state'] != 'unscheduled' and task['story_type'] == 'feature' and \
-                        task.get('estimate') is None and data.get('estimate') is None:
-                    self.raise_error('400', 'Expected an estimate')
+                if data and method == 'PUT':
+                    if data['current_state'] != 'unscheduled' and task['story_type'] == 'feature' and \
+                            task.get('estimate') is None and data.get('estimate') is None:
+                        self.raise_error('400', 'Expected an estimate')
 
-                self.generator_update_resource('story', story_id, {'current_state': data['current_state']})
-                task['current'] = data['current_state']
+                    self.generator_update_resource('story', story_id, {'current_state': data['current_state']})
+                    task['current'] = data['current_state']
 
-                return RESPONSE_HEADERS, task
+                    return RESPONSE_HEADERS, task
+                elif method == 'DELETE':
+                    return RESPONSE_HEADERS, ''
             self.raise_error('404')
         else:
             self.raise_error('401')
