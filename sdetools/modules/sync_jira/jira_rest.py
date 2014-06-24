@@ -41,7 +41,6 @@ class JIRARestAPI(RESTBase):
         Check that the priority exists
         """
         if not self.fields:
-            print "uh oh"
             return False
         elif 'priority' not in self.fields:
             return True
