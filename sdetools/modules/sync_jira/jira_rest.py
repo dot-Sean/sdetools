@@ -41,6 +41,7 @@ class JIRARestAPI(RESTBase):
         Check that the priority exists
         """
         if not self.fields:
+            print "uh oh"
             return False
         elif 'priority' not in self.fields:
             return True
@@ -64,6 +65,10 @@ class JIRARestAPI(RESTBase):
             if item['name'] == self.config['jira_issue_type']:
                 self.fields = item['fields']
                 break
+
+        if not self.fields:
+            raise AlmException('Issue type %s not available for project %s' %
+                               (self.config['jira_issue_type'], self.config['alm_project']))
 
         assigned_fields = JIRARestAPI.BASE_FIELDS[:]
 
