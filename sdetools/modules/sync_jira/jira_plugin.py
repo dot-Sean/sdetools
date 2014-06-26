@@ -90,7 +90,7 @@ class JIRAConnector(AlmConnector):
                 self.jira_issue_type_id = issue_type['id']
                 break
         if self.jira_issue_type_id is None:
-            raise AlmException('Issue type %s not available' % self.config['jira_issue_type'])
+            raise AlmException("Issue type %s is not valid" % self.config['jira_issue_type'])
 
     def alm_connect_project(self):
         self.alm_plugin.connect_project()

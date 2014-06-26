@@ -455,3 +455,21 @@ class JiraCustomFieldResponseGenerator(JiraResponseGenerator):
             return RESPONSE_HEADERS, response
         else:
             self.raise_error('403')
+
+
+class JiraInvalidProjectIssueTypeResponseGenerator(JiraResponseGenerator):
+
+    def __init__(self, config, test_dir=None):
+        super(JiraInvalidProjectIssueTypeResponseGenerator, self).__init__(config, test_dir)
+
+    def get_create_meta(self, target, flag, data, method):
+        if not flag:
+            response = {'expands': 'projects'}
+            _project = self.generate_project()
+
+            _project['issuetypes'] = [self.generate_issue_type(0)]
+            response['projects'] = [_project]
+
+            return RESPONSE_HEADERS, response
+        else:
+            self.raise_error('403')
