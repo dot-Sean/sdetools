@@ -109,16 +109,19 @@ class FortifySSCImporter(BaseImporter):
             
         return project_version_id
     
-    def _download_file(self, stream, fprfd):
+    def _download_file(self, stream, fpr_fname):
 
         logger.info('Downloading FPR file')
 
-        fp = os.fdopen(fprfd, 'wb')
+        fp = open(fpr_fname, 'wb')
         while True:
             try:
                 chunk = stream.read()
             except httplib.IncompleteRead as e:
                 chunk = e.partial
+            except Exception as error:
+                fp.close()
+                raise error
             if not chunk:
                 break
             fp.write(chunk)
@@ -159,8 +162,9 @@ class FortifySSCImporter(BaseImporter):
         temp_fd, fpr_fname = tempfile.mkstemp()
 
         try:
-            self._download_file(stream, temp_fd)
+            self._download_file(stream, fpr_fname)
         except Exception, e:
+            os.close(temp_fd)
             os.remove(fpr_fname)
             raise FortifyIntegrationError("Could not download FPR file: %s" % e)
 
@@ -171,6 +175,7 @@ class FortifySSCImporter(BaseImporter):
         try:
             self.importer.parse(fpr_fname)
         finally:
+            os.close(temp_fd)
             os.remove(fpr_fname)
 
         self.raw_findings = self.importer.raw_findings
