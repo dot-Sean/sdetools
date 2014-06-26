@@ -1,0 +1,79 @@
+{
+	"self": "http://localhost:8090/jira/rest/api/2.0/issueType/3",
+	"id": "3",
+	"description": "A task that needs to be done.",
+	"iconUrl": "http://localhost:8090/jira/images/icons/issuetypes/task.png",
+	"name": "Task",
+	"subtask": false,
+	"fields": {
+        "priority": {
+            "operations": ["set"],
+            "required": true,
+            "allowedValues": [{
+                "iconUrl": "http: //198.74.61.26: 8080/images/icons/priority_blocker.gif",
+                "self": "http: //198.74.61.26: 8080/rest/api/2/priority/1",
+                "name": "Blocker",
+                "id": "1"
+            },
+            {
+                "iconUrl": "http: //198.74.61.26: 8080/images/icons/priority_critical.gif",
+                "self": "http: //198.74.61.26: 8080/rest/api/2/priority/2",
+                "name": "Critical",
+                "id": "2"
+            },
+            {
+                "iconUrl": "http: //198.74.61.26: 8080/images/icons/priority_major.gif",
+                "self": "http: //198.74.61.26: 8080/rest/api/2/priority/3",
+                "name": "Major",
+                "id": "3"
+            },
+            {
+                "iconUrl": "http: //198.74.61.26: 8080/images/icons/priority_minor.gif",
+                "self": "http: //198.74.61.26: 8080/rest/api/2/priority/4",
+                "name": "Minor",
+                "id": "4"
+            },
+            {
+                "iconUrl": "http: //198.74.61.26: 8080/images/icons/priority_trivial.gif",
+                "self": "http: //198.74.61.26: 8080/rest/api/2/priority/5",
+                "name": "Trivial",
+                "id": "5"
+            },
+            {
+                "iconUrl": "http: //198.74.61.26: 8080/images/icons/priorities/trivial.png",
+                "self": "http: //198.74.61.26: 8080/rest/api/2/priority/6",
+                "name": "pretty_bad",
+                "id": "6"
+            },
+            {
+                "iconUrl": "http: //198.74.61.26: 8080/images/icons/priorities/blocker.png",
+                "self": "http: //198.74.61.26: 8080/rest/api/2/priority/7",
+                "name": "extreme",
+                "id": "7"
+            }],
+            "name": "Priority",
+            "schema": {
+                "type": "priority",
+                "system": "priority"
+            }
+        },
+        "issuetype": {
+            "required": true,
+            "name": "Issue Type",
+            "operations": ["set"],
+			"schema": {
+				"type": "issuetype",
+				"system": "issuetype"
+			}
+        },
+        "customField": {
+            "required": false,
+            "name": "Custom Field",
+            "schema": {
+                "customId": 10000,
+                "type": "string",
+                "custom": "com.atlassian.jira.plugin.system.customfieldtypes:textfield"
+            }
+        }
+    }
+}

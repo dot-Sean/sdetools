@@ -2,6 +2,7 @@ import urllib
 import urllib2
 import httplib
 import base64
+import cookielib
 
 from commons import json, Error, UsageError
 from sdetools.extlib import http_req
@@ -12,11 +13,13 @@ logger = logging.getLogger(__name__)
 URLRequest = http_req.ExtendedMethodRequest
 
 CONF_OPTS = [
-    ['%(prefix)s_user', 'Username for %(name)s Tool', None],
-    ['%(prefix)s_pass', 'Password for %(name)s Tool', None],
-    ['%(prefix)s_server', 'Server of the %(name)s', None],
+    ['%(prefix)s_user', 'Username for %(name)s Tool', ''],
+    ['%(prefix)s_pass', 'Password for %(name)s Tool', ''],
+    ['%(prefix)s_server', 'Server of the %(name)s', ''],
     ['%(prefix)s_method', 'http vs https for %(name)s server', 'https'],
 ]
+
+DEFAULT_API_TOKEN_HEADER_NAME = "X-Api-Token"
 
 class APIError(Error):
     pass
@@ -51,6 +54,13 @@ class APIFormatError(APIError):
     pass
 
 class RESTBase(object):
+    """
+    REST base class supports four authentication mode specified by auth_mode:
+    - basic: HTTP Basic Auth using username and password
+    - api_token: We use the _pass and allow customizing the API Token header name
+    - session: Used mainly for SD Elements session
+    - cookie: A cookie jar is added and cookies will be maintained
+    """
     URLRequest = URLRequest
 
     APIError = APIError
@@ -59,32 +69,58 @@ class RESTBase(object):
     APIAuthError = APIAuthError
     ServerError = ServerError
     APIFormatError = APIFormatError
+    API_TOKEN_HEADER = "X-Api-Token"
 
-    def __init__(self, conf_prefix, conf_name, config, base_path, conf_opts=CONF_OPTS):
+    def __init__(self, conf_prefix, conf_name, config, base_path=None, extra_conf_opts=[]):
+        self._post_init_done = False
         self.config = config
         self.base_path = base_path
         self.conf_prefix = conf_prefix
         self.conf_name = conf_name
         self.opener = None
-        self.auth_mode = 'basic'
-        self._customize_config(conf_opts)
+        self._auth_mode = 'basic'
+        self.api_token_header_name = DEFAULT_API_TOKEN_HEADER_NAME
+        self._customize_config(CONF_OPTS+extra_conf_opts)
+
+    def _get_conf_name(self, name):
+        return '%s_%s' % (self.conf_prefix, name)
 
     def _get_conf(self, name):
-        conf_name = '%s_%s' % (self.conf_prefix, name)
-        return self.config[conf_name]
+        return self.config[self._get_conf_name(name)]
 
     def _customize_config(self, conf_opts):
         for var_name, desc, default in conf_opts:
-            self.config.add_custom_option(
+            self.config.opts.add(
                 var_name % {'prefix': self.conf_prefix},
                 desc % {'name': self.conf_name},
                 default=default,
                 group_name='%s Connector' % (self.conf_name))
 
+    def set_auth_mode(self, auth_mode):
+        if auth_mode not in ['basic', 'session', 'api_token', 'cookie']:
+            raise UsageError('Invalid auth mode %s' % auth_mode)
+        if auth_mode == self._auth_mode:
+            return
+        if auth_mode == 'session':
+            self.start_session()
+        elif auth_mode == 'cookie':
+            if not self.opener:
+                self.post_conf_init()
+            self.cookiejar = cookielib.CookieJar()
+            self.opener.add_handler(urllib2.HTTPCookieProcessor(self.cookiejar))
+            
+        self._auth_mode = auth_mode
+
     def urlencode_str(self, instr):
         return urllib.urlencode({'a':instr})[2:]
 
     def post_conf_init(self):
+        if self._post_init_done:
+            return
+
+        for name in ['method', 'server']:
+            if not self._get_conf(name):
+                raise UsageError('Missing Configuration %s' % self._get_conf_name(name))
 
         urllib_debuglevel = 0
         if __name__ in self.config['debug_mods']:
@@ -94,16 +130,20 @@ class RESTBase(object):
             self._get_conf('method'),
             self._get_conf('server'),
             debuglevel=urllib_debuglevel)
-        self.config['%s_server' % (self.conf_prefix)] = self.opener.server
+        self.config[self._get_conf_name('server')] = self.opener.server
 
         self.session_info = None
         self.server = self._get_conf('server') 
-        self.base_uri = '%s://%s/%s' % (self._get_conf('method'), self.server, self.base_path)
+        self.base_uri = '%s://%s' % (self._get_conf('method'), self.server)
+        if self.base_path:
+            self.base_uri = '%s/%s' % (self.base_uri, self.base_path)
+
+        self._post_init_done = True
 
     def encode_post_args(self, args):
         return json.dumps(args)
 
-    def parse_response(self, result):
+    def parse_response(self, result, headers):
         try:
             result = json.loads(result)
         except:
@@ -111,7 +151,7 @@ class RESTBase(object):
         return result
 
     def parse_error(self, result):
-        return json.loads(err_msg)['error']
+        return json.loads(result)['error']
 
     def set_content_type(self, req, method):
         if (method != URLRequest.GET):
@@ -123,7 +163,15 @@ class RESTBase(object):
         """
         return []
 
-    def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}):
+    def generate_token_auth_header(self):
+        """
+        Override this to add your own custom authentication header
+        Expected return value:
+            [HEADER_NAME, HEADER_VALUE]
+        """
+        return [self.api_token_header_name, self._get_conf('pass')]
+
+    def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}, auth_mode=None):
         """
         Internal method used to call a RESTFul API
 
@@ -140,7 +188,8 @@ class RESTBase(object):
         logger.info('Calling %s API: %s %s' % (self.conf_name, method, target))
         logger.debug(' + Args: %s' % ((repr(args)[:200]) + (repr(args)[200:] and '...')))
         req_url = '%s/%s' % (self.base_uri, target)
-        auth_mode = self.auth_mode
+        if auth_mode is None:
+            auth_mode = self._auth_mode
         args = args or {}
         data = None
 
@@ -154,12 +203,16 @@ class RESTBase(object):
         self.set_content_type(req, method)
 
         if auth_mode == 'api_token':
-            req.add_header("X-Api-Token", self._get_conf('pass'))
+            authheader = self.generate_token_auth_header()
+            req.add_header(authheader[0], authheader[1])
         elif target == 'session':
+            pass
+        elif auth_mode == 'cookie':
+            # cookie jar will automatically handle this
             pass
         elif auth_mode == 'basic':
             encoded_auth = base64.encodestring('%s:%s' % (self._get_conf('user'), self._get_conf('pass')))[:-1]
-            authheader =  "Basic %s" % (encoded_auth)
+            authheader = "Basic %s" % (encoded_auth)
             req.add_header("Authorization", authheader)
         elif auth_mode == 'session':
             if not self.session_info:
@@ -214,8 +267,7 @@ class RESTBase(object):
                 break
             result += res_buf
         handle.close()
-
-        result = self.parse_response(result)
+        result = self.parse_response(result, dict(handle.headers))
 
         return result
 
@@ -228,7 +280,7 @@ class RESTBase(object):
             'username': self._get_conf('user'),
             'password': self._get_conf('pass')}
         try:
-            result = self.call_api('session', URLRequest.PUT, args=args)
+            result = self.call_api('session', URLRequest.PUT, args=args, auth_mode='basic')
         except APIHTTPError, err:
             if err.code == 400:
                 raise APIAuthError('Invalid Credentials for %s' % self.conf_name)
@@ -238,4 +290,3 @@ class RESTBase(object):
             if key not in result:
                 raise APIFormatError('Invalid session information structure.')
         self.session_info = result
-        self.auth_mode = 'session'

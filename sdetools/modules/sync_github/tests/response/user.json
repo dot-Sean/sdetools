@@ -1,0 +1,8 @@
+{
+	"login": "test",
+	"id": 1,
+	"url": "https://api.github.com/users/test",
+	"name": "test user",
+	"company": "SecurityCompass",
+	"email": "test+user@securitycompass.com"
+}

@@ -1,0 +1,98 @@
+{
+    "status": "TODO",
+    "contextrulesets": [],
+    "timestamp": 1381173561,
+    "note_count": 0,
+    "implementations": [
+        {
+            "contextrulesets": [
+                {
+                    "required": [
+                        {
+                            "type": "imports",
+                            "value": "javax.xml.*"
+                        }
+                    ],
+                    "excluded": []
+                }
+            ],
+            "url": "https://m1.sdelements.com/library/tasks/T40/use-xml-encoding-when-interacting-with-xml-data-java-with-esapi/",
+            "title": "I55: Java with ESAPI",
+            "id": "I55",
+            "content": "## Description\r\n\r\nThe following code demonstrates this implementation:\r\n\r\n## Code\r\n\r\n    String safe_xml = \r\n        \"<element>\" \r\n        + ESAPI.encoder().encodeForXML(untrusted_input ) \r\n        + \"</element>\";\r\n\r\n[Download the Complete Code Example]({{ USE_MEDIA_URL }}code/Java/java.esapi.encoding.jar){@class=code-download}\r\n\r\n## 3rd Party Libraries\r\n\r\nOWASP ESAPI for Java 2.0, RC7\r\n",
+            "slug": "use-xml-encoding-when-interacting-with-xml-data-java-with-esapi"
+        },
+        {
+            "contextrulesets": [
+                {
+                    "required": [
+                        {
+                            "type": "imports",
+                            "value": "javax.xml.*"
+                        }
+                    ],
+                    "excluded": []
+                }
+            ],
+            "url": "https://m1.sdelements.com/library/tasks/T40/use-xml-encoding-when-interacting-with-xml-data-java-ee-with-jaxb/",
+            "title": "I56: Java EE with JAXB",
+            "id": "I56",
+            "content": "## Description\r\n\r\nJAXB marshalling protects against XML injection by performing character escaping automatically. However, it is possible that your implementation overrides the Character Escaping Handler. This could effectively disable protection. See http://download.oracle.com/docs/cd/E17802_01/webservices/webservices/docs/1.6/jaxb/vendorProperties.html for details.\r\n\r\n## 3rd Party Libraries\r\n\r\nJAXB\r\n",
+            "slug": "use-xml-encoding-when-interacting-with-xml-data-java-ee-with-jaxb"
+        },
+        {
+            "contextrulesets": [
+                {
+                    "required": [
+                        {
+                            "type": "regex",
+                            "value": "InnerXml|OuterXml"
+                        }
+                    ],
+                    "excluded": []
+                }
+            ],
+            "url": "https://m1.sdelements.com/library/tasks/T40/use-xml-encoding-when-interacting-with-xml-data-aspnet-with-microsoft-anti-xss/",
+            "title": "I116: ASP.Net / C# with XML and Microsoft Anti XSS",
+            "id": "I116",
+            "content": "## Description\r\n\r\nThe following code demonstrates this implementation:\r\n\r\n## Code\r\n\r\n    // the following code\r\n\r\n    var payload = \"this could have <html> tags inside\";\r\n\r\n    var xmlDocument = new XmlDocument();\r\n    XmlElement rootNode  = xmlDocument.CreateElement(\"RootNode\");\r\n    xmlDocument.AppendChild(rootNode);\r\n    XmlElement childNode  = xmlDocument.CreateElement(\"ChildNode\");\r\n    childNode.InnerXml= AntiXss.XmlEncode(payload);\r\n    rootNode.AppendChild(childNode);\r\n\r\n    //creates the following XML content:\r\n\r\n    <?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n    <RootNode>\r\n      <ChildNode>this could have &lt;html&gt; tags inside</ChildNode>\r\n    </RootNode>\r\n\r\n[Download the Complete Code Example]({{ USE_MEDIA_URL }}code/DotNet/DotNet.XML Encoding.zip){@class=code-download}\r\n\r\n## 3rd Party Libraries\r\n\r\nMicrosoft Anti-XSS\r\n",
+            "slug": "use-xml-encoding-when-interacting-with-xml-data-aspnet-with-microsoft-anti-xss"
+        },
+        {
+            "contextrulesets": [],
+            "url": "https://m1.sdelements.com/library/tasks/T40/use-xml-encoding-when-interacting-with-xml-data-rails/",
+            "title": "I240: Rails",
+            "id": "I240",
+            "content": "## Description\r\nIn Rails, you can you the :to_xml for ActiveRecord objects and :to_xs for String objects to perform a safe XML encoding. The following code demonstrates this implementation:\r\n\r\n## Code\r\n\r\n -- app/controllers/users_controller.rb\r\n\r\n    ...\r\n    def show\r\n        @user = User.find(params[:id])\r\n        respond_to do |format|\r\n            format.html { }\r\n            format.xml { render :xml => @user.to_xml(:only => [:id, :first_name, :last_name]) }\r\n            format.xml2 { }\r\n            format.dtd { }\r\n        end\r\n    end\r\n    ...\r\n\r\n -- app/views/users/show.xml2.builder\r\n\r\n    xml.person do\r\n        xml.first_name @user.first_name\r\n        # Don't use the following as it's vulnerable to injection\r\n        # xml << \"<last_name>#{@user.last_name}</last_name>\"\r\n        xml << \"<last_name>#{@user.last_name.to_xs}</last_name>\"\r\n    end\r\n\r\n[Download the Complete Code Example]({{ USE_MEDIA_URL }}code/Rails/use-xml-encoding-when-interacting-with-xml-data.zip){@class=code-download}",
+            "slug": "use-xml-encoding-when-interacting-with-xml-data-rails"
+        }
+    ],
+    "phase": "development",
+    "id": "1296-T40",
+    "categories": [
+        "Output Encoding",
+        "XML and Web Services"
+    ],
+    "priority": 4,
+    "weakness": {
+        "content": "Within XML, special elements could include reserved words or characters such as \"<\", \">\", \"\"\", and \"&\", which could then be used to add new data or modify XML syntax.",
+        "cwe": [
+            {
+                "url": "http://cwe.mitre.org/data/definitions/91",
+                "title": "XML Injection (aka Blind XPath Injection)",
+                "cwe_id": 91
+            }
+        ],
+        "id": "P667",
+        "title": "P667: XML Injection (aka Blind XPath Injection)"
+    },
+    "title": "T40: Use XML encoding when interacting with XML data",
+    "url": "https://m1.sdelements.com/library/tasks/T40/",
+    "age": "current",
+    "project": 1296,
+    "assigned_to": [],
+    "content": "To mitigate the risk of injection, XML encodes untrusted data when dynamically creating XML. Perform explicit encoding for other XML formats such as:\r\n\r\n*  XPath\r\n*  Document Type Definition (DTD)\r\n*  XML Stylesheets\r\n*  Preprocessing tags\r\n\r\nAs with HTML, use a whitelist of characters which you know to be safe (e.g. alphanumeric) and XML-encode all other characters. If this approach is not feasible, consider XML-encoding known special characters.",
+    "verification_coverage": [
+        "No Automated Dynamic Analysis Coverage"
+    ]
+}

@@ -1,0 +1,2030 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ReportDefinition type="xml">
+    <TemplateName>Fortify Security Report</TemplateName>
+    <TemplatePath></TemplatePath>
+    <LogoPath>/fortify.jpg</LogoPath>
+    <Footnote>Copyright 2012 Fortify Software Inc.</Footnote>
+    <UserName>securitycompass</UserName>
+    <ReportSection optionalSubsections="false" enabled="true">
+        <Title>Executive Summary</Title>
+        <SubSection enabled="true">
+            <Title>Issues Overview</Title>
+            <Description>This section provides an overview of the issues uncovered during analysis. The report covers a summary of vulnerability categories discovered by the tool. The auditor should augment this section with higher-level conclusions derived from human review of the application (including architecture reviews,	black-box testing, compliance issues, etc.)</Description>
+            <Text>On Feb 20, 2013, a source code review was performed over the WebGoat-5.2 code base. 285 files, 1,478 LOC (Executable) were scanned and reviewed for defects that could lead to potential security vulnerabilities. A total of 180 reviewed findings were uncovered during the analysis.</Text>
+        </SubSection>
+        <SubSection enabled="true">
+            <Title>Issue Summary by Fortify Priority Order</Title>
+            <Description>A table summarizing the number of issues found and the breakdown of issues in each Fortify Priority Level</Description>
+            <IssueListing limit="-1" listing="false">
+                <Refinement></Refinement>
+                <Chart chartType="table">
+                    <Axis>Fortify Priority Order</Axis>
+                    <MajorAttribute>Analysis</MajorAttribute>
+                    <GroupingSection count="102">
+                        <groupTitle>Low</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="63">
+                        <groupTitle>Critical</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="9">
+                        <groupTitle>High</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="6">
+                        <groupTitle>Medium</groupTitle>
+                    </GroupingSection>
+                </Chart>
+            </IssueListing>
+        </SubSection>
+        <SubSection enabled="true">
+            <Title>Recommendations and Conclusions</Title>
+            <Description>This section gives some high-level recommendations on remediating the issues discussed in the Issues Summary sub section. Recommendations will vary based on deployment scenarios, risk appetite, and existing mitigating strategies. The auditor should supplement the Fortify generic recommendations with specific information that takes into account the application specific variables.</Description>
+            <Text>The Issues Category section provides Fortify recommendations for addressing issues at a generic level.  The recommendations for specific fixes can be extrapolated from those generic recommendations by the development group.</Text>
+        </SubSection>
+    </ReportSection>
+    <ReportSection optionalSubsections="true" enabled="true">
+        <Title>Project Summary</Title>
+        <SubSection enabled="true">
+            <Title>Code Base Summary</Title>
+            <Description>Summary of the Codebase that was analyzed</Description>
+            <Text>Code location: C:/Users/securitycompass/workspace/WebGoat-5.2&#xD;
+Number of Files: 285&#xD;
+Lines of Code: 1478&#xD;
+Build Label: WebGoat-5.2</Text>
+        </SubSection>
+        <SubSection enabled="true">
+            <Title>Scan Information</Title>
+            <Description>Details of the analysis</Description>
+            <Text>Scan time: 01:11&#xD;
+SCA Engine version: 5.14.0.0034&#xD;
+Machine Name: SecComPC&#xD;
+Username running scan: securitycompass</Text>
+        </SubSection>
+        <SubSection enabled="true">
+            <Title>Results Certification</Title>
+            <Description>A full summary of the Results Certification for this project</Description>
+            <Text>Results Certification Valid&#xD;
+&#xD;
+Details:&#xD;
+&#xD;
+Results Signature:
+
+	SCA Analysis Results has Valid signature
+	
+
+Rules Signature:
+
+	There were no custom rules used in this scan</Text>
+        </SubSection>
+        <SubSection enabled="true">
+            <Title>Attack Surface</Title>
+            <Description>A full summary of the attack surface for this project</Description>
+            <Text>Attack Surface:&#xD;
+Private Information:
+	null.null.null
+	org.owasp.webgoat.session.Employee.getCcn
+	org.owasp.webgoat.session.Employee.getSsn
+
+System Information:
+	javax.servlet.ServletContext.getRealPath
+</Text>
+        </SubSection>
+        <SubSection enabled="true">
+            <Title>Filter Set Summary</Title>
+            <Description>A brief summary of the filterset used to create this report</Description>
+            <Text>Current Enabled Filter Set:&#xD;
+Security Auditor View&#xD;
+&#xD;
+Filter Set Details:&#xD;
+&#xD;
+Folder Filters:
+If [fortify priority order] contains critical Then set folder to Critical
+If [fortify priority order] contains high Then set folder to High
+If [fortify priority order] contains medium Then set folder to Medium
+If [fortify priority order] contains low Then set folder to Low
+If [issue state] is not an issue Then set folder to Non Issue</Text>
+        </SubSection>
+        <SubSection enabled="true">
+            <Title>Audit Guide Summary</Title>
+            <Description>Summary of the impact of the audit guide</Description>
+            <Text>Audit guide not enabled</Text>
+        </SubSection>
+    </ReportSection>
+    <ReportSection optionalSubsections="true" enabled="true">
+        <Title>Results Outline</Title>
+        <SubSection enabled="true">
+            <Title>Overall number of results</Title>
+            <Description>Results count</Description>
+            <Text>The scan found 180 issues.</Text>
+        </SubSection>
+        <SubSection enabled="true">
+            <Title>Vulnerability Examples by Category</Title>
+            <Description>Results summary for critical and high priority issues.  Vulnerability examples are provided by category.</Description>
+            <IssueListing limit="1" listing="true">
+                <Refinement>[fortify priority order]:critical [fortify priority order]:high</Refinement>
+                <Chart chartType="list">
+                    <Axis>Category</Axis>
+                    <MajorAttribute>Analysis</MajorAttribute>
+                    <GroupingSection count="42">
+                        <groupTitle>Privacy Violation</groupTitle>
+                        <MajorAttributeSummary>
+                            <MetaInfo>
+<Name>Abstract</Name>
+<Value>Mishandling private information, such as customer passwords or social security numbers, can compromise user privacy and is often illegal. </Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Explanation</Name>
+<Value>Privacy violations occur when:
+
+1. Private user information enters the program.
+
+2. The data is written to an external location, such as the console, file system, or network. 
+
+
+Example: The following code contains a logging statement that tracks the contents of records added to a database by storing them in a log file. Among other values that are stored, the getPassword() function returns the user-supplied plaintext password associated with the account. 
+
+
+pass = getPassword();
+...
+dbmsLog.println(id+&quot;:&quot;+pass+&quot;:&quot;+type+&quot;:&quot;+tstamp);
+
+
+The code in the example above logs a plaintext password to the filesystem. Although many developers trust the filesystem as a safe storage location for data, it should not be trusted implicitly, particularly when privacy is a concern. 
+
+Private data can enter a program in a variety of ways:
+
+- Directly from the user in the form of a password or personal information
+
+- Accessed from a database or other data store by the application
+
+- Indirectly from a partner or other third party
+
+Sometimes data that is not labeled as private can have a privacy implication in a different context. For example, student identification numbers are usually not considered private because there is no explicit and publicly-available mapping to an individual student's personal information. However, if a school generates identification numbers based on student social security numbers, then the identification numbers should be considered private. 
+
+Security and privacy concerns often seem to compete with each other. From a security perspective, you should record all important operations so that any anomalous activity can later be identified. However, when private data is involved, this practice can in fact create risk. 
+
+Although there are many ways in which private data can be handled unsafely, a common risk stems from misplaced trust. Programmers often trust the operating environment in which a program runs, and therefore believe that it is acceptable to store private information on the file system, in the registry, or in other locally-controlled resources. However, even if access to certain resources is restricted, this does not guarantee that the individuals who do have access can be trusted. For example, in 2004, an unscrupulous employee at AOL sold approximately 92 million private customer e-mail addresses to a spammer marketing an offshore gambling web site [1].
+
+In response to such high-profile exploits, the collection and management of private data is becoming increasingly regulated. Depending on its location, the type of business it conducts, and the nature of any private data it handles, an organization may be required to comply with one or more of the following federal and state regulations:
+
+- Safe Harbor Privacy Framework [3]
+
+- Gramm-Leach Bliley Act (GLBA) [4]
+
+- Health Insurance Portability and Accountability Act (HIPAA) [5]
+
+- California SB-1386 [6]
+
+Despite these regulations, privacy violations continue to occur with alarming frequency.</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Recommendations</Name>
+<Value>When security and privacy demands clash, privacy should usually be given the higher priority. To accomplish this and still maintain required security information, cleanse any private information before it exits the program.
+
+To enforce good privacy management, develop and strictly adhere to internal privacy guidelines. The guidelines should specifically describe how an application should handle private data. If your organization is regulated by federal or state law, ensure that your privacy guidelines are sufficiently strenuous to meet the legal requirements. Even if your organization is not regulated, you must protect private information or risk losing customer confidence.
+
+The best policy with respect to private data is to minimize its exposure. Applications, processes, and employees should not be granted access to any private data unless the access is required for the tasks that they are to perform. Just as the principle of least privilege dictates that no operation should be performed with more than the necessary privileges, access to private data should be restricted to the smallest possible group.</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Tips</Name>
+<Value>1. As part of any thorough audit for privacy violations, ensure that custom rules have been written to identify all sources of private or otherwise sensitive information entering the program. Most sources of private data cannot be identified automatically. Without custom rules, your check for privacy violations is likely to be substantially incomplete.
+
+2. The Fortify Java Annotations FortifyPassword, FortifyNotPassword, FortifyPrivate and FortifyNotPrivate can be used to indicate which fields and variables represent passwords and private data.
+
+3. A number of modern web frameworks provide mechanisms for performing validation of user input. Struts and Struts 2 are among them. To highlight the unvalidated sources of input, the HP Fortify Secure Coding Rulepacks dynamically re-prioritize the issues reported by HP Fortify Static Code Analyzer by lowering their probability of exploit and providing pointers to the supporting evidence whenever the framework validation mechanism is in use. We refer to this feature as Context-Sensitive Ranking. To further assist the HP Fortify user with the auditing process, the Fortify Security Research Group makes available the Data Validation project template that groups the issues into folders based on the validation mechanism applied to their source of input.
+
+4. Fortify RTA adds protection against this category.</Value>
+                            </MetaInfo>
+                            <AttributeValue>
+<Name>&lt;Unaudited&gt;</Name>
+<Count>42</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Not an Issue</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Reliability Issue</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Bad Practice</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Suspicious</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Exploitable</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                        </MajorAttributeSummary>
+                        <Issue ruleID="9C96C95D-D448-4B86-940D-D0371E42CB88" iid="D355355E646F396A12509817D862A27A">
+                            <Category>Privacy Violation</Category>
+                            <Folder>Critical</Folder>
+                            <Kingdom>Security Features</Kingdom>
+                            <Abstract>The method _jspService() in EditProfile.jsp mishandles confidential information, which can compromise user privacy and is often illegal.</Abstract>
+                            <Friority>Critical</Friority>
+                            <Primary>
+<FileName>EditProfile.jsp</FileName>
+<FilePath>WebContent/lessons/CrossSiteScripting/EditProfile.jsp</FilePath>
+<LineStart>54</LineStart>
+<Snippet>			    	&lt;/TD&gt;
+			    	&lt;TD&gt;
+			    		&lt;input class=&quot;lesson_text_db&quot; name=&quot;&lt;%=CrossSiteScripting.SSN%&gt;&quot; type=&quot;text&quot; value=&quot;&lt;%=employee.getSsn()%&gt;&quot;/&gt; 
+					&lt;/TD&gt;
+					&lt;TD&gt;				</Snippet>
+                            </Primary>
+                            <Source>
+<FileName>EditProfile.jsp</FileName>
+<FilePath>WebContent/lessons/CrossSiteScripting/EditProfile.jsp</FilePath>
+<LineStart>54</LineStart>
+<Snippet>			    	&lt;/TD&gt;
+			    	&lt;TD&gt;
+			    		&lt;input class=&quot;lesson_text_db&quot; name=&quot;&lt;%=CrossSiteScripting.SSN%&gt;&quot; type=&quot;text&quot; value=&quot;&lt;%=employee.getSsn()%&gt;&quot;/&gt; 
+					&lt;/TD&gt;
+					&lt;TD&gt;				</Snippet>
+                            </Source>
+                        </Issue>
+                    </GroupingSection>
+                    <GroupingSection count="13">
+                        <groupTitle>Cross-Site Scripting: Reflected</groupTitle>
+                        <MajorAttributeSummary>
+                            <MetaInfo>
+<Name>Abstract</Name>
+<Value>Sending unvalidated data to a web browser can result in the browser executing malicious code.</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Explanation</Name>
+<Value>Cross-site scripting (XSS) vulnerabilities occur when:
+
+1. Data enters a web application through an untrusted source. In the case of Reflected XSS, the untrusted source is typically a web request, while in the case of Persisted (also known as Stored) XSS it is typically a database or other back-end datastore.
+
+
+2. The data is included in dynamic content that is sent to a web user without being validated for malicious code. 
+
+The malicious content sent to the web browser often takes the form of a segment of JavaScript, but may also include HTML, Flash or any other type of code that the browser may execute. The variety of attacks based on XSS is almost limitless, but they commonly include transmitting private data like cookies or other session information to the attacker, redirecting the victim to web content controlled by the attacker, or performing other malicious operations on the user's machine under the guise of the vulnerable site.
+
+
+Example 1: The following JSP code segment reads an employee ID, eid, from an HTTP request and displays it to the user. 
+
+
+&lt;% String eid = request.getParameter(&quot;eid&quot;); %&gt; 
+...
+Employee ID: &lt;%= eid %&gt;
+
+
+
+
+The code in this example operates correctly if eid contains only standard alphanumeric text. If eid has a value that includes meta-characters or source code, then the code will be executed by the web browser as it displays the HTTP response.
+
+Initially this might not appear to be much of a vulnerability. After all, why would someone enter a URL that causes malicious code to run on their own computer? The real danger is that an attacker will create the malicious URL, then use e-mail or social engineering tricks to lure victims into visiting a link to the URL. When victims click the link, they unwittingly reflect the malicious content through the vulnerable web application back to their own computers. This mechanism of exploiting vulnerable web applications is known as Reflected XSS.
+
+
+Example 2: The following JSP code segment queries a database for an employee with a given ID and prints the corresponding employee's name.
+
+ 
+&lt;%... 
+Statement stmt = conn.createStatement();
+ResultSet rs = stmt.executeQuery(&quot;select * from emp where id=&quot;+eid);
+if (rs != null) {
+   rs.next(); 
+   String name = rs.getString(&quot;name&quot;);
+}
+%&gt;
+
+Employee Name: &lt;%= name %&gt;
+
+
+
+
+As in Example 1, this code functions correctly when the values of name are well-behaved, but it does nothing to prevent exploits if they are not. Again, this code can appear less dangerous because the value of name is read from a database, whose contents are apparently managed by the application. However, if the value of name originates from user-supplied data, then the database can be a conduit for malicious content. Without proper input validation on all data stored in the database, an attacker can execute malicious commands in the user's web browser. This type of exploit, known as Persistent (or Stored) XSS, is particularly insidious because the indirection caused by the data store makes it more difficult to identify the threat and increases the possibility that the attack will affect multiple users. XSS got its start in this form with web sites that offered a &quot;guestbook&quot; to visitors. Attackers would include JavaScript in their guestbook entries, and all subsequent visitors to the guestbook page would execute the malicious code.
+
+As the examples demonstrate, XSS vulnerabilities are caused by code that includes unvalidated data in an HTTP response. There are three vectors by which an XSS attack can reach a victim:
+
+- As in Example 1, data is read directly from the HTTP request and reflected back in the HTTP response. Reflected XSS exploits occur when an attacker causes a user to supply dangerous content to a vulnerable web application, which is then reflected back to the user and executed by the web browser. The most common mechanism for delivering malicious content is to include it as a parameter in a URL that is posted publicly or e-mailed directly to victims. URLs constructed in this manner constitute the core of many phishing schemes, whereby an attacker convinces victims to visit a URL that refers to a vulnerable site. After the site reflects the attacker's content back to the user, the content is executed and proceeds to transfer private information, such as cookies that may include session information, from the user's machine to the attacker or perform other nefarious activities.
+
+- As in Example 2, the application stores dangerous data in a database or other trusted data store. The dangerous data is subsequently read back into the application and included in dynamic content. Persistent XSS exploits occur when an attacker injects dangerous content into a data store that is later read and included in dynamic content. From an attacker's perspective, the optimal place to inject malicious content is in an area that is displayed to either many users or particularly interesting users. Interesting users typically have elevated privileges in the application or interact with sensitive data that is valuable to the attacker. If one of these users executes malicious content, the attacker may be able to perform privileged operations on behalf of the user or gain access to sensitive data belonging to the user.
+
+- A source outside the application stores dangerous data in a database or other data store, and the dangerous data is subsequently read back into the application as trusted data and included in dynamic content.
+
+
+
+A number of modern web frameworks provide mechanisms for performing validation of user input. Struts and Struts 2 are among them. To highlight the unvalidated sources of input, the rulepacks dynamically re-prioritize the issues reported by HP Fortify Static Code Analyzer by lowering their probability of exploit and providing pointers to the supporting evidence whenever the framework validation mechanism is in use. We refer to this feature as Context-Sensitive Ranking. To further assist the HP Fortify user with the auditing process, the Fortify Security Research Group makes available the Data Validation project template that groups the issues into folders based on the validation mechanism applied to their source of input.
+</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Recommendations</Name>
+<Value>The solution to XSS is to ensure that validation occurs in the correct places and checks for the correct properties.
+
+Since XSS vulnerabilities occur when an application includes malicious data in its output, one logical approach is to validate data immediately before it leaves the application. However, because web applications often have complex and intricate code for generating dynamic content, this method is prone to errors of omission (missing validation). An effective way to mitigate this risk is to also perform input validation for XSS.
+
+Web applications must validate their input to prevent other vulnerabilities, such as SQL injection, so augmenting an application's existing input validation mechanism to include checks for XSS is generally relatively easy. Despite its value, input validation for XSS does not take the place of rigorous output validation. An application may accept input through a shared data store or other trusted source, and that data store may accept input from a source that does not perform adequate input validation. Therefore, the application cannot implicitly rely on the safety of this or any other data. This means the best way to prevent XSS vulnerabilities is to validate everything that enters the application or leaves the application destined for the user. 
+
+The most secure approach to validation for XSS is to create a whitelist of safe characters that are allowed to appear in HTTP content and accept input composed exclusively of characters in the approved set. For example, a valid username might only include alpha-numeric characters or a phone number might only include digits 0-9. However, this solution is often infeasible in web applications because many characters that have special meaning to the browser should still be considered valid input once they are encoded, such as a web design bulletin board that must accept HTML fragments from its users. 
+
+A more flexible, but less secure approach is known as blacklisting, which selectively rejects or escapes potentially dangerous characters before using the input. In order to form such a list, you first need to understand the set of characters that hold special meaning for web browsers. Although the HTML standard defines what characters have special meaning, many web browsers try to correct common mistakes in HTML and may treat other characters as special in certain contexts. The CERT(R) Coordination Center at the Software Engineering Institute at Carnegie Mellon University provides the following details about special characters in various contexts [1]:
+
+In the content of a block-level element (in the middle of a paragraph of text):
+
+- &quot;&lt;&quot; is special because it introduces a tag.
+
+- &quot;&amp;&quot; is special because it introduces a character entity.
+
+- &quot;&gt;&quot; is special because some browsers treat it as special, on the assumption that the author of the page intended to include an opening &quot;&lt;&quot;, but omitted it in error.
+
+The following principles apply to attribute values:
+
+- In attribute values enclosed with double quotes, the double quotes are special because they mark the end of the attribute value.
+
+- In attribute values enclosed with single quote, the single quotes are special because they mark the end of the attribute value.
+
+- In attribute values without any quotes, white-space characters, such as space and tab, are special.
+
+- &quot;&amp;&quot; is special when used with certain attributes, because it introduces a character entity. 
+
+In URLs, for example, a search engine might provide a link within the results page that the user can click to re-run the search. This can be implemented by encoding the search query inside the URL, which introduces additional special characters:
+
+- Space, tab, and new line are special because they mark the end of the URL.
+
+- &quot;&amp;&quot; is special because it either introduces a character entity or separates CGI parameters.
+
+- Non-ASCII characters (that is, everything above 128 in the ISO-8859-1 encoding) are not allowed in URLs, so they are considered to be special in this context.
+
+- The &quot;%&quot; symbol must be filtered from input anywhere parameters encoded with HTTP escape sequences are decoded by server-side code. For example, &quot;%&quot; must be filtered if input such as &quot;%68%65%6C%6C%6F&quot; becomes &quot;hello&quot; when it appears on the web page in question.
+
+
+Within the body of a &lt;SCRIPT&gt; &lt;/SCRIPT&gt;:
+
+- The semicolon, parenthesis, curly braces, and new line should be filtered in situations where text could be inserted directly into a pre-existing script tag. 
+
+Server-side scripts:
+
+- Server-side scripts that convert any exclamation characters (!) in input to double-quote characters (&quot;) on output might require additional filtering. 
+
+Other possibilities:
+
+- If an attacker submits a request in UTF-7, the special character '&lt;' appears as '+ADw-' and may bypass filtering. If the output is included in a page that does not explicitly specify an encoding format, then some browsers try to intelligently identify the encoding based on the content (in this case, UTF-7).
+
+Once you identify the correct points in an application to perform validation for XSS attacks and what special characters the validation should consider, the next challenge is to identify how your validation handles special characters. If special characters are not considered valid input to the application, then you can reject any input that contains special characters as invalid. A second option in this situation is to remove special characters with filtering. However, filtering has the side effect of changing any visual representation of the filtered content and may be unacceptable in circumstances where the integrity of the input must be preserved for display.
+
+If input containing special characters must be accepted and displayed accurately, validation must encode any special characters to remove their significance. A complete list of ISO 8859-1 encoded values for special characters is provided as part of the official HTML specification [2].
+
+Many application servers attempt to limit an application's exposure to cross-site scripting vulnerabilities by providing implementations for the functions responsible for setting certain specific HTTP response content that perform validation for the characters essential to a cross-site scripting attack. Do not rely on the server running your application to make it secure. When an application is developed there are no guarantees about what application servers it will run on during its lifetime. As standards and known exploits evolve, there are no guarantees that application servers will also stay in sync.</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Tips</Name>
+<Value>1. The HP Fortify Secure Coding Rulepacks treat the database as a source of untrusted data, which can lead to XSS vulnerabilities. If the database is a trusted resource in your environment, use custom filters to filter out dataflow issues that include the DATABASE taint flag or originate from database sources.
+
+2. Even though URL encoding untrusted data protects against many XSS attacks, some browsers (specifically, Internet Explorer 6 and 7 and possibly others) automatically decode content at certain locations within the Document Object Model (DOM) prior to passing it to the JavaScript interpreter. To reflect this danger, the rulepacks no longer treat URL encoding routines as sufficient to protect against Cross-Site Scripting. Data values that are URL encoded and subsequently output will cause Fortify to report Cross-Site Scripting: Poor Validation vulnerabilities.
+
+3. Fortify RTA adds protection against this category.</Value>
+                            </MetaInfo>
+                            <AttributeValue>
+<Name>&lt;Unaudited&gt;</Name>
+<Count>13</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Not an Issue</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Reliability Issue</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Bad Practice</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Suspicious</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Exploitable</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                        </MajorAttributeSummary>
+                        <Issue ruleID="18669F4F-A529-49A2-8A8E-0A7711708F38" iid="841D1A8B4B70E3D782DC2827518D432D">
+                            <Category>Cross-Site Scripting: Reflected</Category>
+                            <Folder>Critical</Folder>
+                            <Kingdom>Input Validation and Representation</Kingdom>
+                            <Abstract>The method _jspService() in eval.jsp sends unvalidated data to a web browser on line 30, which can result in the browser executing malicious code.</Abstract>
+                            <Friority>Critical</Friority>
+                            <Primary>
+<FileName>eval.jsp</FileName>
+<FilePath>C__Users_securitycompass_workspace_WebGoat-5.2_WebContent_lessons_Ajax/eval.jsp</FilePath>
+<LineStart>30</LineStart>
+<Snippet>		}
+		
+		out.write(&quot;alert('Whoops: You entered an incorrect access code of \&quot;&quot; + field1 + &quot;\&quot;');&quot;);
+	}
+	else</Snippet>
+                            </Primary>
+                            <Source>
+<FileName>eval.jsp</FileName>
+<FilePath>C__Users_securitycompass_workspace_WebGoat-5.2_WebContent_lessons_Ajax/eval.jsp</FilePath>
+<LineStart>5</LineStart>
+<Snippet>&lt;%
+String action = request.getParameter(&quot;action&quot;);
+String field1 = request.getParameter(&quot;field1&quot;);
+String field2 = request.getParameter(&quot;field2&quot;);
+String regex1 = &quot;^[0-9]{3}$&quot;;// any three digits</Snippet>
+                            </Source>
+                        </Issue>
+                    </GroupingSection>
+                    <GroupingSection count="7">
+                        <groupTitle>Cross-Site Scripting: DOM</groupTitle>
+                        <MajorAttributeSummary>
+                            <MetaInfo>
+<Name>Abstract</Name>
+<Value>Sending unvalidated data to a web browser can result in the browser executing malicious code.</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Explanation</Name>
+<Value>Cross-site scripting (XSS) vulnerabilities occur when:
+
+1. Data enters a web application through an untrusted source. In the case of DOM-based XSS, data is read from a URL parameter or other value within the browser and written back into the page with client-side code. In the case of Reflected XSS, the untrusted source is typically a web request, while in the case of Persisted (also known as Stored) XSS it is typically a database or other back-end datastore.
+
+
+2. The data is included in dynamic content that is sent to a web user without being validated for malicious code. In the case of DOM Based XSS, malicious code gets executed as part of DOM (Document Object Model) creation, whenever the victim's browser parses the HTML page. 
+
+The malicious content sent to the web browser often takes the form of a segment of JavaScript, but may also include HTML, Flash or any other type of code that the browser may execute. The variety of attacks based on XSS is almost limitless, but they commonly include transmitting private data like cookies or other session information to the attacker, redirecting the victim to web content controlled by the attacker, or performing other malicious operations on the user's machine under the guise of the vulnerable site.
+
+Example: The following JavaScript code segment reads an employee ID, eid, from an HTTP request and displays it to the user. 
+
+
+&lt;SCRIPT&gt;
+var pos=document.URL.indexOf(&quot;eid=&quot;)+4;
+document.write(document.URL.substring(pos,document.URL.length));
+&lt;/SCRIPT&gt;
+
+
+
+The code in this example operates correctly if eid contains only standard alphanumeric text. If eid has a value that includes meta-characters or source code, then the code will be executed by the web browser as it displays the HTTP response.
+
+Initially this might not appear to be much of a vulnerability. After all, why would someone enter a URL that causes malicious code to run on their own computer? The real danger is that an attacker will create the malicious URL, then use e-mail or social engineering tricks to lure victims into visiting a link to the URL. When victims click the link, they unwittingly reflect the malicious content through the vulnerable web application back to their own computers. This mechanism of exploiting vulnerable web applications is known as Reflected XSS.
+
+
+As the example demonstrates, XSS vulnerabilities are caused by code that includes unvalidated data in an HTTP response. There are three vectors by which an XSS attack can reach a victim:
+
+- Data is read directly from the HTTP request and reflected back in the HTTP response. Reflected XSS exploits occur when an attacker causes a user to supply dangerous content to a vulnerable web application, which is then reflected back to the user and executed by the web browser. The most common mechanism for delivering malicious content is to include it as a parameter in a URL that is posted publicly or e-mailed directly to victims. URLs constructed in this manner constitute the core of many phishing schemes, whereby an attacker convinces victims to visit a URL that refers to a vulnerable site. After the site reflects the attacker's content back to the user, the content is executed and proceeds to transfer private information, such as cookies that may include session information, from the user's machine to the attacker or perform other nefarious activities.
+
+- The application stores dangerous data in a database or other trusted data store. The dangerous data is subsequently read back into the application and included in dynamic content. Persistent XSS exploits occur when an attacker injects dangerous content into a data store that is later read and included in dynamic content. From an attacker's perspective, the optimal place to inject malicious content is in an area that is displayed to either many users or particularly interesting users. Interesting users typically have elevated privileges in the application or interact with sensitive data that is valuable to the attacker. If one of these users executes malicious content, the attacker may be able to perform privileged operations on behalf of the user or gain access to sensitive data belonging to the user.
+
+- A source outside the application stores dangerous data in a database or other data store, and the dangerous data is subsequently read back into the application as trusted data and included in dynamic content.</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Recommendations</Name>
+<Value>The solution to XSS is to ensure that validation occurs in the correct places and checks for the correct properties.
+
+Since XSS vulnerabilities occur when an application includes malicious data in its output, one logical approach is to validate data immediately before it leaves the application. However, because web applications often have complex and intricate code for generating dynamic content, this method is prone to errors of omission (missing validation). An effective way to mitigate this risk is to also perform input validation for XSS.
+
+Web applications must validate their input to prevent other vulnerabilities, such as SQL injection, so augmenting an application's existing input validation mechanism to include checks for XSS is generally relatively easy. Despite its value, input validation for XSS does not take the place of rigorous output validation. An application may accept input through a shared data store or other trusted source, and that data store may accept input from a source that does not perform adequate input validation. Therefore, the application cannot implicitly rely on the safety of this or any other data. This means the best way to prevent XSS vulnerabilities is to validate everything that enters the application or leaves the application destined for the user. 
+
+The most secure approach to validation for XSS is to create a whitelist of safe characters that are allowed to appear in HTTP content and accept input composed exclusively of characters in the approved set. For example, a valid username might only include alpha-numeric characters or a phone number might only include digits 0-9. However, this solution is often infeasible in web applications because many characters that have special meaning to the browser should still be considered valid input once they are encoded, such as a web design bulletin board that must accept HTML fragments from its users. 
+
+A more flexible, but less secure approach is known as blacklisting, which selectively rejects or escapes potentially dangerous characters before using the input. In order to form such a list, you first need to understand the set of characters that hold special meaning for web browsers. Although the HTML standard defines what characters have special meaning, many web browsers try to correct common mistakes in HTML and may treat other characters as special in certain contexts. The CERT(R) Coordination Center at the Software Engineering Institute at Carnegie Mellon University provides the following details about special characters in various contexts [1]:
+
+In the content of a block-level element (in the middle of a paragraph of text):
+
+- &quot;&lt;&quot; is special because it introduces a tag.
+
+- &quot;&amp;&quot; is special because it introduces a character entity.
+
+- &quot;&gt;&quot; is special because some browsers treat it as special, on the assumption that the author of the page intended to include an opening &quot;&lt;&quot;, but omitted it in error.
+
+The following principles apply to attribute values:
+
+- In attribute values enclosed with double quotes, the double quotes are special because they mark the end of the attribute value.
+
+- In attribute values enclosed with single quote, the single quotes are special because they mark the end of the attribute value.
+
+- In attribute values without any quotes, white-space characters, such as space and tab, are special.
+
+- &quot;&amp;&quot; is special when used with certain attributes, because it introduces a character entity. 
+
+In URLs, for example, a search engine might provide a link within the results page that the user can click to re-run the search. This can be implemented by encoding the search query inside the URL, which introduces additional special characters:
+
+- Space, tab, and new line are special because they mark the end of the URL.
+
+- &quot;&amp;&quot; is special because it either introduces a character entity or separates CGI parameters.
+
+- Non-ASCII characters (that is, everything above 128 in the ISO-8859-1 encoding) are not allowed in URLs, so they are considered to be special in this context.
+
+- The &quot;%&quot; symbol must be filtered from input anywhere parameters encoded with HTTP escape sequences are decoded by server-side code. For example, &quot;%&quot; must be filtered if input such as &quot;%68%65%6C%6C%6F&quot; becomes &quot;hello&quot; when it appears on the web page in question.
+
+
+Within the body of a &lt;SCRIPT&gt; &lt;/SCRIPT&gt;:
+
+- The semicolon, parenthesis, curly braces, and new line should be filtered in situations where text could be inserted directly into a pre-existing script tag. 
+
+Server-side scripts:
+
+- Server-side scripts that convert any exclamation characters (!) in input to double-quote characters (&quot;) on output might require additional filtering. 
+
+Other possibilities:
+
+- If an attacker submits a request in UTF-7, the special character '&lt;' appears as '+ADw-' and may bypass filtering. If the output is included in a page that does not explicitly specify an encoding format, then some browsers try to intelligently identify the encoding based on the content (in this case, UTF-7).
+
+Once you identify the correct points in an application to perform validation for XSS attacks and what special characters the validation should consider, the next challenge is to identify how your validation handles special characters. If special characters are not considered valid input to the application, then you can reject any input that contains special characters as invalid. A second option in this situation is to remove special characters with filtering. However, filtering has the side effect of changing any visual representation of the filtered content and may be unacceptable in circumstances where the integrity of the input must be preserved for display.
+
+If input containing special characters must be accepted and displayed accurately, validation must encode any special characters to remove their significance. A complete list of ISO 8859-1 encoded values for special characters is provided as part of the official HTML specification [2].
+
+Many application servers attempt to limit an application's exposure to cross-site scripting vulnerabilities by providing implementations for the functions responsible for setting certain specific HTTP response content that perform validation for the characters essential to a cross-site scripting attack. Do not rely on the server running your application to make it secure. When an application is developed there are no guarantees about what application servers it will run on during its lifetime. As standards and known exploits evolve, there are no guarantees that application servers will also stay in sync.</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Tips</Name>
+<Value>1. The HP Fortify Secure Coding Rulepacks treat the database as a source of untrusted data, which can lead to XSS vulnerabilities. If the database is a trusted resource in your environment, use custom filters to filter out dataflow issues that include the DATABASE taint flag or originate from database sources.
+
+2. Even though URL encoding untrusted data protects against many XSS attacks, some browsers (specifically, Internet Explorer 6 and 7 and possibly others) automatically decode content at certain locations within the Document Object Model (DOM) prior to passing it to the JavaScript interpreter. To reflect this danger, the rulepacks no longer treat URL encoding routines as sufficient to protect against Cross-Site Scripting. Data values that are URL encoded and subsequently output will cause HP Fortify to report Cross-Site Scripting: Poor Validation vulnerabilities.</Value>
+                            </MetaInfo>
+                            <AttributeValue>
+<Name>&lt;Unaudited&gt;</Name>
+<Count>3</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Not an Issue</Name>
+<Count>2</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Reliability Issue</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Bad Practice</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Suspicious</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Exploitable</Name>
+<Count>2</Count>
+                            </AttributeValue>
+                        </MajorAttributeSummary>
+                        <Issue ruleID="EC6687E2-7A2A-4B4B-8E8A-7595215D8D4E0" iid="37A0976E8D20BAED80C0C08FA146F15E">
+                            <Category>Cross-Site Scripting: DOM</Category>
+                            <Folder>Critical</Folder>
+                            <Kingdom>Input Validation and Representation</Kingdom>
+                            <Abstract>The method onreadystatechange() in sameOrigin.js sends unvalidated data to a web browser on line 64, which can result in the browser executing malicious code.</Abstract>
+                            <Friority>Critical</Friority>
+                            <Primary>
+<FileName>sameOrigin.js</FileName>
+<FilePath>C__Users_securitycompass_workspace_WebGoat-5.2_C__Users_securitycompass_workspace_WebGoat-5.2_C__Users_securitycompass_workspace_WebGoat-5.2_WebContent_javascript/sameOrigin.js</FilePath>
+<LineStart>64</LineStart>
+<Snippet>        		+ document.getElementById(&quot;requestedURL&quot;).value ;
+        		
+        	document.getElementById(&quot;responseArea&quot;).innerHTML=result;         	
+        	
+        	document.getElementById(&quot;requestedURL&quot;).value=&quot;&quot;; </Snippet>
+                            </Primary>
+                            <Source>
+<FileName>sameOrigin.js</FileName>
+<FilePath>C__Users_securitycompass_workspace_WebGoat-5.2_C__Users_securitycompass_workspace_WebGoat-5.2_C__Users_securitycompass_workspace_WebGoat-5.2_WebContent_javascript/sameOrigin.js</FilePath>
+<LineStart>56</LineStart>
+<Snippet>      {
+      
+      var result = xmlHttp.responseText;
+      if(xmlHttp.readyState==4)
+        {</Snippet>
+                            </Source>
+                        </Issue>
+                    </GroupingSection>
+                    <GroupingSection count="3">
+                        <groupTitle>Header Manipulation</groupTitle>
+                        <MajorAttributeSummary>
+                            <MetaInfo>
+<Name>Abstract</Name>
+<Value>Including unvalidated data in an HTTP response header can enable cache-poisoning, cross-site scripting, cross-user defacement, page hijacking, cookie manipulation or open redirect.</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Explanation</Name>
+<Value>Header Manipulation vulnerabilities occur when:
+
+1. Data enters a web application through an untrusted source, most frequently an HTTP request.
+
+
+
+2. The data is included in an HTTP response header sent to a web user without being validated.
+
+As with many software security vulnerabilities, Header Manipulation is a means to an end, not an end in itself. At its root, the vulnerability is straightforward: an attacker passes malicious data to a vulnerable application, and the application includes the data in an HTTP response header.
+
+One of the most common Header Manipulation attacks is HTTP Response Splitting. To mount a successful HTTP Response Splitting exploit, the application must allow input that contains CR (carriage return, also given by %0d or \r) and LF (line feed, also given by %0a or \n)characters into the header. These characters not only give attackers control of the remaining headers and body of the response the application intends to send, but also allows them to create additional responses entirely under their control.
+
+Many of today's modern application servers will prevent the injection of malicious characters into HTTP headers. For example, recent versions of Apache Tomcat will throw an IllegalArgumentException if you attempt to set a header with prohibited characters. If your application server prevents setting headers with new line characters, then your application is not vulnerable to HTTP Response Splitting. However, solely filtering for new line characters can leave an application vulnerable to Cookie Manipulation or Open Redirects, so care must still be taken when setting HTTP headers with user input.
+
+Example: The following code segment reads the name of the author of a weblog entry, author, from an HTTP request and sets it in a cookie header of an HTTP response. 
+
+
+String author = request.getParameter(AUTHOR_PARAM);
+...
+Cookie cookie = new Cookie(&quot;author&quot;, author);
+     cookie.setMaxAge(cookieExpiration);
+     response.addCookie(cookie);
+
+
+Assuming a string consisting of standard alpha-numeric characters, such as &quot;Jane Smith&quot;, is submitted in the request the HTTP response including this cookie might take the following form:
+
+
+HTTP/1.1 200 OK
+...
+Set-Cookie: author=Jane Smith
+...
+
+
+However, because the value of the cookie is formed of unvalidated user input the response will only maintain this form if the value submitted for AUTHOR_PARAM does not contain any CR and LF characters. If an attacker submits a malicious string, such as &quot;Wiley Hacker\r\nHTTP/1.1 200 OK\r\n...&quot;, then the HTTP response would be split into two responses of the following form:
+
+
+HTTP/1.1 200 OK
+...
+Set-Cookie: author=Wiley Hacker
+
+HTTP/1.1 200 OK
+...
+
+
+Clearly, the second response is completely controlled by the attacker and can be constructed with any header and body content desired. The ability of attacker to construct arbitrary HTTP responses permits a variety of resulting attacks, including: cross-user defacement, web and browser cache poisoning, cross-site scripting and page hijacking. 
+
+Cross-User Defacement: An attacker can make a single request to a vulnerable server that will cause the server to create two responses, the second of which may be misinterpreted as a response to a different request, possibly one made by another user sharing the same TCP connection with the server. This can be accomplished by convincing the user to submit the malicious request themselves, or remotely in situations where the attacker and the user share a common TCP connection to the server, such as a shared proxy server. In the best case, an attacker can leverage this ability to convince users that the application has been hacked, causing users to lose confidence in the security of the application. In the worst case, an attacker may provide specially crafted content designed to mimic the behavior of the application but redirect private information, such as account numbers and passwords, back to the attacker.
+
+Cache Poisoning: The impact of a maliciously constructed response can be magnified if it is cached either by a web cache used by multiple users or even the browser cache of a single user. If a response is cached in a shared web cache, such as those commonly found in proxy servers, then all users of that cache will continue receive the malicious content until the cache entry is purged. Similarly, if the response is cached in the browser of an individual user, then that user will continue to receive the malicious content until the cache entry is purged, although only the user of the local browser instance will be affected. 
+
+Cross-Site Scripting: Once attackers have control of the responses sent by an application, they have a choice of a variety of malicious content to provide users. Cross-site scripting is common form of attack where malicious JavaScript or other code included in a response is executed in the user's browser. The variety of attacks based on XSS is almost limitless, but they commonly include transmitting private data like cookies or other session information to the attacker, redirecting the victim to web content controlled by the attacker, or performing other malicious operations on the user's machine under the guise of the vulnerable site. The most common and dangerous attack vector against users of a vulnerable application uses JavaScript to transmit session and authentication information back to the attacker who can then take complete control of the victim's account. 
+
+Page Hijacking: In addition to using a vulnerable application to send malicious content to a user, the same root vulnerability can also be leveraged to redirect sensitive content generated by the server and intended for the user to the attacker instead. By submitting a request that results in two responses, the intended response from the server and the response generated by the attacker, an attacker can cause an intermediate node, such as a shared proxy server, to misdirect a response generated by the server for the user to the attacker. Because the request made by the attacker generates two responses, the first is interpreted as a response to the attacker's request, while the second remains in limbo. When the user makes a legitimate request through the same TCP connection, the attacker's request is already waiting and is interpreted as a response to the victim's request. The attacker then sends a second request to the server, to which the proxy server responds with the server generated request intended for the victim, thereby compromising any sensitive information in the headers or body of the response intended for the victim.
+
+Cookie Manipulation: When combined with attacks like Cross-Site Request Forgery, attackers can change, add to, or even overwrite a legitimate user's cookies.
+
+Open Redirect: Allowing unvalidated input to control the URL used in a redirect can aid phishing attacks.</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Recommendations</Name>
+<Value>The solution to Header Manipulation is to ensure that input validation occurs in the correct places and checks for the correct properties.
+
+Since Header Manipulation vulnerabilities occur when an application includes malicious data in its output, one logical approach is to validate data immediately before it leaves the application. However, because web applications often have complex and intricate code for generating responses dynamically, this method is prone to errors of omission (missing validation). An effective way to mitigate this risk is to also perform input validation for Header Manipulation.
+
+Web applications must validate their input to prevent other vulnerabilities, such as SQL injection, so augmenting an application's existing input validation mechanism to include checks for Header Manipulation is generally relatively easy. Despite its value, input validation for Header Manipulation does not take the place of rigorous output validation. An application may accept input through a shared data store or other trusted source, and that data store may accept input from a source that does not perform adequate input validation. Therefore, the application cannot implicitly rely on the safety of this or any other data. This means the best way to prevent Header Manipulation vulnerabilities is to validate everything that enters the application or leaves the application destined for the user.
+
+The most secure approach to validation for Header Manipulation is to create a whitelist of safe characters that are allowed to appear in HTTP response headers and accept input composed exclusively of characters in the approved set. For example, a valid name might only include alpha-numeric characters or an account number might only include digits 0-9.
+
+A more flexible, but less secure approach is known as blacklisting, which selectively rejects or escapes potentially dangerous characters before using the input. In order to form such a list, you first need to understand the set of characters that hold special meaning in HTTP response headers. Although the CR and LF characters are at the heart of an HTTP response splitting attack, other characters, such as ':' (colon) and '=' (equal), have special meaning in response headers as well.
+
+Once you identify the correct points in an application to perform validation for Header Manipulation attacks and what special characters the validation should consider, the next challenge is to identify how your validation handles special characters. The application should reject any input destined to be included in HTTP response headers that contains special characters, particularly CR and LF, as invalid.
+
+Many application servers attempt to limit an application's exposure to HTTP response splitting vulnerabilities by providing implementations for the functions responsible for setting HTTP headers and cookies that perform validation for the characters essential to an HTTP response splitting attack. Do not rely on the server running your application to make it secure. When an application is developed there are no guarantees about what application servers it will run on during its lifetime. As standards and known exploits evolve, there are no guarantees that application servers will also stay in sync.</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Tips</Name>
+<Value>1. Many HttpServletRequest implementations return a URL-encoded string from getHeader(), will not cause a HTTP response splitting issue unless it is decoded first because the CR and LF characters will not carry a meta-meaning in their encoded form. However, this behavior is not specified in the J2EE standard and varies by implementation. Furthermore, even encoded user input returned from getHeader() can lead to other vulnerabilities, including open redirects and other HTTP header tampering.
+
+2. A number of modern web frameworks provide mechanisms for performing validation of user input. Struts and Struts 2 are among them. To highlight the unvalidated sources of input, the HP Fortify Secure Coding Rulepacks dynamically re-prioritize the issues reported by HP Fortify Static Code Analyzer by lowering their probability of exploit and providing pointers to the supporting evidence whenever the framework validation mechanism is in use. We refer to this feature as Context-Sensitive Ranking. To further assist the HP Fortify user with the auditing process, the Fortify Security Research Group makes available the Data Validation project template that groups the issues into folders based on the validation mechanism applied to their source of input.
+
+3. Fortify RTA adds protection against this category.</Value>
+                            </MetaInfo>
+                            <AttributeValue>
+<Name>&lt;Unaudited&gt;</Name>
+<Count>3</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Not an Issue</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Reliability Issue</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Bad Practice</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Suspicious</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Exploitable</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                        </MajorAttributeSummary>
+                        <Issue ruleID="7B5AF271-BDC5-4ABE-A93A-316A14FA9028" iid="A65EB364AA4A70FB8F0DC54E696FECAC">
+                            <Category>Header Manipulation</Category>
+                            <Folder>High</Folder>
+                            <Kingdom>Input Validation and Representation</Kingdom>
+                            <Abstract>The method _jspService() in redirect.jsp includes unvalidated data in an HTTP response header on line 12. This enables attacks such as cache-poisoning, cross-site scripting, cross-user defacement, page hijacking, cookie manipulation or open redirect.</Abstract>
+                            <Friority>High</Friority>
+                            <Primary>
+<FileName>redirect.jsp</FileName>
+<FilePath>WebContent/lessons/General/redirect.jsp</FilePath>
+<LineStart>12</LineStart>
+<Snippet>&lt;% response.sendRedirect(&quot;/WebGoat/attack?&quot; +
+		        &quot;Screen=&quot; + request.getParameter(&quot;Screen&quot;) +
+		        &quot;&amp;menu=&quot; + request.getParameter(&quot;menu&quot;) +
+		        &quot;&amp;fromRedirect=yes&amp;language=&quot; + request.getParameter(&quot;language&quot;)); 
+%&gt;</Snippet>
+                            </Primary>
+                            <Source>
+<FileName>redirect.jsp</FileName>
+<FilePath>WebContent/lessons/General/redirect.jsp</FilePath>
+<LineStart>11</LineStart>
+<Snippet>&lt;body&gt;
+&lt;% response.sendRedirect(&quot;/WebGoat/attack?&quot; +
+		        &quot;Screen=&quot; + request.getParameter(&quot;Screen&quot;) +
+		        &quot;&amp;menu=&quot; + request.getParameter(&quot;menu&quot;) +
+		        &quot;&amp;fromRedirect=yes&amp;language=&quot; + request.getParameter(&quot;language&quot;)); </Snippet>
+                            </Source>
+                        </Issue>
+                    </GroupingSection>
+                    <GroupingSection count="3">
+                        <groupTitle>Unreleased Resource: Streams</groupTitle>
+                        <MajorAttributeSummary>
+                            <MetaInfo>
+<Name>Abstract</Name>
+<Value>The program can potentially fail to release a system resource.</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Explanation</Name>
+<Value>The program can potentially fail to release a system resource.
+
+
+Resource leaks have at least two common causes:
+
+- Error conditions and other exceptional circumstances.
+
+- Confusion over which part of the program is responsible for releasing the resource.
+
+Most unreleased resource issues result in general software reliability problems, but if an attacker can intentionally trigger a resource leak, the attacker might be able to launch a denial of service attack by depleting the resource pool.
+
+Example 1: The following method never closes the file handle it opens. The finalize() method for FileInputStream eventually calls close(), but there is no guarantee as to how long it will take before the finalize() method will be invoked. In a busy environment, this can result in the JVM using up all of its file handles.
+
+
+private void processFile(String fName) throws FileNotFoundException, IOException
+{
+  FileInputStream fis = new FileInputStream(fName);
+  int sz;
+  byte[] byteArray = new byte[BLOCK_SIZE];
+  while ((sz = fis.read(byteArray)) != -1) {
+    processBytes(byteArray, sz);
+  }
+}
+
+
+Example 2: Under normal conditions, the following code executes a database query, processes the results returned by the database, and closes the allocated statement object. But if an exception occurs while executing the SQL or processing the results, the statement object will not be closed. If this happens often enough, the database will run out of available cursors and not be able to execute any more SQL queries.
+
+
+  Statement stmt = conn.createStatement();
+  ResultSet rs = stmt.executeQuery(CXN_SQL);
+  harvestResults(rs);
+  stmt.close();
+</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Recommendations</Name>
+<Value>1. Never rely on finalize() to reclaim resources. In order for an object's finalize() method to be invoked, the garbage collector must determine that the object is eligible for garbage collection. Because the garbage collector is not required to run unless the JVM is low on memory, there is no guarantee that an object's finalize() method will be invoked in an expedient fashion. When the garbage collector finally does run, it may cause a large number of resources to be reclaimed in a short period of time, which can lead to &quot;bursty&quot; performance and lower overall system throughput. This effect becomes more pronounced as the load on the system increases.
+
+Finally, if it is possible for a resource reclamation operation to hang (if it requires communicating over a network to a database, for example), then the thread that is executing the finalize() method will hang.
+
+2. Release resources in a finally block. The code for Example 2 should be rewritten as follows:
+
+
+  public void execCxnSql(Connection conn) {
+    Statement stmt;
+    try {
+      stmt = conn.createStatement();
+      ResultSet rs = stmt.executeQuery(CXN_SQL);
+      ...
+    }
+    finally {
+      if (stmt != null) {
+        safeClose(stmt);
+      }
+    }
+}
+
+public static void safeClose(Statement stmt) {
+  if (stmt != null) {
+    try {
+      stmt.close();
+    } catch (SQLException e) {
+      log(e);
+    }
+  }
+}
+
+
+This solution uses a helper function to log the exceptions that might occur when trying to close the statement. Presumably this helper function will be reused whenever a statement needs to be closed.
+
+Also, the execCxnSql method does not initialize the stmt object to null. Instead, it checks to ensure that stmt is not null before calling safeClose(). Without the null check, the Java compiler reports that stmt might not be initialized. This choice takes advantage of Java's ability to detect uninitialized variables. If  stmt is initialized to null in a more complex method, cases in which stmt is used without being initialized will not be detected by the compiler.</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Tips</Name>
+<Value>1. Be aware that closing a database connection may or may not automatically free other resources associated with the connection object. If the application uses connection pooling, it is best to explicitly close the other resources after the connection is closed. If the application is not using connection pooling, the other resources are automatically closed when the database connection is closed. In such a case, this vulnerability is invalid.</Value>
+                            </MetaInfo>
+                            <AttributeValue>
+<Name>&lt;Unaudited&gt;</Name>
+<Count>3</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Not an Issue</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Reliability Issue</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Bad Practice</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Suspicious</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Exploitable</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                        </MajorAttributeSummary>
+                        <Issue ruleID="74714BFC-EDF7-445B-8672-0996214D5845" iid="DB465BD2A7F440C602E43BF3F3FDDFE6">
+                            <Category>Unreleased Resource: Streams</Category>
+                            <Folder>High</Folder>
+                            <Kingdom>Code Quality</Kingdom>
+                            <Abstract>The function _jspService() in clientSideFiltering.jsp sometimes fails to release a system resource allocated by FileInputStream() on line 28.</Abstract>
+                            <Friority>High</Friority>
+                            <Primary>
+<FileName>clientSideFiltering.jsp</FileName>
+<FilePath>WebContent/lessons/Ajax/clientSideFiltering.jsp</FilePath>
+<LineStart>28</LineStart>
+<Snippet>	XPathFactory factory = XPathFactory.newInstance();
+	XPath xPath = factory.newXPath();
+	InputSource inputSource = new InputSource(new FileInputStream(d));
+
+</Snippet>
+                            </Primary>
+                        </Issue>
+                    </GroupingSection>
+                    <GroupingSection count="2">
+                        <groupTitle>Dynamic Code Evaluation: Code Injection</groupTitle>
+                        <MajorAttributeSummary>
+                            <MetaInfo>
+<Name>Abstract</Name>
+<Value>Interpreting user-controlled instructions at run-time can allow attackers to execute malicious code.</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Explanation</Name>
+<Value>Many modern programming languages allow dynamic interpretation of source instructions. This capability allows programmers to perform dynamic instructions based on input received from the user. Code injection vulnerabilities occur when the programmer incorrectly assumes that instructions supplied directly from the user will perform only innocent operations, such as performing simple calculations on active user objects or otherwise modifying the user's state. However, without proper validation, a user might specify operations the programmer does not intend.
+
+ 
+Example: In this classic code injection example, the application implements a basic calculator that allows the user to specify commands for execution. 
+
+
+...
+	userOp = form.operation.value;
+	calcResult = eval(userOp);
+...
+
+
+The program behaves correctly when the operation parameter is a benign value, such as &quot;8 + 7 * 2&quot;, in which case the calcResult variable is assigned a value of 22. However, if an attacker specifies languages operations that are both valid and malicious, those operations would be executed with the full privilege of the parent process. Such attacks are even more dangerous when the underlying language provides access to system resources or allows execution of system commands. In the case of JavaScript, the attacker can utilize this vulnerability to perform a cross-site scripting attack.</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Recommendations</Name>
+<Value>Avoid dynamic code interpretation whenever possible. If your program's functionality requires code to be interpreted dynamically, the likelihood of attack can be minimized by constraining the code your program will execute dynamically as much as possible, limiting it to an application- and context-specific subset of the base programming language. 
+ 
+If dynamic code execution is required, unvalidated user input should never be directly executed and interpreted by the application. Instead, a level of indirection should be introduced: create a list of legitimate operations and data objects that users are allowed to specify, and only allow users to select from the list. With this approach, input provided by users is never executed directly.</Value>
+                            </MetaInfo>
+                            <AttributeValue>
+<Name>&lt;Unaudited&gt;</Name>
+<Count>2</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Not an Issue</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Reliability Issue</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Bad Practice</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Suspicious</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Exploitable</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                        </MajorAttributeSummary>
+                        <Issue ruleID="A1172BFC-2902-4E59-A9C7-C80B132F30CD0" iid="DBDF15ACC68DF08C7608CC9DA6986FC8">
+                            <Category>Dynamic Code Evaluation: Code Injection</Category>
+                            <Folder>High</Folder>
+                            <Kingdom>Input Validation and Representation</Kingdom>
+                            <Abstract>The file eval.js interprets unvalidated user input as source code on line 39. Interpreting user-controlled instructions at run-time can allow attackers to execute malicious code.</Abstract>
+                            <Friority>High</Friority>
+                            <Primary>
+<FileName>eval.js</FileName>
+<FilePath>WebContent/javascript/eval.js</FilePath>
+<LineStart>39</LineStart>
+<Snippet>      			//alert('responseText: ' + responseText);
+      			
+      			eval(http_request.responseText);      			
+		
+      			if(responseText.indexOf(&quot;');&quot;) != -1 </Snippet>
+                            </Primary>
+                            <Source>
+<FileName>eval.js</FileName>
+<FilePath>WebContent/javascript/eval.js</FilePath>
+<LineStart>39</LineStart>
+<Snippet>      			//alert('responseText: ' + responseText);
+      			
+      			eval(http_request.responseText);      			
+		
+      			if(responseText.indexOf(&quot;');&quot;) != -1 </Snippet>
+                            </Source>
+                        </Issue>
+                    </GroupingSection>
+                    <GroupingSection count="1">
+                        <groupTitle>Password Management: Password in Configuration File</groupTitle>
+                        <MajorAttributeSummary>
+                            <MetaInfo>
+<Name>Abstract</Name>
+<Value>Storing a plaintext password in a configuration file may result in a system compromise.</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Explanation</Name>
+<Value>Storing a plaintext password in a configuration file allows anyone who can read the file access to the password-protected resource. Developers sometimes believe that they cannot defend the application from someone who has access to the configuration, but this attitude makes an attacker's job easier. Good password management guidelines require that a password never be stored in plaintext.
+
+</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Recommendations</Name>
+<Value>A password should never be stored in plaintext. Instead, the password should be entered by an administrator when the system starts. If that approach is impractical, a less secure but often adequate solution is to obfuscate the password and scatter the de-obfuscation material around the system so that an attacker has to obtain and correctly combine multiple system resources to decipher the password.
+
+Some third party products claim the ability to manage passwords in a more secure way. For example, WebSphere Application Server 4.x uses a simple XOR encryption algorithm for obfuscating values, but be skeptical about such facilities. WebSphere and other application servers offer outdated and relatively weak encryption mechanisms that are insufficient for security-sensitive environments. For a secure solution the only viable option is a proprietary one.</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Tips</Name>
+<Value>1. HP Fortify Static Code Analyzer searches configuration files for common names used for password properties. Audit these issues by verifying that the flagged entry is used as a password and that the password entry contains plaintext.
+
+2. If the entry in the configuration file is a default password, require that it be changed in addition to requiring that it be obfuscated in the configuration file.</Value>
+                            </MetaInfo>
+                            <AttributeValue>
+<Name>&lt;Unaudited&gt;</Name>
+<Count>1</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Not an Issue</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Reliability Issue</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Bad Practice</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Suspicious</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Exploitable</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                        </MajorAttributeSummary>
+                        <Issue ruleID="9F6CA34F-B0C3-47E2-B679-17B0B1730C57" iid="5E0FC7EC055048EF51BDE8974450F9CA">
+                            <Category>Password Management: Password in Configuration File</Category>
+                            <Folder>High</Folder>
+                            <Kingdom>Environment</Kingdom>
+                            <Abstract>Storing a plaintext password in a configuration file may result in a system compromise.</Abstract>
+                            <Friority>High</Friority>
+                            <Primary>
+<FileName>server-config.wsdd</FileName>
+<FilePath>WebContent/WEB-INF/server-config.wsdd</FilePath>
+<LineStart>6</LineStart>
+<Snippet>  &lt;parameter name=&quot;sendMultiRefs&quot; value=&quot;true&quot;/&gt;
+  &lt;parameter name=&quot;disablePrettyXML&quot; value=&quot;true&quot;/&gt;
+  &lt;parameter name=&quot;adminPassword&quot; value=&quot;admin&quot;/&gt;
+&lt;!--
+  &lt;parameter name=&quot;attachments.Directory&quot; value=&quot;C:\webgoat\tomcat\webapps\WebGoat\WEB-INF\attachments&quot;/&gt;</Snippet>
+                            </Primary>
+                        </Issue>
+                    </GroupingSection>
+                    <GroupingSection count="1">
+                        <groupTitle>XPath Injection</groupTitle>
+                        <MajorAttributeSummary>
+                            <MetaInfo>
+<Name>Abstract</Name>
+<Value>Constructing a dynamic XPath query with user input could allow an attacker to modify the statement's meaning. </Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Explanation</Name>
+<Value>XPath injection occurs when:
+
+1.      Data enters a program from an untrusted source.
+
+
+
+
+
+2.      The data used to dynamically construct an XPath query.
+
+
+
+Example 1: The following code dynamically constructs and executes an XPath query that retrieves an e-mail address for a given account ID. The account ID is read from an HTTP request, and is therefore untrusted.
+
+
+...
+String acctID = request.getParameter(&quot;acctID&quot;);
+String query = null;
+if(acctID != null) {
+       StringBuffer sb = new StringBuffer(&quot;/accounts/account[acctID='&quot;);
+       sb.append(acctID);
+       sb.append(&quot;']/email/text()&quot;);
+       query = sb.toString();
+}
+
+DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+domFactory.setNamespaceAware(true);
+DocumentBuilder builder = domFactory.newDocumentBuilder();
+Document doc = builder.parse(&quot;accounts.xml&quot;);
+XPathFactory factory = XPathFactory.newInstance();
+XPath xpath = factory.newXPath();
+XPathExpression expr = xpath.compile(query);
+Object result = expr.evaluate(doc, XPathConstants.NODESET);
+...
+
+
+Under normal conditions, such as searching for an e-mail address that belongs to the account number 1, the query that this code executes will look like the following:
+
+/accounts/account[acctID='1']/email/text()
+
+However, because the query is constructed dynamically by concatenating a constant base query string and a user input string, the query only behaves correctly if acctID does not contain a single-quote character. If an attacker enters the string 1' or '1' = '1 for acctID, then the query becomes the following:
+
+/accounts/account[acctID='1' or '1' = '1']/email/text()
+
+The addition of the 1' or '1' = '1 condition causes the where clause to always evaluate to true, so the query becomes logically equivalent to the much simpler query:
+
+//email/text()
+
+This simplification of the query allows the attacker to bypass the requirement that the query only return items owned by the authenticated user; the query now returns all e-mail addresses stored in the document, regardless of their specified owner.</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Recommendations</Name>
+<Value>The root cause of XPath injection vulnerability is the ability of an attacker to change context in the XPath query, causing a value that the programmer intended to be interpreted as data to be interpreted as a command instead. When an XPath query is constructed, the programmer knows what should be interpreted as part of the command and what should be interpreted as data.
+ 
+To prevent an attacker from violating the programmer's expectations, use a whitelist to ensure that user-controlled values used in an XPath query are composed from only the expected set of characters and do not contain any XPath metacharacters given the context in which they are used. If a user-controlled value requires that it contain XPath metacharacters, use an appropriate encoding mechanism to remove their significance within the XPath query.
+
+Example 2
+
+...
+String acctID = request.getParameter(&quot;acctID&quot;);
+String query = null;
+if(acctID != null) {
+       Integer iAcctID = -1;
+       try {
+              iAcctID = Integer.parseInt(acctID);
+       }
+       catch (NumberFormatException e) {
+              throw new InvalidParameterException();
+       }
+       StringBuffer sb = new StringBuffer(&quot;/accounts/account[acctID='&quot;);
+       sb.append(iAcctID.toString());
+       sb.append(&quot;']/email/text()&quot;);
+       query = sb.toString();
+}
+
+DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+domFactory.setNamespaceAware(true);
+DocumentBuilder builder = domFactory.newDocumentBuilder();
+Document doc = builder.parse(&quot;accounts.xml&quot;);
+XPathFactory factory = XPathFactory.newInstance();
+XPath xpath = factory.newXPath();
+XPathExpression expr = xpath.compile(query);
+Object result = expr.evaluate(doc, XPathConstants.NODESET);
+...
+</Value>
+                            </MetaInfo>
+                            <MetaInfo>
+<Name>Tips</Name>
+<Value>1. A number of modern web frameworks provide mechanisms for performing validation of user input. Struts and Struts 2 are among them. To highlight the unvalidated sources of input, the HP Fortify Secure Coding Rulepacks dynamically re-prioritize the issues reported by HP Fortify Static Code Analyzer by lowering their probability of exploit and providing pointers to the supporting evidence whenever the framework validation mechanism is in use. We refer to this feature as Context-Sensitive Ranking. To further assist the HP Fortify user with the auditing process, the Fortify Security Research Group makes available the Data Validation project template that groups the issues into folders based on the validation mechanism applied to their source of input.</Value>
+                            </MetaInfo>
+                            <AttributeValue>
+<Name>&lt;Unaudited&gt;</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Not an Issue</Name>
+<Count>1</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Reliability Issue</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Bad Practice</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Suspicious</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                            <AttributeValue>
+<Name>Exploitable</Name>
+<Count>0</Count>
+                            </AttributeValue>
+                        </MajorAttributeSummary>
+                        <Issue ruleID="F0E4F1C5-E664-40CA-A8AD-71F1DD742306" iid="383771F8CB37365E2F397D68B995D3EE">
+                            <Category>XPath Injection</Category>
+                            <Folder>Non Issue</Folder>
+                            <Kingdom>Input Validation and Representation</Kingdom>
+                            <Abstract>On line 47 of clientSideFiltering_i.jsp, the method _jspService() invokes an XPath query built using unvalidated input. This call could allow an attacker to modify the statement's meaning or to execute arbitrary XPath queries.</Abstract>
+                            <Friority>Critical</Friority>
+                            <Tag>
+<Name>Analysis</Name>
+<Value>Not an Issue</Value>
+                            </Tag>
+                            <Primary>
+<FileName>clientSideFiltering_i.jsp</FileName>
+<FilePath>WebContent/lessons/Ajax/instructor/clientSideFiltering_i.jsp</FilePath>
+<LineStart>47</LineStart>
+<Snippet>
+
+	nodes = (NodeList) xPath.evaluate(expression, inputSource,
+	XPathConstants.NODESET);
+	int nodesLength = nodes.getLength();</Snippet>
+                            </Primary>
+                            <Source>
+<FileName>clientSideFiltering_i.jsp</FileName>
+<FilePath>WebContent/lessons/Ajax/instructor/clientSideFiltering_i.jsp</FilePath>
+<LineStart>9</LineStart>
+<Snippet>&lt;% 
+
+String userId = request.getParameter(&quot;userId&quot;);
+
+</Snippet>
+                            </Source>
+                        </Issue>
+                    </GroupingSection>
+                </Chart>
+            </IssueListing>
+        </SubSection>
+    </ReportSection>
+    <ReportSection optionalSubsections="true" enabled="false">
+        <Title>Detailed Project Summary</Title>
+        <SubSection enabled="true">
+            <Title>Files Scanned</Title>
+            <Description>A detailed listing of all scanned files.  Files are listed with paths relative to the Source Base Path</Description>
+            <Text>Code base location: C:/Users/securitycompass/workspace/WebGoat-5.2&#xD;
+Files Scanned:&#xD;
+.settings/org.eclipse.wst.common.project.facet.core.xml		xml		345 bytes	Feb 1, 2012 9:56:12 AM
+C__Users_securitycompass_workspace_WebGoat-5.2_C__Users_securitycompass_workspace_WebGoat-5.2_C__Users_securitycompass_workspace_WebGoat-5.2_WebContent_javascript/sameOrigin.js		javascript		2.1 KB	Feb 15, 2013 11:09:26 AM
+C__Users_securitycompass_workspace_WebGoat-5.2_C__Users_securitycompass_workspace_WebGoat-5.2_WebContent_javascript/clientSideFiltering.js		javascript		2.8 KB	Feb 11, 2013 10:24:15 AM
+C__Users_securitycompass_workspace_WebGoat-5.2_C__Users_securitycompass_workspace_WebGoat-5.2_WebContent_javascript/sameOrigin.js		javascript		2.1 KB	Feb 15, 2013 10:49:06 AM
+C__Users_securitycompass_workspace_WebGoat-5.2_WebContent_javascript/clientSideFiltering.js		javascript		2.8 KB	Feb 8, 2013 3:59:18 PM
+C__Users_securitycompass_workspace_WebGoat-5.2_WebContent_javascript/sameOrigin.js		javascript		2.1 KB	Feb 11, 2013 10:24:31 AM
+C__Users_securitycompass_workspace_WebGoat-5.2_WebContent_lessons_Ajax/eval.jsp		jsp		1.3 KB	Feb 11, 2013 10:24:37 AM
+C__Users_securitycompass_workspace_WebGoat-5.2_WebContent_lessons_DBCrossSiteScripting/SearchStaff.jsp		jsp		866 bytes	Feb 8, 2013 4:29:48 PM
+WebContent/WEB-INF/server-config.wsdd		xml		3.4 KB	Feb 1, 2012 9:56:08 AM
+WebContent/WEB-INF/web.xml		xml		11.7 KB	Feb 1, 2012 9:55:46 AM
+WebContent/WEB-INF/webgoat-class.properties		java_properties		1.7 KB	Feb 1, 2012 9:55:56 AM
+WebContent/WEB-INF/webgoat-lab.properties		java_properties		1.6 KB	Feb 1, 2012 9:56:04 AM
+WebContent/WEB-INF/webgoat-owasp.properties		java_properties		36 bytes	Feb 1, 2012 9:55:48 AM
+WebContent/WEB-INF/webgoat.properties		java_properties		36 bytes	Feb 1, 2012 9:55:58 AM
+WebContent/WEB-INF/webgoat_oracle.sql		tsql		4.1 KB	Feb 1, 2012 9:55:48 AM
+WebContent/WEB-INF/webgoat_sqlserver.sql		tsql		5.2 KB	Feb 1, 2012 9:56:00 AM
+WebContent/javascript/DOMXSS.js		javascript		130 bytes	Feb 1, 2012 9:55:42 AM
+WebContent/javascript/DOMXSS_backup.js		javascript		130 bytes	Feb 1, 2012 9:55:44 AM
+WebContent/javascript/clientSideFiltering.js		javascript		2.8 KB	Feb 1, 2012 9:55:52 AM
+WebContent/javascript/clientSideValidation.js		javascript		2.3 KB	Feb 1, 2012 9:56:00 AM
+WebContent/javascript/escape.js		javascript		175 bytes	Feb 1, 2012 9:55:52 AM
+WebContent/javascript/eval.js		javascript		2 KB	Feb 1, 2012 9:55:54 AM
+WebContent/javascript/instructor/DOMXSS_i.js		javascript		325 bytes	Feb 1, 2012 9:56:08 AM
+WebContent/javascript/javascript.js		javascript		369 bytes	Feb 1, 2012 9:56:00 AM
+WebContent/javascript/lessonNav.js		javascript		2.6 KB	Feb 1, 2012 9:56:04 AM
+WebContent/javascript/makeWindow.js		javascript		239 bytes	Feb 1, 2012 9:56:10 AM
+WebContent/javascript/menu_system.js		javascript		7.4 KB	Feb 1, 2012 9:55:46 AM
+WebContent/javascript/sameOrigin.js		javascript		2.1 KB	Feb 1, 2012 9:55:58 AM
+WebContent/javascript/toggle.js		javascript		1.2 KB	Feb 1, 2012 9:55:48 AM
+WebContent/lesson_plans/AccessControlMatrix.html		html		912 bytes	Feb 1, 2012 9:56:10 AM
+WebContent/lesson_plans/BackDoors.html		html		1.1 KB	Feb 1, 2012 9:55:54 AM
+WebContent/lesson_plans/BasicAuthentication.html		html		974 bytes	Feb 1, 2012 9:55:52 AM
+WebContent/lesson_plans/BlindSqlInjection.html		html		1.3 KB	Feb 1, 2012 9:56:04 AM
+WebContent/lesson_plans/BufferOverflow.html		html		290 bytes	Feb 1, 2012 9:56:00 AM
+WebContent/lesson_plans/CSRF.html		html		2.1 KB	Feb 1, 2012 9:55:40 AM
+WebContent/lesson_plans/ChallengeScreen.html		html		291 bytes	Feb 1, 2012 9:55:48 AM
+WebContent/lesson_plans/ClientSideFiltering.html		html		602 bytes	Feb 1, 2012 9:55:56 AM
+WebContent/lesson_plans/ClientSideValidation.html		html		661 bytes	Feb 1, 2012 9:55:44 AM
+WebContent/lesson_plans/CommandInjection.html		html		992 bytes	Feb 1, 2012 9:55:48 AM
+WebContent/lesson_plans/ConcurrencyCart.html		html		1.2 KB	Feb 1, 2012 9:55:46 AM
+WebContent/lesson_plans/CrossSiteScripting.html		html		1 KB	Feb 1, 2012 9:55:36 AM
+WebContent/lesson_plans/DBCrossSiteScripting.html		html		1 KB	Feb 1, 2012 9:56:04 AM
+WebContent/lesson_plans/DBSQLInjection.html		html		661 bytes	Feb 1, 2012 9:56:06 AM
+WebContent/lesson_plans/DOMInjection.html		html		898 bytes	Feb 1, 2012 9:55:54 AM
+WebContent/lesson_plans/DOMXSS.html		html		810 bytes	Feb 1, 2012 9:56:02 AM
+WebContent/lesson_plans/DOS_Login.html		html		618 bytes	Feb 1, 2012 9:55:38 AM
+WebContent/lesson_plans/DangerousEval.html		html		843 bytes	Feb 1, 2012 9:56:04 AM
+WebContent/lesson_plans/Encoding.html		html		380 bytes	Feb 1, 2012 9:55:56 AM
+WebContent/lesson_plans/FailOpenAuthentication.html		html		681 bytes	Feb 1, 2012 9:55:52 AM
+WebContent/lesson_plans/ForcedBrowsing.html		html		833 bytes	Feb 1, 2012 9:56:08 AM
+WebContent/lesson_plans/ForgotPassword.html		html		758 bytes	Feb 1, 2012 9:56:04 AM
+WebContent/lesson_plans/HiddenFieldTampering.html		html		707 bytes	Feb 1, 2012 9:55:52 AM
+WebContent/lesson_plans/HowToWork.html		html		2.7 KB	Feb 1, 2012 9:55:52 AM
+WebContent/lesson_plans/HtmlClues.html		html		539 bytes	Feb 1, 2012 9:56:02 AM
+WebContent/lesson_plans/HttpBasics.html		html		1.5 KB	Feb 1, 2012 9:55:54 AM
+WebContent/lesson_plans/HttpOnly.html		html		1.3 KB	Feb 1, 2012 9:56:02 AM
+WebContent/lesson_plans/HttpSplitting.html		html		2.1 KB	Feb 1, 2012 9:56:00 AM
+WebContent/lesson_plans/InsecureLogin.html		html		621 bytes	Feb 1, 2012 9:55:46 AM
+WebContent/lesson_plans/JSONInjection.html		html		1.2 KB	Feb 1, 2012 9:55:44 AM
+WebContent/lesson_plans/JavaScriptValidation.html		html		908 bytes	Feb 1, 2012 9:55:38 AM
+WebContent/lesson_plans/Lesson_Plan_Template.html		html		643 bytes	Feb 1, 2012 9:55:46 AM
+WebContent/lesson_plans/LogSpoofing.html		html		733 bytes	Feb 1, 2012 9:55:44 AM
+WebContent/lesson_plans/MultiLevelLogin1.html		html		956 bytes	Feb 1, 2012 9:55:38 AM
+WebContent/lesson_plans/MultiLevelLogin2.html		html		917 bytes	Feb 1, 2012 9:55:46 AM
+WebContent/lesson_plans/NewLesson.html		html		679 bytes	Feb 1, 2012 9:56:04 AM
+WebContent/lesson_plans/PasswordStrength.html		html		697 bytes	Feb 1, 2012 9:56:04 AM
+WebContent/lesson_plans/PathBasedAccessControl.html		html		602 bytes	Feb 1, 2012 9:55:58 AM
+WebContent/lesson_plans/Phishing.html		html		755 bytes	Feb 1, 2012 9:55:58 AM
+WebContent/lesson_plans/ReflectedXSS.html		html		776 bytes	Feb 1, 2012 9:56:10 AM
+WebContent/lesson_plans/RemoteAdminFlaw.html		html		731 bytes	Feb 1, 2012 9:56:06 AM
+WebContent/lesson_plans/RoleBasedAccessControl.html		html		1.5 KB	Feb 1, 2012 9:55:38 AM
+WebContent/lesson_plans/SQLInjection.html		html		1 KB	Feb 1, 2012 9:55:42 AM
+WebContent/lesson_plans/SameOriginPolicyProtection.html		html		680 bytes	Feb 1, 2012 9:55:54 AM
+WebContent/lesson_plans/SessionFixation.html		html		1.3 KB	Feb 1, 2012 9:55:52 AM
+WebContent/lesson_plans/SilentTransactions.html		html		1.2 KB	Feb 1, 2012 9:55:36 AM
+WebContent/lesson_plans/SoapRequest.html		html		757 bytes	Feb 1, 2012 9:56:06 AM
+WebContent/lesson_plans/SqlNumericInjection.html		html		1 KB	Feb 1, 2012 9:55:46 AM
+WebContent/lesson_plans/SqlStringInjection.html		html		1.1 KB	Feb 1, 2012 9:55:46 AM
+WebContent/lesson_plans/StoredXss.html		html		791 bytes	Feb 1, 2012 9:55:36 AM
+WebContent/lesson_plans/ThreadSafetyProblem.html		html		1.3 KB	Feb 1, 2012 9:55:50 AM
+WebContent/lesson_plans/TomcatSetup.html		html		5 KB	Feb 1, 2012 9:56:10 AM
+WebContent/lesson_plans/TraceXSS.html		html		793 bytes	Feb 1, 2012 9:55:36 AM
+WebContent/lesson_plans/UncheckedEmail.html		html		506 bytes	Feb 1, 2012 9:55:46 AM
+WebContent/lesson_plans/UsefulTools.html		html		2 KB	Feb 1, 2012 9:56:00 AM
+WebContent/lesson_plans/WSDLScanning.html		html		555 bytes	Feb 1, 2012 9:55:46 AM
+WebContent/lesson_plans/WeakAuthenticationCookie.html		html		899 bytes	Feb 1, 2012 9:56:04 AM
+WebContent/lesson_plans/WeakSessionID.html		html		570 bytes	Feb 1, 2012 9:55:48 AM
+WebContent/lesson_plans/WelcomeScreeen.html		html		710 bytes	Feb 1, 2012 9:55:46 AM
+WebContent/lesson_plans/WsSAXInjection.html		html		725 bytes	Feb 1, 2012 9:56:08 AM
+WebContent/lesson_plans/WsSqlInjection.html		html		689 bytes	Feb 1, 2012 9:56:02 AM
+WebContent/lesson_plans/XMLInjection.html		html		791 bytes	Feb 1, 2012 9:56:10 AM
+WebContent/lesson_plans/XPATHInjection.html		html		1.5 KB	Feb 1, 2012 9:55:54 AM
+WebContent/lesson_solutions/AccessControlMatrix.html		html		31.8 KB	Feb 1, 2012 9:56:00 AM
+WebContent/lesson_solutions/AccessControlMatrix_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:58 AM
+WebContent/lesson_solutions/AccessControlMatrix_files/filelist.xml		xml		350 bytes	Feb 1, 2012 9:55:54 AM
+WebContent/lesson_solutions/BackDoors.html		html		38.1 KB	Feb 1, 2012 9:55:52 AM
+WebContent/lesson_solutions/BackDoors_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:54 AM
+WebContent/lesson_solutions/BackDoors_files/filelist.xml		xml		596 bytes	Feb 1, 2012 9:55:44 AM
+WebContent/lesson_solutions/BasicAuthentication.html		html		46 KB	Feb 1, 2012 9:55:48 AM
+WebContent/lesson_solutions/BasicAuthentication_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:56:10 AM
+WebContent/lesson_solutions/BasicAuthentication_files/filelist.xml		xml		990 bytes	Feb 1, 2012 9:55:34 AM
+WebContent/lesson_solutions/BlindSqlInjection.html		html		42.9 KB	Feb 1, 2012 9:55:46 AM
+WebContent/lesson_solutions/BlindSqlInjection_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:48 AM
+WebContent/lesson_solutions/BlindSqlInjection_files/filelist.xml		xml		604 bytes	Feb 1, 2012 9:56:00 AM
+WebContent/lesson_solutions/CSRF.html		html		40.5 KB	Feb 1, 2012 9:55:48 AM
+WebContent/lesson_solutions/CSRF_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:56:00 AM
+WebContent/lesson_solutions/CSRF_files/filelist.xml		xml		527 bytes	Feb 1, 2012 9:55:36 AM
+WebContent/lesson_solutions/ClientSideFiltering.html		html		3.3 KB	Feb 1, 2012 9:55:38 AM
+WebContent/lesson_solutions/ClientSideValidation.html		html		2.6 KB	Feb 1, 2012 9:55:44 AM
+WebContent/lesson_solutions/CommandInjection.html		html		33.8 KB	Feb 1, 2012 9:56:04 AM
+WebContent/lesson_solutions/CommandInjection_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:42 AM
+WebContent/lesson_solutions/CommandInjection_files/filelist.xml		xml		411 bytes	Feb 1, 2012 9:55:46 AM
+WebContent/lesson_solutions/ConcurrencyCart.html		html		2 KB	Feb 1, 2012 9:56:10 AM
+WebContent/lesson_solutions/DOMInjection.html		html		39.7 KB	Feb 1, 2012 9:56:06 AM
+WebContent/lesson_solutions/DOMInjection_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:46 AM
+WebContent/lesson_solutions/DOMInjection_files/filelist.xml		xml		599 bytes	Feb 1, 2012 9:55:36 AM
+WebContent/lesson_solutions/DOMXSS.html		html		3 KB	Feb 1, 2012 9:56:10 AM
+WebContent/lesson_solutions/DOS_Login.html		html		31.3 KB	Feb 1, 2012 9:56:02 AM
+WebContent/lesson_solutions/DOS_Login_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:36 AM
+WebContent/lesson_solutions/DOS_Login_files/filelist.xml		xml		340 bytes	Feb 1, 2012 9:56:08 AM
+WebContent/lesson_solutions/DangerousEval.html		html		1.5 KB	Feb 1, 2012 9:55:56 AM
+WebContent/lesson_solutions/Encoding.html		html		887 bytes	Feb 1, 2012 9:56:08 AM
+WebContent/lesson_solutions/FailOpenAuthentication.html		html		33.9 KB	Feb 1, 2012 9:56:08 AM
+WebContent/lesson_solutions/FailOpenAuthentication_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:56:02 AM
+WebContent/lesson_solutions/FailOpenAuthentication_files/filelist.xml		xml		481 bytes	Feb 1, 2012 9:56:02 AM
+WebContent/lesson_solutions/ForcedBrowsing.html		html		35.3 KB	Feb 1, 2012 9:55:48 AM
+WebContent/lesson_solutions/ForcedBrowsing_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:58 AM
+WebContent/lesson_solutions/ForcedBrowsing_files/filelist.xml		xml		473 bytes	Feb 1, 2012 9:55:36 AM
+WebContent/lesson_solutions/ForgotPassword.html		html		38.5 KB	Feb 1, 2012 9:55:48 AM
+WebContent/lesson_solutions/ForgotPassword_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:58 AM
+WebContent/lesson_solutions/ForgotPassword_files/filelist.xml		xml		665 bytes	Feb 1, 2012 9:55:58 AM
+WebContent/lesson_solutions/HiddenFieldTampering.html		html		33.8 KB	Feb 1, 2012 9:55:56 AM
+WebContent/lesson_solutions/HiddenFieldTampering_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:36 AM
+WebContent/lesson_solutions/HiddenFieldTampering_files/filelist.xml		xml		543 bytes	Feb 1, 2012 9:56:04 AM
+WebContent/lesson_solutions/HtmlClues.html		html		32.6 KB	Feb 1, 2012 9:55:38 AM
+WebContent/lesson_solutions/HtmlClues_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:54 AM
+WebContent/lesson_solutions/HtmlClues_files/filelist.xml		xml		532 bytes	Feb 1, 2012 9:56:10 AM
+WebContent/lesson_solutions/HttpBasics.html		html		28.1 KB	Feb 1, 2012 9:56:08 AM
+WebContent/lesson_solutions/HttpBasics_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:42 AM
+WebContent/lesson_solutions/HttpBasics_files/filelist.xml		xml		341 bytes	Feb 1, 2012 9:55:46 AM
+WebContent/lesson_solutions/HttpOnly.html		html		39.9 KB	Feb 1, 2012 9:56:10 AM
+WebContent/lesson_solutions/HttpOnly_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:46 AM
+WebContent/lesson_solutions/HttpOnly_files/filelist.xml		xml		659 bytes	Feb 1, 2012 9:55:36 AM
+WebContent/lesson_solutions/HttpSplitting.html		html		48.2 KB	Feb 1, 2012 9:56:04 AM
+WebContent/lesson_solutions/HttpSplitting_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:42 AM
+WebContent/lesson_solutions/HttpSplitting_files/filelist.xml		xml		1.1 KB	Feb 1, 2012 9:55:42 AM
+WebContent/lesson_solutions/InsecureLogin.html		html		2.5 KB	Feb 1, 2012 9:55:44 AM
+WebContent/lesson_solutions/JSONInjection.html		html		36.9 KB	Feb 1, 2012 9:55:44 AM
+WebContent/lesson_solutions/JSONInjection_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:52 AM
+WebContent/lesson_solutions/JSONInjection_files/filelist.xml		xml		600 bytes	Feb 1, 2012 9:56:06 AM
+WebContent/lesson_solutions/JavaScriptValidation.html		html		43 KB	Feb 1, 2012 9:55:42 AM
+WebContent/lesson_solutions/JavaScriptValidation_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:50 AM
+WebContent/lesson_solutions/JavaScriptValidation_files/filelist.xml		xml		959 bytes	Feb 1, 2012 9:55:52 AM
+WebContent/lesson_solutions/Lab Access Control/Lab Add Business Layer Access Control.html		html		2 KB	Feb 1, 2012 9:55:48 AM
+WebContent/lesson_solutions/Lab Access Control/Lab Add Data Layer Access Control.html		html		2.2 KB	Feb 1, 2012 9:56:06 AM
+WebContent/lesson_solutions/Lab Access Control/Lab Bypass Business Layer Access Control.html		html		2 KB	Feb 1, 2012 9:55:54 AM
+WebContent/lesson_solutions/Lab Access Control/Lab Bypass Data Layer Access Control.html		html		1.9 KB	Feb 1, 2012 9:55:48 AM
+WebContent/lesson_solutions/Lab SQL Injection/Lab Numeric SQL Injection.html		html		1.8 KB	Feb 1, 2012 9:55:48 AM
+WebContent/lesson_solutions/Lab SQL Injection/Lab Parameterized Query #1.html		html		3.4 KB	Feb 1, 2012 9:55:46 AM
+WebContent/lesson_solutions/Lab SQL Injection/Lab Parameterized Query #2.html		html		2.1 KB	Feb 1, 2012 9:55:54 AM
+WebContent/lesson_solutions/Lab SQL Injection/Lab String SQL Injection.html		html		1.7 KB	Feb 1, 2012 9:55:38 AM
+WebContent/lesson_solutions/Lab XSS/Lab Block Reflected XSS.html		html		1.8 KB	Feb 1, 2012 9:55:42 AM
+WebContent/lesson_solutions/Lab XSS/Lab Block Stored XSS using Input Validation.html		html		2.1 KB	Feb 1, 2012 9:56:00 AM
+WebContent/lesson_solutions/Lab XSS/Lab Block Stored XSS using Output Encoding.html		html		1.8 KB	Feb 1, 2012 9:56:02 AM
+WebContent/lesson_solutions/Lab XSS/Lab Reflected XSS.html		html		1.6 KB	Feb 1, 2012 9:56:00 AM
+WebContent/lesson_solutions/Lab XSS/Lab Stored XSS Revisited.html		html		1.4 KB	Feb 1, 2012 9:55:54 AM
+WebContent/lesson_solutions/Lab XSS/Lab Stored XSS.html		html		2 KB	Feb 1, 2012 9:55:48 AM
+WebContent/lesson_solutions/LogSpoofing.html		html		35 KB	Feb 1, 2012 9:55:58 AM
+WebContent/lesson_solutions/LogSpoofing_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:56:06 AM
+WebContent/lesson_solutions/LogSpoofing_files/filelist.xml		xml		406 bytes	Feb 1, 2012 9:55:38 AM
+WebContent/lesson_solutions/MultiLevelLogin1.html		html		2.8 KB	Feb 1, 2012 9:56:04 AM
+WebContent/lesson_solutions/MultiLevelLogin2.html		html		1.9 KB	Feb 1, 2012 9:55:54 AM
+WebContent/lesson_solutions/PasswordStrength.html		html		2.1 KB	Feb 1, 2012 9:56:04 AM
+WebContent/lesson_solutions/PathBasedAccessControl.html		html		30.4 KB	Feb 1, 2012 9:55:48 AM
+WebContent/lesson_solutions/PathBasedAccessControl_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:48 AM
+WebContent/lesson_solutions/PathBasedAccessControl_files/filelist.xml		xml		417 bytes	Feb 1, 2012 9:56:02 AM
+WebContent/lesson_solutions/Phishing.html		html		3.6 KB	Feb 1, 2012 9:55:42 AM
+WebContent/lesson_solutions/ReflectedXSS.html		html		30.7 KB	Feb 1, 2012 9:56:10 AM
+WebContent/lesson_solutions/ReflectedXSS_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:56:06 AM
+WebContent/lesson_solutions/ReflectedXSS_files/filelist.xml		xml		343 bytes	Feb 1, 2012 9:56:06 AM
+WebContent/lesson_solutions/RemoteAdminFlaw.html		html		31.7 KB	Feb 1, 2012 9:55:50 AM
+WebContent/lesson_solutions/RemoteAdminFlaw_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:56:06 AM
+WebContent/lesson_solutions/RemoteAdminFlaw_files/filelist.xml		xml		410 bytes	Feb 1, 2012 9:56:04 AM
+WebContent/lesson_solutions/SessionFixation.html		html		4.3 KB	Feb 1, 2012 9:55:34 AM
+WebContent/lesson_solutions/SilentTransactions.html		html		42.9 KB	Feb 1, 2012 9:56:10 AM
+WebContent/lesson_solutions/SilentTransactions_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:56:04 AM
+WebContent/lesson_solutions/SilentTransactions_files/filelist.xml		xml		477 bytes	Feb 1, 2012 9:56:02 AM
+WebContent/lesson_solutions/SoapRequest.html		html		40.1 KB	Feb 1, 2012 9:56:08 AM
+WebContent/lesson_solutions/SoapRequest_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:56:10 AM
+WebContent/lesson_solutions/SoapRequest_files/filelist.xml		xml		534 bytes	Feb 1, 2012 9:55:56 AM
+WebContent/lesson_solutions/SqlNumericInjection.html		html		30.5 KB	Feb 1, 2012 9:55:48 AM
+WebContent/lesson_solutions/SqlNumericInjection_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:42 AM
+WebContent/lesson_solutions/SqlNumericInjection_files/filelist.xml		xml		414 bytes	Feb 1, 2012 9:55:52 AM
+WebContent/lesson_solutions/SqlStringInjection.html		html		32.2 KB	Feb 1, 2012 9:56:10 AM
+WebContent/lesson_solutions/SqlStringInjection_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:56:04 AM
+WebContent/lesson_solutions/SqlStringInjection_files/filelist.xml		xml		349 bytes	Feb 1, 2012 9:55:36 AM
+WebContent/lesson_solutions/StoredXSS_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:52 AM
+WebContent/lesson_solutions/StoredXSS_files/filelist.xml		xml		404 bytes	Feb 1, 2012 9:55:44 AM
+WebContent/lesson_solutions/StoredXss.html		html		32.2 KB	Feb 1, 2012 9:55:50 AM
+WebContent/lesson_solutions/ThreadSafetyProblem.html		html		32.1 KB	Feb 1, 2012 9:56:00 AM
+WebContent/lesson_solutions/ThreadSafetyProblem_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:34 AM
+WebContent/lesson_solutions/ThreadSafetyProblem_files/filelist.xml		xml		414 bytes	Feb 1, 2012 9:55:54 AM
+WebContent/lesson_solutions/TraceXSS.html		html		30.5 KB	Feb 1, 2012 9:55:42 AM
+WebContent/lesson_solutions/TraceXSS_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:44 AM
+WebContent/lesson_solutions/TraceXSS_files/filelist.xml		xml		275 bytes	Feb 1, 2012 9:55:48 AM
+WebContent/lesson_solutions/UncheckedEmail.html		html		32.3 KB	Feb 1, 2012 9:55:56 AM
+WebContent/lesson_solutions/UncheckedEmail_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:42 AM
+WebContent/lesson_solutions/UncheckedEmail_files/filelist.xml		xml		473 bytes	Feb 1, 2012 9:55:46 AM
+WebContent/lesson_solutions/WSDLScanning.html		html		32.7 KB	Feb 1, 2012 9:56:00 AM
+WebContent/lesson_solutions/WSDLScanning_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:56:02 AM
+WebContent/lesson_solutions/WSDLScanning_files/filelist.xml		xml		471 bytes	Feb 1, 2012 9:56:02 AM
+WebContent/lesson_solutions/WeakAuthenticationCookie.html		html		43.9 KB	Feb 1, 2012 9:55:58 AM
+WebContent/lesson_solutions/WeakAuthenticationCookie_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:56:04 AM
+WebContent/lesson_solutions/WeakAuthenticationCookie_files/filelist.xml		xml		803 bytes	Feb 1, 2012 9:56:10 AM
+WebContent/lesson_solutions/WeakSessionID.html		html		42.5 KB	Feb 1, 2012 9:56:08 AM
+WebContent/lesson_solutions/WeakSessionID_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:50 AM
+WebContent/lesson_solutions/WeakSessionID_files/filelist.xml		xml		824 bytes	Feb 1, 2012 9:55:38 AM
+WebContent/lesson_solutions/WsSAXInjection.html		html		48.3 KB	Feb 1, 2012 9:55:48 AM
+WebContent/lesson_solutions/WsSAXInjection_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:56:00 AM
+WebContent/lesson_solutions/WsSAXInjection_files/filelist.xml		xml		537 bytes	Feb 1, 2012 9:55:48 AM
+WebContent/lesson_solutions/WsSqlInjection.html		html		35.3 KB	Feb 1, 2012 9:55:46 AM
+WebContent/lesson_solutions/WsSqlInjection_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:56:10 AM
+WebContent/lesson_solutions/WsSqlInjection_files/filelist.xml		xml		473 bytes	Feb 1, 2012 9:56:02 AM
+WebContent/lesson_solutions/XMLInjection.html		html		39.6 KB	Feb 1, 2012 9:55:44 AM
+WebContent/lesson_solutions/XMLInjection_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:56 AM
+WebContent/lesson_solutions/XMLInjection_files/filelist.xml		xml		727 bytes	Feb 1, 2012 9:55:46 AM
+WebContent/lesson_solutions/XPATHInjection.html		html		35.5 KB	Feb 1, 2012 9:56:04 AM
+WebContent/lesson_solutions/XPATHInjection_files/colorschememapping.xml		xml		314 bytes	Feb 1, 2012 9:55:58 AM
+WebContent/lesson_solutions/XPATHInjection_files/filelist.xml		xml		409 bytes	Feb 1, 2012 9:55:54 AM
+WebContent/lessons/Ajax/clientSideFiltering.jsp		jsp		2.3 KB	Feb 1, 2012 9:56:10 AM
+WebContent/lessons/Ajax/clientSideFiltering_backup.jsp		jsp		2.3 KB	Feb 1, 2012 9:55:56 AM
+WebContent/lessons/Ajax/clientSideValidation.jsp		jsp		605 bytes	Feb 1, 2012 9:55:48 AM
+WebContent/lessons/Ajax/employees.xml		xml		9.2 KB	Feb 1, 2012 9:55:44 AM
+WebContent/lessons/Ajax/eval.jsp		jsp		1.3 KB	Feb 1, 2012 9:56:04 AM
+WebContent/lessons/Ajax/instructor/clientSideFiltering_i.jsp		jsp		2.5 KB	Feb 1, 2012 9:55:42 AM
+WebContent/lessons/Ajax/sameOrigin.jsp		jsp		13 bytes	Feb 1, 2012 9:55:36 AM
+WebContent/lessons/ConfManagement/config.jsp		jsp		599 bytes	Feb 1, 2012 9:55:38 AM
+WebContent/lessons/CrossSiteScripting/CrossSiteScripting.jsp		jsp		764 bytes	Feb 1, 2012 9:56:10 AM
+WebContent/lessons/CrossSiteScripting/EditProfile.jsp		jsp		4.8 KB	Feb 1, 2012 9:55:58 AM
+WebContent/lessons/CrossSiteScripting/ListStaff.jsp		jsp		2.1 KB	Feb 1, 2012 9:55:40 AM
+WebContent/lessons/CrossSiteScripting/Login.jsp		jsp		1.3 KB	Feb 1, 2012 9:55:44 AM
+WebContent/lessons/CrossSiteScripting/SearchStaff.jsp		jsp		856 bytes	Feb 1, 2012 9:56:00 AM
+WebContent/lessons/CrossSiteScripting/ViewProfile.jsp		jsp		4.5 KB	Feb 1, 2012 9:55:56 AM
+WebContent/lessons/CrossSiteScripting/error.jsp		jsp		125 bytes	Feb 1, 2012 9:56:00 AM
+WebContent/lessons/DBCrossSiteScripting/DBCrossSiteScripting.jsp		jsp		774 bytes	Feb 1, 2012 9:56:02 AM
+WebContent/lessons/DBCrossSiteScripting/EditProfile.jsp		jsp		4.8 KB	Feb 1, 2012 9:55:58 AM
+WebContent/lessons/DBCrossSiteScripting/ListStaff.jsp		jsp		2.1 KB	Feb 1, 2012 9:55:54 AM
+WebContent/lessons/DBCrossSiteScripting/Login.jsp		jsp		1.3 KB	Feb 1, 2012 9:56:10 AM
+WebContent/lessons/DBCrossSiteScripting/SearchStaff.jsp		jsp		866 bytes	Feb 1, 2012 9:55:36 AM
+WebContent/lessons/DBCrossSiteScripting/ViewProfile.jsp		jsp		4.1 KB	Feb 1, 2012 9:56:10 AM
+WebContent/lessons/DBCrossSiteScripting/error.jsp		jsp		125 bytes	Feb 1, 2012 9:55:44 AM
+WebContent/lessons/DBSQLInjection/DBSQLInjection.jsp		jsp		744 bytes	Feb 1, 2012 9:56:06 AM
+WebContent/lessons/DBSQLInjection/EditProfile.jsp		jsp		4.7 KB	Feb 1, 2012 9:56:06 AM
+WebContent/lessons/DBSQLInjection/ListStaff.jsp		jsp		2.1 KB	Feb 1, 2012 9:56:02 AM
+WebContent/lessons/DBSQLInjection/Login.jsp		jsp		1.3 KB	Feb 1, 2012 9:55:48 AM
+WebContent/lessons/DBSQLInjection/SearchStaff.jsp		jsp		836 bytes	Feb 1, 2012 9:55:52 AM
+WebContent/lessons/DBSQLInjection/ViewProfile.jsp		jsp		4.2 KB	Feb 1, 2012 9:55:38 AM
+WebContent/lessons/DBSQLInjection/error.jsp		jsp		125 bytes	Feb 1, 2012 9:56:04 AM
+WebContent/lessons/General/redirect.jsp		jsp		600 bytes	Feb 1, 2012 9:55:58 AM
+WebContent/lessons/GoatHillsFinancial/EditProfile.jsp		jsp		5 KB	Feb 1, 2012 9:56:06 AM
+WebContent/lessons/GoatHillsFinancial/GoatHillsFinancial.jsp		jsp		948 bytes	Feb 1, 2012 9:56:04 AM
+WebContent/lessons/GoatHillsFinancial/ListStaff.jsp		jsp		2.1 KB	Feb 1, 2012 9:55:58 AM
+WebContent/lessons/GoatHillsFinancial/Login.jsp		jsp		1.3 KB	Feb 1, 2012 9:55:38 AM
+WebContent/lessons/GoatHillsFinancial/SearchStaff.jsp		jsp		857 bytes	Feb 1, 2012 9:55:54 AM
+WebContent/lessons/GoatHillsFinancial/ViewProfile.jsp		jsp		4.8 KB	Feb 1, 2012 9:55:48 AM
+WebContent/lessons/GoatHillsFinancial/error.jsp		jsp		609 bytes	Feb 1, 2012 9:56:04 AM
+WebContent/lessons/RoleBasedAccessControl/EditProfile.jsp		jsp		5.1 KB	Feb 1, 2012 9:56:00 AM
+WebContent/lessons/RoleBasedAccessControl/ListStaff.jsp		jsp		2.1 KB	Feb 1, 2012 9:55:58 AM
+WebContent/lessons/RoleBasedAccessControl/Login.jsp		jsp		1.3 KB	Feb 1, 2012 9:55:48 AM
+WebContent/lessons/RoleBasedAccessControl/RoleBasedAccessControl.jsp		jsp		784 bytes	Feb 1, 2012 9:55:46 AM
+WebContent/lessons/RoleBasedAccessControl/SearchStaff.jsp		jsp		877 bytes	Feb 1, 2012 9:56:04 AM
+WebContent/lessons/RoleBasedAccessControl/ViewProfile.jsp		jsp		4.8 KB	Feb 1, 2012 9:55:58 AM
+WebContent/lessons/RoleBasedAccessControl/error.jsp		jsp		629 bytes	Feb 1, 2012 9:55:54 AM
+WebContent/lessons/SQLInjection/EditProfile.jsp		jsp		4.6 KB	Feb 1, 2012 9:55:52 AM
+WebContent/lessons/SQLInjection/ListStaff.jsp		jsp		2 KB	Feb 1, 2012 9:56:00 AM
+WebContent/lessons/SQLInjection/Login.jsp		jsp		1.3 KB	Feb 1, 2012 9:56:08 AM
+WebContent/lessons/SQLInjection/SQLInjection.jsp		jsp		734 bytes	Feb 1, 2012 9:55:48 AM
+WebContent/lessons/SQLInjection/SearchStaff.jsp		jsp		826 bytes	Feb 1, 2012 9:55:46 AM
+WebContent/lessons/SQLInjection/ViewProfile.jsp		jsp		4.1 KB	Feb 1, 2012 9:55:42 AM
+WebContent/lessons/SQLInjection/error.jsp		jsp		125 bytes	Feb 1, 2012 9:55:42 AM
+WebContent/lessons/XPATHInjection/EmployeesData.xml		xml		517 bytes	Feb 1, 2012 9:56:08 AM
+WebContent/main.jsp		jsp		11.8 KB	Feb 1, 2012 9:55:36 AM
+WebContent/sideWindow.jsp		jsp		832 bytes	Feb 1, 2012 9:55:56 AM
+WebContent/webgoat.jsp		jsp		4.1 KB	Feb 1, 2012 9:56:04 AM
+WebContent/webgoat_challenge.jsp		jsp		4.1 KB	Feb 1, 2012 9:56:04 AM</Text>
+        </SubSection>
+        <SubSection enabled="true">
+            <Title>Reference Elements</Title>
+            <Description>A Listing of all libraries used for the translation phase of the analysis</Description>
+            <Text>Classpath:&#xD;
+&#xD;
+C:\Program Files\Java\jre6\lib\charsets.jar
+C:\Program Files\Java\jre6\lib\ext\dns_sd.jar
+C:\Program Files\Java\jre6\lib\ext\dnsns.jar
+C:\Program Files\Java\jre6\lib\ext\localedata.jar
+C:\Program Files\Java\jre6\lib\ext\sunjce_provider.jar
+C:\Program Files\Java\jre6\lib\jce.jar
+C:\Program Files\Java\jre6\lib\jsse.jar
+C:\Program Files\Java\jre6\lib\resources.jar
+C:\Program Files\Java\jre6\lib\rt.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\ImportedClasses
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\activation.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\axis-ant.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\axis.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\catalina.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\commons-collections-3.1.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\commons-digester.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\commons-discovery-0.2.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\commons-logging-1.0.4.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\dsn.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\ecs-1.4.2.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\hsqldb.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\imap.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\j2h.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\jaxrpc.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\jta-spec1_0_1.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\jtds-1.2.2.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\log4j-1.2.8.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\mail.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\mailapi.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\ojdbc14.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\pop3.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\saaj.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\smtp.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\lib\wsdl4j-1.5.1.jar
+C:\Users\securitycompass\workspace\WebGoat-5.2\src
+C:\Users\securitycompass\workspace\WebGoat-5.2\src\org\owasp\webgoat\lessons\DBSQLInjection
+&#xD;
+&#xD;
+Libdirs:&#xD;
+&#xD;
+No libdirs specified during translation</Text>
+        </SubSection>
+        <SubSection enabled="true">
+            <Title>Rulepacks</Title>
+            <Description>A listing of all rulepacks used in the analysis</Description>
+            <Text>Valid Rulepacks:
+
+Name: 		Fortify Secure Coding Rules, Core, ABAP
+Version: 	2012.4.0.0007
+ID: 				5A663288-B1F7-416A-AEED-E5F00DC3596F
+SKU: 			RUL13095
+
+Name: 		Fortify Secure Coding Rules, Core, ActionScript 3.0
+Version: 	2012.4.0.0007
+ID: 				92127AA2-E666-4F28-B1C1-C0F6A939A089
+SKU: 			RUL13094
+
+Name: 		Fortify Secure Coding Rules, Core, Android
+Version: 	2012.4.0.0007
+ID: 				FF9890E6-D119-4EE8-A591-83DCF4CA6952
+SKU: 			RUL13093
+
+Name: 		Fortify Secure Coding Rules, Core, Annotations
+Version: 	2012.4.0.0007
+ID: 				14EE50EB-FA1C-4AE8-8B59-39F952E21E3B
+SKU: 			RUL13078
+
+Name: 		Fortify Secure Coding Rules, Core, ColdFusion
+Version: 	2012.4.0.0007
+ID: 				EEA7C678-058E-462A-8A59-AF925F7B7164
+SKU: 			RUL13024
+
+Name: 		Fortify Secure Coding Rules, Core, C/C++
+Version: 	2012.4.0.0007
+ID: 				711E0652-7494-42BE-94B1-DB3799418C7E
+SKU: 			RUL13001
+
+Name: 		Fortify Secure Coding Rules, Core, .NET
+Version: 	2012.4.0.0007
+ID: 				D57210E5-E762-4112-97DD-019E61D32D0E
+SKU: 			RUL13002
+
+Name: 		Fortify Secure Coding Rules, Core, Java
+Version: 	2012.4.0.0007
+ID: 				06A6CC97-8C3F-4E73-9093-3E74C64A2AAF
+SKU: 			RUL13003
+
+Name: 		Fortify Secure Coding Rules, Core, JavaScript
+Version: 	2012.4.0.0007
+ID: 				BD292C4E-4216-4DB8-96C7-9B607BFD9584
+SKU: 			RUL13059
+
+Name: 		Fortify Secure Coding Rules, Core, Objective-C
+Version: 	2012.4.0.0007
+ID: 				B18E58BA-8B2D-4FC5-83BF-378594CAD260
+SKU: 			RUL13099
+
+Name: 		Fortify Secure Coding Rules, Core, PHP
+Version: 	2012.4.0.0007
+ID: 				343CBB32-087C-4A4E-8BD8-273B5F876069
+SKU: 			RUL13058
+
+Name: 		Fortify Secure Coding Rules, Core, Python
+Version: 	2012.4.0.0007
+ID: 				FD15CBE4-E059-4CBB-914E-546BDCEB422B
+SKU: 			RUL13083
+
+Name: 		Fortify Secure Coding Rules, Core, SQL
+Version: 	2012.4.0.0007
+ID: 				6494160B-E1DB-41F5-9840-2B1609EE7649
+SKU: 			RUL13004
+
+Name: 		Fortify Secure Coding Rules, Core, Classic ASP, VBScript, and VB6
+Version: 	2012.4.0.0007
+ID: 				1D426B6F-8D33-4AD6-BBCE-237ABAFAB924
+SKU: 			RUL13060
+
+Name: 		Fortify Secure Coding Rules, Extended, Configuration
+Version: 	2012.4.0.0007
+ID: 				CD6959FC-0C37-45BE-9637-BAA43C3A4D56
+SKU: 			RUL13005
+
+Name: 		Fortify Secure Coding Rules, Extended, Content
+Version: 	2012.4.0.0007
+ID: 				9C48678C-09B6-474D-B86D-97EE94D38F17
+SKU: 			RUL13067
+
+Name: 		Fortify Secure Coding Rules, Extended, C/C++
+Version: 	2012.4.0.0007
+ID: 				BD4641AD-A6FF-4401-A8F4-6873272F2748
+SKU: 			RUL13006
+
+Name: 		Fortify Secure Coding Rules, Extended, .NET
+Version: 	2012.4.0.0007
+ID: 				557BCC56-CD42-43A7-B4FE-CDD00D58577E
+SKU: 			RUL13027
+
+Name: 		Fortify Secure Coding Rules, Extended, Java
+Version: 	2012.4.0.0007
+ID: 				AAAC0B10-79E7-4FE5-9921-F4903A79D317
+SKU: 			RUL13007
+
+Name: 		Fortify Secure Coding Rules, Extended, JSP
+Version: 	2012.4.0.0007
+ID: 				00403342-15D0-48C9-8E67-4B1CFBDEFCD2
+SKU: 			RUL13026
+
+Name: 		Fortify Secure Coding Rules, Extended, SQL
+Version: 	2012.4.0.0007
+ID: 				4BC5B2FA-C209-4DBC-9C3E-1D3EEFAF135A
+SKU: 			RUL13025
+
+External Metadata:
+
+Name: 		CWE
+ID: 				3ADB9EE4-5761-4289-8BD3-CBFCC593EBBC
+
+Name: 		FISMA
+ID: 				B40F9EE0-3824-4879-B9FE-7A789C89307C
+
+Name: 		OWASP Top 10 2004
+ID: 				771C470C-9274-4580-8556-C023E4D3ADB4
+
+Name: 		OWASP Top 10 2007
+ID: 				1EB1EC0E-74E6-49A0-BCE5-E6603802987A
+
+Name: 		OWASP Top 10 2010
+ID: 				FDCECA5E-C2A8-4BE8-BB26-76A8ECD0ED59
+
+Name: 		PCI 1.1
+ID: 				CBDB9D4D-FC20-4C04-AD58-575901CAB531
+
+Name: 		PCI 1.2
+ID: 				57940BDB-99F0-48BF-BF2E-CFC42BA035E5
+
+Name: 		PCI 2.0
+ID: 				8970556D-7F9F-4EA7-8033-9DF39D68FF3E
+
+Name: 		SANS Top 25 2009
+ID: 				939EF193-507A-44E2-ABB7-C00B2168B6D8
+
+Name: 		SANS Top 25 2010
+ID: 				72688795-4F7B-484C-88A6-D4757A6121CA
+
+Name: 		SANS Top 25 2011
+ID: 				92EB4481-1FD9-4165-8E16-F2DE6CB0BD63
+
+Name: 		STIG 3
+ID: 				F2FA57EA-5AAA-4DDE-90A5-480BE65CE7E7
+
+Name: 		STIG 3.4
+ID: 				58E2C21D-C70F-4314-8994-B859E24CF855
+
+Name: 		WASC 24 + 2
+ID: 				9DC61E7F-1A48-4711-BBFD-E9DFF537871F
+
+</Text>
+        </SubSection>
+        <SubSection enabled="true">
+            <Title>Properties</Title>
+            <Description>A complete listing of all properties set during analysis phase</Description>
+            <Text>WinForms.CollectionMutationMonitor.Label=WinFormsDataSource
+WinForms.ExtractEventHandlers=true
+WinForms.TransformChangeNotificationPattern=true
+WinForms.TransformDataBindings=true
+WinForms.TransformMessageLoops=true
+awt.toolkit=sun.awt.windows.WToolkit
+com.fortify.AuthenticationKey=C:\Users\securitycompass\AppData\Local/Fortify/config/tools
+com.fortify.Core=C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\Core
+com.fortify.InstallRoot=C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70
+com.fortify.InstallationUserName=securitycompass
+com.fortify.SCAExecutablePath=C:Program FilesHP_FortifyHP_Fortify_SCA_and_Apps_3.70binsourceanalyzer.exe
+com.fortify.TotalPhysicalMemory=8375676928
+com.fortify.VS.RequireASPPrecompilation=true
+com.fortify.WorkingDirectory=C:\Users\securitycompass\AppData\Local/Fortify
+com.fortify.locale=en
+com.fortify.sca.AddImpliedMethods=true
+com.fortify.sca.AllocationWebServiceURL=https://per-use.fortify.com/services/GasAllocationService
+com.fortify.sca.AntCompilerClass=com.fortify.dev.ant.SCACompiler
+com.fortify.sca.BuildID=WebGoat-5.2
+com.fortify.sca.BundleControlflowIssues=true
+com.fortify.sca.CollectPerformanceData=true
+com.fortify.sca.CustomRulesDir=C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\Core\config\customrules
+com.fortify.sca.DaemonCompilers=com.fortify.sca.util.compilers.GppCompiler,com.fortify.sca.util.compilers.GccCompiler,com.fortify.sca.util.compilers.AppleGppCompiler,com.fortify.sca.util.compilers.AppleGccCompiler,com.fortify.sca.util.compilers.MicrosoftCompiler,com.fortify.sca.util.compilers.MicrosoftLinker,com.fortify.sca.util.compilers.LdCompiler,com.fortify.sca.util.compilers.ArUtil,com.fortify.sca.util.compilers.SunCCompiler,com.fortify.sca.util.compilers.SunCppCompiler,com.fortify.sca.util.compilers.IntelCompiler,com.fortify.sca.util.compilers.ExternalCppAdapter,com.fortify.sca.util.compilers.ClangCompiler
+com.fortify.sca.DeadCodeFilter=true
+com.fortify.sca.DeadCodeIgnoreTrivialPredicates=true
+com.fortify.sca.DefaultAnalyzers=semantic:dataflow:controlflow:nullptr:configuration:content:structural:buffer
+com.fortify.sca.DefaultFileTypes=java,jsp,jspx,tag,tagx,sql,cfm,php,ctp,pks,pkh,pkb,xml,config,properties,dll,exe,inc,asp,vbscript,js,ini,bas,cls,vbs,frm,ctl,html,htm,xsd,wsdd,xmi,py,cfml,cfc,abap,xhtml,cpx,xcfg,jsff,as,mxml
+com.fortify.sca.DefaultJarsDirs=default_jars
+com.fortify.sca.DefaultRulesDir=C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\Core\config\rules
+com.fortify.sca.DisableDeadCodeElimination=false
+com.fortify.sca.DisableFunctionPointers=false
+com.fortify.sca.DisableGlobals=false
+com.fortify.sca.DisplayProgress=true
+com.fortify.sca.FVDLAllowUnifiedVulnerability=true
+com.fortify.sca.FVDLDisableDescriptions=false
+com.fortify.sca.FVDLDisableProgramData=false
+com.fortify.sca.FVDLDisableSnippets=false
+com.fortify.sca.FVDLStylesheet=C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\Core/resources/sca/fvdl2html.xsl
+com.fortify.sca.IndirectCallGraphBuilders=com.fortify.sca.analyzer.callgraph.WinFormsAdHocFunctionBuilder,com.fortify.sca.analyzer.callgraph.VirtualCGBuilder,com.fortify.sca.analyzer.callgraph.J2EEIndirectCGBuilder,com.fortify.sca.analyzer.callgraph.JNICGBuilder,com.fortify.sca.analyzer.callgraph.StoredProcedureResolver,com.fortify.sca.analyzer.callgraph.JavaWSCGBuilder,com.fortify.sca.analyzer.callgraph.StrutsCGBuilder,com.fortify.sca.analyzer.callgraph.DotNetWSCGBuilder,com.fortify.sca.analyzer.callgraph.SqlServerSPResolver,com.fortify.sca.analyzer.callgraph.ASPCGBuilder,com.fortify.sca.analyzer.callgraph.ScriptedCGBuilder,com.fortify.sca.analyzer.callgraph.NewJspCustomTagCGBuilder,com.fortify.sca.analyzer.callgraph.DotNetCABCGBuilder,com.fortify.sca.analyzer.callgraph.StateInjectionCGBuilder,com.fortify.sca.analyzer.callgraph.SqlServerSPResolver2,com.fortify.sca.analyzer.callgraph.PHPLambdaResolver
+com.fortify.sca.JVMArgs=-Dcom.sun.management.jmxremote=true -XX:SoftRefLRUPolicyMSPerMB=100 -Xss1M -Xmx600M -Xms300M -server
+com.fortify.sca.JdkVersion=1.4
+com.fortify.sca.LowSeverityCutoff=1.0
+com.fortify.sca.MachineOutputMode=
+com.fortify.sca.NoNestedOutTagOutput=org.apache.taglibs.standard.tag.rt.core.RemoveTag,org.apache.taglibs.standard.tag.rt.core.SetTag
+com.fortify.sca.PID=4844
+com.fortify.sca.PidFile=C:\Users\SECURI~1\AppData\Local\Temp\PID2870985456829513676.tmp
+com.fortify.sca.PrintPerformanceDataAfterScan=false
+com.fortify.sca.ProjectRoot=C:\Users\securitycompass\AppData\Local/Fortify
+com.fortify.sca.Renderer=fpr
+com.fortify.sca.ResultsFile=C:\Users\securitycompass\AppData\Local/Fortify\Eclipse.Plugin-3.70\C__Users_securitycompass_workspace_WebGoat-5.2\WebGoat-5.2Scan.fpr
+com.fortify.sca.SolverTimeout=15
+com.fortify.sca.SqlLanguage=TSQL
+com.fortify.sca.SuppressLowSeverity=true
+com.fortify.sca.Tank=#0#0#C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\Core\config\tank.a09556#823316#1#C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\Core\config\tank.b09556#823319#1#
+com.fortify.sca.UnicodeInputFile=true
+com.fortify.sca.analyzer.controlflow.EnableLivenessOptimization=false
+com.fortify.sca.analyzer.controlflow.EnableMachineFiltering=false
+com.fortify.sca.analyzer.controlflow.EnableRefRuleOptimization=false
+com.fortify.sca.analyzer.controlflow.EnableTimeOut=true
+com.fortify.sca.compilers.ant=com.fortify.sca.util.compilers.AntAdapter
+com.fortify.sca.compilers.ar=com.fortify.sca.util.compilers.ArUtil
+com.fortify.sca.compilers.armcc=com.fortify.sca.util.compilers.ArmCcCompiler
+com.fortify.sca.compilers.armcpp=com.fortify.sca.util.compilers.ArmCppCompiler
+com.fortify.sca.compilers.c++=com.fortify.sca.util.compilers.GppCompiler
+com.fortify.sca.compilers.c89=com.fortify.sca.util.compilers.C89Compiler
+com.fortify.sca.compilers.cc=com.fortify.sca.util.compilers.GccCompiler
+com.fortify.sca.compilers.cl=com.fortify.sca.util.compilers.MicrosoftCompiler
+com.fortify.sca.compilers.clearmake=com.fortify.sca.util.compilers.TouchlessCompiler
+com.fortify.sca.compilers.devenv=com.fortify.sca.util.compilers.DevenvNetAdapter
+com.fortify.sca.compilers.fortify=com.fortify.sca.util.compilers.FortifyCompiler
+com.fortify.sca.compilers.g++=com.fortify.sca.util.compilers.GppCompiler
+com.fortify.sca.compilers.g++-*=com.fortify.sca.util.compilers.GppCompiler
+com.fortify.sca.compilers.g++2*=com.fortify.sca.util.compilers.GppCompiler
+com.fortify.sca.compilers.g++3*=com.fortify.sca.util.compilers.GppCompiler
+com.fortify.sca.compilers.g++4*=com.fortify.sca.util.compilers.GppCompiler
+com.fortify.sca.compilers.gcc=com.fortify.sca.util.compilers.GccCompiler
+com.fortify.sca.compilers.gcc-*=com.fortify.sca.util.compilers.GccCompiler
+com.fortify.sca.compilers.gcc2*=com.fortify.sca.util.compilers.GccCompiler
+com.fortify.sca.compilers.gcc3*=com.fortify.sca.util.compilers.GccCompiler
+com.fortify.sca.compilers.gcc4*=com.fortify.sca.util.compilers.GccCompiler
+com.fortify.sca.compilers.gmake=com.fortify.sca.util.compilers.TouchlessCompiler
+com.fortify.sca.compilers.icc=com.fortify.sca.util.compilers.IntelCompiler
+com.fortify.sca.compilers.icpc=com.fortify.sca.util.compilers.IntelCompiler
+com.fortify.sca.compilers.jam=com.fortify.sca.util.compilers.TouchlessCompiler
+com.fortify.sca.compilers.javac=com.fortify.sca.util.compilers.JavacCompiler
+com.fortify.sca.compilers.ld=com.fortify.sca.util.compilers.LdCompiler
+com.fortify.sca.compilers.link=com.fortify.sca.util.compilers.MicrosoftLinker
+com.fortify.sca.compilers.make=com.fortify.sca.util.compilers.TouchlessCompiler
+com.fortify.sca.compilers.msbuild=com.fortify.sca.util.compilers.MSBuildAdapter
+com.fortify.sca.compilers.msdev=com.fortify.sca.util.compilers.DevenvAdapter
+com.fortify.sca.compilers.nmake=com.fortify.sca.util.compilers.TouchlessCompiler
+com.fortify.sca.compilers.tcc=com.fortify.sca.util.compilers.ArmCcCompiler
+com.fortify.sca.compilers.tcpp=com.fortify.sca.util.compilers.ArmCppCompiler
+com.fortify.sca.compilers.touchless=com.fortify.sca.util.compilers.FortifyCompiler
+com.fortify.sca.cpfe.command=C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\Core/private-bin/sca/cpfe.exe
+com.fortify.sca.cpfe.file.option=--gen_c_file_name
+com.fortify.sca.cpfe.new.command=C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\Core/private-bin/sca/cpfe441
+com.fortify.sca.cpfe.options=--remove_unneeded_entities --suppress_vtbl -tused
+com.fortify.sca.cpfe.options=--remove_unneeded_entities --suppress_vtbl -tused
+com.fortify.sca.env.classpath=.;C:\Program Files (x86)\Java\jre6\lib\ext\QTJava.zip
+com.fortify.sca.env.exesearchpath=C:\Eclipse\eclipse;C:\Program Files\Fortify Software\HP Fortify v3.30\bin;C:\Perl64\site\bin;C:\Perl64\bin;C:\Program Files\Common Files\Microsoft Shared\Windows Live;C:\Program Files (x86)\Common Files\Microsoft Shared\Windows Live;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\Intel\WiFi\bin\;C:\Program Files\Common Files\Intel\WirelessCommon\;C:\Program Files\TortoiseSVN\bin;C:\Program Files (x86)\QuickTime\QTSystem\;C:\Program Files (x86)\Windows Live\Shared;C:\Program Files\SlikSvn\bin;c:\Program Files (x86)\Microsoft SQL Server\100\Tools\Binn\;c:\Program Files\Microsoft SQL Server\100\Tools\Binn\;c:\Program Files\Microsoft SQL Server\100\DTS\Binn\;C:\Program Files (x86)\Microsoft ASP.NET\ASP.NET Web Pages\v1.0\;c:\Program Files (x86)\Microsoft SQL Server\100\Tools\Binn\VSShell\Common7\IDE\;c:\Program Files (x86)\Microsoft SQL Server\100\DTS\Binn\;C:\Program Files\Microsoft SQL Server\110\Tools\Binn\;C:\Program Files\Microsoft\Web Platform Installer\;C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\bin;C:\Program Files\SlikSvn\bin;C:\Perl64\bin;C:\Python27;C:\Ruby192\bin;C:\Program Files\Intel\WiFi\bin\;C:\Program Files\Common Files\Intel\WirelessCommon\
+com.fortify.sca.fileextensions.ABAP=ABAP
+com.fortify.sca.fileextensions.abap=ABAP
+com.fortify.sca.fileextensions.as=ACTIONSCRIPT
+com.fortify.sca.fileextensions.asp=ASP
+com.fortify.sca.fileextensions.bas=VB6
+com.fortify.sca.fileextensions.cfc=CFML
+com.fortify.sca.fileextensions.cfm=CFML
+com.fortify.sca.fileextensions.cfml=CFML
+com.fortify.sca.fileextensions.cls=VB6
+com.fortify.sca.fileextensions.config=XML
+com.fortify.sca.fileextensions.cpx=XML
+com.fortify.sca.fileextensions.cs=CSHARP
+com.fortify.sca.fileextensions.ctl=VB6
+com.fortify.sca.fileextensions.ctp=PHP
+com.fortify.sca.fileextensions.dll=MSIL
+com.fortify.sca.fileextensions.exe=MSIL
+com.fortify.sca.fileextensions.faces=JSPX
+com.fortify.sca.fileextensions.frm=VB6
+com.fortify.sca.fileextensions.htm=HTML
+com.fortify.sca.fileextensions.html=HTML
+com.fortify.sca.fileextensions.ini=JAVA_PROPERTIES
+com.fortify.sca.fileextensions.java=JAVA
+com.fortify.sca.fileextensions.js=JAVASCRIPT
+com.fortify.sca.fileextensions.jsff=JSPX
+com.fortify.sca.fileextensions.jsp=JSP
+com.fortify.sca.fileextensions.jspx=JSPX
+com.fortify.sca.fileextensions.mdl=MSIL
+com.fortify.sca.fileextensions.mod=MSIL
+com.fortify.sca.fileextensions.mxml=MXML
+com.fortify.sca.fileextensions.php=PHP
+com.fortify.sca.fileextensions.pkb=PLSQL
+com.fortify.sca.fileextensions.pkh=PLSQL
+com.fortify.sca.fileextensions.pks=PLSQL
+com.fortify.sca.fileextensions.properties=JAVA_PROPERTIES
+com.fortify.sca.fileextensions.py=PYTHON
+com.fortify.sca.fileextensions.sql=SQL
+com.fortify.sca.fileextensions.tag=JSP
+com.fortify.sca.fileextensions.tagx=JSP
+com.fortify.sca.fileextensions.vb=VB
+com.fortify.sca.fileextensions.vbs=VB6
+com.fortify.sca.fileextensions.vbscript=VBSCRIPT
+com.fortify.sca.fileextensions.wsdd=XML
+com.fortify.sca.fileextensions.xcfg=XML
+com.fortify.sca.fileextensions.xhtml=JSPX
+com.fortify.sca.fileextensions.xmi=XML
+com.fortify.sca.fileextensions.xml=XML
+com.fortify.sca.fileextensions.xsd=XML
+com.fortify.sca.jsp.UseNativeParser=true
+com.sun.management.jmxremote=true
+dotnet.install.dir=C:\Windows\Microsoft.NET\Framework
+dotnet.v30.referenceAssemblies=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\v3.0
+dotnet.v35.referenceAssemblies=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\v3.5
+file.encoding=Cp1252
+file.encoding.pkg=sun.io
+file.separator=\
+java.awt.graphicsenv=sun.awt.Win32GraphicsEnvironment
+java.awt.printerjob=sun.awt.windows.WPrinterJob
+java.class.path=C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\Core\lib\exe\sca-exe.jar
+java.class.version=50.0
+java.endorsed.dirs=C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\jre\lib\endorsed
+java.ext.dirs=C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\jre\lib\ext;C:\Windows\Sun\Java\lib\ext
+java.home=C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\jre
+java.io.tmpdir=C:\Users\SECURI~1\AppData\Local\Temp\
+java.library.path=C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\jre\bin;C:\Windows\Sun\Java\bin;C:\Windows\system32;C:\Windows;C:\Program Files\Fortify Software\HP Fortify v3.30\bin;C:\Perl64\site\bin;C:\Perl64\bin;C:\Program Files\Common Files\Microsoft Shared\Windows Live;C:\Program Files (x86)\Common Files\Microsoft Shared\Windows Live;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\Intel\WiFi\bin\;C:\Program Files\Common Files\Intel\WirelessCommon\;C:\Program Files\TortoiseSVN\bin;C:\Program Files (x86)\QuickTime\QTSystem\;C:\Program Files (x86)\Windows Live\Shared;C:\Program Files\SlikSvn\bin;c:\Program Files (x86)\Microsoft SQL Server\100\Tools\Binn\;c:\Program Files\Microsoft SQL Server\100\Tools\Binn\;c:\Program Files\Microsoft SQL Server\100\DTS\Binn\;C:\Program Files (x86)\Microsoft ASP.NET\ASP.NET Web Pages\v1.0\;c:\Program Files (x86)\Microsoft SQL Server\100\Tools\Binn\VSShell\Common7\IDE\;c:\Program Files (x86)\Microsoft SQL Server\100\DTS\Binn\;C:\Program Files\Microsoft SQL Server\110\Tools\Binn\;C:\Program Files\Microsoft\Web Platform Installer\;C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\bin;C:\Program Files\SlikSvn\bin;C:\Perl64\bin;C:\Python27;C:\Ruby192\bin;C:\Program Files\Intel\WiFi\bin\;C:\Program Files\Common Files\Intel\WirelessCommon\;.
+java.rmi.server.randomIDs=true
+java.runtime.name=Java(TM) SE Runtime Environment
+java.runtime.version=1.6.0_35-b10
+java.specification.name=Java Platform API Specification
+java.specification.vendor=Sun Microsystems Inc.
+java.specification.version=1.6
+java.vendor=Sun Microsystems Inc.
+java.vendor.url=http://java.sun.com/
+java.vendor.url.bug=http://java.sun.com/cgi-bin/bugreport.cgi
+java.version=1.6.0_35
+java.vm.info=mixed mode
+java.vm.name=Java HotSpot(TM) Server VM
+java.vm.specification.name=Java Virtual Machine Specification
+java.vm.specification.vendor=Sun Microsystems Inc.
+java.vm.specification.version=1.0
+java.vm.vendor=Sun Microsystems Inc.
+java.vm.version=20.10-b01
+line.separator=&#xD;
+
+max.file.path.length=255
+os.arch=x86
+os.name=Windows 7
+os.version=6.1
+path.separator=;
+stderr.isatty=false
+stdout.isatty=false
+sun.arch.data.model=32
+sun.boot.class.path=C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\jre\lib\resources.jar;C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\jre\lib\rt.jar;C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\jre\lib\sunrsasign.jar;C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\jre\lib\jsse.jar;C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\jre\lib\jce.jar;C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\jre\lib\charsets.jar;C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\jre\lib\modules\jdk.boot.jar;C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\jre\classes
+sun.boot.library.path=C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\jre\bin
+sun.cpu.endian=little
+sun.cpu.isalist=pentium_pro+mmx pentium_pro pentium+mmx pentium i486 i386 i86
+sun.desktop=windows
+sun.io.unicode.encoding=UnicodeLittle
+sun.java.command=C:\Program Files\HP_Fortify\HP_Fortify_SCA_and_Apps_3.70\Core\lib\exe\sca-exe.jar -scan -pid-file C:\Users\SECURI~1\AppData\Local\Temp\PID2870985456829513676.tmp @C:\Users\securitycompass\AppData\Local\Fortify\Eclipse.Plugin-3.70\C__Users_securitycompass_workspace_WebGoat-5.2\WebGoat-5.2Scan.txt
+sun.java.launcher=SUN_STANDARD
+sun.jnu.encoding=Cp1252
+sun.management.compiler=HotSpot Tiered Compilers
+sun.os.patch.level=Service Pack 1
+user.country=US
+user.dir=C:\Eclipse\eclipse
+user.home=C:\Users\securitycompass
+user.language=en
+user.name=securitycompass
+user.timezone=America/New_York
+user.variant=
+win32.LocalAppdata=C:\Users\securitycompass\AppData\Local
+</Text>
+        </SubSection>
+        <SubSection enabled="true">
+            <Title>Commandline Arguments</Title>
+            <Description>A listing of all arguments passed to SCA during the analysis phase</Description>
+            <Text>-scan
+-pid-file
+C:\Users\SECURI~1\AppData\Local\Temp\PID2870985456829513676.tmp
+-b
+WebGoat-5.2
+-machine-output
+-format
+fpr
+-f
+C:\Users\securitycompass\AppData\Local/Fortify\Eclipse.Plugin-3.70\C__Users_securitycompass_workspace_WebGoat-5.2\WebGoat-5.2Scan.fpr
+</Text>
+        </SubSection>
+        <SubSection enabled="true">
+            <Title>Warnings</Title>
+            <Description>A listing of all warnings that occurred during the scan, during both translation and analysis phase</Description>
+            <Text>[10002] Unable to parse T-SQL at C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\webgoat_oracle.sql:2:27.
+[10002] Unable to parse T-SQL at C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\webgoat_oracle.sql:1:11.
+[10002] Unable to parse T-SQL at C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\webgoat_oracle.sql:4:1.
+[10002] Unable to parse T-SQL at C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\webgoat_oracle.sql:43:1.
+[10002] Unable to parse T-SQL at C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\webgoat_oracle.sql:34:1.
+[10002] Unable to parse T-SQL at C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\webgoat_oracle.sql:85:1.
+[10002] Unable to parse T-SQL at C:\Users\securitycompass\workspace\WebGoat-5.2\WebContent\WEB-INF\webgoat_oracle.sql:24:2.
+[1215] Could not locate the root (WEB-INF) of the web application. Please build your web application and try again.</Text>
+        </SubSection>
+    </ReportSection>
+    <ReportSection optionalSubsections="false" enabled="true">
+        <Title>Issue Count by Category</Title>
+        <SubSection enabled="true">
+            <Title>Issues By Category</Title>
+            <IssueListing limit="-1" listing="false">
+                <Refinement></Refinement>
+                <Chart chartType="table">
+                    <Axis>Category</Axis>
+                    <MajorAttribute>Analysis</MajorAttribute>
+                    <GroupingSection count="53">
+                        <groupTitle>Cross-Site Request Forgery</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="42">
+                        <groupTitle>Privacy Violation</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="30">
+                        <groupTitle>Hidden Field</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="13">
+                        <groupTitle>Cross-Site Scripting: Reflected</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="8">
+                        <groupTitle>Unchecked Return Value</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="7">
+                        <groupTitle>Cross-Site Scripting: DOM</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="6">
+                        <groupTitle>Axis 2 Misconfiguration: Debug Information</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="3">
+                        <groupTitle>Header Manipulation</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="3">
+                        <groupTitle>System Information Leak: HTML Comment in JSP</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="3">
+                        <groupTitle>Unreleased Resource: Streams</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="2">
+                        <groupTitle>Dynamic Code Evaluation: Code Injection</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="2">
+                        <groupTitle>J2EE Misconfiguration: Missing Data Transport Constraint</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="1">
+                        <groupTitle>J2EE Misconfiguration: Excessive Servlet Mappings</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="1">
+                        <groupTitle>J2EE Misconfiguration: Excessive Session Timeout</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="1">
+                        <groupTitle>J2EE Misconfiguration: Missing Error Handling</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="1">
+                        <groupTitle>J2EE Misconfiguration: Missing Servlet Mapping</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="1">
+                        <groupTitle>JavaScript Hijacking: Ad Hoc Ajax</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="1">
+                        <groupTitle>Missing Check against Null</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="1">
+                        <groupTitle>Password Management: Password in Configuration File</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="1">
+                        <groupTitle>XPath Injection</groupTitle>
+                    </GroupingSection>
+                </Chart>
+            </IssueListing>
+        </SubSection>
+    </ReportSection>
+    <ReportSection optionalSubsections="false" enabled="true">
+        <Title>Issue Breakdown by Analysis</Title>
+        <SubSection enabled="true">
+            <Title>Issue by Analysis</Title>
+            <IssueListing limit="-1" listing="false">
+                <Refinement></Refinement>
+                <Chart chartType="pie">
+                    <Axis>Analysis</Axis>
+                    <MajorAttribute>Analysis</MajorAttribute>
+                    <GroupingSection count="2">
+                        <groupTitle>Exploitable</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="4">
+                        <groupTitle>Not an Issue</groupTitle>
+                    </GroupingSection>
+                    <GroupingSection count="174">
+                        <groupTitle>&lt;none&gt;</groupTitle>
+                    </GroupingSection>
+                </Chart>
+            </IssueListing>
+        </SubSection>
+    </ReportSection>
+    <ReportSection optionalSubsections="false" enabled="false">
+        <Title>New Issues</Title>
+        <SubSection enabled="true">
+            <Title>New Issues</Title>
+            <Description>A list of issues discovered since the previous analysis.</Description>
+            <Text>The following issues have been discovered since the last scan.</Text>
+            <IssueListing limit="-1" listing="false">
+                <Refinement></Refinement>
+                <Chart chartType="pie">
+                    <Axis>New Issue</Axis>
+                    <MajorAttribute>Analysis</MajorAttribute>
+                    <GroupingSection count="180">
+                        <groupTitle>Issue Updated: Feb 20, 2013</groupTitle>
+                    </GroupingSection>
+                </Chart>
+            </IssueListing>
+        </SubSection>
+    </ReportSection>
+</ReportDefinition>

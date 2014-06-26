@@ -21,17 +21,17 @@ class Command(BaseCommand):
     def configure(self):
         self.plugin = PlugInExperience(self.config)
 
-        self.config.add_custom_option("list_archived", "Include Archived Projects (True|False)", 
+        self.config.opts.add("list_archived", "Include Archived Projects (True|False)", 
             default="False")
-        self.config.add_custom_option("list_tasks", "Include Tasks inside each Project (True|FalsE)",
+        self.config.opts.add("list_tasks", "Include Tasks inside each Project (True|FalsE)",
             default="True")
-        self.config.add_custom_option("created_after", "Project Created After (YYYY-MM-DD)", 
+        self.config.opts.add("created_after", "Project Created After (YYYY-MM-DD)", 
             default="1900-01-01")
-        self.config.add_custom_option("created_before", "Project Created Before (YYYY-MM-DD)", 
+        self.config.opts.add("created_before", "Project Created Before (YYYY-MM-DD)", 
             default="9999-12-31")
-        self.config.add_custom_option("write_file", "Name of Output File", 'w',
+        self.config.opts.add("write_file", "Name of Output File", 'w',
             default=DEFAULT_CSV_FILENAME)
-        self.config.add_custom_option("show_progress", "Show Progress on Console (True|False)",
+        self.config.opts.add("show_progress", "Show Progress on Console (True|False)",
             default="True")
 
 

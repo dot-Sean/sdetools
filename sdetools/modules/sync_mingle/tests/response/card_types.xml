@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<card_types type="array">
+  <card_type>
+    <id type="integer">32</id>
+    <name>Story</name>
+    <color>#c526ff</color>
+    <position type="integer">1</position>
+    <property_definitions type="array">
+      <property_definition url="http://localhost:8080/api/v2/projects/simple/property_definitions/107.xml">
+        <name>Status</name>
+        <position nil="true"></position>
+        <data_type>string</data_type>
+        <is_numeric type="boolean">false</is_numeric>
+      </property_definition>
+      <property_definition url="http://localhost:8080/api/v2/projects/simple/property_definitions/109.xml">
+        <name>Priority</name>
+        <position nil="true"></position>
+        <data_type>string</data_type>
+        <is_numeric type="boolean">false</is_numeric>
+      </property_definition>
+    </property_definitions>
+  </card_type>
+  <card_type>
+    <id type="integer">33</id>
+    <name>Bug</name>
+    <color>
+    </color>
+    <position type="integer">2</position>
+    <property_definitions type="array">
+      <property_definition url="http://localhost:8080/api/v2/projects/simple/property_definitions/107.xml">
+        <name>Status</name>
+        <position nil="true"></position>
+        <data_type>string</data_type>
+        <is_numeric type="boolean">false</is_numeric>
+      </property_definition>
+    </property_definitions>
+  </card_type>
+</card_types>

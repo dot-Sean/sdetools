@@ -1,25 +1,20 @@
 # Copyright SDElements Inc
 # Extensible two way integration with JIRA
 
-import re
-from datetime import datetime
-
 from sdetools.alm_integration.alm_plugin_base import AlmConnector, AlmException
-from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
 from sdetools.modules.sync_jira.jira_markdown import convert_markdown
-from sdetools.sdelib.conf_mgr import Config
 
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
-RE_MAP_RANGE_KEY = re.compile('^\d+(-\d+)?$')
 JIRA_DEFAULT_PRIORITY_MAP = {
     '10': 'Blocker',
     '7-9': 'Critical',
     '5-6': 'Major',
     '3-4': 'Minor',
     '1-2': 'Trivial',
-    }
+}
+
 
 class JIRAConnector(AlmConnector):
     alm_name = 'JIRA'
@@ -28,23 +23,28 @@ class JIRAConnector(AlmConnector):
         """ Initializes connection to JIRA """
         super(JIRAConnector, self).__init__(config, alm_plugin)
 
-        config.add_custom_option('jira_issue_type', 'IDs for issues raised in JIRA',
+        config.opts.add('jira_issue_type', 'IDs for issues raised in JIRA',
                 default='Bug')
-        config.add_custom_option('jira_close_transition', 'Close transition in JIRA',
+        config.opts.add('jira_close_transition', 'Close transition in JIRA',
                 default='Close Issue')
-        config.add_custom_option('jira_reopen_transition', 'Re-open transition in JIRA',
+        config.opts.add('jira_reopen_transition', 'Re-open transition in JIRA',
                 default='Reopen Issue')
-        config.add_custom_option('jira_done_statuses', 'Statuses that signify a task is Done in JIRA',
+        config.opts.add('jira_done_statuses', 'Statuses that signify a task is Done in JIRA',
                 default='Resolved,Closed')
-        config.add_custom_option('jira_existing_issue', 'Provide the key of an existing issue to support custom fields (JIRA 4.x only)',
+        config.opts.add('jira_existing_issue', 'Provide the key of an existing issue to support custom fields (JIRA 4.x only)',
                 default='')
-        config.add_custom_option('alm_project_version', 'Project version',
+        config.opts.add('alm_project_version', 'Project version',
                 default='')
-        config.add_custom_option('alm_parent_issue', 'Create sub-tasks under this issue',
+        config.opts.add('alm_parent_issue', 'Create sub-tasks under this issue',
                 default='')
-        config.add_custom_option('alm_priority_map', 'Customized map from priority in SDE to JIRA '
+        config.opts.add('alm_priority_map', 'Customized map from priority in SDE to JIRA '
                 '(JSON encoded dictionary of strings)',
                 default='')
+        self.jira_issue_type_id = None
+        self.project_version = None
+        self.transition_id = {
+            'close': None,
+            'reopen': None}
 
     def initialize(self):
         super(JIRAConnector, self).initialize()
@@ -54,7 +54,7 @@ class JIRAConnector(AlmConnector):
             len(self.config['jira_done_statuses']) < 1):
             raise AlmException('Missing jira_done_statuses in configuration')
 
-        self.config['jira_done_statuses'] = (self.config['jira_done_statuses'].split(','))
+        self.config.process_list_config('jira_done_statuses')
 
         if not self.config['jira_issue_type']:
             raise AlmException('Missing jira_issue_type in configuration')
@@ -66,18 +66,14 @@ class JIRAConnector(AlmConnector):
         self.config.process_json_str_dict('alm_priority_map')
         if not self.config['alm_priority_map']:
             self.config['alm_priority_map'] = JIRA_DEFAULT_PRIORITY_MAP
-        for key in self.config['alm_priority_map']:
-            if not RE_MAP_RANGE_KEY.match(key):
-                raise AlmException('Unable to process alm_priority_map (not a JSON dictionary). '
-                        'Reason: Invalid range key %s' % key)
+        self._validate_alm_priority_map()
 
         if self.config['alm_custom_fields'] and self.config.jira_api_ver == 4 and not self.config['jira_existing_issue']:
             raise AlmException('Unable to process alm_custom_fields. '
                     'Reason: jira_existing_issue must be specified')
-        
-        self.transition_id = {
-            'close': None,
-            'reopen': None}
+
+    def _get_issue_url(self, issue_key):
+        return self.config['alm_method'] + '://' + self.config['alm_server'] + '/browse/' + issue_key
 
     def alm_connect_server(self):
         self.alm_plugin.connect_server()
@@ -90,7 +86,7 @@ class JIRAConnector(AlmConnector):
         
         self.jira_issue_type_id = None
         for issue_type in issue_types:
-            if (issue_type['name'] == self.config['jira_issue_type']):
+            if issue_type['name'] == self.config['jira_issue_type']:
                 self.jira_issue_type_id = issue_type['id']
                 break
         if self.jira_issue_type_id is None:
@@ -105,8 +101,17 @@ class JIRAConnector(AlmConnector):
 
         self.alm_plugin.setup_fields(self.jira_issue_type_id)
 
+    def alm_validate_configurations(self):
+        missing_priorities = []
+        pmap = self.config['alm_priority_map']
+        for key, priority_name in pmap.iteritems():
+            if not self.alm_plugin._has_priority(priority_name):
+                missing_priorities.append(priority_name)
+        if missing_priorities:
+            raise AlmException('Incorrect priority mapping values specified: %s' % ', '.join(missing_priorities))
+
     def alm_get_task(self, task):
-        task_id = task['title'].partition(':')[0]
+        task_id = self._extract_task_id(task['id'])
 
         task = self.alm_plugin.get_task(task, task_id)
         if task:
@@ -130,8 +135,15 @@ class JIRAConnector(AlmConnector):
             alm_task = self.alm_get_task(task)
             self.alm_update_task_status(alm_task, task['status'])
 
+        url = self._get_issue_url(new_issue['key'])
+
         #Return a unique identifier to this task in JIRA
-        return 'Issue %s' % new_issue['key']
+        return 'Issue %s, URL: %s' % (new_issue['key'], url)
+
+    def alm_remove_task(self, task):
+
+        self.alm_plugin.remove_task(task)
+        logger.info('Removed task in JIRA: %s' % task.get_task_id())
 
     def alm_update_task_status(self, task, status):
         if not task or not self.config['alm_standard_workflow']:
@@ -140,7 +152,7 @@ class JIRAConnector(AlmConnector):
         alm_id = task.get_alm_id()
 
         # This is an unexpected situation
-        if (task.get_status() == status):
+        if task.get_status() == status:
             logger.debug('Status update in JIRA not required for issue %s' % alm_id)
             return
 
@@ -153,7 +165,8 @@ class JIRAConnector(AlmConnector):
 
         trans_name = self.config['jira_%s_transition' % new_state]
         if trans_name not in trans_table:
-            raise AlmException('Unable to find transition %s' % trans_name)
+            raise AlmException('Transition %s is invalid for issue %s. Valid entries are: %s' % (
+                trans_name, alm_id, ', '.join(trans_table)))
         trans_id = trans_table[trans_name]
 
         self.alm_plugin.update_task_status(alm_id, trans_id)
@@ -162,7 +175,7 @@ class JIRAConnector(AlmConnector):
 
     def alm_get_version(self, version_name):
         for v in self.alm_plugin.versions:
-            if v['name']==version_name:
+            if v['name'] == version_name:
                 return v
         return None
  

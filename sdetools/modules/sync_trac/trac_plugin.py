@@ -3,10 +3,10 @@
 
 import xmlrpclib
 import socket
+from datetime import datetime
 
 from sdetools.sdelib.commons import UsageError, json, urlencode_str
 from sdetools.sdelib.restclient import RESTBase
-from sdetools.sdelib.restclient import URLRequest, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from sdetools.alm_integration.alm_plugin_base import AlmException
 
@@ -28,10 +28,10 @@ class TracXMLRPCAPI(RESTBase):
             self.base_path)
 
     def connect(self):
-        if self.proxy:
-            return
-        self.post_conf_init()
-        self.proxy = xmlrpclib.ServerProxy(self.base_uri)
+        if self.proxy is None:
+            self.post_conf_init()
+            self.proxy = xmlrpclib.ServerProxy(self.base_uri)
+
 
 class TracTask(AlmTask):
     """ Representation of a task in Trac"""
@@ -49,9 +49,6 @@ class TracTask(AlmTask):
 
     def get_alm_id(self):
         return self.alm_id
-
-    def get_priority(self):
-        return self.priority
 
     def get_milestone(self):
         return self.milestone
@@ -75,13 +72,13 @@ class TracConnector(AlmConnector):
         """ Initializes connection to Trac """
         super(TracConnector, self).__init__(config, alm_plugin)
 
-        config.add_custom_option('alm_close_transition', 'Close transition in Trac',
+        config.opts.add('alm_close_transition', 'Close transition in Trac',
                 default='resolve,{"action_resolve_resolve_resolution":"fixed"}')
-        config.add_custom_option('alm_reopen_transition', 'Re-open transiiton in Trac',
+        config.opts.add('alm_reopen_transition', 'Re-open transiiton in Trac',
                 default='reopen')
-        config.add_custom_option('alm_new_status', 'Status to set for new tasks in Trac',
+        config.opts.add('alm_new_status', 'Status to set for new tasks in Trac',
             default='Ready for Analysis')
-        config.add_custom_option('alm_done_statuses', 'Statuses that signify a task is Done in Trac',
+        config.opts.add('alm_done_statuses', 'Statuses that signify a task is Done in Trac',
             default='closed')
         self.alm_task_title_prefix = 'SDE '
 
@@ -89,7 +86,7 @@ class TracConnector(AlmConnector):
         super(TracConnector, self).initialize()
 
         #Verify that the configuration options are set properly
-        self.config['alm_done_statuses'] = self.config['alm_done_statuses'].split(',')
+        self.config.process_list_config('alm_done_statuses')
 
         if (not self.config['alm_done_statuses'] or
             len(self.config['alm_done_statuses']) < 1):
@@ -123,6 +120,8 @@ class TracConnector(AlmConnector):
             raise AlmException('Unable to connect to Trac server (check the server URL) '
                     'Reason: %s' % (str(err)))
         except (xmlrpclib.ProtocolError, xmlrpclib.Fault), err:
+            if hasattr(err, 'url'):
+                err.url = err.url.split('@', 1)[-1]
             raise AlmException('Unable to connect to Trac XML-RPC. Please verify '
                     'the server URL, username, and password. Reason: %s' % (str(err)))
         except Exception, err:
@@ -134,7 +133,6 @@ class TracConnector(AlmConnector):
             trac_ver = '0.10'
         elif (api_version[0] == 1):
             trac_ver = '0.11 or higher'
-        
         logger.debug('Connected to Trac API %s v%s.%s' % (trac_ver, api_version[1], api_version[2]))
 
     def alm_connect_project(self):
@@ -148,12 +146,11 @@ class TracConnector(AlmConnector):
 
     def _get_trac_task_by_id(self, sde_id, alm_id):
         trac_task = self.alm_plugin.proxy.ticket.get(alm_id)
-
         return TracTask(sde_id, alm_id, trac_task[3]['status'], trac_task[3]['changetime'],
                           self.config['alm_done_statuses'], trac_task[3]['milestone'])
 
     def alm_get_task(self, task):
-        sde_id = task['title'].partition(':')[0]
+        sde_id = self._extract_task_id(task['id'])
 
         # The colon is needed, otherwise for "T6" we match on "T6" and "T68"
         qstr = 'summary^=%s%s:' % (self.alm_task_title_prefix, sde_id)
@@ -173,7 +170,7 @@ class TracConnector(AlmConnector):
         return trac_ticket
 
     def alm_add_task(self, task):
-        sde_id = task['title'].partition(':')[0]
+        sde_id = self._extract_task_id(task['id'])
         title = '%s%s' % (self.alm_task_title_prefix, task['title'])
 
         alm_id = self.alm_plugin.proxy.ticket.create(
@@ -205,7 +202,7 @@ class TracConnector(AlmConnector):
         task_list = self.alm_plugin.proxy.ticket.update(task.get_alm_id(),
                 comment, update_args)
         if not task_list:
-            logging.error('Update failed for %s' % task.task_id)
+            logger.error('Update failed for %s' % task.task_id)
             return None
 
         logger.debug('Milestone changed to %s for ticket %s in Trac' %
@@ -252,7 +249,7 @@ class TracConnector(AlmConnector):
         task_list = self.alm_plugin.proxy.ticket.update(task.get_alm_id(),
                 comment, update_args)
         if not task_list:
-            logging.error('Update failed for %s' % task.task_id)
+            logger.error('Update failed for %s' % task.task_id)
             return None
 
         logger.debug('Status changed to %s for ticket %s in Trac' %

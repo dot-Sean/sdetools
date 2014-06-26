@@ -27,7 +27,7 @@ def set_py2exe_options():
     ext_opt['zipfile'] = None
 
 try:
-    import py2exe
+    import py2exe # noqa
 except ImportError:
     if 'py2exe' in sys.argv[1:]:
         print "Error: Missing py2exe package."

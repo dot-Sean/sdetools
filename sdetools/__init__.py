@@ -1,13 +1,13 @@
 __all__ = [
     'call',
-    'sdelib', 
-    'modules', 
-    'alm_integration', 
-    'analysis_integration', 
+    'sdelib',
+    'modules',
+    'alm_integration',
+    'analysis_integration',
     'extlib',
 ]
 
-VERSION = '3.7.0'
+VERSION = '4.4.4'
 
 from sdetools.sdelib import mod_mgr
 
@@ -21,7 +21,6 @@ def setup_path():
         base_path = os.path.split(os.path.abspath(sys.argv[0]))[0]
         base_path = os.path.join(base_path, 'sdetools')
     else:
-        current_file = __file__
         base_path = os.path.split(os.path.abspath(__file__))[0]
 
     commons.setup_base_path(base_path)
@@ -34,7 +33,7 @@ def set_api_connector(api_module):
     sdeapi.APIBase = api_module
 
 def call(cmd_name, options, args=(), call_back=mod_mgr.stdout_callback, call_back_args={}):
-    exit_stat = mod_mgr.run_command(cmd_name, args, 'import', call_options=options, 
+    exit_stat = mod_mgr.run_command(cmd_name, args, 'import', call_options=options,
             call_back=call_back, call_back_args=call_back_args)
 
     return exit_stat

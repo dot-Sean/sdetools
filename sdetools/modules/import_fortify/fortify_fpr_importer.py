@@ -1,55 +1,37 @@
-import os
-import zipfile
-
-from sdetools.sdelib import commons
-from sdetools.analysis_integration.base_integrator import BaseImporter
+from sdetools.analysis_integration.base_integrator import BaseZIPImporter
 from sdetools.modules.import_fortify.fortify_fvdl_importer import FortifyFVDLImporter
-from sdetools.modules.import_fortify.fortify_integration_error import FortifyIntegrationError
+from sdetools.modules.import_fortify.fortify_audit_importer import FortifyAuditImporter
 
 
-class FortifyFPRImporter(BaseImporter):
-    AUDIT_FILE = "audit.fvdl"
-    MAX_SIZE_IN_MB = 50  # Maximum FVDL size in MB
+class FortifyFPRImporter(BaseZIPImporter):
 
-    def __init__(self):
+    ANALYSIS_BLACKLIST = []  # Filter out issues based on this list of analysis statuses
+
+    def __init__(self, blacklist=[]):
         super(FortifyFPRImporter, self).__init__()
+        self.register_importer('audit.xml', FortifyAuditImporter())
+        self.register_importer('audit.fvdl', FortifyFVDLImporter())
+        self.ANALYSIS_BLACKLIST = blacklist
 
-    def parse(self, fpr_file_name):
-        try:
-            fpr_fd = zipfile.ZipFile(fpr_file_name, "r")
-        except zipfile.BadZipfile, e:
-            raise FortifyIntegrationError("Error opening file (Bad file) %s" % (fpr_file_name))
-        except zipfile.LargeZipFile, e:
-            raise FortifyIntegrationError("Error opening file (File too large) %s" % (fpr_file_name))
+    def parse(self, fpr_file):
 
-        importer = FortifyFVDLImporter()
+        self.findings = []
+        self.process_archive(fpr_file)
 
-        try:
-            file_info = fpr_fd.getinfo(self.AUDIT_FILE)
-        except KeyError, ke:
-            raise FortifyIntegrationError("File (%s) not found in archive %s" % (self.AUDIT_FILE, fpr_file_name))
+        self.id = self.IMPORTERS['audit.xml'].id or self.IMPORTERS['audit.fvdl'].id
 
-        if file_info.file_size > self.MAX_SIZE_IN_MB * 1024 * 1024:
-            raise FortifyIntegrationError("File %s is larger than %s MB: %d bytes" %
-                    (self.MAX_SIZE_IN_MB, self.AUDIT_FILE, file_info.file_size))
+        # If we have no audit details or blacklists then we're done
+        audit_findings = self.IMPORTERS['audit.xml'].findings
+        if not audit_findings or not self.ANALYSIS_BLACKLIST:
+            self.findings = self.IMPORTERS['audit.fvdl'].findings
+            return
 
-        # Python 2.6+ can open a ZIP file entry as a stream
-        if hasattr(fpr_fd, 'open'):
-            try:
-                fvdl_file = fpr_fd.open(self.AUDIT_FILE)
-            except KeyError, ke:
-                raise FortifyIntegrationError("File (%s) not found in archive %s" % (self.AUDIT_FILE, fpr_file_name))
+        # remove issues that match our blacklist
+        for vulnerability_instance in self.IMPORTERS['audit.fvdl'].findings:
+            instance_id = vulnerability_instance['instance_id']
 
-            importer.parse_file(fvdl_file)
-
-            fvdl_file.close()
-
-        # Python 2.5 and prior must open the file into memory
-        else:
-            fvdl_xml = fpr_fd.read(self.AUDIT_FILE)
-            importer.parse_string(fvdl_xml)
-
-        fpr_fd.close()
-
-        self.report_id = importer.report_id
-        self.raw_findings = importer.raw_findings
+            if instance_id in audit_findings and audit_findings[instance_id] in self.ANALYSIS_BLACKLIST:
+                # skip this vulnerability
+                continue
+            else:
+                self.findings.append(vulnerability_instance)

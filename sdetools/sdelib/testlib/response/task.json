@@ -1,0 +1,32 @@
+{
+    "status": "TODO",
+    "contextrulesets": [],
+    "timestamp": 1381173270,
+    "note_count": 0,
+    "implementations": [],
+    "phase": "requirements",
+    "id": "1296-T36",
+    "categories": [],
+    "priority": 8,
+    "weakness": {
+        "content": "Cross-site scripting (XSS) vulnerabilities occur when the software does not neutralize or incorrectly neutralizes user-controllable input before it is placed in output. \r\n\r\nOnce the malicious script is injected, the attacker can perform a variety of malicious activities. The attacker could transfer private information, such as cookies that may include session information, from the victim's machine to the attacker. \r\n\r\nThe attacker could send malicious requests to a web site on behalf of the victim, which could be especially dangerous to the site if the victim has administrator privileges to manage that site. Phishing attacks could be used to emulate trusted web sites and trick the victim into entering a password, allowing the attacker to compromise the victim's account on that web site. \r\n\r\nFinally, the script could exploit a vulnerability in the web browser itself possibly taking over the victim's machine, sometimes referred to as \"drive-by hacking.\"In many cases, the attack can be launched without the victim even being aware of it. Even with careful users, attackers frequently use a variety of methods to encode the malicious portion of the attack, such as URL encoding or Unicode, so the request looks less suspicious.\r\n\r\n\r\n### Training\r\n * Learn about [cross site scripting](http://securitycompass.com/training/free/course-demos/modules/XSS/player.html)",
+        "cwe": [
+            {
+                "url": "http://cwe.mitre.org/data/definitions/79",
+                "title": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')",
+                "cwe_id": 79
+            }
+        ],
+        "id": "P632",
+        "title": "P632: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+    },
+    "title": "Txx: Task Title",
+    "url": "https://m1.sdelements.com/library/tasks/T36/",
+    "age": "current",
+    "project": 1296,
+    "assigned_to": [],
+    "content": "Task Description.",
+    "verification_coverage": [
+        "No Automated Dynamic Analysis Coverage"
+    ]
+}

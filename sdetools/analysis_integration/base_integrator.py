@@ -1,10 +1,15 @@
 #!/usr/bin/python
 import collections
 import re
+import xml
+import os
+import glob
+import zipfile
 from datetime import datetime
+from xml.sax.handler import ContentHandler
 from sdetools.extlib.defusedxml import minidom, sax
 
-from sdetools.sdelib.commons import Error, abc
+from sdetools.sdelib.commons import Error, abc, UsageError
 from sdetools.sdelib.restclient import APIError
 from sdetools.sdelib.interactive_plugin import PlugInExperience
 
@@ -26,11 +31,102 @@ class IntegrationResult(object):
         self.error_count = error_count
         self.error_weaknesses_unmapped = error_weaknesses_unmapped
 
-class BaseImporter(object):
+class BaseContentHandler(ContentHandler):
+
+    findings = []
+    id = None
 
     def __init__(self):
-        self.report_id = ""
-        self.raw_findings = []
+        self.findings = []
+        self.id = None
+
+    @abstractmethod
+    def valid_content_detected(self):
+        pass
+
+class BaseImporter(object):
+
+    findings = []
+    id = ""
+
+    def __init__(self):
+        self.id = ""
+        self.findings = []
+
+
+class BaseZIPImporter(BaseImporter):
+    ARCHIVED_FILE_NAME = None
+    MAX_SIZE_IN_MB = 300  # Maximum archived file size in MB
+    MAX_MEMORY_SIZE_IN_MB = 50  # Python 2.5 and prior must be much more conservative
+    IMPORTERS = {}
+
+    def __init__(self):
+        super(BaseZIPImporter, self).__init__()
+        self.IMPORTERS = {}
+
+    def register_importer(self, file_name, importer):
+        self.IMPORTERS[file_name] = importer
+
+    def process_archive(self, zip_archive):
+
+        logger.debug("Processing archive file: %s" % zip_archive)
+
+        try:
+            results_archive = zipfile.ZipFile(zip_archive, "r")
+        except zipfile.BadZipfile:
+            raise IntegrationError("Error opening file (Bad file) %s" % zip_archive)
+        except zipfile.LargeZipFile:
+            raise IntegrationError("Error opening file (File too large) %s" % zip_archive)
+
+        for file_name in self.IMPORTERS.keys():
+            try:
+                self._process_archived_file(results_archive, file_name)
+            except IntegrationError, ie:
+                raise IntegrationError("Error processing %s: %s" % (zip_archive, str(ie)))
+
+        results_archive.close()
+
+    def _process_archived_file(self, archive, file_name):
+
+        logger.debug("Processing archived file: %s" % file_name)
+
+        try:
+            file_info = archive.getinfo(file_name)
+        except KeyError:
+            raise IntegrationError("File %s not found" % file_name)
+
+        importer = self.IMPORTERS[file_name]
+
+        # Python 2.6+ can open a ZIP file entry as a stream
+        if hasattr(archive, 'open'):
+
+            # Restrict the size of the file we will open
+            if file_info.file_size > self.MAX_SIZE_IN_MB * 1024 * 1024:
+                raise IntegrationError("File %s is larger than %s MB: %d bytes" %
+                                       (file_name, self.MAX_SIZE_IN_MB, file_info.file_size))
+
+            try:
+                results_file = archive.open(file_name)
+            except KeyError:
+                raise IntegrationError("File %s not found" % file_name)
+
+            importer.parse_file(results_file)
+
+            results_file.close()
+
+        # Python 2.5 and prior must open the file into memory
+        else:
+            # Restrict the size of the file we will open into RAM
+            if file_info.file_size > self.MAX_MEMORY_SIZE_IN_MB * 1024 * 1024:
+                raise IntegrationError("File %s is larger than %s MB: %d bytes" %
+                                      (file_name, self.MAX_MEMORY_SIZE_IN_MB, file_info.file_size))
+
+            results_xml = archive.read(file_name)
+            importer.parse_string(results_xml)
+
+        # retain the results in the importer
+        self.IMPORTERS[file_name] = importer
+
 
 class BaseXMLImporter(BaseImporter):
 
@@ -45,56 +141,82 @@ class BaseXMLImporter(BaseImporter):
         """
         pass
 
-    def parse(self, file_name):        
-        try:    
-            fp = open(file_name, 'r')
-        except IOError, ioe:
-            raise IntegrationError("Could not open file '%s': %s" % (file_name, ioe))
+    def parse(self, file_name):
+        if isinstance(file_name, basestring):
+            try:
+                fp = open(file_name, 'r')
+            except IOError, ioe:
+                raise IntegrationError("Could not open file '%s': %s" % (file_name, ioe))
+        else:
+            fp = file_name
         self.parse_file(fp)
 
     def parse_file(self, xml_file):
         XMLReader = self._get_content_handler()
-        try:    
+        try:
             parser = sax.make_parser()
             parser.setContentHandler(XMLReader)
             parser.parse(xml_file)
-        except (xml.sax.SAXException, xml.sax.SAXParseException, xml.sax.SAXNotSupportedException, 
+        except (xml.sax.SAXException, xml.sax.SAXParseException, xml.sax.SAXNotSupportedException,
                 xml.sax.SAXNotRecognizedException), se:
             raise IntegrationError("Could not parse file '%s': %s" % (xml_file, se))
-        
-        self.raw_findings = XMLReader.raw_findings
-        self.report_id = XMLReader.report_id   
-        
+
+        if not XMLReader.valid_content_detected():
+            raise IntegrationError("Malformed document detected: %s" % xml_file)
+
+        self.findings = XMLReader.findings
+        if XMLReader.id:
+            self.id = XMLReader.id
+
     def parse_string(self, xml):
         XMLReader = self._get_content_handler()
-        try:    
+        try:
             sax.parseString(xml, XMLReader)
-        except (xml.sax.SAXException, xml.sax.SAXParseException, xml.sax.SAXNotSupportedException, 
+        except (xml.sax.SAXException, xml.sax.SAXParseException, xml.sax.SAXNotSupportedException,
                 xml.sax.SAXNotRecognizedException), se:
-            raise IntegrationError("Could not parse file '%s': %s" % (xml_file, se))
-        
-        self.raw_findings = XMLReader.raw_findings
-        self.report_id = XMLReader.report_id
-        
+            raise IntegrationError("Could not parse xml source %s" % (se))
+
+        if not XMLReader.valid_content_detected():
+            raise IntegrationError("Malformed document detected")
+
+        self.findings = XMLReader.findings
+        if XMLReader.id:
+            self.id = XMLReader.id
+
 class BaseIntegrator(object):
     TOOL_NAME = 'External tool'
+    VALID_IMPORT_BEHAVIOUR = ['replace', 'replace-scanner', 'combine']
 
-    def __init__(self, config, default_mapping_file=None):
+    def __init__(self, config, tool_name, supported_file_types, default_mapping_file=None):
         self.findings = []
         self.phase_exceptions = ['testing']
         self.mapping = {}
-        self.report_id = ""
+        self.report_id = "Not specified"
         self.config = config
         self.emit = self.config.emit
         self.weakness_title = {}
         self.confidence = {}
         self.plugin = PlugInExperience(self.config)
-        self.config.add_custom_option("mapping_file",
-                "Task ID -> Tool Weakness mapping in XML format", "m", default_mapping_file)
-        self.config.add_custom_option("flaws_only",
-                "Only update tasks identified having flaws. (True | False)", "z", "False")
-        self.config.add_custom_option("trial_run",
-                "Trial run only: 'True' or 'False'", "t", "False")
+        self.supported_file_types = supported_file_types
+
+        self.config.opts.add(
+                "report_file",
+                "Common separated list of %s Report Files" % tool_name.capitalize(),
+                "x", None)
+        self.config.opts.add(
+                "report_type",
+                "%s Report Type: %s|auto" % (tool_name.capitalize(), '|'.join(supported_file_types)),
+                default="auto")
+        self.config.opts.add(
+                "mapping_file",
+                "Task ID -> Tool Weakness mapping in XML format",
+                "m", default_mapping_file)
+        self.config.opts.add(
+                "import_behaviour",
+                "One of the following: %s" % '|'.join(BaseIntegrator.VALID_IMPORT_BEHAVIOUR),
+                default="replace")
+        self.config.opts.add("flaws_only", "Only update tasks identified having flaws. (True | False)", "z", "False")
+        self.config.opts.add("trial_run", "Trial run only: 'True' or 'False'", "t", "False")
 
     def initialize(self):
         """
@@ -105,10 +227,100 @@ class BaseIntegrator(object):
         self.config.process_boolean_config('flaws_only')
         self.config.process_boolean_config('trial_run')
 
+        # Validate the report_type config. If report_type is not auto, we will process only
+        # the specified report_type, else we process all supported file types.
+        if self.config['report_type'] in self.supported_file_types:
+            self.supported_file_types = [self.config['report_type']]
+        elif self.config['report_type'] != 'auto':
+            raise UsageError('Invalid report_type %s' % self.config['report_type'])
+
+        if self.config['import_behaviour'] in BaseIntegrator.VALID_IMPORT_BEHAVIOUR:
+            self.behaviour = self.config['import_behaviour']
+        else:
+            raise UsageError('Invalid import_behaviour %s' % self.config['import_behaviour'])
+
+        self.process_report_file_config()
+
+    @staticmethod
+    def _get_file_extension(file_path):
+        return os.path.splitext(file_path)[1][1:]
+
+    @abstractmethod
+    def parse_report_file(self, report_file, report_type):
+        """Returns the raw findings and the report id for a single report file"""
+        return [], None
+
+    def parse(self):
+        _raw_findings = []
+        _report_ids = []
+
+        for report_file in self.config['report_file']:
+            if self.config['report_type'] == 'auto':
+                if not isinstance(report_file, basestring):
+                    raise UsageError("On auto-detect mode, the file name needs to be specified.")
+                report_type = self._get_file_extension(report_file)
+            else:
+                report_type = self.config['report_type']
+
+            raw_findings, report_id = self.parse_report_file(report_file, report_type)
+
+            _raw_findings.extend(raw_findings)
+
+            if report_id:
+                _report_ids.append(report_id)
+
+        self.findings = _raw_findings
+
+        if _report_ids:
+            self.report_id = ', '.join(_report_ids)
+        else:
+            self.report_id = "Not specified"
+            self.emit.info("Report ID not found in report: Using default.")
+
+    def process_report_file_config(self):
+        """
+        If report files contains a directory path, find all possible files in that folder
+        """
+        if not self.config['report_file']:
+            raise UsageError("Missing configuration option 'report_file'")
+
+        if not isinstance(self.config['report_file'], basestring):
+            # Should be a file object
+            self.config['report_file'] = [self.config['report_file']]
+        else:
+            processed_report_files = []
+
+            for file_path in self.config['report_file'].split(','):
+                file_path = file_path.strip()
+                file_name, file_ext = os.path.splitext(file_path)
+                file_ext = file_ext[1:]
+
+                if file_ext in self.supported_file_types:
+                    processed_report_files.extend(glob.glob(file_path))
+                elif re.search('[*?]', file_ext):
+                    # Run the glob and filter out unsupported file types
+                    processed_report_files.extend([f for f in glob.iglob(file_path)
+                                                  if self._get_file_extension(f) in self.supported_file_types])
+                elif not file_ext:
+                    # Glob using our supported file types
+                    if os.path.isdir(file_path):
+                        _base_path = file_path + '/*'
+                    else:
+                        _base_path = file_name
+                    for file_type in self.supported_file_types:
+                        processed_report_files.extend(glob.glob('%s.%s' % (_base_path, file_type)))
+                else:
+                    raise UsageError('%s does not match any supported file type(s): %s' %
+                                     (file_path, self.supported_file_types))
+            if not processed_report_files:
+                raise UsageError("Did not find any report files. Check if 'report_file' is configured properly.")
+            else:
+                self.config['report_file'] = processed_report_files
+
     def load_mapping_from_xml(self):
         try:
             base = minidom.parse(self.config['mapping_file'])
-        except KeyError, ke:
+        except KeyError:
             raise IntegrationError("Missing configuration option 'mapping_file'")
         except Exception, e:
             raise IntegrationError("An error occurred opening mapping file '%s': %s" % (self.config['mapping_file'], e))
@@ -169,12 +381,12 @@ class BaseIntegrator(object):
     def task_exists_in_project_tasks(self, task_id, project_tasks):
         """
         Return True if task_id is present in the array of project_tasks, False otherwise
-        
+
         task_id is an integer
         project_tasks is an array of maps. Each map contains a key 'id' with a corresponding integer value
         """
         for task in project_tasks:
-            task_search = re.search('^(\d+)-[^\d]+(\d+)$', task['id'])
+            task_search = re.search('^(\d+)-T(\d+)$', task['id'])
             if task_search:
                 project_task_id = task_search.group(2)
                 if project_task_id == task_id:
@@ -196,18 +408,17 @@ class BaseIntegrator(object):
         import_start_datetime = datetime.now()
 
         logger.info("Integration underway for: %s" % (self.report_id))
-        logger.info("Mapped SD application/project: %s/%s" % 
+        logger.info("Mapped SD application/project: %s/%s" %
             (self.config['sde_application'], self.config['sde_project']))
 
         if self.config['trial_run']:
             logger.info("Trial run only. No changes will be made")
         else:
             ret = self.plugin.add_project_analysis_note(self.report_id, self.TOOL_NAME)
-            project_analysis_note_ref = ret['id'] 
-
+            project_analysis_note_ref = ret['id']
 
         task_list = self.plugin.get_task_list()
-        logger.debug("Retrieved %d tasks from %s/%s" % 
+        logger.debug("Retrieved %d tasks from %s/%s" %
             (len(task_list), self.config['sde_application'], self.config['sde_project']))
 
         unique_findings = self.unique_findings()
@@ -219,13 +430,13 @@ class BaseIntegrator(object):
         for task_id in task_ids:
             finding = unique_findings[task_id]
 
-            if not self.task_exists_in_project_tasks( task_id, task_list):
+            if not self.task_exists_in_project_tasks(task_id, task_list):
                 logger.debug("Task %s not found in project tasks" % task_id)
                 mapped_tasks = self.lookup_task("*")
                 if mapped_tasks:
                     new_task_id = mapped_tasks[0] # use the first one
                     if task_id != new_task_id:
-                        logger.warn("Task %s was not found in the project, mapping it to the default task %s." % 
+                        logger.warn("Task %s was not found in the project, mapping it to the default task %s." %
                                 (task_id, new_task_id))
                         if not unique_findings.has_key(new_task_id):
                             unique_findings[new_task_id] = finding
@@ -242,7 +453,7 @@ class BaseIntegrator(object):
             stats_total_flaws_found += len(finding['weaknesses'])
 
             if not self.task_exists_in_project_tasks(task_id, task_list):
-                logger.error("Task %s was not found in the project, skipping %d findings." % 
+                logger.error("Task %s was not found in the project, skipping %d findings." %
                              (task_id, len(finding['weaknesses'])))
                 stats_total_skips += 1
                 stats_total_skips_findings += len(finding['weaknesses'])
@@ -255,7 +466,16 @@ class BaseIntegrator(object):
             weakness_finding = {}
 
             for weakness in sorted(finding['weaknesses']):
-                if last_weakness != weakness['weakness_id']:
+
+                if 'description' in weakness:
+                    weakness_description = weakness['description']
+                elif (self.weakness_title.has_key(weakness['weakness_id']) and
+                        self.weakness_title[weakness['weakness_id']] != ''):
+                    weakness_description = self.weakness_title[weakness['weakness_id']]
+                else:
+                    weakness_description = weakness['weakness_id']
+
+                if last_weakness != weakness_description:
                     if len(weakness_finding.items()) > 0:
                         analysis_findings.append(weakness_finding)
                         weakness_finding = {}
@@ -265,19 +485,14 @@ class BaseIntegrator(object):
                             self.weakness_type[weakness['weakness_id']] == 'cwe'):
                         weakness_finding['cwe'] = weakness['weakness_id']
 
-                    if (self.weakness_title.has_key(weakness['weakness_id']) and
-                            self.weakness_title[weakness['weakness_id']] != ''):
-                        weakness_finding['desc'] = self.weakness_title[weakness['weakness_id']]
-                    else:
-                        weakness_finding['desc'] = weakness['weakness_id']
+                    weakness_finding['desc'] = weakness_description
 
-                    last_weakness = weakness['weakness_id']
+                    last_weakness = weakness_description
 
                 if 'count' in weakness:
                     weakness_finding['count'] += weakness['count']
                 else:
                     weakness_finding['count'] += 1
-
             if len(finding.items()) > 0:
                 analysis_findings.append(weakness_finding)
 
@@ -287,8 +502,8 @@ class BaseIntegrator(object):
                     finding_confidence = self.confidence[task_id]
 
                 if not self.config['trial_run']:
-                    ret = self.plugin.add_analysis_note(task_name, project_analysis_note_ref, 
-                            finding_confidence, analysis_findings)
+                    ret = self.plugin.add_analysis_note(task_name, project_analysis_note_ref,
+                            finding_confidence, analysis_findings, self.behaviour)
                 logger.debug("Marked %s as FAILURE with %s confidence" % (task_name, finding_confidence))
                 stats_failures_added += 1
             except APIError, e:
@@ -302,16 +517,16 @@ class BaseIntegrator(object):
         affected_tasks = []
         noflaw_tasks = []
         for task in task_list:
-            if(task['phase'] in self.phase_exceptions):
+            if task['phase'] in self.phase_exceptions:
                 stats_test_tasks += 1
                 continue
-            task_search = re.search('^(\d+)-[^\d]+(\d+)$', task['id'])
+            task_search = re.search('^(\d+)-T(\d+)$', task['id'])
             if task_search:
                 task_id = task_search.group(2)
-                if(unique_findings.has_key(task_id)):
+                if unique_findings.has_key(task_id):
                     affected_tasks.append(task_id)
                     continue
-            noflaw_tasks.append(task_id)
+                noflaw_tasks.append(task_id)
 
         if not self.config['flaws_only']:
             for task_id in noflaw_tasks:
@@ -328,8 +543,8 @@ class BaseIntegrator(object):
                     if not self.config['trial_run']:
                         analysis_findings = []
 
-                        self.plugin.add_analysis_note(task_name, project_analysis_note_ref, 
-                                finding_confidence, analysis_findings)
+                        self.plugin.add_analysis_note(task_name, project_analysis_note_ref,
+                                finding_confidence, analysis_findings, self.behaviour)
                     logger.info("Marked %s as PASS with %s confidence" % (task_name, finding_confidence))
                     stats_passes_added += 1
                 except APIError, e:
@@ -338,8 +553,8 @@ class BaseIntegrator(object):
                     stats_api_errors += 1
 
         if missing_weakness_map:
-            self.emit.error("Could not map %s flaws" % (len(missing_weakness_map)), 
-                err_type='unmapped_weakness', 
+            self.emit.error("Could not map %s flaws" % (len(missing_weakness_map)),
+                err_type='unmapped_weakness',
                 weakness_list=missing_weakness_map)
         else:
             self.emit.info("All flaws successfully mapped to tasks.")
@@ -349,7 +564,7 @@ class BaseIntegrator(object):
         results['tasks_marked_fail'] = (stats_failures_added, 'Number of Tasks marked as FAILED')
         results['tasks_without_findings'] = (noflaw_tasks, 'Number of Tasks in the project without any flaws')
         if stats_total_skips:
-            results['skipped_flaws'] = (stats_total_skips_findings, 
+            results['skipped_flaws'] = (stats_total_skips_findings,
                     'Number of flaws skipped because the related task was not'\
                     ' found in the project')
             results['skipped_tasks'] = (stats_total_skips, 'Number of tasks with flaws not found in project')
@@ -363,3 +578,5 @@ class BaseIntegrator(object):
                                  noflaw_tasks=noflaw_tasks,
                                  error_count=stats_api_errors,
                                  error_weaknesses_unmapped=len(missing_weakness_map))
+
+

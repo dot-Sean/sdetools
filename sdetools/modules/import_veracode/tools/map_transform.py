@@ -14,7 +14,7 @@ class Mapping:
     def load_mapping_from_xml(self, mapping_file):
         try:
             base = minidom.parse(mapping_file)
-        except Exception, e:
+        except Exception:
             raise MappingError("An error occured opening mapping file '%s'" % mapping_file)
 
         cwe_mapping = {}

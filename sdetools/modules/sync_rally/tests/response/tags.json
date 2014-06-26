@@ -1,0 +1,19 @@
+{
+	"QueryResult": {
+		"_rallyAPIMajor": "1",
+		"_rallyAPIMinor": "39",
+		"Errors": [],
+		"Warnings": [],
+		"TotalResultCount": 1,
+		"StartIndex": 1,
+		"PageSize": 20,
+		"Results": [{
+			"_rallyAPIMajor": "1",
+			"_rallyAPIMinor": "39",
+			"_ref": "https://rally1.rallydev.com/slm/webservice/1.39/tag/16958640048",
+			"_refObjectUUID": "cefcf9fe-a333-4678-ba9f-3c4ad5df3c71",
+			"_refObjectName": "SD-Elements",
+			"_type": "Tag"
+		}]
+	}
+}

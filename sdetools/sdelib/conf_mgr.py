@@ -7,12 +7,13 @@ import logging
 import datetime
 
 import log_mgr
+logger = log_mgr.mods.add_mod(__name__)
 
 from sdetools.sdelib.commons import UsageError, json
 
 __all__ = ['Config']
 
-DEFAULT_CONFIG_FILE = os.path.join("~", ".sdelint.cnf")
+DEFAULT_CONFIG_FILE = os.path.join("~", ".sdetools.cnf")
 
 LOG_LEVELS = {
     'debug': logging.DEBUG,
@@ -20,7 +21,84 @@ LOG_LEVELS = {
     'default': logging.WARNING,
     'error': logging.ERROR,
     'quiet': logging.CRITICAL,
-    }
+}
+
+
+class Option(object):
+    """
+    Use this to extend the options for your own use cases. The item is added to arguments.
+    The same var_name is parsed from config file if present.
+
+    Args:
+        var_name: Name of the config variable. (use lower case, numbers and underscore)
+        help_title: A one or two sentence description of the config item
+        [short_form]: a single character where (e.g. 'w' for -w)
+        [default]: Optional. Emtpy string by default
+        [meta_var]: Optional. Defaults to capital format
+        [group_name]: Name of the group (use same name for grouping)
+
+    Note: the long form becomes --<var_name>
+    Note: short form is case sensitive
+    Note: Do not use the base <var_names> (used in the base defaults)
+    Note: If default is a string, the option is optional. Otherwise, it is mandatory.
+    """
+    def __init__(self, var_name, help_title, short_form=None,
+                default='', meta_var=None, group_name=None):
+        var_name = var_name.lower()
+
+        self.var_name = var_name
+        self.help_title = help_title
+        self.short_form = short_form
+        self.default = default
+        self.meta_var = meta_var
+        self.group_name = group_name
+
+    def __str__(self):
+        summary = {}
+        for item in [
+                'var_name', 'help_title', 'short_form', 'default',
+                'meta_var', 'group_name']:
+            summary[item] = getattr(self, item)
+        return str(summary)
+
+    def __repr__(self):
+        return '%s(**%s)' % (self.__class__.__name__, str(self))
+
+class ModuleOptions(dict):
+    """
+    Note: The first item in sub_cmds is the default.
+    """
+
+    Option = Option
+
+    def __init__(self, sub_cmds=['']):
+        self.sub_cmds = sub_cmds
+        for sub_cmd in self.sub_cmds:
+            self[sub_cmd] = []
+
+    def add(self, *args, **kwargs):
+        opt = self.Option(*args, **kwargs)
+        self.add_opt(opt)
+
+    def add_subcmd(self, sub_cmd, *args, **kwargs):
+        opt = self.Option(*args, **kwargs)
+        self.add_opt(opt, sub_cmd)
+
+    def add_opt(self, opt, sub_cmd=None):
+        # Note: sub_cmd being '' vs None have two different meanings here
+        if sub_cmd is None:
+            for cmd in self:
+                self[cmd].append(opt)
+        else:
+            if sub_cmd not in self:
+                raise UsageError("Sub-Command %s is not available" % sub_cmd)
+            self[sub_cmd].append(opt)
+
+    def copy(self):
+        dup = ModuleOptions()
+        for item in self:
+            dup[item] = self[item]
+        return dup
 
 class Config(object):
     """
@@ -47,22 +125,42 @@ class Config(object):
             'debug_mods': '',
             'args': None,
             'proxy_auth': '',
+            'cert_loc': '',
         }
 
-    def __init__(self, command_list, args, ret_chn, call_src, call_options={}):
+    def __init__(self, cmd_name, sub_cmd_name, command_list, args, ret_chn, call_src, call_options={}):
         if call_src not in ['shell', 'import']:
             raise UsageError("Invalid config source")
 
-        self.call_src = call_src
         self.command_list = command_list
+        self.command = cmd_name
+        self.sub_cmds = self.command_list[self.command].sub_cmds
+        self.opts = ModuleOptions(self.sub_cmds)
+        self.sub_cmd = sub_cmd_name
+        self.args = args[1:]
+
+        self.call_src = call_src
         self.settings = self.DEFAULTS.copy()
         self.custom_options = []
         self.parser = None
         self.use_conf_file = True
         self.call_options = call_options
-        self.args = args
         self.ret_chn = ret_chn
         self.emit = self.ret_chn.emit
+
+    def copy(self, command=None, sub_cmd=''):
+        copy_opts = False
+        if command is None:
+            command = self.command
+            sub_cmd = self.sub_cmd
+            copy_opts = True
+        dup = Config(command, sub_cmd, self.command_list, [''] + self.args, self.ret_chn,
+                self.call_src, self.call_options)
+        dup.use_conf_file = self.use_conf_file
+        if copy_opts:
+            dup.settings = self.settings.copy()
+            dup.opts = self.opts.copy()
+        return dup
 
     def __getitem__(self, key):
         if key in self.settings:
@@ -72,6 +170,8 @@ class Config(object):
     def __setitem__(self, key, val):
         if key not in self.settings:
             raise KeyError, 'Unknown configuration item: %s' % (key)
+        if key == 'cert_loc':
+            self.set_custom_cert_loc(val)
         self.settings[key] = val
 
     def has_key(self, key):
@@ -82,28 +182,19 @@ class Config(object):
     def get(self, key, default=None):
         return self.settings.get(key, default)
 
-    def add_custom_option(self, var_name, help_title, short_form=None, 
+    def import_custom_options(self, opt_list=None, rebuild=False):
+        if opt_list is None:
+            opt_list = self.opts
+        if rebuild:
+            self.settings = self.DEFAULTS.copy()
+        for opt in opt_list[self.sub_cmd]:
+            self._add_custom_option(opt.var_name, opt.help_title, opt.short_form,
+                    opt.default, opt.meta_var, opt.group_name)
+
+    def _add_custom_option(self, var_name, help_title, short_form=None, 
             default='', meta_var=None, group_name=None):
-        """
-        Use this to extend the options for your own use cases. The item is added to arguments.
-        The same var_name is parsed from config file if present.
-
-        Args:
-            var_name: Name of the config variable. (use lower case, numbers and underscore)
-            help_title: A one or two sentence description of the config item
-            [short_form]: a single character where (e.g. 'w' for -w)
-            [default]: Optional. Emtpy string by default
-            [meta_var]: Optional. Defaults to capital format
-            [group_name]: Name of the group (use same name for grouping)
-
-        Note: the long form becomes --<var_name>
-        Note: short form is case sensitive
-        Note: Do not use the base <var_names> (used in the base defaults)
-        Note: If default is a string, the option is optional. Otherwise, it is mandatory.
-        """
-        var_name = var_name.lower()
         if var_name in self.settings:
-            log_mgr.warning('Attempting to re-customize an existing '
+            logger.warning('Attempting to re-customize an existing '
                 'config %s (IGNORE)' % var_name)
             return
 
@@ -153,7 +244,7 @@ class Config(object):
                     return False, 'Config file not found.'
 
         config_keys = ['log_level', 'debug_mods', 'application', 'project', 
-            'authmode', 'args', 'proxy_auth']
+            'authmode', 'args', 'proxy_auth', 'cert_loc']
 
         for name, optlist in self.custom_options:
             for item in optlist:
@@ -189,21 +280,22 @@ class Config(object):
         if self.use_conf_file:
             parser.add_option('-c', '--config', metavar='CONFIG_FILE', dest='conf_file', 
                 default=self.DEFAULTS['conf_file'], type='string',
-                help = "Configuration File if. Ignored if -C is used. (Default is %s)" % (self.DEFAULTS['conf_file']))
+                help = "Specify the configuration file to be used. (Default is %s)" % (self.DEFAULTS['conf_file']))
             parser.add_option('-C', '--skipconfig', dest='skip_conf_file', default=False, action='store_true',
                 help = "Do NOT use any configuration file")
         parser.add_option('-I', '--noninteractive', dest='interactive', default=True, action='store_false', 
             help="Run in Non-Interactive mode")
         parser.add_option('-d', '--debug', dest='debug', action='store_true', 
             help = "Set logging to debug level")
-        parser.add_option('-v', '--verbose', dest='verbose', action='store_true', help = "Verbose output")
+        parser.add_option('-v', '--verbose', dest='verbose', action='store_true', help="Verbose output")
         parser.add_option('-q', '--quiet', dest='quiet', action='store_true', 
             help = "Silent output (except for unrecoverable errors)")
         parser.add_option('--proxy_auth', metavar='USERNAME:PASSWORD', dest='proxy_auth', default='', type='string',
             help = "Proxy authentication credentials, in <username>:<password> format [optional]")
         parser.add_option('--debugmods', metavar='MOD_NAME1,[MOD_NAME2,[...]]', dest='debug_mods', 
             default='', type='string',
-            help = "Comma-seperated List of modules to debug, e.g. sdetools.sdelib.sdeapi)")
+            help = "Comma-separated list of modules to debug, e.g. sdetools.sdelib.sdeapi)")
+        parser.add_option('-s', '--cert_loc', metavar='FILE_PATH', help='Custom certificate bundle', default='')
 
         for group_name, optslist in self.custom_options:
             group = optparse.OptionGroup(parser, group_name)
@@ -239,7 +331,7 @@ class Config(object):
         try:
             (opts, args) = self.parser.parse_args()
         except:
-            if (str(sys.exc_info()[1]) == '0'):
+            if str(sys.exc_info()[1]) == '0':
                 # This happens when -h is used
                 sys.exit(0)
             else:
@@ -252,10 +344,7 @@ class Config(object):
 
         ret_stat, ret_val = self.parse_config_file(self['conf_file'])
         if not ret_stat:
-            raise UsageError("Unable to read or process configuration file.\n Reason: %s" % (ret_val))
-
-        self.command = args[0]
-        self.args = args[1:]
+            raise UsageError("Unable to read or process configuration file.\n Reason: %s" % ret_val)
 
         # No more errors, lets apply the changes
         if opts.quiet:
@@ -280,6 +369,8 @@ class Config(object):
             self['proxy_auth'] = opts.proxy_auth
         if self['proxy_auth']:
             self.fix_proxy_env()
+        if opts.cert_loc:
+            self['cert_loc'] = opts.cert_loc
 
         for group_name, optlist in self.custom_options:
             for item in optlist:
@@ -308,6 +399,13 @@ class Config(object):
             return
         self[key] = (str(self[key]).lower() == 'true')
 
+    def process_list_config(self, key):
+        if not self[key]:
+            self[key] = []
+            return
+        if isinstance(self[key], basestring):
+            self[key] = [x.strip() for x in self[key].split(',')]
+
     def process_json_str_dict(self, key):
         try:
             if not self[key]:
@@ -332,3 +430,12 @@ class Config(object):
             self[key] = datetime.datetime.strptime(self[key], '%Y-%m-%d').date()
         except ValueError, err:
             raise UsageError('Unable to read date field %s. Reason: %s' % (key, str(err)))
+
+    def set_custom_cert_loc(self, cert_loc):
+        if not os.path.isfile(cert_loc):
+            logger.warning('Custom certificate file %s not found. Skipping the option ...' % cert_loc)
+            return
+        from sdetools.extlib import http_req
+        if http_req.custom_ca_file != cert_loc:
+            http_req.custom_ca_file = cert_loc
+            http_req.compile_certs()

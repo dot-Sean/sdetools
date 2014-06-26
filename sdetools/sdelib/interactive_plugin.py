@@ -21,9 +21,9 @@ class PlugInExperience:
         self.api = sdeapi.APIBase(self.config)
         self.app_id = None
         self.prj_id = None
-        config.add_custom_option('sde_application', "SDE Application to use", 
+        config.opts.add('sde_application', "SDE Application to use",
             default='', group_name="SD Elements Connector")
-        config.add_custom_option('sde_project', "SDE Project to use",
+        config.opts.add('sde_project', "SDE Project to use",
             default='', group_name="SD Elements Connector")
         self.connected = False
 
@@ -158,12 +158,16 @@ class PlugInExperience:
 
     @_verify_connect
     def get_task_notes(self, task_id, note_type=''):
-        return self.api.get_task_ide_notes("%d-%s" % (self.prj_id, task_id), note_type)
+        return self.api.get_task_notes("%d-%s" % (self.prj_id, task_id), note_type)
 
     @_verify_connect
     def add_project_analysis_note(self, analysis_ref, analysis_type):
         return self.api.add_project_analysis_note(self.prj_id, analysis_ref, analysis_type)
 
     @_verify_connect
-    def add_analysis_note(self, task_id, analysis_ref, confidence, findings):
-        return self.api.add_analysis_note("%d-%s" % (self.prj_id, task_id), analysis_ref, confidence, findings)
+    def add_analysis_note(self, task_id, analysis_ref, confidence, findings, behaviour):
+        return self.api.add_analysis_note("%d-%s" % (self.prj_id, task_id), analysis_ref, confidence, findings, behaviour)
+
+    @_verify_connect
+    def get_phases(self):
+        return self.api.get_phases()

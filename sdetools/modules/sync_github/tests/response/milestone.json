@@ -1,0 +1,19 @@
+{
+	"url": "https://api.github.com/org:/repo:/milestones/1",
+	"number": 1,
+	"state": "open",
+	"title": "milestone01",
+	"description": "",
+	"creator": {
+					"login": "test",
+					"id": 1,
+					"url": "https://api.github.com/users/test",
+					"name": "test user",
+					"company": "SecurityCompass",
+					"email": "test+user@securitycompass.com"
+				},
+	"open_issues": 4,
+	"closed_issues": 8,
+	"created_at": "2011-04-10T20:09:31Z",
+	"due_on": null
+}
