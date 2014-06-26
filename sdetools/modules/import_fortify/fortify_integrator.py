@@ -18,45 +18,48 @@ class FortifyIntegrator(BaseIntegrator):
     TOOL_NAME = "fortify"
 
     def __init__(self, config):
-        supported_file_types = ["xml", "fpr", "fvdl"]
-        super(FortifyIntegrator, self).__init__(config, self.TOOL_NAME, supported_file_types, DEFAULT_MAPPING_FILE)
+        supported_input = {
+            'file': ["xml", "fpr", "fvdl"],
+            'network': 'https'
+        }
+        super(FortifyIntegrator, self).__init__(config, self.TOOL_NAME, supported_input, DEFAULT_MAPPING_FILE)
     
         self.config.opts.add("import_blacklist", "Do not import issues which have been triaged with these " +
                 "statuses (i.e. 'Bad Practice, Not an Issue').", "a", "Not an Issue")
-        config.add_custom_option('integration_mode',"Integration mode: (ssc or file)", default='file')
-        config.add_custom_option("file_results", "Verification results file", "x", default='')
-        config.add_custom_option('ssc_test_connection','Test Fortify SSC Connection Only '
+        config.opts.add('integration_mode', "Integration mode: (ssc or file)", default='file')
+        config.opts.add('ssc_test_connection', 'Test Fortify SSC Connection Only '
                 '(Also checks existence of project and version)', default='False')
-        config.add_custom_option('ssc_method','http vs https for Fortify SSC server', default='https')
-        config.add_custom_option('ssc_server','Fortify SSC server name or IP', default='')
-        config.add_custom_option('ssc_user','Fortify SSC user',default='')
-        config.add_custom_option('ssc_pass','Fortify SSC password',default='')
-        config.add_custom_option('ssc_authtoken','Fortify SSC authtoken (AnalysisDownloadToken permission)',default='')
-        config.add_custom_option('ssc_project_name','Fortify Project name',default='')
-        config.add_custom_option('ssc_project_version','Fortify Project version',default='')
+        config.opts.add('ssc_method', 'http vs https for Fortify SSC server', default='https')
+        config.opts.add('ssc_server', 'Fortify SSC server name or IP', default='')
+        config.opts.add('ssc_user', 'Fortify SSC user', default='')
+        config.opts.add('ssc_pass', 'Fortify SSC password', default='')
+        config.opts.add('ssc_authtoken', 'Fortify SSC authtoken (AnalysisDownloadToken permission)', default='')
+        config.opts.add('ssc_project_name', 'Fortify Project name', default='')
+        config.opts.add('ssc_project_version', 'Fortify Project version', default='')
         
         self.raw_findings = []
         self.importer = None
 
     def initialize(self):
-        super(FortifyIntegrator, self).initialize()
+
         self.config.process_list_config('import_blacklist')
-        
+
         if self.config['integration_mode'] == 'ssc':
             self.config.process_boolean_config('ssc_test_connection')
 
-            for config_key in ['ssc_method','ssc_server','ssc_project_name','ssc_project_version']:
+            for config_key in ['ssc_method', 'ssc_server', 'ssc_project_name', 'ssc_project_version']:
                 if not self.config[config_key]:
                     raise UsageError("Missing value for option %s" % config_key)
 
             if not self.config['ssc_authtoken']:
-                for config_key in ['ssc_user','ssc_pass']:
+                for config_key in ['ssc_user', 'ssc_pass']:
                     if not self.config[config_key]:
                         raise UsageError("Missing value for option %s" % config_key)
+            # disable file support
+            self.supported_input.pop('file')
             
-        elif self.config['integration_mode'] == 'file':        
-            if not self.config['file_results']:
-                raise UsageError("Missing value for option file_results")
+        elif self.config['integration_mode'] == 'file':
+            super(FortifyIntegrator, self).initialize()
         else:
             raise UsageError("Invalid value for integration_mode. Valid values are: ssc or file")
 
@@ -76,6 +79,13 @@ class FortifyIntegrator(BaseIntegrator):
         self.report_id = importer.id
 
         return importer.findings, importer.id
+
+    def parse(self):
+        if self.config['integration_mode'] == 'file':
+            super(FortifyIntegrator, self).parse()
+        elif self.config['integration_mode'] == 'ssc':
+            self.importer = FortifySSCImporter(self.config)
+            self.importer.run()
 
     def _make_finding(self, item):
         return {'weakness_id': item['id'], 'description': item['description'], 'count': item['count']}

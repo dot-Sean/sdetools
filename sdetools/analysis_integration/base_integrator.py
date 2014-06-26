@@ -185,9 +185,10 @@ class BaseXMLImporter(BaseImporter):
 
 class BaseIntegrator(object):
     TOOL_NAME = 'External tool'
-    VALID_IMPORT_BEHAVIOUR = ['replace', 'replace-scanner', 'combine']
+    DEFAULT_IMPORT_BEHAVIOUR = 'replace'
+    VALID_IMPORT_BEHAVIOUR = [DEFAULT_IMPORT_BEHAVIOUR, 'replace-scanner', 'combine']
 
-    def __init__(self, config, tool_name, supported_file_types, default_mapping_file=None):
+    def __init__(self, config, tool_name, supported_input={}, default_mapping_file=None):
         self.findings = []
         self.phase_exceptions = ['testing']
         self.mapping = {}
@@ -197,16 +198,23 @@ class BaseIntegrator(object):
         self.weakness_title = {}
         self.confidence = {}
         self.plugin = PlugInExperience(self.config)
-        self.supported_file_types = supported_file_types
+        self.supported_input = supported_input
+        self.behaviour = BaseIntegrator.DEFAULT_IMPORT_BEHAVIOUR
 
-        self.config.opts.add(
-                "report_file",
-                "Common separated list of %s Report Files" % tool_name.capitalize(),
-                "x", None)
-        self.config.opts.add(
-                "report_type",
-                "%s Report Type: %s|auto" % (tool_name.capitalize(), '|'.join(supported_file_types)),
-                default="auto")
+        if 'file' in supported_input:
+            # if a tool supports files and network we have make 'report_file' optional
+            default_file_name = None
+            if 'network' in supported_input:
+                default_file_name = ''
+
+            self.config.opts.add(
+                    "report_file",
+                    "Common separated list of %s Report Files" % tool_name.capitalize(),
+                    "x", default_file_name)
+            self.config.opts.add(
+                    "report_type",
+                    "%s Report Type: %s|auto" % (tool_name.capitalize(), '|'.join(supported_input['file'])),
+                    default="auto")
         self.config.opts.add(
                 "mapping_file",
                 "Task ID -> Tool Weakness mapping in XML format",
@@ -214,7 +222,7 @@ class BaseIntegrator(object):
         self.config.opts.add(
                 "import_behaviour",
                 "One of the following: %s" % '|'.join(BaseIntegrator.VALID_IMPORT_BEHAVIOUR),
-                default="replace")
+                default=BaseIntegrator.DEFAULT_IMPORT_BEHAVIOUR)
         self.config.opts.add("flaws_only", "Only update tasks identified having flaws. (True | False)", "z", "False")
         self.config.opts.add("trial_run", "Trial run only: 'True' or 'False'", "t", "False")
 
@@ -229,17 +237,19 @@ class BaseIntegrator(object):
 
         # Validate the report_type config. If report_type is not auto, we will process only
         # the specified report_type, else we process all supported file types.
-        if self.config['report_type'] in self.supported_file_types:
-            self.supported_file_types = [self.config['report_type']]
-        elif self.config['report_type'] != 'auto':
-            raise UsageError('Invalid report_type %s' % self.config['report_type'])
+        if 'file' in self.supported_input:
+            if self.config['report_type'] in self.supported_input['file']:
+                self.supported_input['file'] = [self.config['report_type']]
+            elif self.config['report_type'] != 'auto':
+                raise UsageError('Invalid report_type %s' % self.config['report_type'])
+
+            self.process_report_file_config()
 
         if self.config['import_behaviour'] in BaseIntegrator.VALID_IMPORT_BEHAVIOUR:
             self.behaviour = self.config['import_behaviour']
         else:
             raise UsageError('Invalid import_behaviour %s' % self.config['import_behaviour'])
 
-        self.process_report_file_config()
 
     @staticmethod
     def _get_file_extension(file_path):
@@ -295,7 +305,7 @@ class BaseIntegrator(object):
                 file_name, file_ext = os.path.splitext(file_path)
                 file_ext = file_ext[1:]
 
-                if file_ext in self.supported_file_types:
+                if file_ext in self.supported_input['file']:
                     processed_report_files.extend(glob.glob(file_path))
                 elif re.search('[*?]', file_ext):
                     # Run the glob and filter out unsupported file types
@@ -307,11 +317,11 @@ class BaseIntegrator(object):
                         _base_path = file_path + '/*'
                     else:
                         _base_path = file_name
-                    for file_type in self.supported_file_types:
+                    for file_type in self.supported_input['file']:
                         processed_report_files.extend(glob.glob('%s.%s' % (_base_path, file_type)))
                 else:
                     raise UsageError('%s does not match any supported file type(s): %s' %
-                                     (file_path, self.supported_file_types))
+                                     (file_path, self.supported_input['file']))
             if not processed_report_files:
                 raise UsageError("Did not find any report files. Check if 'report_file' is configured properly.")
             else:
