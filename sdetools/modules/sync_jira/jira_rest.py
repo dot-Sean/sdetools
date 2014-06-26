@@ -65,6 +65,10 @@ class JIRARestAPI(RESTBase):
                 self.fields = item['fields']
                 break
 
+        if not self.fields:
+            raise AlmException('Issue type %s not available for project %s' %
+                               (self.config['jira_issue_type'], self.config['alm_project']))
+
         assigned_fields = JIRARestAPI.BASE_FIELDS[:]
 
         missing_fields = []
