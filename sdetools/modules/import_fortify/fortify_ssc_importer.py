@@ -18,6 +18,7 @@ from sdetools.modules.import_fortify.fortify_fpr_importer import FortifyFPRImpor
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
+
 class TokenPlugin(MessagePlugin):
 
     def __init__(self, token_value):
@@ -27,6 +28,7 @@ class TokenPlugin(MessagePlugin):
         header = context.envelope.getChild('Header')
         header.set('xmlns:axis2ns1', 'www.fortify.com/schema')
         header.set('axis2ns1:token', self.auth_token)
+
 
 class FortifySSCImporter(BaseImporter):
 
@@ -159,13 +161,13 @@ class FortifySSCImporter(BaseImporter):
         stream = opener.open(req)
 
         # Download the FPR file to a temporary file
-        temp_fd, fpr_fname = tempfile.mkstemp()
+        temp_fd, fpr_filename = tempfile.mkstemp()
 
         try:
-            self._download_file(stream, fpr_fname)
+            self._download_file(stream, fpr_filename)
         except Exception, e:
             os.close(temp_fd)
-            os.remove(fpr_fname)
+            os.remove(fpr_filename)
             raise FortifyIntegrationError("Could not download FPR file: %s" % e)
 
         logger.info('FPR file downloaded successfully')
@@ -173,10 +175,10 @@ class FortifySSCImporter(BaseImporter):
         self.importer = FortifyFPRImporter()
         
         try:
-            self.importer.parse(fpr_fname)
+            self.importer.parse(fpr_filename)
         finally:
             os.close(temp_fd)
-            os.remove(fpr_fname)
+            os.remove(fpr_filename)
 
         self.raw_findings = self.importer.raw_findings
         self.report_id = self.importer.report_id

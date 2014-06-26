@@ -41,7 +41,6 @@ class FortifyIntegrator(BaseIntegrator):
         self.importer = None
 
     def initialize(self):
-
         self.config.process_list_config('import_blacklist')
 
         if self.config['integration_mode'] == 'ssc':
