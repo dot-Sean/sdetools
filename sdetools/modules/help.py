@@ -7,6 +7,8 @@ import sys
 
 from sdetools.sdelib.cmd import BaseCommand
 from sdetools.sdelib import commons
+from sdetools import VERSION
+
 
 class Command(BaseCommand):
     name = 'help'
@@ -49,6 +51,8 @@ class Command(BaseCommand):
         return ret
 
     def print_command_list(self, cmd_list):
+        print 'SD Elements Tools v%s' % VERSION
+        print
         print 'Available commands are:'
         print
         for cmd_name, cmd_help in cmd_list:
