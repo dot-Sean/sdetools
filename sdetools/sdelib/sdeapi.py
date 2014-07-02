@@ -11,6 +11,7 @@ def _encode_options(options):
         headers['Accept'] += '; %s=%s' % (item, json.dumps(json.dumps(options[item])))
     return headers
 
+
 class ExtAPI(restclient.RESTBase):
     """
     Note: In all the API calls:
@@ -137,8 +138,7 @@ class ExtAPI(restclient.RESTBase):
         Returns the 'status' field of he result
         """
         #TODO: regular expression on task and status for validation
-        result = self.call_api('tasks/%s' % task, self.URLRequest.PUT,
-            args={'status': status})
+        result = self.call_api('tasks/%s' % task, self.URLRequest.PUT, args={'status': status})
         return result['status']
 
     def get_phases(self, options={}, **filters):
