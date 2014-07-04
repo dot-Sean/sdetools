@@ -342,6 +342,13 @@ class BaseIntegrator(object):
                 self.weakness_title[weakness_id] = weakness.attributes['title'].value
 
         self.mapping = weakness_mapping
+
+        # Ensure no weakness maps to more than 1 task
+        for weakness_id, tasks in self.mapping.iteritems():
+            task_mapping_count = len(tasks)
+            if task_mapping_count  > 1:
+                raise IntegrationError("Weakness %s is incorrectly mapped to more than 1 task: %d" %
+                                       (weakness_id, task_mapping_count))
         if not self.mapping:
             raise IntegrationError("No mapping was found in file '%s'" % self.config['mapping_file'])
 
@@ -364,7 +371,7 @@ class BaseIntegrator(object):
                 unique_findings['nomap'].append(weakness_id)
                 continue
             for mapped_task_id in mapped_tasks:
-                if unique_findings.has_key(mapped_task_id):
+                if mapped_task_id in unique_findings:
                     flaws = unique_findings[mapped_task_id]
                 else:
                     flaws = {'weaknesses': []}
@@ -374,9 +381,9 @@ class BaseIntegrator(object):
         return unique_findings
 
     def lookup_task(self, weakness_id):
-        if self.mapping.has_key(weakness_id):
+        if weakness_id in self.mapping:
             return self.mapping[weakness_id]
-        if self.mapping.has_key('*'):
+        if '*' in self.mapping:
             return self.mapping['*']
         return None
 
@@ -461,7 +468,7 @@ class BaseIntegrator(object):
                 stats_total_skips_findings += len(finding['weaknesses'])
                 continue
 
-            task_name = "T%s" % (task_id)
+            task_name = "T%s" % task_id
 
             analysis_findings = []
             last_weakness = None

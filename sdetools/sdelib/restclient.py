@@ -60,6 +60,7 @@ class RESTBase(object):
     - api_token: We use the _pass and allow customizing the API Token header name
     - session: Used mainly for SD Elements session
     - cookie: A cookie jar is added and cookies will be maintained
+    - custom: sub-class is responsible for authentication
     """
     URLRequest = URLRequest
 
@@ -71,7 +72,7 @@ class RESTBase(object):
     APIFormatError = APIFormatError
     API_TOKEN_HEADER = "X-Api-Token"
 
-    def __init__(self, conf_prefix, conf_name, config, base_path=None, extra_conf_opts=[]):
+    def __init__(self, conf_prefix, conf_name, config, base_path=None, extra_conf_opts=[], setup_config=True):
         self._post_init_done = False
         self.config = config
         self.base_path = base_path
@@ -80,7 +81,8 @@ class RESTBase(object):
         self.opener = None
         self._auth_mode = 'basic'
         self.api_token_header_name = DEFAULT_API_TOKEN_HEADER_NAME
-        self._customize_config(CONF_OPTS+extra_conf_opts)
+        if setup_config:
+            self._customize_config(CONF_OPTS+extra_conf_opts)
 
     def _get_conf_name(self, name):
         return '%s_%s' % (self.conf_prefix, name)
@@ -94,10 +96,10 @@ class RESTBase(object):
                 var_name % {'prefix': self.conf_prefix},
                 desc % {'name': self.conf_name},
                 default=default,
-                group_name='%s Connector' % (self.conf_name))
+                group_name='%s Connector' % self.conf_name)
 
     def set_auth_mode(self, auth_mode):
-        if auth_mode not in ['basic', 'session', 'api_token', 'cookie']:
+        if auth_mode not in ['basic', 'session', 'api_token', 'cookie', 'custom']:
             raise UsageError('Invalid auth mode %s' % auth_mode)
         if auth_mode == self._auth_mode:
             return
@@ -205,6 +207,8 @@ class RESTBase(object):
         if auth_mode == 'api_token':
             authheader = self.generate_token_auth_header()
             req.add_header(authheader[0], authheader[1])
+        elif auth_mode == 'custom':
+            pass
         elif target == 'session':
             pass
         elif auth_mode == 'cookie':
@@ -212,7 +216,7 @@ class RESTBase(object):
             pass
         elif auth_mode == 'basic':
             encoded_auth = base64.encodestring('%s:%s' % (self._get_conf('user'), self._get_conf('pass')))[:-1]
-            authheader = "Basic %s" % (encoded_auth)
+            authheader = "Basic %s" % encoded_auth
             req.add_header("Authorization", authheader)
         elif auth_mode == 'session':
             if not self.session_info:
@@ -236,16 +240,16 @@ class RESTBase(object):
         try:
             handle = self.opener.open(req)
         except http_req.InvalidCertificateException, err:
-            raise ServerError('Unable to verify SSL certificate for host: %s' % (self.server))
+            raise ServerError('Unable to verify SSL certificate for host: %s' % self.server)
         except urllib2.URLError, err:
             handle = err
             call_success = False
         except httplib.InvalidURL, err:
-            raise UsageError('Invalid URL. Reason %s' % (err))
+            raise UsageError('Invalid URL. Reason %s' % err)
 
         if not call_success:
             if not hasattr(handle, 'code'):
-                raise ServerError('Invalid server or server unreachable: %s' % (self.server))
+                raise ServerError('Invalid server or server unreachable: %s' % self.server)
             try:
                 err_msg = handle.read()
                 logger.info('Error calling %s API. Raw error: %s' % (self.conf_name, repr(err_msg)[:200]))

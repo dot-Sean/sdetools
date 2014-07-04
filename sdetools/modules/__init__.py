@@ -5,6 +5,7 @@ __all__ = [
     'report',
     'import_appscan',
     'import_fortify',
+    'import_threadfix',
     'import_veracode',
     'import_webinspect',
     'import_whitehat',

@@ -17,17 +17,17 @@ DEFAULT_MAPPING_FILE = os.path.join(media_path, 'whitehat', 'sde_whitehat_map.xm
 
 
 class WhiteHatAPI(RESTBase):
-    """ Base plugin for GitHub """
+    """ Base plugin for WhiteHat """
 
     def __init__(self, config):
         extra_conf_opts = [('wh_api_token', 'WhiteHat API Token', '')]
         super(WhiteHatAPI, self).__init__('wh', 'WhiteHat', config, extra_conf_opts=extra_conf_opts)
 
-    def call_api(self, target, method=URLRequest.GET, args={}, call_headers={}, auth_mode=None):
+    def call_api(self, target, method=URLRequest.GET, args={}, call_headers={}, auth_mode='custom'):
 
         args['key'] = self.config['wh_api_token']
         args['accept_fmt'] = 'application/json'
-        print args
+
         try:
             return super(WhiteHatAPI, self).call_api(target, method, args, call_headers, auth_mode)
         except Exception as e:
