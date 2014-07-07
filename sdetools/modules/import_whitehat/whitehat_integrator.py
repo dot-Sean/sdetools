@@ -27,7 +27,6 @@ class WhiteHatAPI(RESTBase):
 
         args['key'] = self.config['wh_api_token']
         args['accept_fmt'] = 'application/json'
-        print args
         try:
             return super(WhiteHatAPI, self).call_api(target, method, args, call_headers, auth_mode)
         except Exception as e:
