@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<mapping>
+    <task id="62" title="Lockdown passwords in property and configuration files (e.g. database connection strings)" confidence="low">
+        <weakness type="category" id="Application Misconfiguration" title=""/>
+    </task>
+	<task id="63" title="Disable auto-complete on confidential fields" confidence="low">
+        <weakness type="category" id="Autocomplete Attribute" title=""/>
+    </task>
+    <task id="202" title="Prevent buffer overflow/underflow" confidence="high">
+        <weakness type="category" id="Buffer Overflow" title=""/>
+    </task>
+    <task id="151" title="Use cryptographically secure random numbers" confidence="low">
+        <weakness type="category" id="Credential/Session Prediction" title=""/>
+    </task>
+	<task id="29" title="Use anti cross site request forgery (CSRF) tokens" confidence="low">
+        <weakness type="category" id="Cross Site Request Forgery" title=""/>
+    </task>
+	<task id="36" title="Escape untrusted data in HTML, HTML attributes, Cascading Style Sheets and JavaScript" confidence="high">
+        <weakness type="category" id="Cross Site Scripting" title=""/>
+    </task>
+    <task id="50" title="Use indirect object reference maps if accessing files">
+        <weakness type="category" id="Directory Traversal" title=""/>
+    </task>
+    <task id="244" title="Securely delete any unprotected sensitive data">
+        <weakness type="category" id="Fingerprinting" title=""/>
+    </task>
+    <task id="203" title="Avoid uncontrolled format string">
+        <weakness type="category" id="Format String Attack" title=""/>
+    </task>
+    <task id="39" title="Disallow carriage returns and line feeds when adding data to HTTP response headers">
+        <weakness type="category" id="HTTP Response Splitting" title=""/>
+    </task>
+	<task id="31" title="Perform input validation on all forms of input" confidence="low">
+        <weakness type="category" id="Improper Input Handling" title=""/>
+        <weakness type="category" id="Mail Command Injection" title=""/>
+        <weakness type="category" id="Null Byte Injection" title=""/>
+    </task>
+    <task id="6" title="Implement account lockout or authentication throttling">
+        <weakness type="category" id="Insufficient Anti-automation" title=""/>
+    </task>
+    <task id="5" title="Minimum password standards">
+        <weakness type="category" id="Insufficient Password Aging" title=""/>
+        <weakness type="category" id="Insufficient Password Strength" title=""/>
+    </task>
+    <task id="2" title="Secure forgotten password">
+        <weakness type="category" id="Insufficient Password Recovery" title=""/>
+        <weakness type="category" id="Weak Password Recovery Validation" title=""/>
+    </task>
+    <task id="25" title="Enforce absolute session timeouts">
+        <weakness type="category" id="Insufficient Session Expiration" title=""/>
+    </task>
+    <task id="20" title="Invalidate old session ID after authentication">
+        <weakness type="category" id="Insufficient Session Invalidation" title=""/>
+        <weakness type="category" id="Insufficient User Session Invalidation" title=""/>
+        <weakness type="category" id="Session Fixation" title=""/>
+    </task>
+    <task id="21" title="Ensure confidential data is sent over an encrypted channel">
+        <weakness type="category" id="Insufficient Transport Layer Protection" title=""/>
+    </task>
+    <task id="72" title="Use safe arithmetic to avoid integer overflow" confidence="low">
+        <weakness type="category" id="Integer Overflows" title=""/>
+    </task>
+    <task id="65" title="Restrict accepted HTTP verbs" confidence="low">
+        <weakness type="category" id="Invalid HTTP Method Usage" title=""/>
+    </task>
+    <task id="41" title="Use Lightweight Directory Access Protocol (LDAP) encoding when interacting with LDAP data" confidence="low">
+        <weakness type="category" id="LDAP Injection" title=""/>
+    </task>
+	<task id="23" title="Set HttpOnly flag on session cookies" confidence="low">
+        <weakness type="category" id="Non-HttpOnly Session Cookie" title=""/>
+	</task>
+	<task id="43" title="Avoid unsafe operating system interaction" confidence="low">
+        <weakness type="category" id="OS Command Injection" title=""/>
+        <weakness type="category" id="OS Commanding" title=""/>
+	</task>
+	<task id="50" title="Use indirect object reference maps if accessing files" confidence="low">
+        <weakness type="category" id="Path Traversal" title=""/>
+        <weakness type="category" id="Predictable Resource Location" title=""/>
+	</task>
+    <task id="15" title="Centralize authorization">
+        <weakness type="category" id="Insufficient Authorization" title=""/>
+    </task>
+    <task id="22" title="Set secure flag on session cookies">
+        <weakness type="category" id="Insufficient Cookie Access Control" title=""/>
+        <weakness type="category" id="Unsecured Session Cookie" title=""/>
+    </task>
+    <task id="38" title="Bind variables in SQL statements" confidence="high">
+        <weakness type="category" id="SQL Injection" title=""/>
+    </task>
+    <task id="42" title="Avoid relying on untrusted data for server side page, view, or template selection" confidence="high">
+        <weakness type="category" id="SSI Injection" title=""/>
+        <weakness type="category" id="Remote File Inclusion" title=""/>
+    </task>
+    <task id="64" title="No-cache for confidential web pages" confidence="high">
+        <weakness type="category" id="Secured Cachable HTTP Messages" title=""/>
+    </task>
+    <task id="11" title="Disallow external redirects" confidence="high">
+        <weakness type="category" id="URL Redirector Abuse" title=""/>
+    </task>
+    <task id="60" title="Only use approved cryptographic algorithms and key lengths" confidence="low">
+        <weakness type="category" id="Weak Cipher Strength" title=""/>
+    </task>
+    <task id="252" title="Configure XML Parsers for Secure Processing" confidence="low">
+        <weakness type="category" id="XML Attribute Blowup" title=""/>
+        <weakness type="category" id="XML Entity Expansion" title=""/>
+        <weakness type="category" id="XML External Entities" title=""/>
+    </task>
+    <task id="40" title="Use XML encoding when interacting with XML data" confidence="low">
+        <weakness type="category" id="XML Injection" title=""/>
+        <weakness type="category" id="XPath Injection" title=""/>
+        <weakness type="category" id="XQuery Injection" title=""/>
+        <weakness type="category" id="SOAP Array Abuse" title=""/>
+    </task>
+    <task id="243" title="Verify authenticity and integrity of received SOAP messages" confidence="high">
+        <weakness type="category" id="Routing Detour" title=""/>
+    </task>
+    <task id="16" title="Authorize every page" confidence="low">
+        <weakness type="category" id="Information Leakage" title=""/>
+    </task>
+    <task id="193" title="Review non-categorized/miscellaneous findings from static code analysis" confidence="high">
+        <weakness type="category" id="Directory Indexing" title=""/>
+        <weakness type="category" id="Server Misconfiguration" title=""/>
+        <weakness type="category" id="*" title="Unmapped weakness"/>
+    </task>
+</mapping>

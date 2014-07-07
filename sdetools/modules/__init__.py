@@ -7,6 +7,7 @@ __all__ = [
     'import_fortify',
     'import_veracode',
     'import_webinspect',
+    'import_whitehat',
     'sync_jira',
     'sync_mingle',
     'sync_rally',
