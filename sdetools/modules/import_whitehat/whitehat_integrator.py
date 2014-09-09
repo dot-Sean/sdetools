@@ -17,7 +17,7 @@ DEFAULT_MAPPING_FILE = os.path.join(media_path, 'whitehat', 'sde_whitehat_map.xm
 
 
 class WhiteHatAPI(RESTBase):
-    """ Base plugin for GitHub """
+    """ Base plugin for WhiteHat """
 
     def __init__(self, config):
         extra_conf_opts = [('wh_api_token', 'WhiteHat API Token', '')]
