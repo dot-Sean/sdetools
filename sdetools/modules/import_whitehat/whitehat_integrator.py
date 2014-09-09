@@ -38,7 +38,7 @@ class WhiteHatIntegrationError(IntegrationError):
 
 
 class WhiteHatIntegrator(BaseIntegrator):
-    TOOL_NAME = "appscan"
+    TOOL_NAME = "whitehat"
 
     def __init__(self, wh_api, config):
         self.wh_api = wh_api
