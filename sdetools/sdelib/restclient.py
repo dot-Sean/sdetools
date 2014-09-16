@@ -21,8 +21,10 @@ CONF_OPTS = [
 
 DEFAULT_API_TOKEN_HEADER_NAME = "X-Api-Token"
 
+
 class APIError(Error):
     pass
+
 
 class APIHTTPError(APIError):
     def __init__(self, code, msg):
@@ -32,8 +34,10 @@ class APIHTTPError(APIError):
     def __str__(self):
         return 'HTTP Error %s. Explanation returned: %s' % (self.code, Error.__str__(self).replace('\n', ''))
 
+
 class APICallError(APIHTTPError):
     pass
+
 
 class APIAuthError(APIError):
     def __init__(self, msg=None):
@@ -41,17 +45,20 @@ class APIAuthError(APIError):
             msg = 'Incorrect Credentials'
         APIError.__init__(self, msg)
 
+
 class ServerError(APIError):
     """
     Server reachability error (before HTTP is established)
     """
     pass
 
+
 class APIFormatError(APIError):
     """
     API return format is not a proper JSON or is missing some needed fields
     """
     pass
+
 
 class RESTBase(object):
     """
