@@ -24,13 +24,15 @@ except ImportError:
 base_path = None
 media_path = None
 
+
 class Error(Exception):
     """
     Base Error for sdetools.
     All Exceptions in the tool must be inherited from this.
     """
     def __str__(self):
-        return "FATAL ERROR: %s\n" % (self.args)
+        return "FATAL ERROR: %s\n" % self.args
+
 
 class UsageError(Error):
     """
@@ -38,7 +40,8 @@ class UsageError(Error):
     E.g. invalid choices for arguments.
     """
     def __str__(self):
-        return "UsageError: %s\n" % (self.args)
+        return "UsageError: %s\n" % self.args
+
 
 def setup_base_path(base_path_val):
     global base_path
@@ -47,10 +50,12 @@ def setup_base_path(base_path_val):
     base_path = base_path_val
     media_path = os.path.join(base_path, 'docs')
 
+
 def show_error(err_msg, usage_hint=False):
     sys.stderr.write(err_msg)
     if usage_hint:
         sys.stderr.write("  Try specifying 'help' as arguments to see the usage\n")
+
 
 def get_password():
     try:
@@ -62,6 +67,7 @@ def get_password():
     if password and ('\x03' in password or '\x1a' in password):
         raise KeyboardInterrupt
     return password
+
 
 def urlencode_str(inp):
     return urllib.urlencode({'a':inp})[2:]

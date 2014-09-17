@@ -4,10 +4,6 @@
     <weakness type="cwe" id="331" title="Insufficient Entropy"/>
     <weakness type="cwe" id="330" title="Use of Insufficiently Random Values"/>
   </task>
-  <task id="199" title="Avoid relying on evironment variables for application settings">
-    <weakness type="cwe" id="526" title="Information Exposure Through Environmental Variables"/>
-    <weakness type="cwe" id="15" title="External Control of System or Configuration Setting"/>
-  </task>
   <task id="198" title="Encrypt sensitive information in memory">
     <weakness type="cwe" id="316" title="Plaintext Storage in Memory"/>
   </task>
@@ -20,6 +16,9 @@
   </task>
   <task id="244" title="Securely delete any unprotected sensitive data">
     <weakness type="cwe" id="200" title="Information Exposure"/>
+  </task>
+  <task id="253" title="Protect TLS/SSL communication" confidence="low">
+    <weakness type="cwe" id="757" title="Selection of Less-Secure Algorithm During Negotiation (Algorithm Downgrade)"/>
   </task>
   <task id="15" title="Centralize authorization">
     <weakness type="cwe" id="284" title="Improper Access Control"/>
@@ -83,11 +82,16 @@
     <weakness type="cwe" id="88" title="Argument Injection or Modification"/>
     <weakness type="cwe" id="479" title="Signal Handler Use of a Non-Reentrant Function"/>
     <weakness type="cwe" id="287" title="Improper Authentication"/>
+    <weakness type="cwe" id="354" title="Improper Validation of Integrity Check Value"/>
+    <weakness type="cwe" id="526" title="Information Exposure Through Environmental Variables"/>
+    <weakness type="cwe" id="15" title="External Control of System or Configuration Setting"/>
+    <weakness type="cwe" id="170" title="Improper Null Termination"/>
+    <weakness type="cwe" id="*" title="Unmapped CWE"/>
+  </task>
+  <task id="295" title="Avoid storing unencrypted confidential data on client" confidence="low">
     <weakness type="cwe" id="311" title="Missing Encryption of Sensitive Data"/>
     <weakness type="cwe" id="312" title="Cleartext Storage of Sensitive Information"/>
     <weakness type="cwe" id="313" title="Plaintext Storage in a File or on Disk"/>
-    <weakness type="cwe" id="170" title="Improper Null Termination"/>
-    <weakness type="cwe" id="*" title="Unmapped CWE"/>
   </task>
   <task id="186" title="Verify that third party libraries do not have any outstanding security patches">
     </task>
@@ -189,6 +193,7 @@
   <task id="76" title="Do not hard code passwords">
     <weakness type="cwe" id="259" title="Use of Hard-coded Password"/>
     <weakness type="cwe" id="321" title="Use of Hard-coded Cryptographic Key"/>
+    <weakness type="cwe" id="798" title="Use of Hard-coded Credentials"/>
   </task>
   <task id="72" title="Use safe arithmetic to avoid integer overflow">
     <weakness type="cwe" id="191" title="Integer Underflow (Wrap or Wraparound)"/>
@@ -201,6 +206,10 @@
     <weakness type="cwe" id="113" title="Improper Neutralization of CRLF Sequences in HTTP Headers (HTTP Response Splitting)"/>
   </task>
   <task id="38" title="Bind variables in SQL statements">
+    <weakness type="cwe" id="89" title="Improper Neutralization of Special Elements used in an SQL Command (SQL Injection)"/>
+    <weakness type="cwe" id="564" title="SQL Injection: Hibernate"/>
+  </task>
+  <task id="282" title="Bind variables in SQL statements for client applications">
     <weakness type="cwe" id="89" title="Improper Neutralization of Special Elements used in an SQL Command (SQL Injection)"/>
     <weakness type="cwe" id="564" title="SQL Injection: Hibernate"/>
   </task>
@@ -255,10 +264,16 @@
     <weakness type="cwe" id="116" title="Improper Encoding or Escaping of Output"/>
   </task>
   <task id="55" title="Validate all untrusted XML input">
+    <weakness type="cwe" id="91" title="XML Injection (Blind XPath Injection)"/>
+  </task>
+  <task id="288" title="Prevent unauthorized access to information through XML external references">
     <weakness type="cwe" id="611" title="Information Exposure Through XML External Entity Reference"/>
   </task>
   <task id="50" title="Use indirect object reference maps if accessing files">
     <weakness type="cwe" id="73" title="External Control of File Name or Path"/>
     <weakness type="cwe" id="22" title="Improper Limitation of a Pathname to a Restricted Directory (Path Traversal)"/>
+  </task>
+  <task id="275" title="Avoid sending sensitive data using implicit Intents or Broadcasts">
+    <weakness type="cwe" id="402" title="Transmission of Private Resources into a New Sphere (Resource Leak)"/>
   </task>
 </mapping>

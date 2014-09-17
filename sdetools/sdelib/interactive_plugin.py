@@ -2,6 +2,7 @@ from commons import Error, get_password
 import sdeapi
 from content import Content
 
+
 def _verify_connect(wrapped):
     def wrapper(self, *args, **kwargs):
         if not self.connected:
@@ -12,8 +13,10 @@ def _verify_connect(wrapped):
 
     return wrapper
 
+
 class PluginError(Error):
     pass
+
 
 class PlugInExperience:
     def __init__(self, config):
@@ -55,7 +58,7 @@ class PlugInExperience:
                 self.api.connect()
             except self.api.APIAuthError:
                 if askpasswd:
-                    print "Incorrect Email/Passwrd\n"
+                    print "Incorrect Email/Password\n"
                     continue
                 raise
             break
@@ -69,16 +72,16 @@ class PlugInExperience:
             filters['name'] = self.config['sde_application']
         app_list = self.api.get_applications(**filters)
 
-        if (self.config['sde_application']):
-            if (not app_list):
+        if self.config['sde_application']:
+            if not app_list:
                 raise PluginError('Specified Application not found -> %s' % (self.config['sde_application']))
-            elif (len(app_list) == 1):
+            elif len(app_list) == 1:
                 return app_list[0]['id']
 
-        if (not self.config['interactive']):
+        if not self.config['interactive']:
             raise PluginError('Missing Application (either use Interactive mode, or specify the exact name of an Application)')
 
-        if (not app_list):
+        if not app_list:
             raise PluginError('No Applications to choose from')
 
         sel_app = None
@@ -128,18 +131,18 @@ class PlugInExperience:
                 filters['name'] = self.config['sde_project']
             prj_list = self.api.get_projects(sel_app_id, **filters)
 
-            if (self.config['sde_project']):
-                if (not prj_list):
+            if self.config['sde_project']:
+                if not prj_list:
                     raise PluginError('Specified Project not found -> %s' % (self.config['sde_project']))
-                elif (len(prj_list) == 1):
+                elif len(prj_list) == 1:
                     return (sel_app_id, prj_list[0]['id'])
 
-            if (not self.config['interactive']):
+            if not self.config['interactive']:
                 raise PluginError('Missing Project (either use Interactive mode, or specify the exact name of an Project)')
 
             sel_prj = self._select_project_from_list(prj_list)
             if sel_prj is not None:
-                return (sel_app_id, sel_prj['id'])
+                return sel_app_id, sel_prj['id']
 
     def get_compiled_task_list(self):
         task_list = self.get_task_list()

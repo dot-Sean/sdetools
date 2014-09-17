@@ -13,7 +13,7 @@ class RallyResponseGenerator(ResponseGenerator):
             '%s/subscription\.js' % base_path: 'get_subscription',
             '%s/project\.js' % base_path: 'get_project',
             '%s/hierarchicalrequirement\.js' % base_path: 'get_requirements',
-            '%s/hierarchicalrequirement/[0-9]+\.js' % base_path: 'call_card',
+            '%s/hierarchicalrequirement/[0-9]+\.js' % base_path: 'update_card',
             '%s/hierarchicalrequirement/create\.js' % base_path: 'create_card',
             '%s/typedefinition/[0-9]+\.js' % base_path: 'get_type_definition_by_id',
             '%s/typedefinition\.js' % base_path: 'get_type_definitions'
@@ -100,7 +100,7 @@ class RallyResponseGenerator(ResponseGenerator):
         else:
             self.raise_error('401')
 
-    def call_card(self, target, flag, data, method):
+    def update_card(self, target, flag, data, method):
         if not flag:
             task_number = re.search('[0-9]+(?=\.js$)', target).group(0)
             task = self.generator_get_resource('card', task_number)
@@ -116,6 +116,8 @@ class RallyResponseGenerator(ResponseGenerator):
                 task['HierarchicalRequirement'].update(data['HierarchicalRequirement'])
                 self.generator_update_resource('card', task_number, task)
 
+                return RESPONSE_HEADERS, data
+            elif method == 'DELETE':
                 return RESPONSE_HEADERS, data
         else:
             self.raise_error('404')

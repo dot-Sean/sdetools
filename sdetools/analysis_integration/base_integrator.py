@@ -187,7 +187,7 @@ class BaseIntegrator(object):
     TOOL_NAME = 'External tool'
     VALID_IMPORT_BEHAVIOUR = ['replace', 'replace-scanner', 'combine']
 
-    def __init__(self, config, tool_name, supported_file_types, default_mapping_file=None):
+    def __init__(self, config, tool_name, supported_file_types=[], default_mapping_file=None):
         self.findings = []
         self.phase_exceptions = ['testing']
         self.mapping = {}
@@ -199,24 +199,25 @@ class BaseIntegrator(object):
         self.plugin = PlugInExperience(self.config)
         self.supported_file_types = supported_file_types
 
-        self.config.opts.add(
-                "report_file",
-                "Common separated list of %s Report Files" % tool_name.capitalize(),
-                "x", None)
-        self.config.opts.add(
-                "report_type",
-                "%s Report Type: %s|auto" % (tool_name.capitalize(), '|'.join(supported_file_types)),
-                default="auto")
+        if supported_file_types:
+            self.config.opts.add(
+                    "report_file",
+                    "Common separated list of %s Report Files" % tool_name.capitalize(),
+                    "x", None)
+            self.config.opts.add(
+                    "report_type",
+                    "%s Report Type: %s|auto" % (tool_name.capitalize(), ', '.join(supported_file_types)),
+                    default="auto")
         self.config.opts.add(
                 "mapping_file",
                 "Task ID -> Tool Weakness mapping in XML format",
                 "m", default_mapping_file)
         self.config.opts.add(
                 "import_behaviour",
-                "One of the following: %s" % '|'.join(BaseIntegrator.VALID_IMPORT_BEHAVIOUR),
+                "One of the following: %s" % ', '.join(BaseIntegrator.VALID_IMPORT_BEHAVIOUR),
                 default="replace")
         self.config.opts.add("flaws_only", "Only update tasks identified having flaws. (True | False)", "z", "False")
-        self.config.opts.add("trial_run", "Trial run only: 'True' or 'False'", "t", "False")
+        self.config.opts.add("trial_run", "Trial run only: (True | False)", "t", "False")
 
     def initialize(self):
         """
@@ -227,19 +228,20 @@ class BaseIntegrator(object):
         self.config.process_boolean_config('flaws_only')
         self.config.process_boolean_config('trial_run')
 
-        # Validate the report_type config. If report_type is not auto, we will process only
-        # the specified report_type, else we process all supported file types.
-        if self.config['report_type'] in self.supported_file_types:
-            self.supported_file_types = [self.config['report_type']]
-        elif self.config['report_type'] != 'auto':
-            raise UsageError('Invalid report_type %s' % self.config['report_type'])
-
         if self.config['import_behaviour'] in BaseIntegrator.VALID_IMPORT_BEHAVIOUR:
             self.behaviour = self.config['import_behaviour']
         else:
             raise UsageError('Invalid import_behaviour %s' % self.config['import_behaviour'])
 
-        self.process_report_file_config()
+        # Validate the report_type config. If report_type is not auto, we will process only
+        # the specified report_type, else we process all supported file types.
+        if self.supported_file_types:
+            if self.config['report_type'] in self.supported_file_types:
+                self.supported_file_types = [self.config['report_type']]
+            elif self.config['report_type'] != 'auto':
+                raise UsageError('Invalid report_type %s' % self.config['report_type'])
+
+            self.process_report_file_config()
 
     @staticmethod
     def _get_file_extension(file_path):
@@ -409,7 +411,7 @@ class BaseIntegrator(object):
 
         logger.info("Integration underway for: %s" % (self.report_id))
         logger.info("Mapped SD application/project: %s/%s" %
-            (self.config['sde_application'], self.config['sde_project']))
+                    (self.config['sde_application'], self.config['sde_project']))
 
         if self.config['trial_run']:
             logger.info("Trial run only. No changes will be made")
