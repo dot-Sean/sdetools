@@ -23,9 +23,16 @@ class JIRARestAPI(RESTBase):
             return super(JIRARestAPI, self).parse_response(result, headers)
 
     def parse_error(self, result):
+        # Try to parse the response as JSON
         try:
-            return ' '.join(json.loads(result)['errorMessages'])
+            error_response = json.loads(result)
         except ValueError:
+            return result
+
+        # Send back all the error messages in one go
+        if 'errorMessages' in error_response:
+            return ' '.join(error_response['errorMessages'])
+        else:
             return result
 
     def connect_server(self):
