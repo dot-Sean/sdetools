@@ -23,7 +23,10 @@ class JIRARestAPI(RESTBase):
             return super(JIRARestAPI, self).parse_response(result, headers)
 
     def parse_error(self, result):
-        return ' '.join(json.loads(result)['errorMessages'])
+        try:
+            return ' '.join(json.loads(result)['errorMessages'])
+        except ValueError:
+            return result
 
     def connect_server(self):
         """ Verifies that JIRA connection works """
@@ -63,7 +66,8 @@ class JIRARestAPI(RESTBase):
                                       args={'projectKeys': self.config['alm_project'],
                                       'expand': 'projects.issuetypes.fields'})
         except APIError, error:
-            raise AlmException('Could not retrieve fields for JIRA project: %s. %s' % self.config['alm_project'], error)
+            raise AlmException('Could not retrieve fields for JIRA project: %s. %s' %
+                               (self.config['alm_project'], error))
 
         for item in meta_info['projects'][0]['issuetypes']:
             if item['name'] == self.config['jira_issue_type']:
@@ -236,7 +240,7 @@ class JIRARestAPI(RESTBase):
         try:
             transitions = self.call_api(trans_url)
         except APIError, error:
-            raise AlmException("Unable to get transition IDS for JIRA task %s." % (task_id, error))
+            raise AlmException("Unable to get transition IDS for JIRA task %s. %s" % (task_id, error))
         for transition in transitions['transitions']:
             ret_trans[transition['name']] = transition['id']
         return ret_trans
