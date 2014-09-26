@@ -24,6 +24,7 @@ PUBLIC_TASK_CONTENT = 'Visit us at http://www.sdelements.com/ to find out how yo
 GITHUB_NEW_STATUS = 'open'
 GITHUB_DONE_STATUS = 'closed'
 
+
 class GitHubAPI(RESTBase):
     """ Base plugin for GitHub """
 
@@ -237,30 +238,6 @@ class GitHubConnector(AlmConnector):
                           issues_list[0]['number'],
                           issues_list[0]['state'],
                           issues_list[0]['updated_at'])
-
-    def translate_priority(self, priority):
-        """ Translates an SDE priority into a GitHub label """
-        pmap = self.config[self.ALM_PRIORITY_MAP]
-
-        if not pmap:
-            return None
-
-        try:
-            priority = int(priority)
-        except TypeError:
-            raise AlmException("Error in translating SDE priority to GitHub label: "
-                               "%s is not an integer priority" % priority)
-
-        for key in pmap:
-            if '-' in key:
-                lrange, hrange = key.split('-')
-                lrange = int(lrange)
-                hrange = int(hrange)
-                if lrange <= priority <= hrange:
-                    return pmap[key]
-            else:
-                if int(key) == priority:
-                    return pmap[key]
 
     def alm_add_task(self, task):
         github_priority_label = self.translate_priority(task['priority'])

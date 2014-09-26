@@ -19,7 +19,7 @@ PT_DEFAULT_PRIORITY_MAP = {
     '7-10': 'High',
     '4-6': 'Medium',
     '1-3': 'Low',
-    }
+}
 PUBLIC_TASK_CONTENT = 'Visit us at http://www.sdelements.com/ to find out how you can easily add project-specific '\
                       'software security requirements to your existing development processes.'
 
@@ -270,31 +270,6 @@ class PivotalTrackerConnector(AlmConnector):
                                % (release_name, release_marker['code'], release_marker['general_problem']))
         else:
             return release_marker['id']
-
-    def translate_priority(self, priority):
-        """ Translates an SDE priority into a PivotalTracker label """
-        pmap = self.config[self.ALM_PRIORITY_MAP]
-
-        if not pmap:
-            return None
-
-        try:
-            priority = int(priority)
-        except TypeError:
-            logger.error('Could not coerce %s into an integer' % priority)
-            raise AlmException("Error in translating SDE priority to PivotalTracker label: "
-                               "%s is not an integer priority" % priority)
-
-        for key in pmap:
-            if '-' in key:
-                lrange, hrange = key.split('-')
-                lrange = int(lrange)
-                hrange = int(hrange)
-                if lrange <= priority <= hrange:
-                    return pmap[key]
-            else:
-                if int(key) == priority:
-                    return pmap[key]
 
     def pt_get_epic(self, group_name):
         try:

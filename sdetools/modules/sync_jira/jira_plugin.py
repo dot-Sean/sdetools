@@ -204,23 +204,3 @@ class JIRAConnector(AlmConnector):
 
     def convert_markdown_to_alm(self, content, ref): 
         return convert_markdown(content)
-
-    def translate_priority(self, priority):
-        """ Translates an SDE priority into a JIRA priority """
-        try:
-            priority = int(priority)
-        except (TypeError):
-            logger.error('Could not coerce %s into an integer' % priority)
-            raise AlmException("Error in translating SDE priority to JIRA: "
-                               "%s is not an integer priority" % priority)
-        pmap = self.config['alm_priority_map']
-        for key in pmap:
-            if '-' in key:
-                lrange, hrange = key.split('-')
-                lrange = int(lrange)
-                hrange = int(hrange)
-                if lrange <= priority <= hrange:
-                    return pmap[key]
-            else:
-                if int(key) == priority:
-                    return pmap[key]

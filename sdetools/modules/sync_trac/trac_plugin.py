@@ -13,6 +13,7 @@ from sdetools.alm_integration.alm_plugin_base import AlmException
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
+
 class TracXMLRPCAPI(RESTBase):
     def __init__(self, config):
         super(TracXMLRPCAPI, self).__init__('alm', 'Trac', config, 'login/xmlrpc')
@@ -65,6 +66,7 @@ class TracTask(AlmTask):
         return datetime.strptime(self.timestamp,
                                  '%Y-%m-%dT%H:%M:%SZ')
 
+
 class TracConnector(AlmConnector):
     alm_name = 'Trac'
 
@@ -109,7 +111,6 @@ class TracConnector(AlmConnector):
             if type(action_args) is not dict:
                 raise UsageError('Invalid action argument: %s' % repr(action_args))
             self.config[action_type] = (action_to_take, action_args)
-            
 
     def alm_connect_server(self):
         """ Perform initial connect and verify that Trac connection works """

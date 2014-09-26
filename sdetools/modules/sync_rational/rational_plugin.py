@@ -442,27 +442,3 @@ class RationalConnector(AlmConnector):
             s = s[:MAX_CONTENT_SIZE]
 
         return s
-
-    def translate_priority(self, priority):
-        pmap = self.config[self.ALM_PRIORITY_MAP]
-
-        if not pmap:
-            return None
-
-        try:
-            priority = int(priority)
-        except TypeError:
-            logger.error('Could not coerce %s into an integer' % priority)
-            raise AlmException("Error in translating SDE priority to Rational priority: "
-                               "%s is not an integer priority" % priority)
-
-        for key in pmap:
-            if '-' in key:
-                lrange, hrange = key.split('-')
-                lrange = int(lrange)
-                hrange = int(hrange)
-                if lrange <= priority <= hrange:
-                    return pmap[key]
-            else:
-                if int(key) == priority:
-                    return pmap[key]
