@@ -8,7 +8,7 @@ from types import ListType
 from sdetools.sdelib.commons import urlencode_str
 from sdetools.sdelib.restclient import RESTBase
 from sdetools.sdelib.restclient import URLRequest, APIError
-from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
+from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector, PUBLIC_TASK_CONTENT
 from sdetools.alm_integration.alm_plugin_base import AlmException
 
 from sdetools.sdelib import log_mgr
@@ -19,8 +19,6 @@ PT_DEFAULT_PRIORITY_MAP = {
     '4-6': 'Medium',
     '1-3': 'Low',
 }
-PUBLIC_TASK_CONTENT = 'Visit us at http://www.sdelements.com/ to find out how you can easily add project-specific '\
-                      'software security requirements to your existing development processes.'
 
 
 class PivotalTrackerAPI(RESTBase):

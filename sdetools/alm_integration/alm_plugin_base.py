@@ -16,6 +16,8 @@ logger = log_mgr.mods.add_mod(__name__)
 RE_CODE_DOWNLOAD = re.compile(r'\{\{ USE_MEDIA_URL \}\}([^\)]+\))\{@class=code-download\}')
 RE_TASK_IDS = re.compile('^[^\d]+\d+$')
 RE_MAP_RANGE_KEY = re.compile('^([1-9]|10)(-([1-9]|10))?$')
+PUBLIC_TASK_CONTENT = ('Visit us at http://www.sdelements.com/ to find out how you can easily add project-specific '
+                       'software security requirements to your existing development processes.')
 
 
 class AlmException(Error):

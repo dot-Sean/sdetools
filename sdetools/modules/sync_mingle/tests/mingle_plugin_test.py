@@ -1,6 +1,7 @@
 import unittest
 
 from mingle_response_generator import MingleResponseGenerator
+from sdetools.alm_integration.alm_plugin_base import PUBLIC_TASK_CONTENT
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_mingle.mingle_plugin import MingleConnector, MingleAPIBase, AlmException
 
@@ -62,9 +63,6 @@ class TestMingleCase(AlmPluginTestBase, unittest.TestCase):
         self.assert_exception(AlmException, '', exception_msg, self.connector.alm_connect)
 
     def test_content_on_public_repo(self):
-        PUBLIC_TASK_CONTENT = ("Visit us at http://www.sdelements.com/ to find out how you can easily add project-"
-                               "specific software security requirements to your existing development processes.")
-
         self.mock_alm_response.set_response_flags({'get_project': 'anonymous_accessible'})
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
