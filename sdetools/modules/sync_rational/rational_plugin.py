@@ -147,19 +147,16 @@ class RationalConnector(AlmConnector):
     resource_url = None
     priorities = None
     ALM_DONE_STATUSES = 'rational_done_statuses'
-    ALM_PRIORITY_MAP = 'alm_priority_map'
+    default_priority_map = RATIONAL_DEFAULT_PRIORITY_MAP
 
     def __init__(self, config, alm_plugin):
         """ Initializes connection to Rational """
         super(RationalConnector, self).__init__(config, alm_plugin)
 
-        config.opts.add(self.ALM_DONE_STATUSES, 'Statuses that '
-                                 'signify a task is Done in Rational',
-                                 default='Completed,Done')
-        config.opts.add(self.ALM_PRIORITY_MAP, 'Customized map from priority in SDE to Rational '
-                                 '(JSON encoded dictionary of strings)', default='')
+        config.opts.add(self.ALM_DONE_STATUSES, 'Statuses that signify a task is Done in Rational',
+                        default='Completed,Done')
         config.opts.add('rational_context_root', 'Application context root: the part of the URL that accesses '
-                                 'each application and Jazz Team Server', default='')
+                        'each application and Jazz Team Server', default='')
         config.opts.add('alm_issue_label', 'Tags applied to tasks in Rational (space separated)', default='SD-Elements')
 
     def initialize(self):
@@ -177,11 +174,6 @@ class RationalConnector(AlmConnector):
         if self.config['conflict_policy'] != 'alm':
             raise AlmException('Expected "alm" for configuration conflict_policy but got "%s". '
                                'Currently only Rational can be setup as authoritative server' % self.config['conflict_policy'])
-
-        self.config.process_json_str_dict(self.ALM_PRIORITY_MAP)
-        if not self.config[self.ALM_PRIORITY_MAP]:
-            self.config[self.ALM_PRIORITY_MAP] = RATIONAL_DEFAULT_PRIORITY_MAP
-        self._validate_alm_priority_map()
 
     def _rational_forms_login(self, forms_client):
         forms_credentials = {
@@ -328,13 +320,6 @@ class RationalConnector(AlmConnector):
 
     def alm_validate_configurations(self):
         pass
-
-    def _extract_task_id(self, full_task_id):
-        task_id = None
-        task_search = re.search('^(\d+)-([^\d]+\d+)$', full_task_id)
-        if task_search:
-            task_id = task_search.group(2)
-        return task_id
 
     def alm_get_task(self, task):
         """Returns a RationalTask object that has the same ID as the given task"""

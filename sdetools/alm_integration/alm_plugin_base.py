@@ -64,8 +64,10 @@ class AlmConnector(object):
     """
     # This needs to be overwritten
     alm_name = 'ALM Module'
+    ALM_PRIORITY_MAP = 'alm_priority_map'
     TEST_OPTIONS = ['server', 'project', 'settings']
     STANDARD_STATUS_LIST = ['TODO', 'DONE', 'NA']
+    default_priority_map = None
 
     #This is an abstract base class
     __metaclass__ = abc.ABCMeta
@@ -89,8 +91,8 @@ class AlmConnector(object):
         self.config.opts.add('alm_phases', 'Phases to sync '
                 '(comma separated list, e.g. requirements,testing)',
                 default='requirements,architecture-design,development')
-        self.config.opts.add('sde_statuses_in_scope', 'SDE statuses for adding to ALM '
-                '(comma separated %s)' % (','.join(AlmConnector.STANDARD_STATUS_LIST)),
+        self.config.opts.add('sde_statuses_in_scope', 'SDE statuses for adding to %s '
+                '(comma separated %s)' % (self.alm_name, ','.join(AlmConnector.STANDARD_STATUS_LIST)),
                 default='TODO')
         self.config.opts.add('sde_min_priority', 'Minimum SDE priority in scope',
                 default='7')
@@ -99,7 +101,7 @@ class AlmConnector(object):
         self.config.opts.add('selected_tasks', 'Optionally limit the sync to certain tasks '
                 '(comma separated, e.g. T12,T13). Note: Overrides other selections.',
                 default='')
-        self.config.opts.add('alm_project', 'Project in ALM Tool',
+        self.config.opts.add('alm_project', 'Project in %s' % self.alm_name,
                 default='')
         self.config.opts.add('conflict_policy', 'Conflict policy to use',
                 default='alm')
@@ -113,8 +115,13 @@ class AlmConnector(object):
         self.config.opts.add('alm_standard_workflow', 'Standard workflow in ALM?',
                 default='True')
         self.config.opts.add('alm_custom_fields', 
-                'Customized fields to include when creating a task in ALM '
-                '(JSON encoded dictionary of strings)',
+                'Customized fields to include when creating a task in %s '
+                '(JSON encoded dictionary of strings)' % self.alm_name,
+                default='')
+
+        if self.default_priority_map:
+            self.config.opts.add(self.ALM_PRIORITY_MAP, 'Customized map from priority in SDE to %s '
+                '(JSON encoded dictionary of strings)' % self.alm_name,
                 default='')
 
     def initialize(self):
@@ -178,6 +185,11 @@ class AlmConnector(object):
             raise AlmException('Incorrect start_fresh configuration: task deletion is not supported.')
 
         self.alm_plugin.post_conf_init()
+
+        self.config.process_json_str_dict(self.ALM_PRIORITY_MAP)
+        if not self.config[self.ALM_PRIORITY_MAP]:
+            self.config[self.ALM_PRIORITY_MAP] = self.default_priority_map
+        self._validate_alm_priority_map()
 
         logger.info('*** AlmConnector initialized ***')
 
@@ -329,37 +341,38 @@ class AlmConnector(object):
         {'1-3': 'Low', '4-6': 'Medium', '6-10': 'High'}
         {'3-1': 'Low', '6-4': 'Medium', '10-7': 'High'}
         """
-        if 'alm_priority_map' not in self.config:
+        if self.ALM_PRIORITY_MAP not in self.config:
             return
 
         priority_set = set()
-        for key, value in self.config['alm_priority_map'].iteritems():
+        for key, value in self.config[self.ALM_PRIORITY_MAP].iteritems():
             if not RE_MAP_RANGE_KEY.match(key):
-                raise AlmException('Unable to process alm_priority_map (not a JSON dictionary). '
-                        'Reason: Invalid range key %s' % key)
+                raise AlmException('Unable to process %s (not a JSON dictionary). '
+                        'Reason: Invalid range key %s' % (self.ALM_PRIORITY_MAP, key))
 
             if '-' in key:
                 lrange, hrange = key.split('-')
                 lrange = int(lrange)
                 hrange = int(hrange)
                 if lrange >= hrange:
-                    raise AlmException('Invalid alm_priority_map entry %s => %s: Priority %d should be less than %d' %
-                                       (key, value, lrange, hrange))
+                    raise AlmException('Invalid %s entry %s => %s: Priority %d should be less than %d' %
+                                       (self.ALM_PRIORITY_MAP, key, value, lrange, hrange))
                 for mapped_priority in range(lrange, hrange+1):
                     if mapped_priority in priority_set:
-                        raise AlmException('Invalid alm_priority_map entry %s => %s: Priority %d is duplicated' %
-                                          (key, value, mapped_priority))
+                        raise AlmException('Invalid %s entry %s => %s: Priority %d is duplicated' %
+                                          (self.ALM_PRIORITY_MAP, key, value, mapped_priority))
                     priority_set.add(mapped_priority)
             else:
                 key_value = int(key)
                 if key_value in priority_set:
-                    raise AlmException('Invalid alm_priority_map entry %s => %s: Priority %d is duplicated' %
-                                      (key, value, key_value))
+                    raise AlmException('Invalid %s entry %s => %s: Priority %d is duplicated' %
+                                      (self.ALM_PRIORITY_MAP, key, value, key_value))
                 priority_set.add(key_value)
 
         for mapped_priority in xrange(1, 11):
             if mapped_priority not in priority_set:
-                raise AlmException('Invalid alm_priority_map: missing a value mapping for priority %d' % mapped_priority)
+                raise AlmException('Invalid %s: missing a value mapping for priority %d' %
+                                   (self.ALM_PRIORITY_MAP, mapped_priority))
 
     def _extract_task_id(self, full_task_id):
         """
@@ -420,7 +433,7 @@ class AlmConnector(object):
 
         For example, has one of the appropriate phases
         """
-        tid = task['id'].split('-', 1)[-1]
+        tid = self._extract_task_id(task['id'])
         if self.config['selected_tasks']:
             return tid in self.config['selected_tasks']
         return (task['phase'] in self.config['alm_phases'] and
@@ -560,7 +573,7 @@ class AlmConnector(object):
                     self.output_progress(100*progress/total_work)
 
             for task in tasks:
-                tid = task['id'].split('-', 1)[-1]
+                tid = self._extract_task_id(task['id'])
                 progress += 1
                 self.output_progress(100*progress/total_work)
 

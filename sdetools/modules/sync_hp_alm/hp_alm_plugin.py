@@ -100,6 +100,7 @@ class HPAlmTask(AlmTask):
 class HPAlmConnector(AlmConnector):
     """Connects SD Elements to HP Alm"""
     alm_name = 'HP Alm'
+    default_priority_map = HPALM_PRIORITY_MAP
 
     def __init__(self, config, alm_plugin):
         super(HPAlmConnector, self).__init__(config, alm_plugin)

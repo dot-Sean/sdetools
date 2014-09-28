@@ -18,6 +18,7 @@ JIRA_DEFAULT_PRIORITY_MAP = {
 
 class JIRAConnector(AlmConnector):
     alm_name = 'JIRA'
+    default_priority_map = JIRA_DEFAULT_PRIORITY_MAP
 
     def __init__(self, config, alm_plugin):
         """ Initializes connection to JIRA """
@@ -36,9 +37,6 @@ class JIRAConnector(AlmConnector):
         config.opts.add('alm_project_version', 'Project version',
                 default='')
         config.opts.add('alm_parent_issue', 'Create sub-tasks under this issue',
-                default='')
-        config.opts.add('alm_priority_map', 'Customized map from priority in SDE to JIRA '
-                '(JSON encoded dictionary of strings)',
                 default='')
         self.jira_issue_type_id = None
         self.project_version = None
@@ -62,11 +60,6 @@ class JIRAConnector(AlmConnector):
             raise AlmException('Missing jira_close_transition in configuration')
         if not self.config['jira_reopen_transition']:
             raise AlmException('Missing jira_reopen_transition in configuration')
-
-        self.config.process_json_str_dict('alm_priority_map')
-        if not self.config['alm_priority_map']:
-            self.config['alm_priority_map'] = JIRA_DEFAULT_PRIORITY_MAP
-        self._validate_alm_priority_map()
 
         if self.config['alm_custom_fields'] and self.config.jira_api_ver == 4 and not self.config['jira_existing_issue']:
             raise AlmException('Unable to process alm_custom_fields. '
@@ -103,7 +96,7 @@ class JIRAConnector(AlmConnector):
 
     def alm_validate_configurations(self):
         missing_priorities = []
-        pmap = self.config['alm_priority_map']
+        pmap = self.config[self.ALM_PRIORITY_MAP]
         for key, priority_name in pmap.iteritems():
             if not self.alm_plugin._has_priority(priority_name):
                 missing_priorities.append(priority_name)
