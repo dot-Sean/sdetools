@@ -105,7 +105,7 @@ class AlmConnector(object):
                 default='')
         self.config.opts.add('conflict_policy', 'Conflict policy to use',
                 default='alm')
-        self.config.opts.add('start_fresh', 'Delete any existing issues in the ALM',
+        self.config.opts.add('start_fresh', 'Delete any matching issues in %s' % self.alm_name,
                 default='False')
         self.config.opts.add('show_progress', 'Show progress',
                 default='False')
@@ -186,10 +186,11 @@ class AlmConnector(object):
 
         self.alm_plugin.post_conf_init()
 
-        self.config.process_json_str_dict(self.ALM_PRIORITY_MAP)
-        if not self.config[self.ALM_PRIORITY_MAP]:
-            self.config[self.ALM_PRIORITY_MAP] = self.default_priority_map
-        self._validate_alm_priority_map()
+        if self.ALM_PRIORITY_MAP in self.config:
+            self.config.process_json_str_dict(self.ALM_PRIORITY_MAP)
+            if not self.config[self.ALM_PRIORITY_MAP]:
+                self.config[self.ALM_PRIORITY_MAP] = self.default_priority_map
+            self._validate_alm_priority_map()
 
         logger.info('*** AlmConnector initialized ***')
 
