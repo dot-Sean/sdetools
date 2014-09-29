@@ -8,14 +8,12 @@ from sdetools.extlib.defusedxml import minidom
 
 from sdetools.sdelib.restclient import RESTBase
 from sdetools.sdelib.restclient import URLRequest, APIError
-from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
+from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector, PUBLIC_TASK_CONTENT
 from sdetools.alm_integration.alm_plugin_base import AlmException
 from sdetools.extlib import markdown
 
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
-PUBLIC_TASK_CONTENT = ('Visit us at http://www.sdelements.com/ to find out how you can easily add project-specific '
-                       'software security requirements to your existing development processes.')
 
 
 class MingleAPIBase(RESTBase):
@@ -91,17 +89,11 @@ class MingleConnector(AlmConnector):
         super(MingleConnector, self).initialize()
 
         #Verify that the configuration options are set properly
-        if (not self.sde_plugin.config['mingle_done_statuses'] or
-            len(self.sde_plugin.config['mingle_done_statuses']) < 1):
-            raise AlmException('Missing mingle_done_statuses in configuration')
+        for item in ['mingle_done_statuses', 'mingle_card_type', 'mingle_new_status']:
+            if not self.config[item]:
+                raise AlmException('Missing %s in configuration' % item)
 
         self.config.process_list_config('mingle_done_statuses')
-
-        if not self.sde_plugin.config['mingle_card_type']:
-            raise AlmException('Missing mingle_card_type in configuration')
-        if not self.sde_plugin.config['mingle_new_status']:
-            raise AlmException('Missing mingle_card_type in configuration')
-
         self.mark_down_converter = markdown.Markdown(safe_mode="escape")
 
     def alm_connect_server(self):

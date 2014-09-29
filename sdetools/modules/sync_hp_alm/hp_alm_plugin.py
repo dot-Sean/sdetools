@@ -100,6 +100,7 @@ class HPAlmTask(AlmTask):
 class HPAlmConnector(AlmConnector):
     """Connects SD Elements to HP Alm"""
     alm_name = 'HP Alm'
+    default_priority_map = HPALM_PRIORITY_MAP
 
     def __init__(self, config, alm_plugin):
         super(HPAlmConnector, self).__init__(config, alm_plugin)
@@ -412,26 +413,6 @@ class HPAlmConnector(AlmConnector):
 
     def convert_markdown_to_alm(self, content, ref):
         return '<html>'+self.mark_down_converter.convert(content)+'</html>'
-
-    def translate_priority(self, priority):
-        """ Translates an SDE priority into a HP ALM priority """
-        try:
-            priority = int(priority)
-        except TypeError:
-            logger.error('Could not coerce %s into an integer' % priority)
-            raise AlmException("Error in translating SDE priority to HP Alm: "
-                               "%s is not an integer priority" % priority)
-        pmap = HPALM_PRIORITY_MAP
-        for key in pmap:
-            if '-' in key:
-                lrange, hrange = key.split('-')
-                lrange = int(lrange)
-                hrange = int(hrange)
-                if lrange <= priority <= hrange:
-                    return pmap[key]
-            else:
-                if int(key) == priority:
-                    return pmap[key]
 
     def _validate_entity_type(self, type, check_value):
         try:
