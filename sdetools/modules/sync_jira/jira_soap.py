@@ -47,7 +47,6 @@ class JIRASoapAPI:
         self.custom_fields = []
         self.fields = []
         self.proxy = None
-        self.context_root = ''
 
     def _get_context_root(self):
         context_root = self.config['alm_context_root']
