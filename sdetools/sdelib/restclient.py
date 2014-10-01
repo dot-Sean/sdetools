@@ -152,6 +152,7 @@ class RESTBase(object):
         if self.base_path:
             self.base_path = self.base_path.strip('/')
             self.base_uri = '%s/%s' % (self.base_uri, self.base_path)
+
         self._post_init_done = True
 
     def encode_post_args(self, args):
