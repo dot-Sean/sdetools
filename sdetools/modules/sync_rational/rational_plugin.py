@@ -165,7 +165,7 @@ class RationalConnector(AlmConnector):
         self.COOKIE_JSESSIONID = None
         self.mark_down_converter = markdown.Markdown(safe_mode="escape")
 
-        for item in [self.ALM_DONE_STATUSES, 'rational_context_root', 'alm_issue_label']:
+        for item in [self.ALM_DONE_STATUSES, 'alm_context_root', 'alm_issue_label']:
             if not self.config[item]:
                 raise AlmException('Missing %s in configuration' % item)
 
