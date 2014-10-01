@@ -152,8 +152,8 @@ class PlugInExperience:
         return content
 
     @_verify_connect
-    def get_task_list(self):
-        return self.api.get_tasks(self.prj_id)
+    def get_task_list(self, options={}, **filters):
+        return self.api.get_tasks(self.prj_id, options, **filters)
 
     @_verify_connect
     def add_task_ide_note(self, task_id, text, filename, status):

@@ -397,7 +397,7 @@ class AlmConnector(object):
             raise AlmException('Requires initialization')
 
         try:
-            return self.sde_plugin.get_task_list()
+            return self.sde_plugin.get_task_list(priority__gte=self.config['sde_min_priority'])
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get tasks from SD Elements. Please ensure'
