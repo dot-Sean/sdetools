@@ -49,6 +49,12 @@ class JIRASoapAPI:
         self.proxy = None
         self.context_root = ''
 
+    def _get_context_root(self):
+        context_root = self.config['alm_context_root']
+        if context_root:
+            return '%s/' % context_root.strip('/')
+        return context_root
+
     def connect_server(self):
         config = SOAPpy.Config
         if __name__ in self.config['debug_mods']:
@@ -57,13 +63,9 @@ class JIRASoapAPI:
         opener = http_req.get_opener(self.config['alm_method'], self.config['alm_server'])
         self.config['alm_server'] = opener.server
 
-        self.context_root = self.config['alm_context_root'].strip('/')
-        if self.context_root:
-            self.context_root = '%s/' % self.context_root
-
         try:
             stream = opener.open('%s://%s/%srpc/soap/jirasoapservice-v2?wsdl' %
-                    (self.config['alm_method'], self.config['alm_server'], self.context_root))
+                    (self.config['alm_method'], self.config['alm_server'], self._get_context_root()))
         except urllib2.URLError, err:
             raise AlmException('Unable to reach JIRA service (Check URL). Reason: %s' % (err))
         except http_req.InvalidCertificateException, err:

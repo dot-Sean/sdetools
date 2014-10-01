@@ -200,13 +200,22 @@ class ResponseGenerator(object):
             the corresponding values in the resource
         """
         for key, value in _filter.items():
-            _task_value = task.get(key)
-            if type(_task_value) == IntType:
-                _task_value = str(_task_value)
-            if type(value) == ListType:
-                value = value[0]
-            if _task_value is None or not re.match(value, _task_value):
-                return False
+
+            # Support priority__gte filter on the SDE /api/tasks endpoint
+            m = re.match(r"(\w+)__gte", key)
+            if m:
+                value = task.get(m.group(1))
+                if type(value) == ListType:
+                    _task_value = value[0]
+                return _task_value >= value
+            else:
+                _task_value = task.get(key)
+                if type(_task_value) == IntType:
+                    _task_value = str(_task_value)
+                if type(value) == ListType:
+                    value = value[0]
+                if _task_value is None or not re.match(value, _task_value):
+                    return False
         return True
 
     def generator_update_resource(self, resource_type, _id, update_args):

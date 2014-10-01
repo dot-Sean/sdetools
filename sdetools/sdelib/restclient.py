@@ -86,7 +86,6 @@ class RESTBase(object):
         self.conf_prefix = conf_prefix
         self.conf_name = conf_name
         self.opener = None
-        self.context_root = ''
         self._auth_mode = 'basic'
         self.api_token_header_name = DEFAULT_API_TOKEN_HEADER_NAME
         self._customize_config(CONF_OPTS+extra_conf_opts)
@@ -123,6 +122,12 @@ class RESTBase(object):
     def urlencode_str(self, instr):
         return urllib.urlencode({'a': instr})[2:]
 
+    def _get_context_root(self):
+        context_root = self._get_conf('context_root')
+        if context_root:
+            return '/%s' % context_root.strip('/')
+        return context_root
+
     def post_conf_init(self):
         if self._post_init_done:
             return
@@ -143,14 +148,10 @@ class RESTBase(object):
 
         self.session_info = None
         self.server = self._get_conf('server')
-        self.context_root = self._get_conf('context_root').strip('/')
-        if self.context_root:
-            self.context_root = '%s/' % self.context_root
-        self.base_path = self.base_path.strip('/')
-        self.base_uri = '%s://%s/%s' % (self._get_conf('method'), self.server, self.context_root)
+        self.base_uri = '%s://%s%s' % (self._get_conf('method'), self.server, self._get_context_root())
         if self.base_path:
-            self.base_uri = '%s%s' % (self.base_uri, self.base_path)
-
+            self.base_path = self.base_path.strip('/')
+            self.base_uri = '%s/%s' % (self.base_uri, self.base_path)
         self._post_init_done = True
 
     def encode_post_args(self, args):
