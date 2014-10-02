@@ -17,6 +17,7 @@ CONF_OPTS = [
     ['%(prefix)s_pass', 'Password for %(name)s Tool', ''],
     ['%(prefix)s_server', 'Server of the %(name)s', ''],
     ['%(prefix)s_method', 'http vs https for %(name)s server', 'https'],
+    ['%(prefix)s_context_root', 'Context root for %(name)s server', ''],
 ]
 
 DEFAULT_API_TOKEN_HEADER_NAME = "X-Api-Token"
@@ -101,7 +102,7 @@ class RESTBase(object):
                 var_name % {'prefix': self.conf_prefix},
                 desc % {'name': self.conf_name},
                 default=default,
-                group_name='%s Connector' % (self.conf_name))
+                group_name='%s Connector' % self.conf_name)
 
     def set_auth_mode(self, auth_mode):
         if auth_mode not in ['basic', 'session', 'api_token', 'cookie']:
@@ -119,7 +120,13 @@ class RESTBase(object):
         self._auth_mode = auth_mode
 
     def urlencode_str(self, instr):
-        return urllib.urlencode({'a':instr})[2:]
+        return urllib.urlencode({'a': instr})[2:]
+
+    def _get_context_root(self):
+        context_root = self._get_conf('context_root')
+        if context_root:
+            return '/%s' % context_root.strip('/')
+        return context_root
 
     def post_conf_init(self):
         if self._post_init_done:
@@ -140,9 +147,10 @@ class RESTBase(object):
         self.config[self._get_conf_name('server')] = self.opener.server
 
         self.session_info = None
-        self.server = self._get_conf('server') 
-        self.base_uri = '%s://%s' % (self._get_conf('method'), self.server)
+        self.server = self._get_conf('server')
+        self.base_uri = '%s://%s%s' % (self._get_conf('method'), self.server, self._get_context_root())
         if self.base_path:
+            self.base_path = self.base_path.strip('/')
             self.base_uri = '%s/%s' % (self.base_uri, self.base_path)
 
         self._post_init_done = True
@@ -219,7 +227,7 @@ class RESTBase(object):
             pass
         elif auth_mode == 'basic':
             encoded_auth = base64.encodestring('%s:%s' % (self._get_conf('user'), self._get_conf('pass')))[:-1]
-            authheader = "Basic %s" % (encoded_auth)
+            authheader = "Basic %s" % encoded_auth
             req.add_header("Authorization", authheader)
         elif auth_mode == 'session':
             if not self.session_info:

@@ -55,10 +55,6 @@ class RationalAPI(RESTBase):
 
         return error_msg
 
-    def post_conf_init(self):
-        self.base_path = self.config['rational_context_root']
-        super(RationalAPI, self).post_conf_init()
-
     def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}, auth_mode=None):
         call_headers['Accept'] = 'application/json'
         call_headers['OSLC-Core-Version'] = '2.0'
@@ -74,10 +70,6 @@ class RationalFormsLogin(RESTBase):
 
     def __init__(self, config):
         super(RationalFormsLogin, self).__init__('alm', 'Rational Forms Login', config)
-
-    def post_conf_init(self):
-        self.base_path = self.config['rational_context_root']
-        super(RationalFormsLogin, self).post_conf_init()
 
     def encode_post_args(self, args):
         return urllib.urlencode(args)
@@ -155,8 +147,6 @@ class RationalConnector(AlmConnector):
 
         config.opts.add(self.ALM_DONE_STATUSES, 'Statuses that signify a task is Done in Rational',
                         default='Completed,Done')
-        config.opts.add('rational_context_root', 'Application context root: the part of the URL that accesses '
-                        'each application and Jazz Team Server', default='')
         config.opts.add('alm_issue_label', 'Tags applied to tasks in Rational (space separated)', default='SD-Elements')
 
     def initialize(self):
@@ -165,7 +155,7 @@ class RationalConnector(AlmConnector):
         self.COOKIE_JSESSIONID = None
         self.mark_down_converter = markdown.Markdown(safe_mode="escape")
 
-        for item in [self.ALM_DONE_STATUSES, 'rational_context_root', 'alm_issue_label']:
+        for item in [self.ALM_DONE_STATUSES, 'alm_issue_label']:
             if not self.config[item]:
                 raise AlmException('Missing %s in configuration' % item)
 

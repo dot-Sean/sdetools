@@ -20,12 +20,13 @@ class TracXMLRPCAPI(RESTBase):
         self.proxy = None
 
     def post_conf_init(self):
-        self.server = self._get_conf('server') 
-        self.base_uri = '%s://%s:%s@%s/%s' % (
+        self.server = self._get_conf('server')
+        self.base_uri = '%s://%s:%s@%s/%s%s' % (
             self._get_conf('method'), 
             urlencode_str(self._get_conf('user')),
             urlencode_str(self._get_conf('pass')),
-            self.server, 
+            self.server,
+            self._get_context_root(),
             self.base_path)
 
     def connect(self):
