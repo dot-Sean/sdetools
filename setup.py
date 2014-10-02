@@ -53,7 +53,7 @@ f.close()
 
 setup(
     name='sdetools',
-    description='SD Element Tools: A collection of SD Elements integeration tools build around SD Elements API.',
+    description='SD Element Tools: A collection of SD Elements integration tools built around SD Elements API.',
     long_description=readme,
     maintainer="SD Elements",
     maintainer_email="support@sdelements.com",
