@@ -360,7 +360,7 @@ class RallyConnector(AlmConnector):
         card_type_details = self.card_types[self.config['rally_card_type']]
         task_id = self._extract_task_id(task['id'])
 
-        artifact_query = '(Name contains "%s:")' % task_id
+        artifact_query = '(Name contains "%s")' % task['identity']
 
         if card_type_details['type'] == 'Task':
             artifact_query = '(%s and (WorkProduct.FormattedID = "%s"))' % (

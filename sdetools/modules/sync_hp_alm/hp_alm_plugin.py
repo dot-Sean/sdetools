@@ -242,7 +242,7 @@ class HPAlmConnector(AlmConnector):
         if not task_id:
             return None
         query_args = {
-            'query': "{name['%s-*']}" % task_id,
+            'query': "{name['%s*']}" % task['identity'],
             'fields': 'id,name,last-modified'
         }
 

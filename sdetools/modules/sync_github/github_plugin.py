@@ -188,14 +188,14 @@ class GitHubConnector(AlmConnector):
 
         try:
             # We need to perform 2 API calls to search open and closed issues
-            open_issues = self.alm_plugin.call_api('legacy/issues/search/%s/%s/%s:' %
+            open_issues = self.alm_plugin.call_api('legacy/issues/search/%s/%s/%s' %
                                                    (self.project_uri,
                                                     GITHUB_NEW_STATUS,
-                                                    urlencode_str(task_id)))
-            closed_issues = self.alm_plugin.call_api('legacy/issues/search/%s/%s/%s:' %
+                                                    task['identity']))
+            closed_issues = self.alm_plugin.call_api('legacy/issues/search/%s/%s/%s' %
                                                      (self.project_uri,
                                                       GITHUB_DONE_STATUS,
-                                                      urlencode_str(task_id)))
+                                                      task['identity']))
         except APIError, err:
             raise AlmException('Unable to get task %s from GitHub. Reason: %s' % (task_id, str(err)))
 

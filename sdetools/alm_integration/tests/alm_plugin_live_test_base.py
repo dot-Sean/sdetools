@@ -102,9 +102,9 @@ class AlmPluginLiveTestBase(object):
             self.connector.synchronize()
 
             tasks = self.connector.sde_get_tasks()
-            pruned_tasks = self.connector.prune_tasks(tasks)
+            filtered_tasks = self.connector.filter_tasks(tasks)
 
-            for task in pruned_tasks:
+            for task in filtered_tasks:
                 alm_task = self.connector.alm_get_task(task)
                 self.assertNotNone(alm_task, 'Missing Alm task for %s' % task['id'])
                 self.assertTrue(self.connector.status_match(alm_task.get_status(), task['status']))

@@ -125,7 +125,7 @@ class JIRASoapAPI:
 
     def get_task(self, task, task_id):
         try:
-            jql = "project='%s' AND summary~'%s\\\\:'" % (self.config['alm_project'], task_id)
+            jql = "project='%s' AND summary~'%s'" % (self.config['alm_project'], task['identity'])
             issues = self.proxy.getIssuesFromJqlSearch(self.auth, jql, SOAPpy.Types.intType(1))
         except SOAPpy.Types.faultType:
             raise AlmException("Unable to get task %s from JIRA" % task_id)

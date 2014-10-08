@@ -1,4 +1,5 @@
 from datetime import datetime
+from string import Template
 import sys
 import re
 
@@ -69,6 +70,13 @@ class AlmConnector(object):
     ALM_PRIORITY_MAP = 'alm_priority_map'
     TEST_OPTIONS = ['server', 'project', 'settings']
     STANDARD_STATUS_LIST = ['TODO', 'DONE', 'NA']
+    FIELD_TASK_ID = 'task_id'
+    FIELD_CONTEXT = 'context'
+    FIELD_APPLICATION = 'application'
+    FIELD_PROJECT = 'project'
+    FIELD_TITLE = 'title'
+    FIELD_OPTIONS = [FIELD_TASK_ID, FIELD_TITLE, FIELD_CONTEXT, FIELD_APPLICATION, FIELD_PROJECT]
+    DEFAULT_TITLE = '${%s}: ${%s}' % (FIELD_TASK_ID, FIELD_TITLE)
     default_priority_map = None
 
     #This is an abstract base class
@@ -111,6 +119,9 @@ class AlmConnector(object):
                 default='False')
         self.config.opts.add('show_progress', 'Show progress',
                 default='False')
+        self.config.opts.add('alm_title_format', 'Task title format in %s. May be composed of: %s' %
+                (self.alm_name, ','.join(AlmConnector.FIELD_OPTIONS)),
+                default=AlmConnector.DEFAULT_TITLE)
         self.config.opts.add('test_alm', 'Test Alm "server", "project" or "settings" '
                 'configuration only',
                 default='')
@@ -193,6 +204,17 @@ class AlmConnector(object):
             if not self.config[self.ALM_PRIORITY_MAP]:
                 self.config[self.ALM_PRIORITY_MAP] = self.default_priority_map
             self._validate_alm_priority_map()
+
+        matches = re.findall('\${([a-zA-Z_]+)}', self.config['alm_title_format'])
+        if not matches:
+            raise AlmException('Incorrect alm_title_format configuration')
+        if AlmConnector.FIELD_TITLE not in matches:
+            raise AlmException('Incorrect alm_title_format configuration. Missing ${%s}' % AlmConnector.FIELD_TITLE)
+        if AlmConnector.FIELD_TASK_ID not in matches:
+            raise AlmException('Incorrect alm_title_format configuration. Missing ${%s}' % AlmConnector.FIELD_TASK_ID)
+        for match in matches:
+            if match not in AlmConnector.FIELD_OPTIONS:
+                raise AlmException('Incorrect alm_title_format configuration. Invalid field: ${%s}' % match)
 
         logger.info('*** AlmConnector initialized ***')
 
@@ -387,6 +409,25 @@ class AlmConnector(object):
             task_id = task_search.group(2)
         return task_id
 
+    def _get_task_title_mapping(self, task):
+        task_id = self._extract_task_id(task['id'])
+        title = task['title'].replace("%s: " % task_id, "")
+        return {
+            AlmConnector.FIELD_TASK_ID: task_id,
+            AlmConnector.FIELD_CONTEXT: '',
+            AlmConnector.FIELD_APPLICATION: self.config['sde_application'],
+            AlmConnector.FIELD_PROJECT: self.config['sde_project'],
+            AlmConnector.FIELD_TITLE: title,
+        }
+
+    def get_task_title(self, task, unique=False):
+        mapping = self._get_task_title_mapping(task)
+        if unique:
+            mapping[AlmConnector.FIELD_TITLE] = ''
+
+        title = Template(self.config['alm_title_format']).substitute(mapping)
+        return title.strip()
+
     def sde_get_tasks(self):
         """ Gets all tasks for project in SD Elements
 
@@ -509,10 +550,15 @@ class AlmConnector(object):
         else:
             return alm_status == "TODO"
 
-    def prune_tasks(self, tasks):
-        tasks = [task for task in tasks if self.in_scope(task)]
+    def filter_tasks(self, tasks):
+        tasks = [self.update_task(task) for task in tasks if self.in_scope(task)]
 
         return tasks
+
+    def update_task(self, task):
+        task['title'] = self.get_task_title(task, unique=False)
+        task['identity'] = self.get_task_title(task, unique=True)
+        return task
 
     def synchronize(self):
         """ Synchronizes SDE project with ALM project.
@@ -557,10 +603,10 @@ class AlmConnector(object):
             tasks = self.sde_get_tasks()
             logger.info('Retrieved all tasks from SDE')
 
-            #Prune unnecessary tasks - progress must match reality
-            tasks = self.prune_tasks(tasks)
+            #Filter tasks - progress must match reality
+            tasks = self.filter_tasks(tasks)
 
-            logger.info('Pruned tasks out of scope')
+            logger.info('Filtered tasks')
 
             if self.config['start_fresh']:
                 total_work = progress + len(tasks) * 2
