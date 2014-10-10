@@ -123,11 +123,11 @@ class AlmPluginLiveTestBase(object):
                 elif i == 1:
                     self.assertNotEqual(alm_tasks[task['id']], alm_task.get_alm_id())
 
-#    def test_synchronize_sde_as_master(self):
-#        self.synchronize({'conflict_policy': 'sde'})
+    def test_synchronize_sde_as_master(self):
+        self.synchronize({'conflict_policy': 'sde'})
 
-#    def test_synchronize_alm_as_master(self):
-#        self.synchronize({'conflict_policy': 'alm'})
+    def test_synchronize_alm_as_master(self):
+        self.synchronize({'conflict_policy': 'alm'})
 
     def _update_config(self, options):
         for key in options:
