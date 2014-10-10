@@ -6,7 +6,7 @@ from sdetools.sdelib.mod_mgr import ReturnChannel, load_modules
 from sdetools.sdelib.conf_mgr import Config
 from sdetools.sdelib.commons import abc, Error, get_directory_of_current_module, UsageError
 from sdetools.sdelib.testlib.mock_response import MOCK_ALM_RESPONSE, MOCK_SDE_RESPONSE
-from sdetools.alm_integration.alm_plugin_base import AlmException
+from sdetools.alm_integration.alm_plugin_base import AlmConnector, AlmException
 
 abstractmethod = abc.abstractmethod
 CONF_FILE_LOCATION = 'test_settings.conf'
@@ -86,6 +86,7 @@ class AlmPluginTestBase(object):
         # This test can be extended to verify the contents of task.
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
+        test_task = AlmConnector.transform_task(self.config, test_task)
         self.connector.alm_add_task(test_task)
         test_task_result = self.connector.alm_get_task(test_task)
         task_id = test_task_result.get_task_id()
@@ -110,6 +111,7 @@ class AlmPluginTestBase(object):
         # to call alm_connect() before proceeding
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
+        test_task = AlmConnector.transform_task(self.config, test_task)
         self.connector.alm_add_task(test_task)
         test_task_result = self.connector.alm_get_task(test_task)
 
@@ -258,6 +260,7 @@ class AlmPluginTestBase(object):
         self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
+        test_task = AlmConnector.transform_task(self.config, test_task)
         self.connector.synchronize()
         alm_task = self.connector.alm_get_task(test_task)
         self.connector.alm_update_task_status(alm_task, 'DONE')
@@ -269,6 +272,7 @@ class AlmPluginTestBase(object):
         # Most of the module test configurations set the minimum priority to be 8
         # so we will create a task with this priority to make sure its in scope
         test_task = self.mock_sde_response.generate_sde_task(priority=8)
+        test_task = AlmConnector.transform_task(self.config, test_task)
         self.connector.alm_add_task(test_task)
         alm_task = self.connector.alm_get_task(test_task)
 
@@ -286,6 +290,7 @@ class AlmPluginTestBase(object):
     def test_update_task_status_to_na(self):
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
+        test_task = AlmConnector.transform_task(self.config, test_task)
         self.connector.alm_add_task(test_task)
         alm_task = self.connector.alm_get_task(test_task)
 
@@ -299,6 +304,7 @@ class AlmPluginTestBase(object):
     def test_update_task_status_to_todo(self):
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
+        test_task = AlmConnector.transform_task(self.config, test_task)
         test_task['status'] = 'DONE'
         self.connector.alm_add_task(test_task)
         alm_task = self.connector.alm_get_task(test_task)
@@ -317,6 +323,7 @@ class AlmPluginTestBase(object):
 
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
+        test_task = AlmConnector.transform_task(self.config, test_task)
         self.connector.alm_add_task(test_task)
         test_task_result = self.connector.alm_get_task(test_task)
         self.assertNotNone(test_task_result, 'Task added to ALM')

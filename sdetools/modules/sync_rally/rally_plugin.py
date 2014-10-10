@@ -62,7 +62,7 @@ class RallyTask(AlmTask):
         self.alm_task_ref = alm_task_ref
         self.status = status
         self.timestamp = timestamp
-        self.done_statuses = done_statuses #comma-separated list
+        self.done_statuses = done_statuses  # comma-separated list
 
     def get_task_id(self):
         return self.task_id
@@ -441,13 +441,8 @@ class RallyConnector(AlmConnector):
     def alm_update_task_status(self, task, status):
         card_type_details = self.card_types[self.config['rally_card_type']]
 
-        if not task or not self.config['alm_standard_workflow']:
-            logger.debug('Status synchronization disabled')
-            return
-
         if status == 'DONE' or status == 'NA':
             schedule_state = self.config['rally_done_statuses'][0]
-            status = 'DONE'
         elif status == 'TODO':
             schedule_state = self.config['rally_new_status']
         else:

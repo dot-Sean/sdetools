@@ -115,6 +115,8 @@ class AlmConnector(object):
                 default='')
         self.config.opts.add('conflict_policy', 'Conflict policy to use',
                 default='alm')
+        self.config.opts.add('alm_context', 'Add additional context to issues created in %s' % self.alm_name,
+                default='')
         self.config.opts.add('start_fresh', 'Delete any matching issues in %s' % self.alm_name,
                 default='False')
         self.config.opts.add('show_progress', 'Show progress',
@@ -205,13 +207,16 @@ class AlmConnector(object):
                 self.config[self.ALM_PRIORITY_MAP] = self.default_priority_map
             self._validate_alm_priority_map()
 
-        matches = re.findall('\${([a-zA-Z_]+)}', self.config['alm_title_format'])
+        matches = re.findall('\$\{?([a-zA-Z_]+)\}?', self.config['alm_title_format'])
         if not matches:
             raise AlmException('Incorrect alm_title_format configuration')
         if AlmConnector.FIELD_TITLE not in matches:
             raise AlmException('Incorrect alm_title_format configuration. Missing ${%s}' % AlmConnector.FIELD_TITLE)
         if AlmConnector.FIELD_TASK_ID not in matches:
             raise AlmException('Incorrect alm_title_format configuration. Missing ${%s}' % AlmConnector.FIELD_TASK_ID)
+        if AlmConnector.FIELD_CONTEXT in matches and not self.config['alm_context']:
+            raise AlmException('Missing alm_context in configuration')
+
         for match in matches:
             if match not in AlmConnector.FIELD_OPTIONS:
                 raise AlmException('Incorrect alm_title_format configuration. Invalid field: ${%s}' % match)
@@ -399,7 +404,8 @@ class AlmConnector(object):
                 raise AlmException('Invalid %s: missing a value mapping for priority %d' %
                                    (self.ALM_PRIORITY_MAP, mapped_priority))
 
-    def _extract_task_id(self, full_task_id):
+    @staticmethod
+    def _extract_task_id(full_task_id):
         """
         Extract the task id e.g. "CT213" from the full project_id-task_id string e.g. "123-CT213"
         """
@@ -409,23 +415,21 @@ class AlmConnector(object):
             task_id = task_search.group(2)
         return task_id
 
-    def _get_task_title_mapping(self, task):
-        task_id = self._extract_task_id(task['id'])
+    @staticmethod
+    def get_task_title(config, task, unique=False):
+        task_id = AlmConnector._extract_task_id(task['id'])
         title = task['title'].replace("%s: " % task_id, "")
-        return {
+        mapping = {
             AlmConnector.FIELD_TASK_ID: task_id,
-            AlmConnector.FIELD_CONTEXT: '',
-            AlmConnector.FIELD_APPLICATION: self.config['sde_application'],
-            AlmConnector.FIELD_PROJECT: self.config['sde_project'],
+            AlmConnector.FIELD_CONTEXT: config['alm_context'],
+            AlmConnector.FIELD_APPLICATION: config['sde_application'],
+            AlmConnector.FIELD_PROJECT: config['sde_project'],
             AlmConnector.FIELD_TITLE: title,
         }
-
-    def get_task_title(self, task, unique=False):
-        mapping = self._get_task_title_mapping(task)
         if unique:
             mapping[AlmConnector.FIELD_TITLE] = ''
 
-        title = Template(self.config['alm_title_format']).substitute(mapping)
+        title = Template(config['alm_title_format']).substitute(mapping)
         return title.strip()
 
     def sde_get_tasks(self):
@@ -438,7 +442,10 @@ class AlmConnector(object):
             raise AlmException('Requires initialization')
 
         try:
-            return self.sde_plugin.get_task_list(priority__gte=self.config['sde_min_priority'])
+            if self.config['selected_tasks']:
+                return self.sde_plugin.get_task_list()
+            else:
+                return self.sde_plugin.get_task_list(priority__gte=self.config['sde_min_priority'])
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get tasks from SD Elements. Please ensure'
@@ -551,13 +558,14 @@ class AlmConnector(object):
             return alm_status == "TODO"
 
     def filter_tasks(self, tasks):
-        tasks = [self.update_task(task) for task in tasks if self.in_scope(task)]
+        tasks = [AlmConnector.transform_task(self.config, task) for task in tasks if self.in_scope(task)]
 
         return tasks
 
-    def update_task(self, task):
-        task['title'] = self.get_task_title(task, unique=False)
-        task['identity'] = self.get_task_title(task, unique=True)
+    @staticmethod
+    def transform_task(config, task):
+        task['title'] = AlmConnector.get_task_title(config, task, unique=False)
+        task['identity'] = AlmConnector.get_task_title(config, task, unique=True)
         return task
 
     def synchronize(self):

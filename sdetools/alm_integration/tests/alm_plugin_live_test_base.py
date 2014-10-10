@@ -1,9 +1,9 @@
 from sdetools.sdelib.mod_mgr import ReturnChannel, load_modules
 from sdetools.sdelib.conf_mgr import Config
 from sdetools.sdelib.commons import Error
-from sdetools.alm_integration.alm_plugin_base import AlmException
+from sdetools.alm_integration.alm_plugin_base import AlmConnector, AlmException
 from testconfig import config
-
+from copy import copy
 
 def stdout_callback(obj):
     print obj
@@ -79,10 +79,10 @@ class AlmPluginLiveTestBase(object):
         self.connector.initialize()
         self.connector.alm_connect()
 
-    def synchronize(self, master):
-        self.config['test_alm'] = ''
-        self.config['conflict_policy'] = master
-        self.connector.config = self.config
+    def synchronize(self, options):
+        options['test_alm'] = ''
+
+        self._update_config(options)
         self.connector.initialize()
 
         # Only refresh tasks if the configuration has this option explicitly set
@@ -107,10 +107,11 @@ class AlmPluginLiveTestBase(object):
             for task in filtered_tasks:
                 alm_task = self.connector.alm_get_task(task)
                 self.assertNotNone(alm_task, 'Missing Alm task for %s' % task['id'])
-                self.assertTrue(self.connector.status_match(alm_task.get_status(), task['status']))
 
-                # invert the status and get ready to synchronize again
-                self.connector.sde_update_task_status(task, self._inverted_status(task['status']))
+                if self.config['alm_standard_workflow']:
+                    self.assertTrue(self.connector.status_match(alm_task.get_status(), task['status']))
+                    # invert the status and get ready to synchronize again
+                    self.connector.sde_update_task_status(task, self._inverted_status(task['status']))
 
                 # Remaining tests are only applicable if connector supports delete
                 if not refresh_tasks:
@@ -122,11 +123,79 @@ class AlmPluginLiveTestBase(object):
                 elif i == 1:
                     self.assertNotEqual(alm_tasks[task['id']], alm_task.get_alm_id())
 
-    def test_synchronize_sde_as_master(self):
-        self.synchronize('sde')
+#    def test_synchronize_sde_as_master(self):
+#        self.synchronize({'conflict_policy': 'sde'})
 
-    def test_synchronize_alm_as_master(self):
-        self.synchronize('alm')
+#    def test_synchronize_alm_as_master(self):
+#        self.synchronize({'conflict_policy': 'alm'})
+
+    def _update_config(self, options):
+        for key in options:
+            self.config[key] = options[key]
+        self.connector.config = self.config
+
+    def test_custom_titles(self):
+
+        scenario_options = {
+            'alm_standard_workflow': False,
+            'alm_context': 'Context',
+            'start_fresh': True,
+        }
+
+        scenario1_alm_title_format = '[$application-$project] $task_id: $title'
+        scenario2_alm_title_format = '[$context] $task_id: $title'
+
+        self._update_config(scenario_options)
+        self.connector.initialize()
+
+        tasks = self.connector.sde_get_tasks()
+        filtered_tasks = self.connector.filter_tasks(tasks)
+
+        scenario_options['alm_title_format'] = scenario1_alm_title_format
+        self.synchronize(scenario_options)
+
+        scenario_options['alm_title_format'] = scenario2_alm_title_format
+        self.synchronize(scenario_options)
+
+        for task in filtered_tasks:
+            # Find the corresponding scenario1 alm task
+            scenario_options['alm_title_format'] = scenario1_alm_title_format
+            self._update_config(scenario_options)
+            scenario1_task = copy(AlmConnector.transform_task(self.connector.config, task))
+            scenario1_alm_task = self.connector.alm_get_task(scenario1_task)
+
+            # Find the corresponding scenario2 alm task
+            scenario_options['alm_title_format'] = scenario2_alm_title_format
+            self._update_config(scenario_options)
+            scenario2_task = AlmConnector.transform_task(self.connector.config, task)
+            scenario2_alm_task = self.connector.alm_get_task(scenario2_task)
+
+            # Check that these alm tasks are distinct for the same sde task
+            self.assertNotEqual(scenario1_alm_task.get_alm_id(), scenario2_alm_task.get_alm_id())
+
+            # Update the first alm task to the opposite of the second alm task's status
+            scenario2_status = scenario2_alm_task.get_status()
+
+            self.connector.alm_update_task_status(scenario1_alm_task, self._inverted_status(scenario2_status))
+            scenario1_alm_task = self.connector.alm_get_task(scenario1_task)
+            scenario2_alm_task = self.connector.alm_get_task(scenario2_task)
+
+            # Make sure the first alm task status updated and the second one remained the same
+            self.assertTrue(self.connector.status_match(scenario1_alm_task.get_status(),
+                                                        self._inverted_status(scenario2_status)))
+            self.assertTrue(self.connector.status_match(scenario2_alm_task.get_status(), scenario2_status))
+
+            # Update the second alm task to the opposite of the first alm task's status
+            scenario1_status = scenario1_alm_task.get_status()
+            self.connector.alm_update_task_status(scenario2_alm_task, self._inverted_status(scenario1_status))
+            scenario2_alm_task = self.connector.alm_get_task(scenario2_task)
+            scenario1_alm_task = self.connector.alm_get_task(scenario1_task)
+
+            # Make sure the second alm task status updated and the first one remained the same
+            self.assertTrue(self.connector.status_match(scenario2_alm_task.get_status(),
+                                                        self._inverted_status(scenario1_status)))
+            self.assertTrue(self.connector.status_match(scenario1_alm_task.get_status(), scenario1_status))
+
 
     def _inverted_status(self, status):
         return 'DONE' if status == 'TODO' else 'TODO'
