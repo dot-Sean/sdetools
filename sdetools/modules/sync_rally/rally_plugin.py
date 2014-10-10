@@ -5,6 +5,7 @@ import sys
 import re
 from datetime import datetime
 
+from sdetools.sdelib.commons import urlencode_str
 from sdetools.sdelib.restclient import RESTBase, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from sdetools.alm_integration.alm_plugin_base import AlmException
@@ -360,7 +361,7 @@ class RallyConnector(AlmConnector):
         card_type_details = self.card_types[self.config['rally_card_type']]
         task_id = self._extract_task_id(task['id'])
 
-        artifact_query = '(Name contains "%s")' % task['identity']
+        artifact_query = '(Name contains "%s")' % urlencode_str(task['identity'])
 
         if card_type_details['type'] == 'Task':
             artifact_query = '(%s and (WorkProduct.FormattedID = "%s"))' % (
@@ -441,8 +442,13 @@ class RallyConnector(AlmConnector):
     def alm_update_task_status(self, task, status):
         card_type_details = self.card_types[self.config['rally_card_type']]
 
+        if not task or not self.config['alm_standard_workflow']:
+            logger.debug('Status synchronization disabled')
+            return
+
         if status == 'DONE' or status == 'NA':
             schedule_state = self.config['rally_done_statuses'][0]
+            status = 'DONE'
         elif status == 'TODO':
             schedule_state = self.config['rally_new_status']
         else:

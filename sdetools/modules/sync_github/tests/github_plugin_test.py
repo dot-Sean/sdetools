@@ -4,6 +4,7 @@ import unittest
 
 from github_response_generator import GitHubResponseGenerator
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
+from sdetools.alm_integration.alm_plugin_base import AlmConnector
 from sdetools.modules.sync_github.github_plugin import GitHubConnector, GitHubAPI, AlmException
 
 
@@ -25,6 +26,7 @@ class TestGitHubCase(AlmPluginTestBase, unittest.TestCase):
     def test_parse_non_done_status_as_todo(self):
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
+        test_task = AlmConnector.transform_task(self.config, test_task)
         self.connector.alm_add_task(test_task)
         test_task_result = self.connector.alm_get_task(test_task)
         test_task_result.status = "Non-done status"

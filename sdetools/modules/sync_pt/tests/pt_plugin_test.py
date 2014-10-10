@@ -3,6 +3,7 @@
 import unittest
 
 from pt_response_generator import PivotalTrackerResponseGenerator
+from sdetools.alm_integration.alm_plugin_base import AlmConnector
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_pt.pt_plugin import PivotalTrackerConnector, PivotalTrackerAPI, AlmException
 
@@ -70,6 +71,7 @@ class TestPivotalTrackerCase(AlmPluginTestBase, unittest.TestCase):
         self.config['pt_new_status'] = 'started'
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task(status='DONE')
+        test_task = AlmConnector.transform_task(self.config, test_task)
         self.connector.alm_add_task(test_task)
 
         # If we do not auto-assign an estimate when adding a new 'feature' with the 'started' state, this test will fail
@@ -80,6 +82,7 @@ class TestPivotalTrackerCase(AlmPluginTestBase, unittest.TestCase):
         self.config['pt_new_status'] = 'unstarted'
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task(status='TODO')
+        test_task = AlmConnector.transform_task(self.config, test_task)
         self.connector.alm_add_task(test_task)
         alm_task = self.connector.alm_get_task(test_task)
 

@@ -6,6 +6,7 @@ import urllib
 import json
 from datetime import datetime
 
+from sdetools.sdelib.commons import urlencode_str
 from sdetools.sdelib.restclient import RESTBase
 from sdetools.sdelib.restclient import URLRequest, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
@@ -320,8 +321,8 @@ class RationalConnector(AlmConnector):
 
         try:
             # Fields parameter will filter response data to only contain story status, name, timestamp and id
-            work_items = self._call_api('%s/workitems?oslc.where=dcterms:title="%s:*"' %
-                                                  (self.query_url, task_id))
+            work_items = self._call_api('%s/workitems?oslc.where=dcterms:title="%s*"' %
+                                                  (self.query_url, urlencode_str(task['identity'])))
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get task %s from Rational' % task_id)

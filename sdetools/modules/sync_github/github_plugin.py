@@ -191,11 +191,11 @@ class GitHubConnector(AlmConnector):
             open_issues = self.alm_plugin.call_api('legacy/issues/search/%s/%s/%s' %
                                                    (self.project_uri,
                                                     GITHUB_NEW_STATUS,
-                                                    task['identity']))
+                                                    urlencode_str(task['identity'])))
             closed_issues = self.alm_plugin.call_api('legacy/issues/search/%s/%s/%s' %
                                                      (self.project_uri,
                                                       GITHUB_DONE_STATUS,
-                                                      task['identity']))
+                                                      urlencode_str(task['identity'])))
         except APIError, err:
             raise AlmException('Unable to get task %s from GitHub. Reason: %s' % (task_id, str(err)))
 

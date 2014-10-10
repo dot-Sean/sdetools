@@ -5,6 +5,7 @@ import urllib2
 from sdetools.extlib import SOAPpy
 from sdetools.extlib import http_req
 
+from sdetools.sdelib.commons import urlencode_str
 from sdetools.alm_integration.alm_plugin_base import AlmException
 from sdetools.modules.sync_jira.jira_shared import JIRATask
 
@@ -125,7 +126,7 @@ class JIRASoapAPI:
 
     def get_task(self, task, task_id):
         try:
-            jql = "project='%s' AND summary~'%s'" % (self.config['alm_project'], task['identity'])
+            jql = "project='%s' AND summary~'%s'" % (self.config['alm_project'], urlencode_str(task['identity']))
             issues = self.proxy.getIssuesFromJqlSearch(self.auth, jql, SOAPpy.Types.intType(1))
         except SOAPpy.Types.faultType:
             raise AlmException("Unable to get task %s from JIRA" % task_id)

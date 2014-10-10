@@ -212,8 +212,8 @@ class PivotalTrackerConnector(AlmConnector):
 
         try:
             # Fields parameter will filter response data to only contain story status, name, timestamp and id
-            target = ('%s/stories?filter="%s:"&fields=current_state,name,updated_at,id,estimate,story_type' %
-                     (self.project_uri, urlencode_str(task_id)))
+            target = ('%s/stories?filter="%s"&fields=current_state,name,updated_at,id,estimate,story_type' %
+                     (self.project_uri, urlencode_str(task['identity'])))
             stories = self.alm_plugin.call_api(target)
         except APIError, err:
             logger.error(err)

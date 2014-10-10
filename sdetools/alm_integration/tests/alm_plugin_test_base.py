@@ -263,6 +263,7 @@ class AlmPluginTestBase(object):
         test_task = AlmConnector.transform_task(self.config, test_task)
         self.connector.synchronize()
         alm_task = self.connector.alm_get_task(test_task)
+        self.assertNotNone(alm_task, 'Expected alm task to be generated')
         self.connector.alm_update_task_status(alm_task, 'DONE')
 
     def test_update_task_status_to_done(self):
@@ -349,6 +350,7 @@ class AlmPluginTestBase(object):
                 # This will invoke add, get and update task
                 self.connector.alm_connect()
                 test_task = self.mock_sde_response.generate_sde_task()
+                test_task = AlmConnector.transform_task(self.config, test_task)
                 test_task['status'] = 'DONE'
                 self.connector.alm_add_task(test_task)
                 self.connector.synchronize()
