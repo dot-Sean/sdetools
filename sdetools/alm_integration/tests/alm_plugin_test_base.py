@@ -266,17 +266,21 @@ class AlmPluginTestBase(object):
         self.mock_sde_response.clear_tasks()
 
         self.mock_sde_response.generate_sde_task(priority=8, phase='requirements')
-        self.mock_sde_response.generate_sde_task(priority=5, phase='testing')
+        self.mock_sde_response.generate_sde_task(priority=7, phase='testing')
+        self.mock_sde_response.generate_sde_task(priority=7, phase='nothing')
         self.mock_sde_response.generate_sde_task(priority=1, phase='nothing')
+        self.mock_sde_response.generate_sde_task(priority=6, phase='requirements')
 
         tasks = self.connector.sde_get_tasks()
-        self.assertTrue(len(tasks) == 1, 'Expected at least 1 task returned from connector.sde_get_tasks()')
+        self.assertTrue(len(tasks) == 3, 'Expected 3 tasks')
 
         for task in tasks:
             self.assertTrue(task['priority'] >= self.connector.config['sde_min_priority'],
                             'Task %s has an unexpected priority %d' % (task['id'], task['priority']))
 
         tasks = self.connector.filter_tasks(tasks)
+        self.assertTrue(len(tasks) == 2, 'Expected 2 tasks')
+
         for task in tasks:
             self.assertTrue(task['priority'] >= self.connector.config['sde_min_priority'],
                             'Task %s has unexpected priority %d' % (task['id'], task['priority']))
