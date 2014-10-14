@@ -141,7 +141,7 @@ class HPAlmConnector(AlmConnector):
         #We will map requirements its associated tests based on the problem id
         self.requirement_to_test_mapping = {}
 
-    def prune_tasks(self, tasks):
+    def filter_tasks(self, tasks):
         """ We want to organize the tasks in a way such that we sync all non-test tasks first,
         then sync the test tasks. This allows us to create requirement coverages when we sync the
         test tasks.
@@ -162,7 +162,7 @@ class HPAlmConnector(AlmConnector):
 
             return dev_tasks + test_tasks
         else:
-            return super(HPAlmConnector, self).prune_tasks(tasks)
+            return super(HPAlmConnector, self).filter_tasks(tasks)
 
     def alm_connect_server(self):
         """ Verifies that HP Alm connection works """
@@ -242,7 +242,7 @@ class HPAlmConnector(AlmConnector):
         if not task_id:
             return None
         query_args = {
-            'query': "{name['%s*']}" % urlencode_str(task['identity']),
+            'query': "{name['%s-*']}" % task_id,
             'fields': 'id,name,last-modified'
         }
 

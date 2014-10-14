@@ -253,6 +253,43 @@ class AlmPluginTestBase(object):
         exception_msg = 'Incorrect sde_min_priority specified in configuration. Valid values are > 0 and <= 10'
         self.assert_exception(AlmException, '', exception_msg, self.connector.initialize)
 
+    def test_tasks_filter(self):
+        # The plugin may initialize variables during alm_connect() so we need
+        # to call alm_connect() before proceeding
+        self.connector.config['conflict_policy'] = 'sde'
+        self.connector.config['sde_min_priority'] = 7
+        self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
+        self.connector.sde_connect()
+        self.connector.alm_connect()
+
+        # clear out default tasks
+        self.mock_sde_response.clear_tasks()
+
+        self.mock_sde_response.generate_sde_task(priority=8, phase='requirements')
+        self.mock_sde_response.generate_sde_task(priority=5, phase='testing')
+        self.mock_sde_response.generate_sde_task(priority=1, phase='nothing')
+
+        tasks = self.connector.sde_get_tasks()
+        self.assertTrue(len(tasks) == 1, 'Expected at least 1 task returned from connector.sde_get_tasks()')
+
+        for task in tasks:
+            self.assertTrue(task['priority'] >= self.connector.config['sde_min_priority'],
+                            'Task %s has an unexpected priority %d' % (task['id'], task['priority']))
+
+        tasks = self.connector.filter_tasks(tasks)
+        for task in tasks:
+            self.assertTrue(task['priority'] >= self.connector.config['sde_min_priority'],
+                            'Task %s has unexpected priority %d' % (task['id'], task['priority']))
+            self.assertTrue(task['phase'] in self.config['alm_phases'],
+                            'Task %s has unexpected phase %s' % (task['id'], task['phase']))
+
+        test_task = self.mock_sde_response.generate_sde_task()
+        test_task = AlmConnector.transform_task(self.config, test_task)
+        self.connector.synchronize()
+        alm_task = self.connector.alm_get_task(test_task)
+        self.assertNotNone(alm_task, 'Expected alm task to be generated')
+        self.connector.alm_update_task_status(alm_task, 'DONE')
+
     def test_update_existing_task_sde(self):
         # The plugin may initialize variables during alm_connect() so we need
         # to call alm_connect() before proceeding
@@ -270,9 +307,8 @@ class AlmPluginTestBase(object):
         self.connector.config['conflict_policy'] = 'alm'
         self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
         self.connector.alm_connect()
-        # Most of the module test configurations set the minimum priority to be 8
-        # so we will create a task with this priority to make sure its in scope
-        test_task = self.mock_sde_response.generate_sde_task(priority=8)
+
+        test_task = self.mock_sde_response.generate_sde_task()
         test_task = AlmConnector.transform_task(self.config, test_task)
         self.connector.alm_add_task(test_task)
         alm_task = self.connector.alm_get_task(test_task)
