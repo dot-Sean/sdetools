@@ -670,9 +670,6 @@ class AlmConnector(object):
                             task['id'] in self.ignored_tasks):
                         continue
                     ref = self.alm_add_task(task)
-                    if self.config['alm_standard_workflow'] and (task['status'] == 'DONE' or task['status'] == 'NA'):
-                        alm_task = self.alm_get_task(task)
-                        self.alm_update_task_status(alm_task, task['status'])
                     self.emit.info('Added task %s to %s' % (tid, self.alm_name))
                     note_msg = 'Task synchronized in %s. Reference: %s' % (self.alm_name, ref)
                     self._add_note(task['id'], note_msg, '', task['status'])

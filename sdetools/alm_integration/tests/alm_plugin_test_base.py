@@ -370,6 +370,7 @@ class AlmPluginTestBase(object):
         self.assertNotNone(test_task_result, 'Task added to ALM')
         self.connector.alm_remove_task(test_task_result)
         test_task_result = self.connector.alm_get_task(test_task)
+        self.assertEqual(test_task_result, None, 'Failed to remove task from ALM')
 
     def test_synchronize(self):
         # Verify no exceptions are thrown

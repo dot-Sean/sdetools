@@ -269,6 +269,9 @@ class GitHubConnector(AlmConnector):
                               new_issue['state'],
                               new_issue['updated_at'])
 
+        if self.config['alm_standard_workflow'] and (task['status'] == 'DONE' or task['status'] == 'NA'):
+            self.alm_update_task_status(alm_task, task['status'])
+
         return 'Repository: %s, Issue: %s' % (self.config['alm_project'], alm_task.get_alm_id())
 
     def alm_update_task_status(self, task, status):

@@ -224,7 +224,6 @@ class PivotalTrackerConnector(AlmConnector):
         if not stories:
             return None
 
-        print stories
         story = stories[0]
 
         if len(stories) > 1:
@@ -351,6 +350,10 @@ class PivotalTrackerConnector(AlmConnector):
                                       new_story['updated_at'],
                                       self.config[self.ALM_DONE_STATUSES],
                                       updateable)
+
+        if (self.config['alm_standard_workflow'] and
+                (task['status'] == 'DONE' or task['status'] == 'NA')):
+            self.alm_update_task_status(alm_task, task['status'])
 
         return 'Project: %s, Story: %s' % (self.config['alm_project'], alm_task.get_alm_id())
 

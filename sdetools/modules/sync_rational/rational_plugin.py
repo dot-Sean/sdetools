@@ -154,8 +154,6 @@ class RationalConnector(AlmConnector):
     def initialize(self):
         super(RationalConnector, self).initialize()
 
-        # Rational does not support status changes
-        self.config['alm_standard_workflow'] = False
         self.COOKIE_JSESSIONID = None
         self.mark_down_converter = markdown.Markdown(safe_mode="escape")
 
@@ -324,8 +322,8 @@ class RationalConnector(AlmConnector):
 
         try:
             # Fields parameter will filter response data to only contain story status, name, timestamp and id
-            work_items = self._call_api('%s/workitems?oslc.where=dcterms:title="%s*"' %
-                                                  (self.query_url, urlencode_str(task['alm_identity'])))
+            work_items = self._call_api('%s/workitems?oslc.where=dcterms:title="%s*"' % (
+                                        self.query_url, urlencode_str(task['alm_identity'])))
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get task %s from Rational' % task_id)
@@ -361,6 +359,10 @@ class RationalConnector(AlmConnector):
             'oslc_cmx:priority': priority_literal_resource,
             'dcterms:subject': self.config['alm_issue_label'],
         }
+
+        if (self.config['alm_standard_workflow'] and
+                (task['status'] == 'DONE' or task['status'] == 'NA')):
+            create_args['oslc_cm:status'] = self.config[self.ALM_DONE_STATUSES][0]
 
         try:
             self._call_api(self.creation_url,

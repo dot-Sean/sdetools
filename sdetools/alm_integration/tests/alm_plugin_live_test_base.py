@@ -79,6 +79,32 @@ class AlmPluginLiveTestBase(object):
         self.connector.initialize()
         self.connector.alm_connect()
 
+    def test_alm_task_delete(self):
+        if not self.connector.alm_supports_delete():
+            return
+
+        self.config['test_alm'] = ''
+        self.connector.config = self.config
+        self.connector.config['start_fresh'] = True
+        self.connector.initialize()
+        self.connector.sde_connect()
+        self.connector.alm_connect()
+        tasks = self.connector.sde_get_tasks()
+        filtered_tasks = self.connector.filter_tasks(tasks)
+
+        if not filtered_tasks:
+            return
+
+        test_task = filtered_tasks[0]
+        self.connector.alm_add_task(test_task)
+        alm_task1 = self.connector.alm_get_task(test_task)
+        self.assertNotNone(alm_task1, 'Missing Alm task for %s' % test_task['id'])
+        self.connector.alm_remove_task(alm_task1)
+        alm_task2 = self.connector.alm_get_task(test_task)
+        if alm_task2:
+            self.assertNotEqual(alm_task1.get_alm_id(), alm_task2.get_alm_id(),
+                                'Could not delete task %s in alm' % test_task['id'])
+
     def synchronize(self, options):
         options['test_alm'] = ''
 

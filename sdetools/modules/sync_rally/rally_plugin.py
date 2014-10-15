@@ -5,7 +5,6 @@ import sys
 import re
 from datetime import datetime
 
-from sdetools.sdelib.commons import urlencode_str
 from sdetools.sdelib.restclient import RESTBase, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
 from sdetools.alm_integration.alm_plugin_base import AlmException
@@ -420,6 +419,10 @@ class RallyConnector(AlmConnector):
             raise AlmException('Alm task not added successfully. Please '
                                'check ALM-specific settings in config file')
 
+        if (self.config['alm_standard_workflow'] and
+                (task['status'] == 'DONE' or task['status'] == 'NA')):
+            self.alm_update_task_status(alm_task, task['status'])
+
         return 'Project: %s, %s: %s; URL: %s' % (
             self.config['alm_project'],
             card_type_details['name'],
@@ -434,11 +437,11 @@ class RallyConnector(AlmConnector):
             raise AlmException("Unable to delete task: %s" % err)
 
     def alm_update_task_status(self, task, status):
-        card_type_details = self.card_types[self.config['rally_card_type']]
-
         if not task:
             logger.debug('Status synchronization disabled')
             return
+
+        card_type_details = self.card_types[self.config['rally_card_type']]
 
         if status == 'DONE' or status == 'NA':
             schedule_state = self.config['rally_done_statuses'][0]

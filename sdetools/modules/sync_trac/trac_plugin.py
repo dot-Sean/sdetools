@@ -170,6 +170,7 @@ class TracConnector(AlmConnector):
         return trac_ticket
 
     def alm_add_task(self, task):
+        sde_id = self._extract_task_id(task['id'])
 
         alm_id = self.alm_plugin.proxy.ticket.create(
             task['alm_title'],
@@ -183,6 +184,11 @@ class TracConnector(AlmConnector):
             raise AlmException('Alm task not added sucessfully. Please '
                                'check ALM-specific settings in config file')
 
+        alm_task = self._get_trac_task_by_id(sde_id, alm_id)
+
+        if (self.config['alm_standard_workflow'] and
+                (task['status'] == 'DONE' or task['status'] == 'NA')):
+            self.alm_update_task_status(alm_task, task['status'])
         return 'Milestone: %s, Ticket: %s' % (self.config['alm_project'], alm_id)
 
     def alm_update_task_milestone(self, task, milestone):
@@ -214,7 +220,7 @@ class TracConnector(AlmConnector):
 
         action_set = self.alm_plugin.proxy.ticket.getActions(task.get_alm_id())
 
-        if status == 'DONE' or status=='NA':
+        if status == 'DONE' or status == 'NA':
             action_to_take, action_args = self.config['alm_close_transition']
         elif status == 'TODO':
             action_to_take, action_args = self.config['alm_reopen_transition']

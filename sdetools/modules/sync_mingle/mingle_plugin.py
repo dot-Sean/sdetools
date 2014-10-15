@@ -251,7 +251,7 @@ class MingleConnector(AlmConnector):
             }
             headers, result = self.alm_plugin.call_api('%s/cards.xml' % self.project_uri, args=status_args,
                                                        method=URLRequest.POST)
-            logger.debug('Task %s added to Mingle Project' % task['id'])
+            logger.debug('Task %s added to Mingle Project' % task_id)
         except APIError, err:
             raise AlmException('Please check ALM-specific settings in config '
                                'file. Unable to add task %s because of %s' % (task['id'], err))
@@ -270,6 +270,9 @@ class MingleConnector(AlmConnector):
         if not alm_task:
             raise AlmException('Alm task not added successfully for %s. Please '
                                'check ALM-specific settings in config file' % task['id'])
+
+        if self.config['alm_standard_workflow'] and (task['status'] == 'DONE' or task['status'] == 'NA'):
+            self.alm_update_task_status(alm_task, task['status'])
 
         return 'Project: %s, Card: %s' % (self.sde_plugin.config['alm_project'],
                                           alm_task.get_alm_id())
