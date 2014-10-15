@@ -205,13 +205,19 @@ class PivotalTrackerConnector(AlmConnector):
         except APIError, err:
             raise AlmException("Unable to delete task : %s" % err)
 
+    @staticmethod
+    def _clean_title(text):
+        """
+        There is a  bug in Pivotal Tracker where you cannot search for text with - characters
+        """
+        return text.replace('-', ' ')
+
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])
         if not task_id:
             return None
 
-        # Dashes (-) are special characters
-        alm_identity = task['alm_identity'].replace('-', ' ')
+        alm_identity = self._clean_title(task['alm_identity'])
         try:
             # Fields parameter will filter response data to only contain story status, name, timestamp and id
             target = ('%s/stories?filter="%s"&fields=current_state,name,updated_at,id,estimate,story_type' %
@@ -228,7 +234,7 @@ class PivotalTrackerConnector(AlmConnector):
 
         if len(stories) > 1:
             logger.warning('Found multiple issues with the title %s. Selecting the first task found with id %s'
-                           % (task['alm_identity'], story['id']))
+                           % (alm_identity, story['id']))
 
         logger.info('Found task: %s', task_id)
         updateable = story['story_type'] not in self.requires_estimate or story.get('estimate') is not None
@@ -304,7 +310,7 @@ class PivotalTrackerConnector(AlmConnector):
             task_content = self.sde_get_task_content(task)
 
         # Dashes (-) are special characters
-        alm_title = task['alm_title'].replace('-', ' ')
+        alm_title = self._clean_title(task['alm_title'])
         create_args = {
             'name': alm_title,
             'description': task_content,
@@ -344,7 +350,7 @@ class PivotalTrackerConnector(AlmConnector):
 
         updateable = new_story['story_type'] not in self.requires_estimate or new_story.get('estimate') is not None
         # API returns JSON of the new issue
-        alm_task = PivotalTrackerTask(task['alm_title'],
+        alm_task = PivotalTrackerTask(alm_title,
                                       new_story['id'],
                                       new_story['current_state'],
                                       new_story['updated_at'],

@@ -238,6 +238,43 @@ class AlmPluginTestBase(object):
         except UsageError:
             pass
 
+    def test_alm_title_format(self):
+        task = {
+            'id': '1099-T12',
+            'title': 'T12: Sample Title'
+        }
+        config = {
+            'alm_context': 'Coffee',
+            'sde_application': 'Breakfast',
+            'sde_project': 'Sandwich',
+            'alm_title_format': '[$application ${project} $context] $task_id: ${title}'
+        }
+        full_title = '[Breakfast Sandwich Coffee] T12: Sample Title'
+        task_title = AlmConnector.get_task_title(config, task)
+        self.assertEqual(full_title, task_title, 'Incorrect full alm title')
+
+        full_title = '[Breakfast Sandwich Coffee] T12:'
+        task_title = AlmConnector.get_task_title(config, task, True)
+        self.assertEqual(full_title, task_title, 'Incorrect unique alm title')
+
+    def test_malformed_alm_title_format(self):
+        self.connector.config['alm_title_format'] = 'BAD'
+        exception_msg = 'Incorrect alm_title_format configuration'
+        self.assert_exception(AlmException, '', exception_msg, self.connector.initialize)
+
+        self.connector.config['alm_title_format'] = '${task_id}'
+        exception_msg = 'Incorrect alm_title_format configuration. Missing ${title}'
+        self.assert_exception(AlmException, '', exception_msg, self.connector.initialize)
+
+        self.connector.config['alm_title_format'] = '${title}'
+        exception_msg = 'Incorrect alm_title_format configuration. Missing ${task_id}'
+        self.assert_exception(AlmException, '', exception_msg, self.connector.initialize)
+
+        self.connector.config['alm_context'] = ''
+        self.connector.config['alm_title_format'] = '${context} ${task_id} ${title}'
+        exception_msg = 'Missing alm_context in configuration'
+        self.assert_exception(AlmException, '', exception_msg, self.connector.initialize)
+
     def test_sde_invalid_min_priority(self):
         self.connector.config['sde_min_priority'] = 'BAD'
         exception_msg = 'Incorrect sde_min_priority specified in configuration. Valid values are > 0 and <= 10'
