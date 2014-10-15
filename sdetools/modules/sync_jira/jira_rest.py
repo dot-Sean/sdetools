@@ -118,8 +118,16 @@ class JIRARestAPI(RESTBase):
     def get_subtask_issue_types(self):
         return self.get_issue_types()
 
+    @staticmethod
+    def _clean_summary(text):
+        """
+        [ ] are special characters that need to be escaped
+        """
+        text = text.replace('[', '\\\\[')
+        return text.replace(']', '\\\\]')
+
     def get_task(self, task, task_id):
-        alm_identity = task['alm_identity'].replace('[', '\\\\[').replace(']', '\\\\]')
+        alm_identity = self._clean_summary(task['alm_identity'])
         try:
             url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s\'' % (
                     self.config['alm_project'], self.urlencode_str(alm_identity))
