@@ -347,9 +347,6 @@ class HPAlmConnector(AlmConnector):
 
         logger.debug('Task %s added to HP Alm Project', task['id'])
 
-        if self.config['alm_standard_workflow'] and (task['status'] == 'DONE' or task['status'] == 'NA'):
-            self.alm_update_task_status(alm_task, task['status'])
-
         return "HP Alm %s ID: %s" % (task_type, alm_task.get_alm_id())
 
     def _get_uncovered_requirements(self, test_id, req_ids):

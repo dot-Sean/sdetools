@@ -3,7 +3,7 @@ from sdetools.sdelib.conf_mgr import Config
 from sdetools.sdelib.commons import Error
 from sdetools.alm_integration.alm_plugin_base import AlmConnector, AlmException
 from testconfig import config
-from copy import copy
+
 
 def stdout_callback(obj):
     print obj
@@ -139,7 +139,6 @@ class AlmPluginLiveTestBase(object):
         scenario_options = {
             'alm_standard_workflow': False,
             'alm_context': 'Context',
-            'start_fresh': True,
         }
 
         scenario1_alm_title_format = '[$application-$project] $task_id: $title'
@@ -161,13 +160,13 @@ class AlmPluginLiveTestBase(object):
             # Find the corresponding scenario1 alm task
             scenario_options['alm_title_format'] = scenario1_alm_title_format
             self._update_config(scenario_options)
-            scenario1_task = copy(AlmConnector.transform_task(self.connector.config, task))
+            scenario1_task = AlmConnector.transform_task(self.connector.config, task.copy())
             scenario1_alm_task = self.connector.alm_get_task(scenario1_task)
 
             # Find the corresponding scenario2 alm task
             scenario_options['alm_title_format'] = scenario2_alm_title_format
             self._update_config(scenario_options)
-            scenario2_task = AlmConnector.transform_task(self.connector.config, task)
+            scenario2_task = AlmConnector.transform_task(self.connector.config, task.copy())
             scenario2_alm_task = self.connector.alm_get_task(scenario2_task)
 
             # Check that these alm tasks are distinct for the same sde task
@@ -175,8 +174,8 @@ class AlmPluginLiveTestBase(object):
 
             # Update the first alm task to the opposite of the second alm task's status
             scenario2_status = scenario2_alm_task.get_status()
-
             self.connector.alm_update_task_status(scenario1_alm_task, self._inverted_status(scenario2_status))
+
             scenario1_alm_task = self.connector.alm_get_task(scenario1_task)
             scenario2_alm_task = self.connector.alm_get_task(scenario2_task)
 

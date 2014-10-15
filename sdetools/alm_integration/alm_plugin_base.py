@@ -429,8 +429,7 @@ class AlmConnector(object):
         if unique:
             mapping[AlmConnector.FIELD_TITLE] = ''
 
-        title = Template(config['alm_title_format']).substitute(mapping)
-        return title.strip()
+        return Template(config['alm_title_format']).substitute(mapping).strip()
 
     def sde_get_tasks(self):
         """ Gets all tasks for project in SD Elements
@@ -564,8 +563,8 @@ class AlmConnector(object):
 
     @staticmethod
     def transform_task(config, task):
-        task['title'] = AlmConnector.get_task_title(config, task, unique=False)
-        task['identity'] = AlmConnector.get_task_title(config, task, unique=True)
+        task['alm_title'] = AlmConnector.get_task_title(config, task, unique=False)
+        task['alm_identity'] = AlmConnector.get_task_title(config, task, unique=True)
         return task
 
     def synchronize(self):
@@ -671,6 +670,9 @@ class AlmConnector(object):
                             task['id'] in self.ignored_tasks):
                         continue
                     ref = self.alm_add_task(task)
+                    if self.config['alm_standard_workflow'] and (task['status'] == 'DONE' or task['status'] == 'NA'):
+                        alm_task = self.alm_get_task(task)
+                        self.alm_update_task_status(alm_task, task['status'])
                     self.emit.info('Added task %s to %s' % (tid, self.alm_name))
                     note_msg = 'Task synchronized in %s. Reference: %s' % (self.alm_name, ref)
                     self._add_note(task['id'], note_msg, '', task['status'])

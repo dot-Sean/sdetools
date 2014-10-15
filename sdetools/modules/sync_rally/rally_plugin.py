@@ -361,7 +361,7 @@ class RallyConnector(AlmConnector):
         card_type_details = self.card_types[self.config['rally_card_type']]
         task_id = self._extract_task_id(task['id'])
 
-        artifact_query = '(Name contains "%s")' % urlencode_str(task['identity'])
+        artifact_query = '(Name contains "%s")' % task['alm_identity']
 
         if card_type_details['type'] == 'Task':
             artifact_query = '(%s and (WorkProduct.FormattedID = "%s"))' % (
@@ -386,7 +386,7 @@ class RallyConnector(AlmConnector):
 
         create_args = {
             card_type_details['type']: {
-                'Name': task['title'],
+                'Name': task['alm_title'],
                 'Tags': [{'_ref': self.tag_ref}],
                 'Description': self.sde_get_task_content(task),
                 'Workspace': self.workspace_ref,
@@ -420,12 +420,6 @@ class RallyConnector(AlmConnector):
             raise AlmException('Alm task not added successfully. Please '
                                'check ALM-specific settings in config file')
 
-        if (self.config['alm_standard_workflow'] and
-                (task['status'] == 'DONE' or task['status'] == 'NA')):
-            self.alm_update_task_status(alm_task, task['status'])
-
-        # Manually stitch the url of the new Rally task
-
         return 'Project: %s, %s: %s; URL: %s' % (
             self.config['alm_project'],
             card_type_details['name'],
@@ -442,7 +436,7 @@ class RallyConnector(AlmConnector):
     def alm_update_task_status(self, task, status):
         card_type_details = self.card_types[self.config['rally_card_type']]
 
-        if not task or not self.config['alm_standard_workflow']:
+        if not task:
             logger.debug('Status synchronization disabled')
             return
 

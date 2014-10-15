@@ -5,7 +5,6 @@ import urllib2
 from sdetools.extlib import SOAPpy
 from sdetools.extlib import http_req
 
-from sdetools.sdelib.commons import urlencode_str
 from sdetools.alm_integration.alm_plugin_base import AlmException
 from sdetools.modules.sync_jira.jira_shared import JIRATask
 
@@ -125,8 +124,9 @@ class JIRASoapAPI:
             raise AlmException('Unable to get subtask issuetypes from JIRA')
 
     def get_task(self, task, task_id):
+        alm_identity = task['alm_identity'].replace('[', '').replace(']', '')
         try:
-            jql = "project='%s' AND summary~'%s'" % (self.config['alm_project'], urlencode_str(task['identity']))
+            jql = "project='%s' AND summary~'%s'" % (self.config['alm_project'], alm_identity)
             issues = self.proxy.getIssuesFromJqlSearch(self.auth, jql, SOAPpy.Types.intType(1))
         except SOAPpy.Types.faultType:
             raise AlmException("Unable to get task %s from JIRA" % task_id)
@@ -261,7 +261,7 @@ class JIRASoapAPI:
             updates.append({'id': 'versions', 'values': [project_version['id']]})
         args = {
             'project': self.config['alm_project'],
-            'summary': task['title'],
+            'summary': task['alm_title'].replace('[', '').replace(']', ''),
             'type': issue_type_id
         }
 
@@ -292,20 +292,20 @@ class JIRASoapAPI:
         except SOAPpy.Types.faultType, err:
             raise AlmException("Unable to delete task %s. Reason: %s" % (task.get_task_id(), err))
 
-    def get_available_transitions(self, task_id):
+    def get_available_transitions(self, alm_id):
         try:
-            transitions = self.proxy.getAvailableActions(self.auth, task_id)
+            transitions = self.proxy.getAvailableActions(self.auth, alm_id)
         except SOAPpy.Types.faultType, err:
-            raise AlmException("Unable to get available actions for task %s. Reason: %s" % (task_id, err))
+            raise AlmException("Unable to get available actions for issue %s. Reason: %s" % (alm_id, err))
 
         ret_trans = {}
         for transition in transitions:
             ret_trans[transition['name']] = transition['id']
         return ret_trans
 
-    def update_task_status(self, task_id, status_id):
+    def update_task_status(self, alm_id, status_id):
         try:
-            self.proxy.progressWorkflowAction(self.auth, task_id, status_id)                
+            self.proxy.progressWorkflowAction(self.auth, alm_id, status_id)
         except SOAPpy.Types.faultType, err:
             logger.error(err)
             raise AlmException("Unable to set task status: %s" % err)

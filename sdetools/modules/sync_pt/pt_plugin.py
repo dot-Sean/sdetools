@@ -210,23 +210,26 @@ class PivotalTrackerConnector(AlmConnector):
         if not task_id:
             return None
 
+        # Dashes (-) are special characters
+        alm_identity = task['alm_identity'].replace('-', ' ')
         try:
             # Fields parameter will filter response data to only contain story status, name, timestamp and id
             target = ('%s/stories?filter="%s"&fields=current_state,name,updated_at,id,estimate,story_type' %
-                     (self.project_uri, urlencode_str(task['identity'])))
+                     (self.project_uri, urlencode_str(alm_identity)))
             stories = self.alm_plugin.call_api(target)
         except APIError, err:
             logger.error(err)
-            raise AlmException('Unable to get story %s from PivotalTracker' % task_id)
+            raise AlmException('Unable to get story from PivotalTracker for task %s' % task_id)
 
         if not stories:
             return None
 
+        print stories
         story = stories[0]
 
         if len(stories) > 1:
             logger.warning('Found multiple issues with the title %s. Selecting the first task found with id %s'
-                           % (task_id, story['id']))
+                           % (task['alm_identity'], story['id']))
 
         logger.info('Found task: %s', task_id)
         updateable = story['story_type'] not in self.requires_estimate or story.get('estimate') is not None
@@ -301,8 +304,10 @@ class PivotalTrackerConnector(AlmConnector):
         if not self.sync_titles_only:
             task_content = self.sde_get_task_content(task)
 
+        # Dashes (-) are special characters
+        alm_title = task['alm_title'].replace('-', ' ')
         create_args = {
-            'name': task['title'],
+            'name': alm_title,
             'description': task_content,
             'current_state': self.config[self.ALM_NEW_STATUS],
             'story_type': self.config[self.PT_STORY_TYPE],
@@ -340,21 +345,17 @@ class PivotalTrackerConnector(AlmConnector):
 
         updateable = new_story['story_type'] not in self.requires_estimate or new_story.get('estimate') is not None
         # API returns JSON of the new issue
-        alm_task = PivotalTrackerTask(task['title'],
+        alm_task = PivotalTrackerTask(task['alm_title'],
                                       new_story['id'],
                                       new_story['current_state'],
                                       new_story['updated_at'],
                                       self.config[self.ALM_DONE_STATUSES],
                                       updateable)
 
-        if (self.config['alm_standard_workflow'] and
-                (task['status'] == 'DONE' or task['status'] == 'NA')):
-            self.alm_update_task_status(alm_task, task['status'])
-
         return 'Project: %s, Story: %s' % (self.config['alm_project'], alm_task.get_alm_id())
 
     def alm_update_task_status(self, task, status):
-        if not task or not self.config['alm_standard_workflow']:
+        if not task:
             logger.debug('Status synchronization disabled')
             return
 

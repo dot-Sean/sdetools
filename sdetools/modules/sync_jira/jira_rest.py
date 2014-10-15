@@ -119,9 +119,10 @@ class JIRARestAPI(RESTBase):
         return self.get_issue_types()
 
     def get_task(self, task, task_id):
+        alm_identity = task['alm_identity'].replace('[', '\\\\[').replace(']', '\\\\]')
         try:
             url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s\'' % (
-                    self.config['alm_project'], self.urlencode_str(task['identity']))
+                    self.config['alm_project'], self.urlencode_str(alm_identity))
             result = self.call_api(url)
         except APIError, error:
             raise AlmException("Unable to get task %s from JIRA. %s" % (task_id, error))
@@ -176,7 +177,7 @@ class JIRARestAPI(RESTBase):
                 'project': {
                     'key': self.config['alm_project']
                 },
-                'summary': task['title'],
+                'summary': task['alm_title'],
                 'issuetype': {
                     'id': issue_type_id
                 },
