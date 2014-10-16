@@ -71,7 +71,7 @@ class AlmConnector(object):
     TEST_OPTIONS = ['server', 'project', 'settings']
     STANDARD_STATUS_LIST = ['TODO', 'DONE', 'NA']
     FIELD_OPTIONS = ['task_id', 'title', 'context', 'application', 'project']
-    DEFAULT_TITLE_FORMAT = '${task_id}: ${title}'
+    DEFAULT_TITLE_FORMAT = '${task_id} ${title}'
     default_priority_map = None
 
     #This is an abstract base class
@@ -411,17 +411,22 @@ class AlmConnector(object):
         return task_id
 
     @staticmethod
-    def get_task_title(config, task, unique=False):
+    def get_alm_task_title(config, task, fixed=False):
+        """
+        Return the user-defined formatted fixed or full alm title for an SDE task. The fixed title can be used
+        to uniquely identify an issue inside the ALM, allowing one ALM project to sync
+        with more than one instance of the same SDE task
+        """
         task_id = AlmConnector._extract_task_id(task['id'])
         title = task['title'].replace("%s: " % task_id, "")
         mapping = {
-            'task_id': task_id,
+            'task_id': '%s:' % task_id,
             'context': config['alm_context'],
             'application': config['sde_application'],
             'project': config['sde_project'],
             'title': title,
         }
-        if unique:
+        if fixed:
             mapping['title'] = ''
 
         return Template(config['alm_title_format']).substitute(mapping).strip()
@@ -552,14 +557,14 @@ class AlmConnector(object):
             return alm_status == "TODO"
 
     def filter_tasks(self, tasks):
-        tasks = [AlmConnector.transform_task(self.config, task) for task in tasks if self.in_scope(task)]
+        tasks = [AlmConnector.add_alm_title(self.config, task) for task in tasks if self.in_scope(task)]
 
         return tasks
 
     @staticmethod
-    def transform_task(config, task):
-        task['alm_title'] = AlmConnector.get_task_title(config, task, unique=False)
-        task['alm_identity'] = AlmConnector.get_task_title(config, task, unique=True)
+    def add_alm_title(config, task):
+        task['alm_full_title'] = AlmConnector.get_alm_task_title(config, task, fixed=False)
+        task['alm_fixed_title'] = AlmConnector.get_alm_task_title(config, task, fixed=True)
         return task
 
     def synchronize(self):

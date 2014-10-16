@@ -25,7 +25,7 @@ class TestRationalCase(AlmPluginTestBase, unittest.TestCase):
         # Most of the module test configurations set the minimum priority to be 8
         # so we will create a task with this priority to make sure its in scope
         test_task = self.mock_sde_response.generate_sde_task()
-        test_task = AlmConnector.transform_task(self.config, test_task)
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         test_task['status'] = 'DONE'
         self.connector.alm_add_task(test_task)
         self.connector.synchronize()
@@ -41,7 +41,7 @@ class TestRationalCase(AlmPluginTestBase, unittest.TestCase):
         self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
-        test_task = AlmConnector.transform_task(self.config, test_task)
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         test_task['status'] = 'TODO'
         #print test_task
         self.connector.alm_add_task(test_task)
@@ -54,7 +54,7 @@ class TestRationalCase(AlmPluginTestBase, unittest.TestCase):
         self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
-        test_task = AlmConnector.transform_task(self.config, test_task)
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.synchronize()
         alm_task = self.connector.alm_get_task(test_task)
         self.assertEqual(test_task['id'][test_task['id'].find('T'):], alm_task.get_task_id(), 'Files don\'t match, mismatch: %s - %s' % (test_task['id'][test_task['id'].find('T'):], alm_task.get_task_id()))

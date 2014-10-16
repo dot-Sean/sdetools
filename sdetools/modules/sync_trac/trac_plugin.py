@@ -153,7 +153,7 @@ class TracConnector(AlmConnector):
         sde_id = self._extract_task_id(task['id'])
 
         # The colon is needed, otherwise for "T6" we match on "T6" and "T68"
-        qstr = 'summary^=%s' % task['alm_identity']
+        qstr = 'summary^=%s' % task['alm_fixed_title']
         task_list = self.alm_plugin.proxy.ticket.query(qstr)
         if not task_list:
             return None
@@ -173,7 +173,7 @@ class TracConnector(AlmConnector):
         sde_id = self._extract_task_id(task['id'])
 
         alm_id = self.alm_plugin.proxy.ticket.create(
-            task['alm_title'],
+            task['alm_full_title'],
             self.sde_get_task_content(task),
             {
                 'status': self.config['alm_new_status'],

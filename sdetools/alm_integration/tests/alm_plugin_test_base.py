@@ -86,7 +86,7 @@ class AlmPluginTestBase(object):
         # This test can be extended to verify the contents of task.
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
-        test_task = AlmConnector.transform_task(self.config, test_task)
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         test_task_result = self.connector.alm_get_task(test_task)
         task_id = test_task_result.get_task_id()
@@ -111,7 +111,7 @@ class AlmPluginTestBase(object):
         # to call alm_connect() before proceeding
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
-        test_task = AlmConnector.transform_task(self.config, test_task)
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         test_task_result = self.connector.alm_get_task(test_task)
 
@@ -238,7 +238,7 @@ class AlmPluginTestBase(object):
         except UsageError:
             pass
 
-    def test_alm_title_format(self):
+    def test_alm_fixed_title(self):
         task = {
             'id': '1099-T12',
             'title': 'T12: Sample Title'
@@ -247,29 +247,43 @@ class AlmPluginTestBase(object):
             'alm_context': 'Coffee',
             'sde_application': 'Breakfast',
             'sde_project': 'Sandwich',
-            'alm_title_format': '[$application ${project} $context] $task_id: ${title}'
+            'alm_title_format': '[$application ${project} $context] $task_id ${title}'
         }
-        full_title = '[Breakfast Sandwich Coffee] T12: Sample Title'
-        task_title = AlmConnector.get_task_title(config, task)
-        self.assertEqual(full_title, task_title, 'Incorrect full alm title')
+        title = '[Breakfast Sandwich Coffee] T12:'
+        task_title = AlmConnector.get_alm_task_title(config, task, True)
+        self.assertEqual(title, task_title, 'Incorrect fixed alm title: %s' % title)
 
-        full_title = '[Breakfast Sandwich Coffee] T12:'
-        task_title = AlmConnector.get_task_title(config, task, True)
-        self.assertEqual(full_title, task_title, 'Incorrect unique alm title')
+    def test_alm_full_title(self):
+        task = {
+            'id': '1099-T12',
+            'title': 'T12: Sample Title'
+        }
+        config = {
+            'alm_context': 'Coffee',
+            'sde_application': 'Breakfast',
+            'sde_project': 'Sandwich',
+            'alm_title_format': '[$application ${project} $context] $task_id ${title}'
+        }
+        title = '[Breakfast Sandwich Coffee] T12: Sample Title'
+        task_title = AlmConnector.get_alm_task_title(config, task)
+        self.assertEqual(title, task_title, 'Incorrect full alm title: %s' % title)
 
     def test_malformed_alm_title_format(self):
         self.connector.config['alm_title_format'] = 'BAD'
         exception_msg = 'Incorrect alm_title_format configuration'
         self.assert_exception(AlmException, '', exception_msg, self.connector.initialize)
 
+    def test_missing_title_in_alm_title_format(self):
         self.connector.config['alm_title_format'] = '${task_id}'
         exception_msg = 'Incorrect alm_title_format configuration. Missing ${title}'
         self.assert_exception(AlmException, '', exception_msg, self.connector.initialize)
 
+    def test_missing_task_id_in_alm_title_format(self):
         self.connector.config['alm_title_format'] = '${title}'
         exception_msg = 'Incorrect alm_title_format configuration. Missing ${task_id}'
         self.assert_exception(AlmException, '', exception_msg, self.connector.initialize)
 
+    def test_missing_context_in_alm_title_format(self):
         self.connector.config['alm_context'] = ''
         self.connector.config['alm_title_format'] = '${context} ${task_id} ${title}'
         exception_msg = 'Missing alm_context in configuration'
@@ -291,8 +305,6 @@ class AlmPluginTestBase(object):
         self.assert_exception(AlmException, '', exception_msg, self.connector.initialize)
 
     def test_tasks_filter(self):
-        # The plugin may initialize variables during alm_connect() so we need
-        # to call alm_connect() before proceeding
         self.connector.config['conflict_policy'] = 'sde'
         self.connector.config['sde_min_priority'] = 7
         self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
@@ -324,13 +336,6 @@ class AlmPluginTestBase(object):
             self.assertTrue(task['phase'] in self.config['alm_phases'],
                             'Task %s has unexpected phase %s' % (task['id'], task['phase']))
 
-        test_task = self.mock_sde_response.generate_sde_task()
-        test_task = AlmConnector.transform_task(self.config, test_task)
-        self.connector.synchronize()
-        alm_task = self.connector.alm_get_task(test_task)
-        self.assertNotNone(alm_task, 'Expected alm task to be generated')
-        self.connector.alm_update_task_status(alm_task, 'DONE')
-
     def test_update_existing_task_sde(self):
         # The plugin may initialize variables during alm_connect() so we need
         # to call alm_connect() before proceeding
@@ -338,7 +343,7 @@ class AlmPluginTestBase(object):
         self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
-        test_task = AlmConnector.transform_task(self.config, test_task)
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.synchronize()
         alm_task = self.connector.alm_get_task(test_task)
         self.assertNotNone(alm_task, 'Expected alm task to be generated')
@@ -350,7 +355,7 @@ class AlmPluginTestBase(object):
         self.connector.alm_connect()
 
         test_task = self.mock_sde_response.generate_sde_task()
-        test_task = AlmConnector.transform_task(self.config, test_task)
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         alm_task = self.connector.alm_get_task(test_task)
 
@@ -368,7 +373,7 @@ class AlmPluginTestBase(object):
     def test_update_task_status_to_na(self):
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
-        test_task = AlmConnector.transform_task(self.config, test_task)
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         alm_task = self.connector.alm_get_task(test_task)
 
@@ -382,7 +387,7 @@ class AlmPluginTestBase(object):
     def test_update_task_status_to_todo(self):
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
-        test_task = AlmConnector.transform_task(self.config, test_task)
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         test_task['status'] = 'DONE'
         self.connector.alm_add_task(test_task)
         alm_task = self.connector.alm_get_task(test_task)
@@ -401,7 +406,7 @@ class AlmPluginTestBase(object):
 
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
-        test_task = AlmConnector.transform_task(self.config, test_task)
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         test_task_result = self.connector.alm_get_task(test_task)
         self.assertNotNone(test_task_result, 'Task added to ALM')
@@ -428,7 +433,7 @@ class AlmPluginTestBase(object):
                 # This will invoke add, get and update task
                 self.connector.alm_connect()
                 test_task = self.mock_sde_response.generate_sde_task()
-                test_task = AlmConnector.transform_task(self.config, test_task)
+                test_task = AlmConnector.add_alm_title(self.config, test_task)
                 test_task['status'] = 'DONE'
                 self.connector.alm_add_task(test_task)
                 self.connector.synchronize()

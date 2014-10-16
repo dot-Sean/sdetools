@@ -25,20 +25,20 @@ class TestMingleCase(AlmPluginTestBase, unittest.TestCase):
     def test_mingle_cached_cards(self):
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
-        test_task = AlmConnector.transform_task(self.config, test_task)
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         alm_id = test_task['id'].split('T')[1]
 
         self.connector.alm_add_task(test_task)
         cached_cards = self.connector.cached_cards
 
-        self.assertEqual(cached_cards, {alm_id: test_task['alm_title']})
+        self.assertEqual(cached_cards, {alm_id: test_task['alm_full_title']})
 
         self.connector._cache_all_sde_mingle_cards()
         cached_cards = self.connector.cached_cards
 
         self.assertNotNone(cached_cards)
         self.assertNotNone(cached_cards.get(alm_id))
-        self.assertEquals(cached_cards.get(alm_id), test_task['alm_title'])
+        self.assertEquals(cached_cards.get(alm_id), test_task['alm_full_title'])
         self.assertNotNone(self.connector.alm_get_task(test_task))
 
     def test_invalid_config_card_type(self):
@@ -66,7 +66,7 @@ class TestMingleCase(AlmPluginTestBase, unittest.TestCase):
         self.mock_alm_response.set_response_flags({'get_project': 'anonymous_accessible'})
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
-        test_task = AlmConnector.transform_task(self.config, test_task)
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         alm_id = int(test_task['id'].split('T')[1])
         headers, card = self.connector.alm_plugin.call_api('%s/cards/%s.xml' % (self.connector.project_uri, alm_id))

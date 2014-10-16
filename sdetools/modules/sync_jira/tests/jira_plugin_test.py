@@ -48,7 +48,7 @@ class JiraBaseCase(AlmPluginTestBase):
                 # This will invoke add, get and update task
                 self.connector.alm_connect()
                 test_task = self.mock_sde_response.generate_sde_task()
-                test_task = AlmConnector.transform_task(self.config, test_task)
+                test_task = AlmConnector.add_alm_title(self.config, test_task)
                 test_task['status'] = 'DONE'
                 self.connector.alm_add_task(test_task)
                 self.connector.config['alm_project_version'] = '1.2'
@@ -70,7 +70,7 @@ class JiraBaseCase(AlmPluginTestBase):
     def test_parse_non_done_status_as_todo(self):
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
-        test_task = AlmConnector.transform_task(self.config, test_task)
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         test_task_result = self.connector.alm_get_task(test_task)
         test_task_result.status = "Non-done status"
@@ -83,7 +83,7 @@ class JiraBaseCase(AlmPluginTestBase):
         self.init_response_generator()
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
-        test_task = AlmConnector.transform_task(self.config, test_task)
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         test_task_result = self.connector.alm_get_task(test_task)
 
@@ -220,7 +220,7 @@ class TestJiraAPI4Case(JiraBaseCase, unittest.TestCase):
         self.connector.alm_connect()
         self.config['alm_custom_fields'] = {"Custom Field": "value"}
         test_task = self.mock_sde_response.generate_sde_task()
-        test_task = AlmConnector.transform_task(self.config, test_task)
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         alm_task = self.connector.alm_get_task(test_task)
         self.config['jira_existing_issue'] = alm_task.get_alm_id()

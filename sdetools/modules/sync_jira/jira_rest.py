@@ -127,7 +127,7 @@ class JIRARestAPI(RESTBase):
         return text.replace(']', '\\\\]')
 
     def get_task(self, task, task_id):
-        alm_identity = self._clean_summary(task['alm_identity'])
+        alm_identity = self._clean_summary(task['alm_fixed_title'])
         try:
             url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s\'' % (
                     self.config['alm_project'], self.urlencode_str(alm_identity))
@@ -185,7 +185,7 @@ class JIRARestAPI(RESTBase):
                 'project': {
                     'key': self.config['alm_project']
                 },
-                'summary': task['alm_title'],
+                'summary': task['alm_full_title'],
                 'issuetype': {
                     'id': issue_type_id
                 },

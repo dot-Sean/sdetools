@@ -132,7 +132,7 @@ class JIRASoapAPI:
         return text.replace(']', '')
 
     def get_task(self, task, task_id):
-        alm_identity = self._clean_summary(task['alm_identity'])
+        alm_identity = self._clean_summary(task['alm_fixed_title'])
         try:
             jql = "project='%s' AND summary~'%s'" % (self.config['alm_project'], alm_identity)
             issues = self.proxy.getIssuesFromJqlSearch(self.auth, jql, SOAPpy.Types.intType(1))
@@ -269,7 +269,7 @@ class JIRASoapAPI:
             updates.append({'id': 'versions', 'values': [project_version['id']]})
         args = {
             'project': self.config['alm_project'],
-            'summary': self._clean_summary(task['alm_title']),
+            'summary': self._clean_summary(task['alm_full_title']),
             'type': issue_type_id
         }
 

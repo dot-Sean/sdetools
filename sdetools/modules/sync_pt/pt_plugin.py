@@ -217,7 +217,7 @@ class PivotalTrackerConnector(AlmConnector):
         if not task_id:
             return None
 
-        alm_identity = self._clean_title(task['alm_identity'])
+        alm_identity = self._clean_title(task['alm_fixed_title'])
         try:
             # Fields parameter will filter response data to only contain story status, name, timestamp and id
             target = ('%s/stories?filter="%s"&fields=current_state,name,updated_at,id,estimate,story_type' %
@@ -310,7 +310,7 @@ class PivotalTrackerConnector(AlmConnector):
             task_content = self.sde_get_task_content(task)
 
         # Dashes (-) are special characters
-        alm_title = self._clean_title(task['alm_title'])
+        alm_title = self._clean_title(task['alm_full_title'])
         create_args = {
             'name': alm_title,
             'description': task_content,

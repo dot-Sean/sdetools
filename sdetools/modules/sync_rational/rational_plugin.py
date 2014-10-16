@@ -323,7 +323,7 @@ class RationalConnector(AlmConnector):
         try:
             # Fields parameter will filter response data to only contain story status, name, timestamp and id
             work_items = self._call_api('%s/workitems?oslc.where=dcterms:title="%s*"' % (
-                                        self.query_url, urlencode_str(task['alm_identity'])))
+                                        self.query_url, urlencode_str(task['alm_fixed_title'])))
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get task %s from Rational' % task_id)
@@ -354,7 +354,7 @@ class RationalConnector(AlmConnector):
         priority_literal_resource = self._get_priority_literal(priority_name)
 
         create_args = {
-            'dcterms:title': task['alm_title'],
+            'dcterms:title': task['alm_full_title'],
             'dcterms:description': self.sde_get_task_content(task),
             'oslc_cmx:priority': priority_literal_resource,
             'dcterms:subject': self.config['alm_issue_label'],

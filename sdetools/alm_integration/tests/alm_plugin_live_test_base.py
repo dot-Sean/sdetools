@@ -186,13 +186,13 @@ class AlmPluginLiveTestBase(object):
             # Find the corresponding scenario1 alm task
             scenario_options['alm_title_format'] = scenario1_alm_title_format
             self._update_config(scenario_options)
-            scenario1_task = AlmConnector.transform_task(self.connector.config, task.copy())
+            scenario1_task = AlmConnector.add_alm_title(self.connector.config, task.copy())
             scenario1_alm_task = self.connector.alm_get_task(scenario1_task)
 
             # Find the corresponding scenario2 alm task
             scenario_options['alm_title_format'] = scenario2_alm_title_format
             self._update_config(scenario_options)
-            scenario2_task = AlmConnector.transform_task(self.connector.config, task.copy())
+            scenario2_task = AlmConnector.add_alm_title(self.connector.config, task.copy())
             scenario2_alm_task = self.connector.alm_get_task(scenario2_task)
 
             # Check that these alm tasks are distinct for the same sde task

@@ -207,7 +207,7 @@ class MingleConnector(AlmConnector):
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])
 
-        card_item = self._alm_get_task_by_identity(task['alm_identity'])
+        card_item = self._alm_get_task_by_identity(task['alm_fixed_title'])
         if card_item is None:
             return None
 
@@ -235,7 +235,7 @@ class MingleConnector(AlmConnector):
 
     def alm_add_task(self, task):
         task_id = self._extract_task_id(task['id'])
-        card_name = task['alm_title']
+        card_name = task['alm_full_title']
         description = PUBLIC_TASK_CONTENT
 
         if not self.sync_titles_only:
@@ -261,7 +261,7 @@ class MingleConnector(AlmConnector):
         if card_re:
             if not self.cached_cards:
                 self.cached_cards = {}
-            self.cached_cards[card_re.group(1)] = task['alm_title']
+            self.cached_cards[card_re.group(1)] = task['alm_full_title']
         else:
             raise AlmException('Alm task not added successfully for %s: could not find card number' % task['id'])
 

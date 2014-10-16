@@ -26,7 +26,7 @@ class TestGitHubCase(AlmPluginTestBase, unittest.TestCase):
     def test_parse_non_done_status_as_todo(self):
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
-        test_task = AlmConnector.transform_task(self.config, test_task)
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         test_task_result = self.connector.alm_get_task(test_task)
         test_task_result.status = "Non-done status"
@@ -67,7 +67,7 @@ class TestGitHubCase(AlmPluginTestBase, unittest.TestCase):
         self.mock_alm_response.set_response_flags({'post_issue': '422'})
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
-        test_task = AlmConnector.transform_task(self.config, test_task)
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         exception_msg = 'Unable to add task %s to GitHub. Reason: HTTP Error 422. Explanation returned: FATAL ERROR: Validation Failed. ' \
                         'Additional Info - The field "title" is required for the resource "Issue"' % test_task['id']
 
