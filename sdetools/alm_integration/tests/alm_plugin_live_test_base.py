@@ -160,6 +160,52 @@ class AlmPluginLiveTestBase(object):
             self.config[key] = options[key]
         self.connector.config = self.config
 
+    def test_synchronize_similar_tasks(self):
+        self.connector.initialize()
+        self.connector.sde_connect()
+        self.connector.alm_connect()
+
+        tasks = self.connector.sde_get_tasks()
+        filtered_tasks = self.connector.filter_tasks(tasks)
+        self.assertTrue(len(filtered_tasks) > 0)
+        task = filtered_tasks[0]
+        test_task = task.copy()
+
+        task_id = test_task['id']
+        title = test_task['title']
+
+        # construct a similar task (T21 => T21222222) and add to the ALM
+        task['id'] = '%s222222' % test_task['id']
+        task['title'] = '%s: Sample Title' % AlmConnector._extract_task_id(task['id'])
+        task = AlmConnector.add_alm_title(self.connector.config, task)
+
+        # re-use an issue if one already exists in the ALM
+        alm_task1 = self.connector.alm_get_task(task)
+        if not alm_task1:
+            ref = self.connector.alm_add_task(task)
+            alm_task1 = self.connector.alm_get_task(task)
+
+        # Try to sync a similar task
+        test_task['id'] = task_id
+        test_task['title'] = title
+        test_task = AlmConnector.add_alm_title(self.connector.config, test_task)
+        alm_task2 = self.connector.alm_get_task(test_task)
+        if not alm_task2:
+            ref = self.connector.alm_add_task(test_task)
+            alm_task2 = self.connector.alm_get_task(test_task)
+
+        self.assertNotEqual(alm_task1.get_alm_id(), alm_task2.get_alm_id())
+
+        # clean-up issues in the ALM
+        if not self.connector.alm_supports_delete():
+            return
+
+        if alm_task1:
+            self.connector.alm_remove_task(alm_task1)
+
+        if alm_task2:
+            self.connector.alm_remove_task(alm_task2)
+
     def test_custom_titles(self):
 
         scenario_options = {
@@ -167,8 +213,8 @@ class AlmPluginLiveTestBase(object):
             'alm_context': 'Context',
         }
 
-        scenario1_alm_title_format = '[$application-$project] $task_id: $title'
-        scenario2_alm_title_format = '[$context] $task_id: $title'
+        scenario1_alm_title_format = '[$application-$project] $task_id $title'
+        scenario2_alm_title_format = '[$context] $task_id $title'
 
         self._update_config(scenario_options)
         self.connector.initialize()
@@ -220,7 +266,6 @@ class AlmPluginLiveTestBase(object):
             self.assertTrue(self.connector.status_match(scenario2_alm_task.get_status(),
                                                         self._inverted_status(scenario1_status)))
             self.assertTrue(self.connector.status_match(scenario1_alm_task.get_status(), scenario1_status))
-
 
     def _inverted_status(self, status):
         return 'DONE' if status == 'TODO' else 'TODO'

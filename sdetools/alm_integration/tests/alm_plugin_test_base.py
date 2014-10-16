@@ -251,7 +251,7 @@ class AlmPluginTestBase(object):
         }
         title = '[Breakfast Sandwich Coffee] T12:'
         task_title = AlmConnector.get_alm_task_title(config, task, True)
-        self.assertEqual(title, task_title, 'Incorrect fixed alm title: %s' % title)
+        self.assertEqual(title, task_title, 'Incorrect fixed alm title: %s' % task_title)
 
     def test_alm_full_title(self):
         task = {
@@ -266,7 +266,7 @@ class AlmPluginTestBase(object):
         }
         title = '[Breakfast Sandwich Coffee] T12: Sample Title'
         task_title = AlmConnector.get_alm_task_title(config, task)
-        self.assertEqual(title, task_title, 'Incorrect full alm title: %s' % title)
+        self.assertEqual(title, task_title, 'Incorrect full alm title: %s' % task_title)
 
     def test_malformed_alm_title_format(self):
         self.connector.config['alm_title_format'] = 'BAD'

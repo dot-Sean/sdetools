@@ -418,9 +418,12 @@ class AlmConnector(object):
         with more than one instance of the same SDE task
         """
         task_id = AlmConnector._extract_task_id(task['id'])
-        title = task['title'].replace("%s: " % task_id, "")
+
+        # Remove the task id from the title to get the actual title
+        title = re.sub('^%s:\s+' % task_id, '', task['title'])
+
         mapping = {
-            'task_id': '%s:' % task_id,
+            'task_id': '%s:' % task_id,  # Force a suffix to avoid finding "T222" when searching with "T2"
             'context': config['alm_context'],
             'application': config['sde_application'],
             'project': config['sde_project'],
