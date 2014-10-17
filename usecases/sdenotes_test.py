@@ -5,22 +5,25 @@
 # Copyright SDElements Inc
 #
 
-import sys, os
+import os
+import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sdelib.conf_mgr import config
-from sdelib.commons import show_error, Error
-from sdelib.interactive_plugin import PlugInExperience
+from sdetools.sdelib.conf_mgr import Config
+from sdetools.sdelib.commons import show_error, Error
+from sdetools.sdelib.interactive_plugin import PlugInExperience
+
 
 def load():
-    plugin = PlugInExperience(config)
+    plugin = PlugInExperience(Config)
 
     plugin.get_compiled_task_list()
         
     plugin.add_task_note("T21", "Test note", "filename", "DONE")
 
+
 def main(argv):
-    ret = config.parse_args(argv)
+    ret = Config.parse_args(argv)
     if not ret:
         sys.exit(1)
 

@@ -1,6 +1,7 @@
 from sdetools.sdelib.cmd import BaseCommand
 from sdetools.sdelib.sdeapi import APIBase
 
+
 class Command(BaseCommand):
     name = 'list_projects'
     help = 'Creates a list of applications and projects that contain a certain word in their name'\

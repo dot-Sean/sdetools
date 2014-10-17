@@ -1,5 +1,6 @@
 from sdetools.sdelib import restclient 
 
+
 class InternalAPI(restclient):
     """
     Note: In all the API calls:
@@ -28,7 +29,7 @@ class InternalAPI(restclient):
         Available Filters:
             name -> project name to be searched for
         """
-        args = {'application':application}
+        args = {'application': application}
         args.update(filters)
         result = self.call_api('projects', args=args)
         return result['projects']
@@ -37,7 +38,7 @@ class InternalAPI(restclient):
         """ 
         Get all tasks for a project indicated by the ID of the project
         """
-        result = self.call_api('tasks', args={'project':project})
+        result = self.call_api('tasks', args={'project': project})
         return result['tasks']
 
     def get_task(self, task):
@@ -54,7 +55,7 @@ class InternalAPI(restclient):
         return result
 
     def add_task_ide_note(self, task, text, filename, status):
-        note = {'text':text, 'filename':filename, 'status':status, 'task':task}
+        note = {'text': text, 'filename': filename, 'status': status, 'task': task}
         result = self.call_api('tasknotes/ide', self.URLRequest.POST, args=note)
         return result
 
@@ -64,14 +65,14 @@ class InternalAPI(restclient):
             return
         if note_type:
             end_point += '/%s' % (note_type)
-        return self.call_api(end_point, args={'task':task})
+        return self.call_api(end_point, args={'task': task})
 
     def add_analysis_note(self, task, analysis_ref, confidence, findings):
-        note = {'task':task, 'project_analysis_note':analysis_ref, 'confidence':confidence, 'findings':findings}
+        note = {'task': task, 'project_analysis_note': analysis_ref, 'confidence': confidence, 'findings': findings}
         return self.call_api('tasknotes/analysis', self.URLRequest.POST, args=note)
 
     def add_project_analysis_note(self, project_id, analysis_ref, analysis_type):
-        project_analysis = {'project':project_id, 'analysis_ref':analysis_ref, 'analysis_type':analysis_type}
+        project_analysis = {'project': project_id, 'analysis_ref': analysis_ref, 'analysis_type': analysis_type}
         return self.call_api('projectnotes/analysis', self.URLRequest.POST, args=project_analysis)
 
     def update_task_status(self, task, status):
@@ -79,6 +80,5 @@ class InternalAPI(restclient):
         Update the task status. The task ID should include the project number
         Returns the 'status' field of he result
         """
-        result = self.call_api('tasks/%s' % task, self.URLRequest.PUT,
-            args={'status':status})
+        result = self.call_api('tasks/%s' % task, self.URLRequest.PUT, args={'status': status})
         return result['status']

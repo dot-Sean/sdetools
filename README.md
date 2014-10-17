@@ -10,7 +10,7 @@ The console usage
 
 __sde.py__
 
-The command line tool to run SD Elements integeration modules. Use 'python sde.py help' to see usage and 'python sde.py help <cmd>' to see usage for specific module.
+The command line tool to run SD Elements integration modules. Use 'python sde.py help' to see usage and 'python sde.py help <cmd>' to see usage for specific module.
 
 The package usage
 ================

@@ -64,6 +64,7 @@ class Option(object):
     def __repr__(self):
         return '%s(**%s)' % (self.__class__.__name__, str(self))
 
+
 class ModuleOptions(dict):
     """
     Note: The first item in sub_cmds is the default.
@@ -99,6 +100,7 @@ class ModuleOptions(dict):
         for item in self:
             dup[item] = self[item]
         return dup
+
 
 class Config(object):
     """
