@@ -180,7 +180,7 @@ class RationalConnector(AlmConnector):
 
         if self.config['conflict_policy'] != 'alm':
             raise AlmException('Expected "alm" for configuration conflict_policy but got "%s". '
-                               'Currently only Rational can be setup as authoritative server' %
+                               'Currently Rational can only be setup as authoritative server' %
                                self.config['conflict_policy'])
 
     def _rational_forms_login(self, forms_client):
