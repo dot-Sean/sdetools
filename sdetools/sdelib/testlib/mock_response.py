@@ -109,8 +109,12 @@ class MockSDEResponse(MockResponse):
         response_generator = SdeResponseGenerator(config)
         super(MockSDEResponse, self).initialize(response_generator)
 
-    def generate_sde_task(self, task_number=None, project_id=None, status='TODO', priority=7, phase='requirements'):
-        return self.get_response_generator().generate_sde_task(task_number, project_id, status, priority, phase)
+    def generate_sde_task(self, task_number=None, project_id=None, status='TODO', priority=7, phase='requirements',
+                          tags=None):
+        return self.get_response_generator().generate_sde_task(task_number, project_id, status, priority, phase, tags)
+
+    def clear_tasks(self):
+        return self.get_response_generator().generator_clear_resource('task')
 
 MOCK_ALM_RESPONSE = MockResponse()
 MOCK_SDE_RESPONSE = MockSDEResponse()

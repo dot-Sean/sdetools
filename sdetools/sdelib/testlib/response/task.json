@@ -25,6 +25,7 @@
     "age": "current",
     "project": 1296,
     "assigned_to": [],
+    "tags": [],
     "content": "Task Description.",
     "verification_coverage": [
         "No Automated Dynamic Analysis Coverage"

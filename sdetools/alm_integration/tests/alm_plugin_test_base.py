@@ -251,6 +251,100 @@ class AlmPluginTestBase(object):
         exception_msg = 'Incorrect sde_min_priority specified in configuration. Valid values are > 0 and <= 10'
         self.assert_exception(AlmException, '', exception_msg, self.connector.initialize)
 
+    def test_tasks_filter_tags(self):
+        self.connector.config['conflict_policy'] = 'sde'
+        self.connector.config['sde_min_priority'] = 1
+        self.connector.config['sde_tags_filter'] = ['one', 'two']
+        self.connector.sde_connect()
+        self.connector.alm_connect()
+
+        # clear out default tasks
+        self.mock_sde_response.clear_tasks()
+
+        self.mock_sde_response.generate_sde_task(priority=8, tags=['one', 'two', 'three'])
+        self.mock_sde_response.generate_sde_task(priority=7, tags=['one'])
+        self.mock_sde_response.generate_sde_task(priority=7, tags=['two'])
+        self.mock_sde_response.generate_sde_task(priority=1, tags=['two', 'one'])
+        self.mock_sde_response.generate_sde_task(priority=6, tags=['four', 'five'])
+
+        tasks = self.connector.sde_get_tasks()
+        self.assertTrue(len(tasks) == 5, 'Expected 3 tasks')
+
+        tasks = self.connector.filter_tasks(tasks)
+        self.assertTrue(len(tasks) == 2, 'Expected 2 tasks')
+
+        for task in tasks:
+            self.assertTrue(set(self.connector.config['sde_tags_filter']).issubset(task['tags']),
+                            'Task %s has unexpected priority %d' % (task['id'], task['priority']))
+
+    def test_tasks_filter_empty_tags(self):
+        self.connector.config['conflict_policy'] = 'sde'
+        self.connector.config['sde_min_priority'] = 1
+        self.connector.config['sde_tags_filter'] = []
+        self.connector.sde_connect()
+        self.connector.alm_connect()
+
+        # clear out default tasks
+        self.mock_sde_response.clear_tasks()
+
+        self.mock_sde_response.generate_sde_task(priority=8, tags=['one', 'two', 'three'])
+        self.mock_sde_response.generate_sde_task(priority=7, tags=['one'])
+        self.mock_sde_response.generate_sde_task(priority=7, tags=['two'])
+        self.mock_sde_response.generate_sde_task(priority=1, tags=['two', 'one'])
+        self.mock_sde_response.generate_sde_task(priority=6, tags=['four', 'five'])
+
+        tasks = self.connector.sde_get_tasks()
+        self.assertTrue(len(tasks) == 5, 'Expected 5 tasks')
+
+        tasks = self.connector.filter_tasks(tasks)
+        self.assertTrue(len(tasks) == 5, 'Expected 5 tasks')
+
+    def test_tasks_filter_priority(self):
+        self.connector.config['conflict_policy'] = 'sde'
+        self.connector.config['sde_min_priority'] = 7
+        self.connector.sde_connect()
+        self.connector.alm_connect()
+
+        # clear out default tasks
+        self.mock_sde_response.clear_tasks()
+
+        self.mock_sde_response.generate_sde_task(priority=8)
+        self.mock_sde_response.generate_sde_task(priority=7)
+        self.mock_sde_response.generate_sde_task(priority=7)
+        self.mock_sde_response.generate_sde_task(priority=1)
+        self.mock_sde_response.generate_sde_task(priority=6)
+
+        tasks = self.connector.sde_get_tasks()
+        self.assertTrue(len(tasks) == 3, 'Expected 3 tasks')
+
+        for task in tasks:
+            self.assertTrue(task['priority'] >= self.connector.config['sde_min_priority'],
+                            'Task %s has an unexpected priority %d' % (task['id'], task['priority']))
+
+    def test_tasks_filter_phase(self):
+        self.connector.config['conflict_policy'] = 'sde'
+        self.connector.config['sde_min_priority'] = 7
+        self.connector.config['alm_phases'] = ['requirements', 'testing']
+        self.connector.sde_connect()
+        self.connector.alm_connect()
+
+        # clear out default tasks
+        self.mock_sde_response.clear_tasks()
+
+        self.mock_sde_response.generate_sde_task(priority=7, phase='requirements')
+        self.mock_sde_response.generate_sde_task(priority=7, phase='testing')
+        self.mock_sde_response.generate_sde_task(priority=7, phase='development')
+
+        tasks = self.connector.sde_get_tasks()
+        self.assertTrue(len(tasks) == 3, 'Expected 3 tasks')
+
+        tasks = self.connector.filter_tasks(tasks)
+        self.assertTrue(len(tasks) == 2, 'Expected 2 tasks')
+
+        for task in tasks:
+            self.assertTrue(task['phase'] in self.config['alm_phases'],
+                            'Task %s has unexpected phase %s' % (task['id'], task['phase']))
+
     def test_update_existing_task_sde(self):
         # The plugin may initialize variables during alm_connect() so we need
         # to call alm_connect() before proceeding
