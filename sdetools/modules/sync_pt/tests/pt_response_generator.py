@@ -136,6 +136,7 @@ class PivotalTrackerResponseGenerator(ResponseGenerator):
 
                     return RESPONSE_HEADERS, task
                 elif method == 'DELETE':
+                    self.generator_remove_resource('story', story_id)
                     return RESPONSE_HEADERS, ''
             self.raise_error('404')
         else:

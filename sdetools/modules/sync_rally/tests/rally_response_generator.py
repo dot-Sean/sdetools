@@ -118,6 +118,7 @@ class RallyResponseGenerator(ResponseGenerator):
 
                 return RESPONSE_HEADERS, data
             elif method == 'DELETE':
+                self.generator_remove_resource('card', task_number)
                 return RESPONSE_HEADERS, data
         else:
             self.raise_error('404')

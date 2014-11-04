@@ -4,6 +4,7 @@ import unittest
 
 from hp_alm_response_generator import HPAlmResponseGenerator
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
+from sdetools.alm_integration.alm_plugin_base import AlmConnector
 from sdetools.modules.sync_hp_alm.hp_alm_plugin import HPAlmConnector, HPAlmAPIBase, AlmException
 
 
@@ -64,6 +65,7 @@ class TestHPAlmCase(AlmPluginTestBase, unittest.TestCase):
         self.config['alm_phases'] = ['requirement', 'testing']
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task(phase='testing')
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         test_task_result = self.connector.alm_get_task(test_task)
 
@@ -77,7 +79,9 @@ class TestHPAlmCase(AlmPluginTestBase, unittest.TestCase):
     def test_add_requirement_coverage(self):
         self.config['alm_phases'] = ['requirements', 'testing']
         test_task = self.mock_sde_response.generate_sde_task(phase='testing')
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         requirement_task = self.mock_sde_response.generate_sde_task(phase='requirements')
+        requirement_task = AlmConnector.add_alm_title(self.config, requirement_task)
         self.connector.synchronize()
         hp_requirement_id = self.connector.alm_get_task(requirement_task).get_alm_id()
         hp_test_id = self.connector.alm_get_task(test_task).get_alm_id()
@@ -91,6 +95,7 @@ class TestHPAlmCase(AlmPluginTestBase, unittest.TestCase):
     def test_update_test_plan_status(self):
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task(phase='testing')
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         alm_task = self.connector.alm_get_task(test_task)
 

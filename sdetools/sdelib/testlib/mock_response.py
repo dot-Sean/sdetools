@@ -7,6 +7,7 @@ from sdetools.sdelib.testlib.sde_response_generator import SdeResponseGenerator
 
 SDE_SERVER = None
 
+
 class MockRequest(object):
     """ Mock Request object """
     def __init__(self, req, handles):
@@ -112,6 +113,9 @@ class MockSDEResponse(MockResponse):
     def generate_sde_task(self, task_number=None, project_id=None, status='TODO', priority=7, phase='requirements',
                           tags=None):
         return self.get_response_generator().generate_sde_task(task_number, project_id, status, priority, phase, tags)
+
+    def clear_tasks(self):
+        return self.get_response_generator().generator_clear_resource('task')
 
     def clear_tasks(self):
         return self.get_response_generator().generator_clear_resource('task')
