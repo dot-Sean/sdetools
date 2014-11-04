@@ -261,10 +261,13 @@ class AlmPluginTestBase(object):
         # clear out default tasks
         self.mock_sde_response.clear_tasks()
 
+        # We expect these tasks to match
         self.mock_sde_response.generate_sde_task(priority=8, tags=['one', 'two', 'three'])
+        self.mock_sde_response.generate_sde_task(priority=1, tags=['two', 'one'])
+
+        # These tasks do not match the tags filter criteria
         self.mock_sde_response.generate_sde_task(priority=7, tags=['one'])
         self.mock_sde_response.generate_sde_task(priority=7, tags=['two'])
-        self.mock_sde_response.generate_sde_task(priority=1, tags=['two', 'one'])
         self.mock_sde_response.generate_sde_task(priority=6, tags=['four', 'five'])
 
         tasks = self.connector.sde_get_tasks()
@@ -287,6 +290,7 @@ class AlmPluginTestBase(object):
         # clear out default tasks
         self.mock_sde_response.clear_tasks()
 
+        # All these tasks should match
         self.mock_sde_response.generate_sde_task(priority=8, tags=['one', 'two', 'three'])
         self.mock_sde_response.generate_sde_task(priority=7, tags=['one'])
         self.mock_sde_response.generate_sde_task(priority=7, tags=['two'])
@@ -308,9 +312,12 @@ class AlmPluginTestBase(object):
         # clear out default tasks
         self.mock_sde_response.clear_tasks()
 
+        # These tasks should match
         self.mock_sde_response.generate_sde_task(priority=8)
         self.mock_sde_response.generate_sde_task(priority=7)
         self.mock_sde_response.generate_sde_task(priority=7)
+
+        # These tasks should not match
         self.mock_sde_response.generate_sde_task(priority=1)
         self.mock_sde_response.generate_sde_task(priority=6)
 
@@ -331,8 +338,11 @@ class AlmPluginTestBase(object):
         # clear out default tasks
         self.mock_sde_response.clear_tasks()
 
+        # These tasks should match
         self.mock_sde_response.generate_sde_task(priority=7, phase='requirements')
         self.mock_sde_response.generate_sde_task(priority=7, phase='testing')
+
+        # This task should not match
         self.mock_sde_response.generate_sde_task(priority=7, phase='development')
 
         tasks = self.connector.sde_get_tasks()
