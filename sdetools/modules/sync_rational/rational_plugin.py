@@ -6,6 +6,7 @@ import urllib
 import json
 from datetime import datetime
 
+from sdetools.sdelib.commons import urlencode_str
 from sdetools.sdelib.restclient import RESTBase
 from sdetools.sdelib.restclient import URLRequest, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
@@ -147,7 +148,7 @@ class RationalConnector(AlmConnector):
         """ Initializes connection to Rational """
         super(RationalConnector, self).__init__(config, alm_plugin)
 
-        config.opts.add(self.ALM_DONE_STATUSES, 'Statuses that signify a task is Done in Rational',
+        config.opts.add(self.ALM_DONE_STATUSES, 'Statuses that signify a task is Done in Rational Team Concert',
                         default='Completed,Done')
         config.opts.add('alm_issue_label', 'Tags applied to tasks in Rational (space separated)', default='SD-Elements')
         config.opts.add('alm_issue_type', 'Issue type (Fully-qualified identifier)', default='task')
@@ -335,8 +336,8 @@ class RationalConnector(AlmConnector):
 
         try:
             # Fields parameter will filter response data to only contain story status, name, timestamp and id
-            work_items = self._call_api('%s/workitems?oslc.where=dcterms:title="%s:*"' %
-                                                  (self.query_url, task_id))
+            work_items = self._call_api('%s/workitems?oslc.where=dcterms:title="%s*"' % (
+                                        self.query_url, urlencode_str(task['alm_fixed_title'])))
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get task %s from Rational' % task_id)
@@ -367,7 +368,7 @@ class RationalConnector(AlmConnector):
         priority_literal_resource = self._get_priority_literal(priority_name)
 
         create_args = {
-            'dcterms:title': task['title'],
+            'dcterms:title': task['alm_full_title'],
             'dcterms:description': self.sde_get_task_content(task),
             'oslc_cmx:priority': priority_literal_resource,
             'dcterms:subject': self.config['alm_issue_label'],

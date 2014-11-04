@@ -182,17 +182,18 @@ class MingleConnector(AlmConnector):
         if result:
             for card_item in result.getElementsByTagName('card'):
                 card_name = self._get_value_of_element_with_tag(card_item, 'name')
-                _task_id = re.search('^([^\d]+\d+):', card_name)
+                card_num = self._get_value_of_element_with_tag(card_item, 'number')
+                self.cached_cards[card_num] = card_name
 
-                if _task_id:
-                    card_num = self._get_value_of_element_with_tag(card_item, 'number')
-                    self.cached_cards[_task_id.group(1)] = card_num
-
-    def _alm_get_task_by_task_id(self, task_id):
+    def _alm_get_task_by_identity(self, identity):
         if not self.cached_cards:
             self._cache_all_sde_mingle_cards()
 
-        card_num = self.cached_cards.get(task_id)
+        card_num = None
+        for key in self.cached_cards:
+            if self.cached_cards[key].find(identity) >= 0:
+                card_num = key
+                break
 
         if card_num is None:
             return None
@@ -206,7 +207,7 @@ class MingleConnector(AlmConnector):
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])
 
-        card_item = self._alm_get_task_by_task_id(task_id)
+        card_item = self._alm_get_task_by_identity(task['alm_fixed_title'])
         if card_item is None:
             return None
 
@@ -234,7 +235,7 @@ class MingleConnector(AlmConnector):
 
     def alm_add_task(self, task):
         task_id = self._extract_task_id(task['id'])
-        card_name = task['title']
+        card_name = task['alm_full_title']
         description = PUBLIC_TASK_CONTENT
 
         if not self.sync_titles_only:
@@ -250,7 +251,7 @@ class MingleConnector(AlmConnector):
             }
             headers, result = self.alm_plugin.call_api('%s/cards.xml' % self.project_uri, args=status_args,
                                                        method=URLRequest.POST)
-            logger.debug('Task %s added to Mingle Project' % task['id'])
+            logger.debug('Task %s added to Mingle Project' % task_id)
         except APIError, err:
             raise AlmException('Please check ALM-specific settings in config '
                                'file. Unable to add task %s because of %s' % (task['id'], err))
@@ -260,7 +261,7 @@ class MingleConnector(AlmConnector):
         if card_re:
             if not self.cached_cards:
                 self.cached_cards = {}
-            self.cached_cards[task_id] = card_re.group(1)
+            self.cached_cards[card_re.group(1)] = task['alm_full_title']
         else:
             raise AlmException('Alm task not added successfully for %s: could not find card number' % task['id'])
 
@@ -270,14 +271,14 @@ class MingleConnector(AlmConnector):
             raise AlmException('Alm task not added successfully for %s. Please '
                                'check ALM-specific settings in config file' % task['id'])
 
-        if (self.sde_plugin.config['alm_standard_workflow'] and
-                (task['status'] == 'DONE' or task['status'] == 'NA')):
+        if self.config['alm_standard_workflow'] and (task['status'] == 'DONE' or task['status'] == 'NA'):
             self.alm_update_task_status(alm_task, task['status'])
+
         return 'Project: %s, Card: %s' % (self.sde_plugin.config['alm_project'],
                                           alm_task.get_alm_id())
 
     def alm_update_task_status(self, task, status):
-        if not task or not self.sde_plugin.config['alm_standard_workflow']:
+        if not task:
             logger.debug('Status synchronization disabled')
             return
 

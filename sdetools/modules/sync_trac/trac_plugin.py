@@ -83,7 +83,6 @@ class TracConnector(AlmConnector):
             default='Ready for Analysis')
         config.opts.add('alm_done_statuses', 'Statuses that signify a task is Done in Trac',
             default='closed')
-        self.alm_task_title_prefix = 'SDE '
 
     def initialize(self):
         super(TracConnector, self).initialize()
@@ -91,8 +90,7 @@ class TracConnector(AlmConnector):
         #Verify that the configuration options are set properly
         self.config.process_list_config('alm_done_statuses')
 
-        if (not self.config['alm_done_statuses'] or
-            len(self.config['alm_done_statuses']) < 1):
+        if not self.config['alm_done_statuses']:
             raise UsageError('Missing alm_done_statuses in configuration')
 
         for action_type in ['alm_close_transition', 'alm_reopen_transition']:
@@ -131,9 +129,9 @@ class TracConnector(AlmConnector):
                     ' to trac: %s' % (str(err)))
 
         trac_ver = '?'
-        if(api_version[0] == 0):
+        if api_version[0] == 0:
             trac_ver = '0.10'
-        elif (api_version[0] == 1):
+        elif api_version[0] == 1:
             trac_ver = '0.11 or higher'
         logger.debug('Connected to Trac API %s v%s.%s' % (trac_ver, api_version[1], api_version[2]))
 
@@ -155,7 +153,7 @@ class TracConnector(AlmConnector):
         sde_id = self._extract_task_id(task['id'])
 
         # The colon is needed, otherwise for "T6" we match on "T6" and "T68"
-        qstr = 'summary^=%s%s:' % (self.alm_task_title_prefix, sde_id)
+        qstr = 'summary^=%s' % task['alm_fixed_title']
         task_list = self.alm_plugin.proxy.ticket.query(qstr)
         if not task_list:
             return None
@@ -173,10 +171,9 @@ class TracConnector(AlmConnector):
 
     def alm_add_task(self, task):
         sde_id = self._extract_task_id(task['id'])
-        title = '%s%s' % (self.alm_task_title_prefix, task['title'])
 
         alm_id = self.alm_plugin.proxy.ticket.create(
-            title,
+            task['alm_full_title'],
             self.sde_get_task_content(task),
             {
                 'status': self.config['alm_new_status'],
@@ -190,7 +187,7 @@ class TracConnector(AlmConnector):
         alm_task = self._get_trac_task_by_id(sde_id, alm_id)
 
         if (self.config['alm_standard_workflow'] and
-                (task['status']=='DONE' or task['status']=='NA')):
+                (task['status'] == 'DONE' or task['status'] == 'NA')):
             self.alm_update_task_status(alm_task, task['status'])
         return 'Milestone: %s, Ticket: %s' % (self.config['alm_project'], alm_id)
 
@@ -199,21 +196,19 @@ class TracConnector(AlmConnector):
 
         update_args = {
             'milestone': self.config['alm_project']
-            }
+        }
 
-        task_list = self.alm_plugin.proxy.ticket.update(task.get_alm_id(),
-                comment, update_args)
+        task_list = self.alm_plugin.proxy.ticket.update(task.get_alm_id(), comment, update_args)
         if not task_list:
             logger.error('Update failed for %s' % task.task_id)
             return None
 
-        logger.debug('Milestone changed to %s for ticket %s in Trac' %
-                (milestone, task.get_alm_id()))
+        logger.debug('Milestone changed to %s for ticket %s in Trac' % (milestone, task.get_alm_id()))
 
         self.alm_update_task_status(task, "TODO")
     
     def alm_update_task_status(self, task, status):
-        if not task or not self.config['alm_standard_workflow']:
+        if not task:
             logger.debug('Status synchronization disabled')
             return
 
@@ -225,12 +220,12 @@ class TracConnector(AlmConnector):
 
         action_set = self.alm_plugin.proxy.ticket.getActions(task.get_alm_id())
 
-        if status == 'DONE' or status=='NA':
+        if status == 'DONE' or status == 'NA':
             action_to_take, action_args = self.config['alm_close_transition']
         elif status == 'TODO':
             action_to_take, action_args = self.config['alm_reopen_transition']
         else:
-            raise AlmException('Invalid SD Elements state: %s' % (status))
+            raise AlmException('Invalid SD Elements state: %s' % status)
 
         action = None
         for entry in action_set:
@@ -245,17 +240,15 @@ class TracConnector(AlmConnector):
         update_args = {
             'action': action,
             'milestone': self.config['alm_project']
-            }
+        }
         update_args.update(action_args)
 
-        task_list = self.alm_plugin.proxy.ticket.update(task.get_alm_id(),
-                comment, update_args)
+        task_list = self.alm_plugin.proxy.ticket.update(task.get_alm_id(), comment, update_args)
         if not task_list:
             logger.error('Update failed for %s' % task.task_id)
             return None
 
-        logger.debug('Status changed to %s for ticket %s in Trac' %
-                (status, task.get_alm_id()))
+        logger.debug('Status changed to %s for ticket %s in Trac' % (status, task.get_alm_id()))
 
     def alm_disconnect(self):
         pass
