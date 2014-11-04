@@ -80,7 +80,7 @@ class AlmPluginLiveTestBase(object):
         self.connector.alm_connect()
 
     def test_alm_task_delete(self):
-        if not self.connector.alm_supports_delete():
+        if not self.connector.alm_supports_delete() or not self.connector.config['start_fresh']:
             return
 
         self.config['test_alm'] = ''
@@ -185,6 +185,7 @@ class AlmPluginLiveTestBase(object):
             ref = self.connector.alm_add_task(task)
             self.assertNotNone(ref)
             alm_task1 = self.connector.alm_get_task(task)
+        self.assertNotNone(alm_task1, 'Missing ALM task for %s' % task['id'])
 
         # Try to sync a similar task
         test_task['id'] = task_id
@@ -195,11 +196,12 @@ class AlmPluginLiveTestBase(object):
             ref = self.connector.alm_add_task(test_task)
             self.assertNotNone(ref)
             alm_task2 = self.connector.alm_get_task(test_task)
+        self.assertNotNone(alm_task2, 'Missing ALM task for %s' % test_task['id'])
 
         self.assertNotEqual(alm_task1.get_alm_id(), alm_task2.get_alm_id())
 
         # clean-up issues in the ALM
-        if not self.connector.alm_supports_delete():
+        if not self.connector.alm_supports_delete() or not self.connector.config['start_fresh']:
             return
 
         if alm_task1:
