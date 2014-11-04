@@ -39,8 +39,7 @@ class RationalResponseGenerator(ResponseGenerator):
                   'identity',
                   'resourceshape',
                   'priorities',
-                  'count',
-                  'workitem']:
+                  'count']:
             self.generator_add_resource(x, resource_data=self.get_json_from_file(x))
 
     """
@@ -91,16 +90,19 @@ class RationalResponseGenerator(ResponseGenerator):
 
     def get_count(self, target, flag, data, method):
         if not flag:
-            return RESPONSE_HEADERS, self.generator_get_all_resource('count')[0]
+            count = len(self.generator_get_all_resource('workitem'))
+            res = self.generator_get_all_resource('count')[0]
+            res['oslc:responseInfo']['oslc:totalCount'] = count
+            return RESPONSE_HEADERS, res
         else:
             self.raise_error('404')
 
     def update_workitem(self, target, flag, data, method):
         if not flag:
+            task_id = target.rsplit('/', 1)[1]
             if method == 'GET':
-                res = self.generator_get_all_resource('workitem')[0]
+                res = self.generator_get_resource('workitem', str(task_id))
             elif method == 'DELETE':
-                task_id = target.rsplit('/', 1)[1]
                 self.generator_remove_resource('workitem', task_id)
                 res = ''
             return RESPONSE_HEADERS, res
@@ -109,10 +111,8 @@ class RationalResponseGenerator(ResponseGenerator):
 
     def post_workitem(self, target, flag, data, method):
         if not flag:
-            res = self.generator_get_all_resource('workitem')[0]
-            for x in data:
-                res[x] = data[x]
-            self.generator_update_resource('workitem', '0', update_args=res)
+            res = self.generate_resource_from_template('workitem', data)
+            self.generator_add_resource('workitem', res['dcterms:identifier'], resource_data=res)
             return RESPONSE_HEADERS, res
         else:
             self.raise_error('404')

@@ -24,10 +24,8 @@ class PlugInExperience:
         self.api = sdeapi.APIBase(self.config)
         self.app_id = None
         self.prj_id = None
-        config.opts.add('sde_application', "SDE Application to use",
-            default='', group_name="SD Elements Connector")
-        config.opts.add('sde_project', "SDE Project to use",
-            default='', group_name="SD Elements Connector")
+        config.opts.add('sde_application', "SDE Application to use", default='', group_name="SD Elements Connector")
+        config.opts.add('sde_project', "SDE Project to use", default='', group_name="SD Elements Connector")
         self.connected = False
 
     def connect(self):
@@ -65,7 +63,7 @@ class PlugInExperience:
 
     def select_application(self):
         if not self.connected:
-             self.connect()
+            self.connect()
 
         filters = {}
         if self.config['sde_application']:
@@ -135,7 +133,7 @@ class PlugInExperience:
                 if not prj_list:
                     raise PluginError('Specified Project not found -> %s' % (self.config['sde_project']))
                 elif len(prj_list) == 1:
-                    return (sel_app_id, prj_list[0]['id'])
+                    return sel_app_id, prj_list[0]['id']
 
             if not self.config['interactive']:
                 raise PluginError('Missing Project (either use Interactive mode, or specify the exact name of an Project)')

@@ -62,7 +62,7 @@ class RallyTask(AlmTask):
         self.alm_task_ref = alm_task_ref
         self.status = status
         self.timestamp = timestamp
-        self.done_statuses = done_statuses #comma-separated list
+        self.done_statuses = done_statuses  # comma-separated list
 
     def get_task_id(self):
         return self.task_id
@@ -360,7 +360,7 @@ class RallyConnector(AlmConnector):
         card_type_details = self.card_types[self.config['rally_card_type']]
         task_id = self._extract_task_id(task['id'])
 
-        artifact_query = '(Name contains "%s:")' % task_id
+        artifact_query = '(Name contains "%s")' % task['alm_fixed_title']
 
         if card_type_details['type'] == 'Task':
             artifact_query = '(%s and (WorkProduct.FormattedID = "%s"))' % (
@@ -385,7 +385,7 @@ class RallyConnector(AlmConnector):
 
         create_args = {
             card_type_details['type']: {
-                'Name': task['title'],
+                'Name': task['alm_full_title'],
                 'Tags': [{'_ref': self.tag_ref}],
                 'Description': self.sde_get_task_content(task),
                 'Workspace': self.workspace_ref,
@@ -423,8 +423,6 @@ class RallyConnector(AlmConnector):
                 (task['status'] == 'DONE' or task['status'] == 'NA')):
             self.alm_update_task_status(alm_task, task['status'])
 
-        # Manually stitch the url of the new Rally task
-
         return 'Project: %s, %s: %s; URL: %s' % (
             self.config['alm_project'],
             card_type_details['name'],
@@ -439,11 +437,11 @@ class RallyConnector(AlmConnector):
             raise AlmException("Unable to delete task: %s" % err)
 
     def alm_update_task_status(self, task, status):
-        card_type_details = self.card_types[self.config['rally_card_type']]
-
-        if not task or not self.config['alm_standard_workflow']:
+        if not task:
             logger.debug('Status synchronization disabled')
             return
+
+        card_type_details = self.card_types[self.config['rally_card_type']]
 
         if status == 'DONE' or status == 'NA':
             schedule_state = self.config['rally_done_statuses'][0]

@@ -155,6 +155,9 @@ class ResponseGenerator(object):
         if _id in self.resources[resource_type]['resources']:
             self.resources[resource_type]['resources'].pop(_id)
 
+    def generator_clear_resource(self, resource_type):
+        self.resources[resource_type]['resources'] = {}
+
     def generator_resource_exists(self, resource_type, _id):
         self._check_resource_type_exists(resource_type)
         if _id == IntType:
@@ -204,9 +207,10 @@ class ResponseGenerator(object):
             # Support priority__gte filter on the SDE /api/tasks endpoint
             m = re.match(r"(\w+)__gte", key)
             if m:
-                value = task.get(m.group(1))
+                _task_value = int(task.get(m.group(1)))
                 if type(value) == ListType:
-                    _task_value = value[0]
+                    value = int(value[0])
+
                 return _task_value >= value
             else:
                 _task_value = task.get(key)

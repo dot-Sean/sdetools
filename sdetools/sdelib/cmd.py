@@ -1,5 +1,6 @@
 import commons
 
+
 class BaseCommand(object):
     cmd_name = None
     conf_syntax = ''

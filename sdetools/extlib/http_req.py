@@ -29,13 +29,14 @@ OS_ROOT_BUNDLES = [
     '/etc/pki/tls/certs/ca-bundle.crt',
     # openSUSE/SLE
     '/etc/ssl/ca-bundle.pem',
-    ]
+]
 
 CERT_PATH_NAME = os.path.join(commons.media_path, 'ssl')
 CA_CERTS_FILE = os.path.join(CERT_PATH_NAME, DEFAULT_ROOT_BUNDLE)
 DEFAULT_CUSTOM_CA_FILE = os.path.join(CERT_PATH_NAME, CUSTOM_ROOT_BUNDLE)
 
 custom_ca_file = DEFAULT_CUSTOM_CA_FILE
+
 
 def compile_certs():
     global CA_CERTS_FILE
@@ -85,6 +86,7 @@ def compile_certs():
     atexit.register(remove_file, crtfname)
     CA_CERTS_FILE = crtfname
 
+
 class ExtendedMethodRequest(urllib2.Request):
     GET = 'GET'
     HEAD = 'HEAD'
@@ -102,6 +104,7 @@ class ExtendedMethodRequest(urllib2.Request):
             return self.method
 
         return urllib2.Request.get_method(self)
+
 
 class ExtendedMethodHTTPRedirectHandler(urllib2.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
@@ -133,6 +136,7 @@ class ExtendedMethodHTTPRedirectHandler(urllib2.HTTPRedirectHandler):
         else:
             raise urllib2.HTTPError(req.get_full_url(), code, msg, headers, fp)
 
+
 class InvalidCertificateException(httplib.HTTPException, urllib2.URLError):
     def __init__(self, host, cert, reason):
         httplib.HTTPException.__init__(self)
@@ -143,6 +147,7 @@ class InvalidCertificateException(httplib.HTTPException, urllib2.URLError):
     def __str__(self):
         return ('Host %s returned an invalid certificate (%s) %s\n' %
                 (self.host, self.reason, self.cert))
+
 
 class CertValidatingHTTPSConnection(httplib.HTTPConnection):
     default_port = httplib.HTTPS_PORT
@@ -212,6 +217,7 @@ class VerifiedHTTPSHandler(urllib2.HTTPSHandler):
 
     https_request = urllib2.HTTPSHandler.do_request_
 
+
 def get_http_handler(mode, debuglevel=0):
     global ssl_warned
 
@@ -227,6 +233,7 @@ def get_http_handler(mode, debuglevel=0):
         else:
             return VerifiedHTTPSHandler(debuglevel=debuglevel, ca_certs=CA_CERTS_FILE)
     raise KeyError, mode
+
 
 def get_opener(method, server, proxy=None, debuglevel=0):
     handler = [get_http_handler(method, debuglevel)]

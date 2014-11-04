@@ -123,8 +123,7 @@ class JIRAConnector(AlmConnector):
         new_issue = self.alm_plugin.add_task(task, self.jira_issue_type_id, self.project_version)
         logger.info('Create new task in JIRA: %s' % new_issue['key'])
 
-        if (self.config['alm_standard_workflow'] and
-            (task['status'] == 'DONE' or task['status'] == 'NA')):
+        if self.config['alm_standard_workflow'] and (task['status'] == 'DONE' or task['status'] == 'NA'):
             alm_task = self.alm_get_task(task)
             self.alm_update_task_status(alm_task, task['status'])
 
@@ -134,12 +133,11 @@ class JIRAConnector(AlmConnector):
         return 'Issue %s, URL: %s' % (new_issue['key'], url)
 
     def alm_remove_task(self, task):
-
         self.alm_plugin.remove_task(task)
         logger.info('Removed task in JIRA: %s' % task.get_task_id())
 
     def alm_update_task_status(self, task, status):
-        if not task or not self.config['alm_standard_workflow']:
+        if not task:
             return
 
         alm_id = task.get_alm_id()

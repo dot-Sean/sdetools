@@ -6,7 +6,7 @@ from sdetools.sdelib.mod_mgr import ReturnChannel, load_modules
 from sdetools.sdelib.conf_mgr import Config
 from sdetools.sdelib.commons import abc, Error, get_directory_of_current_module, UsageError
 from sdetools.sdelib.testlib.mock_response import MOCK_ALM_RESPONSE, MOCK_SDE_RESPONSE
-from sdetools.alm_integration.alm_plugin_base import AlmException
+from sdetools.alm_integration.alm_plugin_base import AlmConnector, AlmException
 
 abstractmethod = abc.abstractmethod
 CONF_FILE_LOCATION = 'test_settings.conf'
@@ -86,6 +86,7 @@ class AlmPluginTestBase(object):
         # This test can be extended to verify the contents of task.
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         test_task_result = self.connector.alm_get_task(test_task)
         task_id = test_task_result.get_task_id()
@@ -110,6 +111,7 @@ class AlmPluginTestBase(object):
         # to call alm_connect() before proceeding
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         test_task_result = self.connector.alm_get_task(test_task)
 
@@ -236,6 +238,57 @@ class AlmPluginTestBase(object):
         except UsageError:
             pass
 
+    def test_alm_fixed_title(self):
+        task = {
+            'id': '1099-T12',
+            'title': 'T12: Sample Title'
+        }
+        config = {
+            'alm_context': 'Coffee',
+            'sde_application': 'Breakfast',
+            'sde_project': 'Sandwich',
+            'alm_title_format': '[$application ${project} $context] $task_id ${title}'
+        }
+        title = '[Breakfast Sandwich Coffee] T12:'
+        task_title = AlmConnector.get_alm_task_title(config, task, True)
+        self.assertEqual(title, task_title, 'Incorrect fixed alm title: %s' % task_title)
+
+    def test_alm_full_title(self):
+        task = {
+            'id': '1099-T12',
+            'title': 'T12: Sample Title'
+        }
+        config = {
+            'alm_context': 'Coffee',
+            'sde_application': 'Breakfast',
+            'sde_project': 'Sandwich',
+            'alm_title_format': '[$application ${project} $context] $task_id ${title}'
+        }
+        title = '[Breakfast Sandwich Coffee] T12: Sample Title'
+        task_title = AlmConnector.get_alm_task_title(config, task)
+        self.assertEqual(title, task_title, 'Incorrect full alm title: %s' % task_title)
+
+    def test_malformed_alm_title_format(self):
+        self.connector.config['alm_title_format'] = 'BAD'
+        exception_msg = 'Incorrect alm_title_format configuration'
+        self.assert_exception(AlmException, '', exception_msg, self.connector.initialize)
+
+    def test_missing_title_in_alm_title_format(self):
+        self.connector.config['alm_title_format'] = '${task_id}'
+        exception_msg = 'Incorrect alm_title_format configuration. Missing ${title}'
+        self.assert_exception(AlmException, '', exception_msg, self.connector.initialize)
+
+    def test_missing_task_id_in_alm_title_format(self):
+        self.connector.config['alm_title_format'] = '${title}'
+        exception_msg = 'Incorrect alm_title_format configuration. Missing ${task_id}'
+        self.assert_exception(AlmException, '', exception_msg, self.connector.initialize)
+
+    def test_missing_context_in_alm_title_format(self):
+        self.connector.config['alm_context'] = ''
+        self.connector.config['alm_title_format'] = '${context} ${task_id} ${title}'
+        exception_msg = 'Missing alm_context in configuration'
+        self.assert_exception(AlmException, '', exception_msg, self.connector.initialize)
+
     def test_sde_invalid_min_priority(self):
         self.connector.config['sde_min_priority'] = 'BAD'
         exception_msg = 'Incorrect sde_min_priority specified in configuration. Valid values are > 0 and <= 10'
@@ -251,6 +304,38 @@ class AlmPluginTestBase(object):
         exception_msg = 'Incorrect sde_min_priority specified in configuration. Valid values are > 0 and <= 10'
         self.assert_exception(AlmException, '', exception_msg, self.connector.initialize)
 
+    def test_tasks_filter(self):
+        self.connector.config['conflict_policy'] = 'sde'
+        self.connector.config['sde_min_priority'] = 7
+        self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
+        self.connector.sde_connect()
+        self.connector.alm_connect()
+
+        # clear out default tasks
+        self.mock_sde_response.clear_tasks()
+
+        self.mock_sde_response.generate_sde_task(priority=8, phase='requirements')
+        self.mock_sde_response.generate_sde_task(priority=7, phase='testing')
+        self.mock_sde_response.generate_sde_task(priority=7, phase='nothing')
+        self.mock_sde_response.generate_sde_task(priority=1, phase='nothing')
+        self.mock_sde_response.generate_sde_task(priority=6, phase='requirements')
+
+        tasks = self.connector.sde_get_tasks()
+        self.assertTrue(len(tasks) == 3, 'Expected 3 tasks')
+
+        for task in tasks:
+            self.assertTrue(task['priority'] >= self.connector.config['sde_min_priority'],
+                            'Task %s has an unexpected priority %d' % (task['id'], task['priority']))
+
+        tasks = self.connector.filter_tasks(tasks)
+        self.assertTrue(len(tasks) == 2, 'Expected 2 tasks')
+
+        for task in tasks:
+            self.assertTrue(task['priority'] >= self.connector.config['sde_min_priority'],
+                            'Task %s has unexpected priority %d' % (task['id'], task['priority']))
+            self.assertTrue(task['phase'] in self.config['alm_phases'],
+                            'Task %s has unexpected phase %s' % (task['id'], task['phase']))
+
     def test_update_existing_task_sde(self):
         # The plugin may initialize variables during alm_connect() so we need
         # to call alm_connect() before proceeding
@@ -258,17 +343,19 @@ class AlmPluginTestBase(object):
         self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.synchronize()
         alm_task = self.connector.alm_get_task(test_task)
+        self.assertNotNone(alm_task, 'Expected alm task to be generated')
         self.connector.alm_update_task_status(alm_task, 'DONE')
 
     def test_update_task_status_to_done(self):
         self.connector.config['conflict_policy'] = 'alm'
         self.connector.config['alm_phases'] = ['requirements', 'testing', 'development']
         self.connector.alm_connect()
-        # Most of the module test configurations set the minimum priority to be 8
-        # so we will create a task with this priority to make sure its in scope
-        test_task = self.mock_sde_response.generate_sde_task(priority=8)
+
+        test_task = self.mock_sde_response.generate_sde_task()
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         alm_task = self.connector.alm_get_task(test_task)
 
@@ -286,6 +373,7 @@ class AlmPluginTestBase(object):
     def test_update_task_status_to_na(self):
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         alm_task = self.connector.alm_get_task(test_task)
 
@@ -299,6 +387,7 @@ class AlmPluginTestBase(object):
     def test_update_task_status_to_todo(self):
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         test_task['status'] = 'DONE'
         self.connector.alm_add_task(test_task)
         alm_task = self.connector.alm_get_task(test_task)
@@ -317,11 +406,13 @@ class AlmPluginTestBase(object):
 
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         test_task_result = self.connector.alm_get_task(test_task)
         self.assertNotNone(test_task_result, 'Task added to ALM')
         self.connector.alm_remove_task(test_task_result)
         test_task_result = self.connector.alm_get_task(test_task)
+        self.assertEqual(test_task_result, None, 'Failed to remove task from ALM')
 
     def test_synchronize(self):
         # Verify no exceptions are thrown
@@ -342,6 +433,7 @@ class AlmPluginTestBase(object):
                 # This will invoke add, get and update task
                 self.connector.alm_connect()
                 test_task = self.mock_sde_response.generate_sde_task()
+                test_task = AlmConnector.add_alm_title(self.config, test_task)
                 test_task['status'] = 'DONE'
                 self.connector.alm_add_task(test_task)
                 self.connector.synchronize()
