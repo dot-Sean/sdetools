@@ -268,7 +268,7 @@ class AlmPluginTestBase(object):
         self.mock_sde_response.generate_sde_task(priority=6, tags=['four', 'five'])
 
         tasks = self.connector.sde_get_tasks()
-        self.assertTrue(len(tasks) == 5, 'Expected 3 tasks')
+        self.assertTrue(len(tasks) == 5, 'Expected 5 tasks')
 
         tasks = self.connector.filter_tasks(tasks)
         self.assertTrue(len(tasks) == 2, 'Expected 2 tasks')
