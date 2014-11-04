@@ -101,6 +101,8 @@ class AlmConnector(object):
                 default='TODO')
         self.config.opts.add('sde_min_priority', 'Minimum SDE priority in scope',
                 default='7')
+        self.config.opts.add('sde_tags_filter', 'Filter project tasks by tag (tag1, tag2)',
+                default='')
         self.config.opts.add('how_tos_in_scope', 'Whether or not HowTos should be included',
                 default='False')
         self.config.opts.add('selected_tasks', 'Optionally limit the sync to certain tasks '
@@ -158,6 +160,8 @@ class AlmConnector(object):
             for status in self.config['sde_statuses_in_scope']:
                 if status not in AlmConnector.STANDARD_STATUS_LIST:
                     raise AlmException('Invalid status specified in sde_statuses_in_scope')
+
+            self.config.process_list_config('sde_tags_filter')
 
         if (not self.config['conflict_policy'] or
             not (self.config['conflict_policy'] == 'alm' or
@@ -489,8 +493,14 @@ class AlmConnector(object):
         tid = self._extract_task_id(task['id'])
         if self.config['selected_tasks']:
             return tid in self.config['selected_tasks']
-        return (task['phase'] in self.config['alm_phases'] and
-                task['priority'] >= self.config['sde_min_priority'])
+
+        in_scope = (task['phase'] in self.config['alm_phases'] and
+                    task['priority'] >= self.config['sde_min_priority'])
+
+        if self.config['sde_tags_filter']:
+            in_scope = set(self.config['sde_tags_filter']).issubset(task['tags'])
+
+        return in_scope
 
     def sde_update_task_status(self, task, status):
         """ Updates the status of the given task in SD Elements

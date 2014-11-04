@@ -210,7 +210,6 @@ class ResponseGenerator(object):
                 _task_value = int(task.get(m.group(1)))
                 if type(value) == ListType:
                     value = int(value[0])
-
                 return _task_value >= value
             else:
                 _task_value = task.get(key)
