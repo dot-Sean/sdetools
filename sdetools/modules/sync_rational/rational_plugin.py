@@ -55,12 +55,7 @@ class RationalAPI(RESTBase):
 
     def parse_error(self, result):
         result = json.loads(result)
-        if 'oslc:message' in result:
-            return result['oslc:message']
-        else:
-            return result
-
-        return error_msg
+        return result['oslc:message'] if 'oslc:message' in result else result
 
     def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}, auth_mode=None):
         call_headers['Accept'] = 'application/json'
