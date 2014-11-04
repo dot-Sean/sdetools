@@ -117,8 +117,5 @@ class MockSDEResponse(MockResponse):
     def clear_tasks(self):
         return self.get_response_generator().generator_clear_resource('task')
 
-    def clear_tasks(self):
-        return self.get_response_generator().generator_clear_resource('task')
-
 MOCK_ALM_RESPONSE = MockResponse()
 MOCK_SDE_RESPONSE = MockSDEResponse()

@@ -183,6 +183,7 @@ class AlmPluginLiveTestBase(object):
         alm_task1 = self.connector.alm_get_task(task)
         if not alm_task1:
             ref = self.connector.alm_add_task(task)
+            self.assertNotNone(ref)
             alm_task1 = self.connector.alm_get_task(task)
 
         # Try to sync a similar task
@@ -192,6 +193,7 @@ class AlmPluginLiveTestBase(object):
         alm_task2 = self.connector.alm_get_task(test_task)
         if not alm_task2:
             ref = self.connector.alm_add_task(test_task)
+            self.assertNotNone(ref)
             alm_task2 = self.connector.alm_get_task(test_task)
 
         self.assertNotEqual(alm_task1.get_alm_id(), alm_task2.get_alm_id())
