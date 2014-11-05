@@ -97,9 +97,13 @@ class AlmPluginLiveTestBase(object):
             return
 
         test_task = filtered_tasks[0]
-        self.connector.alm_add_task(test_task)
         alm_task1 = self.connector.alm_get_task(test_task)
+        if not alm_task1:
+            ref = self.connector.alm_add_task(test_task)
+            self.assertNotNone(ref, 'Could not create ALM issue for %s' % test_task['id'])
+            alm_task1 = self.connector.alm_get_task(test_task)
         self.assertNotNone(alm_task1, 'Missing Alm task for %s' % test_task['id'])
+
         self.connector.alm_remove_task(alm_task1)
         alm_task2 = self.connector.alm_get_task(test_task)
         if alm_task2:
@@ -231,8 +235,10 @@ class AlmPluginLiveTestBase(object):
 
         for task in filtered_tasks:
             # Find the corresponding scenario1 alm task
-            scenario_options['alm_title_format'] = scenario1_alm_title_format
-            self._update_config(scenario_options)
+
+            # setup the alm_title_format and initialize everything
+            self.connector.config['alm_title_format'] = scenario1_alm_title_format
+
             scenario1_task = AlmConnector.add_alm_title(self.connector.config, task.copy())
             scenario1_alm_task = self.connector.alm_get_task(scenario1_task)
             if not scenario1_alm_task:
@@ -243,8 +249,10 @@ class AlmPluginLiveTestBase(object):
                                scenario1_task['alm_full_title'])
 
             # Find the corresponding scenario2 alm task
-            scenario_options['alm_title_format'] = scenario2_alm_title_format
-            self._update_config(scenario_options)
+
+            # setup the alm_title_format and initialize everything
+            self.connector.config['alm_title_format'] = scenario2_alm_title_format
+
             scenario2_task = AlmConnector.add_alm_title(self.connector.config, task.copy())
             scenario2_alm_task = self.connector.alm_get_task(scenario2_task)
             if not scenario2_alm_task:
@@ -252,7 +260,7 @@ class AlmPluginLiveTestBase(object):
                 self.assertNotNone(ref, 'Could not add issue to ALM for %s' % scenario2_task['id'])
                 scenario2_alm_task = self.connector.alm_get_task(scenario2_task)
             self.assertNotNone(scenario2_alm_task, 'Could not retrieve ALM issue with title: %s' %
-                               scenario1_task['alm_full_title'])
+                               scenario2_task['alm_full_title'])
 
             # Check that these alm tasks are distinct for the same sde task
             self.assertNotEqual(scenario1_alm_task.get_alm_id(), scenario2_alm_task.get_alm_id())
