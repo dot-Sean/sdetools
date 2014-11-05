@@ -118,19 +118,10 @@ class JIRARestAPI(RESTBase):
     def get_subtask_issue_types(self):
         return self.get_issue_types()
 
-    @staticmethod
-    def _clean_summary(text):
-        """
-        [ ] are special characters that need to be escaped
-        """
-        text = text.replace('[', '\\\\[')
-        return text.replace(']', '\\\\]')
-
     def get_task(self, task, task_id):
-        alm_identity = self._clean_summary(task['alm_fixed_title'])
         try:
-            url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s\'' % (
-                    self.config['alm_project'], self.urlencode_str(alm_identity))
+            url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~"\\"%s\\""' % \
+                  (self.config['alm_project'], self.urlencode_str(task['alm_fixed_title']))
             result = self.call_api(url)
         except APIError, error:
             raise AlmException("Unable to get task %s from JIRA. %s" % (task_id, error))
