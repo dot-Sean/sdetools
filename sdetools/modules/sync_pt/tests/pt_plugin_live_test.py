@@ -10,3 +10,9 @@ class TestPivotalTrackerLiveCase(AlmPluginLiveTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(self):
         super(TestPivotalTrackerLiveCase, self).setUpClass(PivotalTrackerConnector, PivotalTrackerAPI)
+
+    def test_synchronize_similar_tasks(self):
+        pass
+
+    def test_custom_titles(self):
+        pass

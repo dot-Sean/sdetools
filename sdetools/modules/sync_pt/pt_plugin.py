@@ -210,7 +210,7 @@ class PivotalTrackerConnector(AlmConnector):
         """
         There is a  bug in Pivotal Tracker where you cannot search for text with - characters
         """
-        return text.replace('-', ' ')
+        return text.replace('-', '.')
 
     def alm_get_task(self, task):
         task_id = self._extract_task_id(task['id'])
