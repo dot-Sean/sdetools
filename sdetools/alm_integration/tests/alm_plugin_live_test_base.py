@@ -80,7 +80,7 @@ class AlmPluginLiveTestBase(object):
         self.connector.alm_connect()
 
     def test_alm_task_delete(self):
-        if not self.connector.alm_supports_delete() or not self.connector.config['start_fresh']:
+        if not self.connector.alm_supports_delete() or not self.config['start_fresh']:
             return
 
         self.config['test_alm'] = ''
@@ -183,7 +183,7 @@ class AlmPluginLiveTestBase(object):
         alm_task1 = self.connector.alm_get_task(task)
         if not alm_task1:
             ref = self.connector.alm_add_task(task)
-            self.assertNotNone(ref)
+            self.assertNotNone(ref, 'Could not add issue to ALM for %s' % task['id'])
             alm_task1 = self.connector.alm_get_task(task)
         self.assertNotNone(alm_task1, 'Missing ALM task for %s' % task['id'])
 
@@ -194,7 +194,7 @@ class AlmPluginLiveTestBase(object):
         alm_task2 = self.connector.alm_get_task(test_task)
         if not alm_task2:
             ref = self.connector.alm_add_task(test_task)
-            self.assertNotNone(ref)
+            self.assertNotNone(ref, 'Could not add issue to ALM for %s' % test_task['id'])
             alm_task2 = self.connector.alm_get_task(test_task)
         self.assertNotNone(alm_task2, 'Missing ALM task for %s' % test_task['id'])
 
@@ -222,7 +222,8 @@ class AlmPluginLiveTestBase(object):
 
         self._update_config(scenario_options)
         self.connector.initialize()
-        self.connector.alm_connect_server()
+        self.connector.sde_connect()
+        self.connector.alm_connect()
 
         tasks = self.connector.sde_get_tasks()
         filtered_tasks = self.connector.filter_tasks(tasks)
