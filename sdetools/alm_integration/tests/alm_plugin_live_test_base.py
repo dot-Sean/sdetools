@@ -80,13 +80,14 @@ class AlmPluginLiveTestBase(object):
         self.connector.alm_connect()
 
     def test_alm_task_delete(self):
+        self.config['test_alm'] = ''
+        self.connector.config = self.config
+        self.connector.initialize()
+
         if not self.connector.alm_supports_delete() or not self.config['start_fresh']:
             return
 
-        self.config['test_alm'] = ''
-        self.connector.config = self.config
         self.connector.config['start_fresh'] = True
-        self.connector.initialize()
         self.connector.sde_connect()
         self.connector.alm_connect()
         tasks = self.connector.sde_get_tasks()
