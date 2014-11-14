@@ -211,6 +211,8 @@ class JIRARestAPI(RESTBase):
 
             if mapped_field['schema']['type'] == 'array' and mapped_field['schema']['items'] == 'string':
                 args['fields'][field_id] = [{'value': custom_field_value}]
+            if mapped_field['schema']['type'] == 'array' and mapped_field['schema']['items'] == 'component':
+                args['fields'][field_id] = [{'name': custom_field_value}]
             elif mapped_field['schema']['type'] == 'string':
                 if 'allowedValues' in mapped_field:
                     args['fields'][field_id] = {'value': custom_field_value}
