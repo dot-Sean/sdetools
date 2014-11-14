@@ -92,9 +92,9 @@ class JIRAConnector(AlmConnector):
         if self.config['alm_project_version'] and not self.project_version:
             raise AlmException('Version %s not found in the project' % (self.config['alm_project_version']))
 
+    def alm_validate_configurations(self):
         self.alm_plugin.setup_fields(self.jira_issue_type_id)
 
-    def alm_validate_configurations(self):
         missing_priorities = []
         pmap = self.config[self.ALM_PRIORITY_MAP]
         for key, priority_name in pmap.iteritems():
