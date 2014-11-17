@@ -253,8 +253,11 @@ class JIRASoapAPI:
         if not selected_priority:
             raise AlmException('Unable to find priority %s' % task['alm_priority'])
 
+        # collect task tags
+        tags = [self.config['alm_issue_label']] + task['tags']
+
         updates = []
-        updates.append({'id': 'labels', 'values': ['SD-Elements']})
+        updates.append({'id': 'labels', 'values': tags})
                 
         if project_version:
             updates.append({'id': 'versions', 'values': [project_version['id']]})

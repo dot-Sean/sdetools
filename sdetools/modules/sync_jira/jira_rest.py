@@ -182,6 +182,10 @@ class JIRARestAPI(RESTBase):
                 },
             }
         }
+
+        # collect task tags
+        tags = [self.config['alm_issue_label']] + task['tags']
+
         if self.has_field('description'):
             args['fields']['description'] = task['formatted_content']
 
@@ -189,7 +193,7 @@ class JIRARestAPI(RESTBase):
             args['fields']['reporter'] = {'name': self.config['alm_user']}
 
         if self.has_field('labels'):
-            args['fields']['labels'] = ['SD-Elements']
+            args['fields']['labels'] = tags
 
         if self.has_field('priority'):
             args['fields']['priority'] = {'name': task['alm_priority']}

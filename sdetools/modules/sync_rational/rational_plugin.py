@@ -367,11 +367,15 @@ class RationalConnector(AlmConnector):
         priority_name = self.translate_priority(task['priority'])
         priority_literal_resource = self._get_priority_literal(priority_name)
 
+        tags = self.config['alm_issue_label']
+        if task['tags']:
+            tags += ' ' + ' '.join(task['tags'])
+
         create_args = {
             'dcterms:title': task['alm_full_title'],
             'dcterms:description': self.sde_get_task_content(task),
             'oslc_cmx:priority': priority_literal_resource,
-            'dcterms:subject': self.config['alm_issue_label'],
+            'dcterms:subject': tags,
         }
 
         if (self.config['alm_standard_workflow'] and
