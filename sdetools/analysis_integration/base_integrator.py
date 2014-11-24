@@ -186,7 +186,7 @@ class BaseXMLImporter(BaseImporter):
 class BaseIntegrator(object):
     TOOL_NAME = 'External tool'
     VALID_IMPORT_BEHAVIOUR = ['replace', 'replace-scanner', 'combine']
-    VALID_VERIFICATION = ['pass', 'partial', 'failed']
+    VALID_VERIFICATION_MAP = {'pass': ['TODO', 'DONE'], 'partial': ['TODO', 'DONE'], 'fail': ['TODO']}
 
     def __init__(self, config, tool_name, supported_file_types=[], default_mapping_file=None):
         self.findings = []
@@ -219,7 +219,7 @@ class BaseIntegrator(object):
                 "One of the following: %s" % ', '.join(BaseIntegrator.VALID_IMPORT_BEHAVIOUR),
                 default="replace")
         self.config.opts.add('automatic_status_update', 'Update task status based on verification. Provide a mapping of'
-                ' (%s) to a task status (JSON encoded dictionary of strings)' % ', '.join(self.VALID_VERIFICATION),
+                ' (%s) to a task status (JSON encoded dictionary of strings)' % ', '.join(self.VALID_VERIFICATION_MAP.keys()),
                 default='')
         self.config.opts.add("flaws_only", "Only update tasks identified having flaws. (True | False)", "z", "False")
         self.config.opts.add("trial_run", "Trial run only: (True | False)", "t", "False")
@@ -243,20 +243,16 @@ class BaseIntegrator(object):
             # Get the available system task statuses and their meanings
             self._setup_taskstatuses()
             for verification, status_name in self.config['automatic_status_update'].iteritems():
+                if verification not in self.VALID_VERIFICATION_MAP:
+                    raise UsageError('Invalid automatic_status_update verification %s' % verification)
+
                 if status_name not in self.taskstatuses:
-                    raise UsageError('Invalid automatic_status_update status "%s" for verification: %s' %
+                    raise UsageError('Invalid automatic_status_update status "%s" for verification "%s"' %
                                      (status_name, verification))
 
-                if verification == 'pass' or verification == 'partial':
-                    if self.taskstatuses[status_name]['meaning'] not in ['TODO', 'DONE']:
-                        raise UsageError('Unexpected automatic_status_update status "%s" for verification: %s' %
+                if self.taskstatuses[status_name]['meaning'] not in self.VALID_VERIFICATION_MAP[verification]:
+                        raise UsageError('Unexpected automatic_status_update status "%s" for verification "%s"' %
                                          (status_name, verification))
-                elif verification == 'failed':
-                    if self.taskstatuses[status_name]['meaning'] not in ['TODO']:
-                        raise UsageError('Unexpected automatic_status_update status "%s" for verification: %s' %
-                                         (status_name, verification))
-                else:
-                    raise UsageError('Invalid automatic_status_update verification: %s' % verification)
 
         # Validate the report_type config. If report_type is not auto, we will process only
         # the specified report_type, else we process all supported file types.
@@ -270,9 +266,7 @@ class BaseIntegrator(object):
 
     def _setup_taskstatuses(self):
         statuses = self.plugin.get_taskstatuses()
-        print statuses
         for status in statuses['taskstatuses']:
-            print status
             self.taskstatuses[status['slug']] = status
 
     @staticmethod
