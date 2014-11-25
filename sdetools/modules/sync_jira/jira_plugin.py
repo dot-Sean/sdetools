@@ -38,6 +38,8 @@ class JIRAConnector(AlmConnector):
                 default='')
         config.opts.add('alm_parent_issue', 'Create sub-tasks under this issue',
                 default='')
+        config.opts.add('alm_issue_label', 'Label applied to issue in JIRA',
+                default='SD-Elements')
         self.jira_issue_type_id = None
         self.project_version = None
         self.transition_id = {

@@ -102,6 +102,13 @@ class RallyConnector(AlmConnector):
         config.opts.add('alm_issue_label', 'Label applied to issue in Rally', default='SD-Elements')
         config.opts.add('alm_parent_issue', 'Parent Story for new Tasks', default='')
 
+        self.tag_references = {}
+        self.project_ref = None
+        self.workspace_ref = None
+        self.alm_parent_issue_ref = None
+        self.tag_ref = None
+        self.mark_down_converter = markdown.Markdown(safe_mode="escape")
+
     def initialize(self):
         super(RallyConnector, self).initialize()
 
@@ -145,13 +152,6 @@ class RallyConnector(AlmConnector):
             raise AlmException('Option alm_parent_issue is only valid if rally_card_type is Task')
         if self.config['rally_card_type'] == 'Task' and not self.config['alm_parent_issue']:
             raise AlmException('Missing alm_parent_issue in configuration')
-
-        self.project_ref = None
-        self.workspace_ref = None
-        self.alm_parent_issue_ref = None
-        self.tag_ref = None
-
-        self.mark_down_converter = markdown.Markdown(safe_mode="escape")
 
     def carriage_return(self):
         return '<br//>'
@@ -209,13 +209,11 @@ class RallyConnector(AlmConnector):
             raise AlmException('Rally project not found: %s' % self.config['alm_project'])
         self.project_ref = project_ref['QueryResult']['Results'][0]['_ref']
 
-        self._setup_rally_label()
-
-    def _setup_rally_label(self):
+    def _setup_rally_label(self, tag_name):
 
         # Find the issue tag
         query_args = {
-            'query': '(Name = \"%s\")' % self.config['alm_issue_label'],
+            'query': '(Name = \"%s\")' % tag_name,
             'workspace': self.workspace_ref,
         }
         try:
@@ -225,12 +223,12 @@ class RallyConnector(AlmConnector):
 
         num_results = tag_result['QueryResult']['TotalResultCount']
         if num_results:
-            self.tag_ref = tag_result['QueryResult']['Results'][0]['_ref']
+            self.tag_references[tag_name] = tag_result['QueryResult']['Results'][0]['_ref']
             return
 
         create_args = {
             'Tag': {
-                'Name': self.config['alm_issue_label'],
+                'Name': tag_name,
                 'Workspace': self.workspace_ref,
             }
         }
@@ -245,9 +243,9 @@ class RallyConnector(AlmConnector):
 
         if tag_result['CreateResult']['Errors']:
             raise AlmException('Unable to add label "%s" to Rally. Reason: %s' %
-                              (self.config['alm_issue_label'], str(tag_result['CreateResult']['Errors'])[:200]))
+                              (tag_name, str(tag_result['CreateResult']['Errors'])[:200]))
 
-        self.tag_ref = tag_result['CreateResult']['Object']['_ref']
+        self.tag_references[tag_name] = tag_result['CreateResult']['Object']['_ref']
 
     def alm_validate_configurations(self):
 
@@ -332,17 +330,27 @@ class RallyConnector(AlmConnector):
             raise AlmException('Unable to get artifact from Rally. Reason: %s' % (str(err)))
         return task_data[artifact_type]
 
-    def _apply_label_if_needed(self, artifact_data):
+    def _apply_labels_if_needed(self, labels, artifact_data):
         if 'Tags' not in artifact_data:
             artifact_data['Tags'] = []
 
+        # Determine which tags are missing
         for tag in artifact_data['Tags']:
-            if '_refObjectName' in tag and tag['_refObjectName'] == self.config['alm_issue_label']:
-                return
+            if '_refObjectName' in tag and tag['_refObjectName'] in labels:
+                labels.remove(tag['_refObjectName'])
+
+        # The Rally artifact is assigned all tags
+        if not labels:
+            return
 
         card_type_details = self.card_types[self.config['rally_card_type']]
 
-        artifact_data['Tags'].append({'_ref': self.tag_ref})
+        # Get or create the missing tags if needed
+        for tag_name in labels:
+            if tag_name not in self.tag_references:
+                self._setup_rally_label(tag_name)
+            artifact_data['Tags'].append({'_ref': self.tag_references[tag_name]})
+
         tag_update = {
             card_type_details['type']: {
                 'Tags': artifact_data['Tags'],
@@ -354,7 +362,7 @@ class RallyConnector(AlmConnector):
             self.alm_plugin.call_api(artifact_id, args=tag_update, method=self.alm_plugin.URLRequest.POST)
         except APIError, err:
             raise AlmException('Unable to update tag %s for artifact %s in Rally because of %s' %
-                               (self.config['alm_issue_label'], artifact_data['FormattedID'], err))
+                               (tag_name, artifact_data['FormattedID'], err))
 
     def alm_get_task(self, task):
         card_type_details = self.card_types[self.config['rally_card_type']]
@@ -371,7 +379,9 @@ class RallyConnector(AlmConnector):
         if not task_data:
             return task_data
 
-        self._apply_label_if_needed(task_data)
+        # Make sure the artifact has all the applicable labels
+        tags = [self.config['alm_issue_label']] + task['tags']
+        self._apply_labels_if_needed(tags, task_data)
 
         return RallyTask(task_id,
                          task_data['FormattedID'],
@@ -386,15 +396,26 @@ class RallyConnector(AlmConnector):
         create_args = {
             card_type_details['type']: {
                 'Name': task['alm_full_title'],
-                'Tags': [{'_ref': self.tag_ref}],
                 'Description': self.sde_get_task_content(task),
                 'Workspace': self.workspace_ref,
                 'Project': self.project_ref
             }
         }
+
+        # Setup labels
+        create_args[card_type_details['type']]['Tags'] = []
+
+        labels = [self.config['alm_issue_label']] + task['tags']
+        for label in labels:
+            if label not in self.tag_references:
+                self._setup_rally_label(label)
+            create_args[card_type_details['type']]['Tags'].append({'_ref': self.tag_references[label]})
+
+        # Setup parent issue if applicable
         if card_type_details['type'] == 'Task':
             create_args[card_type_details['type']]['WorkProduct'] = self.alm_parent_issue_ref
 
+        # Setup custom fields if necessary
         if self.config['alm_custom_fields']:
             for key in self.config['alm_custom_fields']:
                 create_args[card_type_details['type']][key] = self.config['alm_custom_fields'][key]
