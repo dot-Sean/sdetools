@@ -527,7 +527,7 @@ class AlmConnector(object):
                                'to the server, or the status was invalid')
         logger.info('Status for task %s successfully set in SD Elements' % task['id'])
 
-        note_msg = 'Task status changed via %s' % self.alm_name
+        note_msg = 'Task status changed to %s via %s' % (status, self.alm_name)
         try:
             self._add_note(task['id'], note_msg, '', status)
         except APIError, err:

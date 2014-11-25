@@ -116,13 +116,15 @@ class ExtAPI(restclient.RESTBase):
         args.update(filters)
         return self.call_api(end_point, args=args, call_headers=_encode_options(options))
 
-    def add_analysis_note(self, task, analysis_ref, confidence, findings, behaviour):
+    def add_analysis_note(self, task, analysis_ref, confidence, findings, behaviour, task_status_mapping):
         note = {
             'task': task,
             'project_analysis_note': analysis_ref,
             'confidence': confidence,
             'findings': findings,
             'behaviour': behaviour}
+        if task_status_mapping:
+            note['task_status_mapping'] = task_status_mapping
         return self.call_api('tasknotes/analysis', self.URLRequest.POST, args=note)
 
     def add_project_analysis_note(self, project_id, analysis_ref, analysis_type):
@@ -140,6 +142,12 @@ class ExtAPI(restclient.RESTBase):
         #TODO: regular expression on task and status for validation
         result = self.call_api('tasks/%s' % task, self.URLRequest.PUT, args={'status': status})
         return result['status']
+
+    def get_taskstatuses(self, options={}, **filters):
+        """
+        Get all statuses for an organization
+        """
+        return self.call_api('taskstatuses', args=filters, call_headers=_encode_options(options))
 
     def get_phases(self, options={}, **filters):
         """

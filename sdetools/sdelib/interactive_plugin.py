@@ -166,8 +166,13 @@ class PlugInExperience:
         return self.api.add_project_analysis_note(self.prj_id, analysis_ref, analysis_type)
 
     @_verify_connect
-    def add_analysis_note(self, task_id, analysis_ref, confidence, findings, behaviour):
-        return self.api.add_analysis_note("%d-%s" % (self.prj_id, task_id), analysis_ref, confidence, findings, behaviour)
+    def add_analysis_note(self, task_id, analysis_ref, confidence, findings, behaviour, task_status_mapping=None):
+        return self.api.add_analysis_note("%d-%s" % (self.prj_id, task_id),
+                                          analysis_ref, confidence, findings, behaviour, task_status_mapping)
+
+    @_verify_connect
+    def get_taskstatuses(self):
+        return self.api.get_taskstatuses()
 
     @_verify_connect
     def get_phases(self):

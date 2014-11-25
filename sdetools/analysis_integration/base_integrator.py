@@ -187,6 +187,9 @@ class BaseIntegrator(object):
     TOOL_NAME = 'External tool'
     VALID_IMPORT_BEHAVIOUR = ['replace', 'replace-scanner', 'combine']
 
+    # An internal map of possible verification and acceptable status meanings
+    VALID_VERIFICATION_MAP = {'pass': ['TODO', 'DONE'], 'partial': ['TODO', 'DONE'], 'fail': ['TODO']}
+
     def __init__(self, config, tool_name, supported_file_types=[], default_mapping_file=None):
         self.findings = []
         self.phase_exceptions = ['testing']
@@ -194,8 +197,10 @@ class BaseIntegrator(object):
         self.report_id = "Not specified"
         self.config = config
         self.emit = self.config.emit
+        self.behaviour = 'replace'
         self.weakness_title = {}
         self.confidence = {}
+        self.taskstatuses = {}
         self.plugin = PlugInExperience(self.config)
         self.supported_file_types = supported_file_types
 
@@ -216,6 +221,10 @@ class BaseIntegrator(object):
                 "import_behaviour",
                 "One of the following: %s" % ', '.join(BaseIntegrator.VALID_IMPORT_BEHAVIOUR),
                 default="replace")
+        self.config.opts.add('task_status_mapping',
+                'Update task status based on verification. Provide a mapping of (%s) to a task status slug'
+                '(JSON encoded dictionary of strings)' % ', '.join(self.VALID_VERIFICATION_MAP.keys()),
+                default='')
         self.config.opts.add("flaws_only", "Only update tasks identified having flaws. (True | False)", "z", "False")
         self.config.opts.add("trial_run", "Trial run only: (True | False)", "t", "False")
 
@@ -227,11 +236,32 @@ class BaseIntegrator(object):
         """
         self.config.process_boolean_config('flaws_only')
         self.config.process_boolean_config('trial_run')
+        self.config.process_json_str_dict('task_status_mapping')
 
         if self.config['import_behaviour'] in BaseIntegrator.VALID_IMPORT_BEHAVIOUR:
             self.behaviour = self.config['import_behaviour']
         else:
             raise UsageError('Invalid import_behaviour %s' % self.config['import_behaviour'])
+
+        if self.config['task_status_mapping']:
+            # Get the available system task statuses and their meanings
+            self._setup_taskstatuses()
+
+            # Validate the mapping against the available system statuses
+            # Sanity check the mapping
+            #     - pass, partial may mark tasks with a status having meaning TODO or DONE only
+            #     - fail may mark tasks with a status having meaning TODO only.
+            for verification, status_name in self.config['task_status_mapping'].iteritems():
+                if verification not in self.VALID_VERIFICATION_MAP:
+                    raise UsageError('Invalid task_status_mapping verification %s' % verification)
+
+                if status_name not in self.taskstatuses:
+                    raise UsageError('Invalid task_status_mapping status "%s" for verification "%s"' %
+                                     (status_name, verification))
+
+                if self.taskstatuses[status_name]['meaning'] not in self.VALID_VERIFICATION_MAP[verification]:
+                        raise UsageError('Unexpected task_status_mapping status "%s" for verification "%s"' %
+                                         (status_name, verification))
 
         # Validate the report_type config. If report_type is not auto, we will process only
         # the specified report_type, else we process all supported file types.
@@ -242,6 +272,11 @@ class BaseIntegrator(object):
                 raise UsageError('Invalid report_type %s' % self.config['report_type'])
 
             self.process_report_file_config()
+
+    def _setup_taskstatuses(self):
+        statuses = self.plugin.get_taskstatuses()
+        for status in statuses['taskstatuses']:
+            self.taskstatuses[status['slug']] = status
 
     @staticmethod
     def _get_file_extension(file_path):
@@ -505,7 +540,7 @@ class BaseIntegrator(object):
 
                 if not self.config['trial_run']:
                     ret = self.plugin.add_analysis_note(task_name, project_analysis_note_ref,
-                            finding_confidence, analysis_findings, self.behaviour)
+                            finding_confidence, analysis_findings, self.behaviour, self.config['task_status_mapping'])
                 logger.debug("Marked %s as FAILURE with %s confidence" % (task_name, finding_confidence))
                 stats_failures_added += 1
             except APIError, e:
@@ -546,7 +581,8 @@ class BaseIntegrator(object):
                         analysis_findings = []
 
                         self.plugin.add_analysis_note(task_name, project_analysis_note_ref,
-                                finding_confidence, analysis_findings, self.behaviour)
+                                finding_confidence, analysis_findings, self.behaviour,
+                                self.config['task_status_mapping'])
                     logger.info("Marked %s as PASS with %s confidence" % (task_name, finding_confidence))
                     stats_passes_added += 1
                 except APIError, e:
