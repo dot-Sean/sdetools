@@ -116,15 +116,15 @@ class ExtAPI(restclient.RESTBase):
         args.update(filters)
         return self.call_api(end_point, args=args, call_headers=_encode_options(options))
 
-    def add_analysis_note(self, task, analysis_ref, confidence, findings, behaviour, automatic_status_update):
+    def add_analysis_note(self, task, analysis_ref, confidence, findings, behaviour, task_status_mapping):
         note = {
             'task': task,
             'project_analysis_note': analysis_ref,
             'confidence': confidence,
             'findings': findings,
             'behaviour': behaviour}
-        if automatic_status_update:
-            note['automatic_status_update'] = automatic_status_update
+        if task_status_mapping:
+            note['task_status_mapping'] = task_status_mapping
         return self.call_api('tasknotes/analysis', self.URLRequest.POST, args=note)
 
     def add_project_analysis_note(self, project_id, analysis_ref, analysis_type):

@@ -218,7 +218,7 @@ class BaseIntegrator(object):
                 "import_behaviour",
                 "One of the following: %s" % ', '.join(BaseIntegrator.VALID_IMPORT_BEHAVIOUR),
                 default="replace")
-        self.config.opts.add('automatic_status_update', 'Update task status based on verification. Provide a mapping of'
+        self.config.opts.add('task_status_mapping', 'Update task status based on verification. Provide a mapping of'
                 ' (%s) to a task status (JSON encoded dictionary of strings)' % ', '.join(self.VALID_VERIFICATION_MAP.keys()),
                 default='')
         self.config.opts.add("flaws_only", "Only update tasks identified having flaws. (True | False)", "z", "False")
@@ -232,26 +232,26 @@ class BaseIntegrator(object):
         """
         self.config.process_boolean_config('flaws_only')
         self.config.process_boolean_config('trial_run')
-        self.config.process_json_str_dict('automatic_status_update')
+        self.config.process_json_str_dict('task_status_mapping')
 
         if self.config['import_behaviour'] in BaseIntegrator.VALID_IMPORT_BEHAVIOUR:
             self.behaviour = self.config['import_behaviour']
         else:
             raise UsageError('Invalid import_behaviour %s' % self.config['import_behaviour'])
 
-        if self.config['automatic_status_update']:
+        if self.config['task_status_mapping']:
             # Get the available system task statuses and their meanings
             self._setup_taskstatuses()
-            for verification, status_name in self.config['automatic_status_update'].iteritems():
+            for verification, status_name in self.config['task_status_mapping'].iteritems():
                 if verification not in self.VALID_VERIFICATION_MAP:
-                    raise UsageError('Invalid automatic_status_update verification %s' % verification)
+                    raise UsageError('Invalid task_status_mapping verification %s' % verification)
 
                 if status_name not in self.taskstatuses:
-                    raise UsageError('Invalid automatic_status_update status "%s" for verification "%s"' %
+                    raise UsageError('Invalid task_status_mapping status "%s" for verification "%s"' %
                                      (status_name, verification))
 
                 if self.taskstatuses[status_name]['meaning'] not in self.VALID_VERIFICATION_MAP[verification]:
-                        raise UsageError('Unexpected automatic_status_update status "%s" for verification "%s"' %
+                        raise UsageError('Unexpected task_status_mapping status "%s" for verification "%s"' %
                                          (status_name, verification))
 
         # Validate the report_type config. If report_type is not auto, we will process only
@@ -531,7 +531,7 @@ class BaseIntegrator(object):
 
                 if not self.config['trial_run']:
                     ret = self.plugin.add_analysis_note(task_name, project_analysis_note_ref,
-                            finding_confidence, analysis_findings, self.behaviour, self.config['automatic_status_update'])
+                            finding_confidence, analysis_findings, self.behaviour, self.config['task_status_mapping'])
                 logger.debug("Marked %s as FAILURE with %s confidence" % (task_name, finding_confidence))
                 stats_failures_added += 1
             except APIError, e:
@@ -573,7 +573,7 @@ class BaseIntegrator(object):
 
                         self.plugin.add_analysis_note(task_name, project_analysis_note_ref,
                                 finding_confidence, analysis_findings, self.behaviour,
-                                self.config['automatic_status_update'])
+                                self.config['task_status_mapping'])
                     logger.info("Marked %s as PASS with %s confidence" % (task_name, finding_confidence))
                     stats_passes_added += 1
                 except APIError, e:
