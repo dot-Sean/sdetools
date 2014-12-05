@@ -115,6 +115,42 @@ class BaseIntegrationTest(object):
             except UsageError:
                 self.assertTrue(False, 'Valid import_behaviour %s improperly disallowed' % behaviour)
 
+    def test_invalid_task_status_mapping(self):
+        # Set of invalid verification => status meaning mappings
+        invalid_mappings = {
+            'no_such_verification': ['BAD', 'TODO', 'DONE'],
+            'partial': ['BAD', 'NA'],
+            'fail': ['BAD', 'DONE', 'NA'],
+            'pass': ['BAD','NA'],
+        }
+        for verification, statuses in invalid_mappings.iteritems():
+            for status in statuses:
+                self.init_integrator()
+                self.config['task_status_mapping'] = {verification: status}
+                try:
+                    self.init_data()
+                    self.assertTrue(False, 'Invalid task_status_mapping (%s=>%s) not detected' % (verification, status))
+                except UsageError:
+                    self.assertTrue(True)
+
+    def test_valid_task_status_mapping(self):
+        # Set of valid verification => status meaning mappings
+        valid_mappings = {
+            'pass': ['TODO', 'DONE'],
+            'partial': ['TODO', 'DONE'],
+            'fail': ['TODO']
+        }
+        for verification, statuses in valid_mappings.iteritems():
+            for status in statuses:
+                self.init_integrator()
+                self.config['task_status_mapping'] = {verification: status}
+                try:
+                    self.init_data()
+                    self.assertTrue(True)
+                except UsageError:
+                    self.assertTrue(False, 'Valid task_mapping (%s => %s) improperly disallowed' %
+                                    (verification, status))
+
     def test_expected_number_of_findings(self):
         self.init_data()
         findings = self.integrator.generate_findings()

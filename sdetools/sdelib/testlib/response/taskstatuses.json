@@ -1,0 +1,28 @@
+{
+    "taskstatuses": [
+        {
+            "meaning": "NA",
+            "icon": "minus-circle",
+            "name": "Not Applicable",
+            "slug": "NA"
+        },
+        {
+            "meaning": "TODO",
+            "icon": "clock-o",
+            "name": "Incomplete",
+            "slug": "TODO"
+        },
+        {
+            "meaning": "DONE",
+            "icon": "check",
+            "name": "Complete",
+            "slug": "DONE"
+        },
+        {
+            "meaning": "NA",
+            "icon": "beer",
+            "name": "Accept Risk",
+            "slug": "ACCEPT"
+        }
+    ]
+}

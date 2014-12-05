@@ -56,16 +56,22 @@ class BaseImporter(object):
 
 class BaseZIPImporter(BaseImporter):
     ARCHIVED_FILE_NAME = None
+    MAX_NUMER_ARCHIVED_FILES = 10
     MAX_SIZE_IN_MB = 300  # Maximum archived file size in MB
     MAX_MEMORY_SIZE_IN_MB = 50  # Python 2.5 and prior must be much more conservative
     IMPORTERS = {}
+    PATTERN_IMPORTERS = {}
 
     def __init__(self):
         super(BaseZIPImporter, self).__init__()
         self.IMPORTERS = {}
+        self.PATTERN_IMPORTERS = {}
 
     def register_importer(self, file_name, importer):
         self.IMPORTERS[file_name] = importer
+
+    def register_importer_for_pattern(self, pattern, importer):
+        self.PATTERN_IMPORTERS[pattern] = importer
 
     def process_archive(self, zip_archive):
 
@@ -78,6 +84,17 @@ class BaseZIPImporter(BaseImporter):
         except zipfile.LargeZipFile:
             raise IntegrationError("Error opening file (File too large) %s" % zip_archive)
 
+        # Find any files in the ZIP that match any patterns
+        for pattern in self.PATTERN_IMPORTERS.keys():
+            for file_name in results_archive.namelist():
+                if re.match(pattern, file_name):
+                    self.register_importer(file_name, self.PATTERN_IMPORTERS[pattern])
+
+        # Put a limit on the number of supported files we will process from a ZIP
+        if len(self.IMPORTERS.keys()) > BaseZIPImporter.MAX_NUMER_ARCHIVED_FILES:
+            raise IntegrationError("File %s exceeds the limit of %d files" % (zip_archive,
+                                                                              BaseZIPImporter.MAX_NUMER_ARCHIVED_FILES))
+
         for file_name in self.IMPORTERS.keys():
             try:
                 self._process_archived_file(results_archive, file_name)
@@ -89,6 +106,9 @@ class BaseZIPImporter(BaseImporter):
     def _process_archived_file(self, archive, file_name):
 
         logger.debug("Processing archived file: %s" % file_name)
+
+        if file_name not in self.IMPORTERS:
+            raise IntegrationError("No importer available for %s" % file_name)
 
         try:
             file_info = archive.getinfo(file_name)
@@ -127,6 +147,14 @@ class BaseZIPImporter(BaseImporter):
         # retain the results in the importer
         self.IMPORTERS[file_name] = importer
 
+    def parse(self, zip_file):
+        self.process_archive(zip_file)
+        build_ids = []
+        for file_name in self.IMPORTERS.keys():
+            self.findings.extend(self.IMPORTERS[file_name].findings)
+            build_ids.append(self.IMPORTERS[file_name].id)
+        self.id = ', '.join(build_ids)
+
 
 class BaseXMLImporter(BaseImporter):
 
@@ -137,7 +165,7 @@ class BaseXMLImporter(BaseImporter):
     def _get_content_handler(self):
         """
         Returns a customizable XML Reader that can extract information as
-        the parse goes through the file
+        the parser goes through the file
         """
         pass
 
@@ -198,6 +226,7 @@ class BaseIntegrator(object):
         self.config = config
         self.emit = self.config.emit
         self.behaviour = 'replace'
+        self.weakness_map_identifier = 'id' # default XML attribute with weakness identifier
         self.weakness_title = {}
         self.confidence = {}
         self.taskstatuses = {}
@@ -368,10 +397,10 @@ class BaseIntegrator(object):
         self.weakness_type = {}
         for task in base.getElementsByTagName('task'):
             if task.attributes.has_key('confidence'):
-                self.confidence[task.attributes['id'].value] = task.attributes['confidence'].value
+                self.confidence[task.attributes[self.weakness_map_identifier].value] = task.attributes['confidence'].value
 
             for weakness in task.getElementsByTagName('weakness'):
-                weakness_id = weakness.attributes['id'].value
+                weakness_id = weakness.attributes[self.weakness_map_identifier].value
                 weakness_mapping[weakness_id].append(task.attributes['id'].value)
                 self.weakness_type[weakness_id] = weakness.attributes['type'].value
                 self.weakness_title[weakness_id] = weakness.attributes['title'].value
