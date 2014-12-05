@@ -152,7 +152,8 @@ class BaseZIPImporter(BaseImporter):
         build_ids = []
         for file_name in self.IMPORTERS.keys():
             self.findings.extend(self.IMPORTERS[file_name].findings)
-            build_ids.append(self.IMPORTERS[file_name].id)
+            if self.IMPORTERS[file_name].id not in build_ids:
+                build_ids.append(self.IMPORTERS[file_name].id)
         self.id = ', '.join(build_ids)
 
 
