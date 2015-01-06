@@ -14,6 +14,7 @@ class JIRARestAPI(RESTBase):
         super(JIRARestAPI, self).__init__('alm', 'JIRA', config, 'rest/api/2')
         self.versions = None
         self.custom_fields = {}
+        self.custom_lookup_fields = {}
         self.fields = {}
 
     def parse_response(self, result, headers):
@@ -66,8 +67,15 @@ class JIRARestAPI(RESTBase):
 
         return False
 
+    def _get_filter_name(self, all_field_meta, field_name):
+        for field in all_field_meta:
+            if field['name'] == field_name:
+                return field['clauseNames'][0]
+        return None
+
     def setup_fields(self, issue_type_id):
 
+        # Retrieve field meta information for the chosen issue type
         try:
             meta_info = self.call_api('issue/createmeta', method=self.URLRequest.GET,
                                       args={'projectKeys': self.config['alm_project'],
@@ -96,6 +104,23 @@ class JIRARestAPI(RESTBase):
                         self.custom_fields[field_id] = value
                         assigned_fields.append(field_id)
 
+        # Get all fields from the system to help with custom lookups
+        if self.config['alm_custom_lookup_fields']:
+            try:
+                all_fields_meta = self.call_api('field', method=self.URLRequest.GET)
+            except APIError, error:
+                raise AlmException('Could not retrieve sql search for JIRA project: %s. %s' %
+                                   (self.config['alm_project'], error))
+
+            for key, value in self.config['alm_custom_lookup_fields'].iteritems():
+                for field_id, field_details in self.fields.iteritems():
+                    if key == field_details['name']:
+                        filter_name = self._get_filter_name(all_fields_meta, key)
+                        if filter_name:
+                            self.custom_lookup_fields[filter_name] = value
+                        else:
+                            raise AlmException('No filter name found for: %s' % key)
+
         for field_id, field_details in self.fields.iteritems():
             if field_details['required'] and field_id not in assigned_fields:
                 missing_fields.append(field_details['name'])
@@ -119,9 +144,15 @@ class JIRARestAPI(RESTBase):
         return self.get_issue_types()
 
     def get_task(self, task, task_id):
+
+        custom_lookup = []
+        for field, value in self.custom_lookup_fields.items():
+            condition = '%s=\'%s\'' % (field, value)
+            custom_lookup.append(condition)
+
         try:
-            url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~"\\"%s\\""' % \
-                  (self.config['alm_project'], self.urlencode_str(task['alm_fixed_title']))
+            url = 'search?jql=project%%3D\'%s\'%%20AND%%20%s%%20AND%%20summary~"\\"%s\\""' % \
+                  (self.config['alm_project'], '%%20AND'.join(custom_lookup), self.urlencode_str(task['alm_fixed_title']))
             result = self.call_api(url)
         except APIError, error:
             raise AlmException("Unable to get task %s from JIRA. %s" % (task_id, error))

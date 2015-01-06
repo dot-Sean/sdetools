@@ -130,6 +130,10 @@ class AlmConnector(object):
                 'Customized fields to include when creating a task in %s '
                 '(JSON encoded dictionary of strings)' % self.alm_name,
                 default='')
+        self.config.opts.add('alm_custom_lookup_fields',
+                'Custom fields and values to use when finding a task in %s '
+                '(JSON encoded dictionary of strings)' % self.alm_name,
+                default='')
 
         if self.default_priority_map:
             self.config.opts.add(self.ALM_PRIORITY_MAP, 'Customized map from priority in SDE to %s '
@@ -194,6 +198,9 @@ class AlmConnector(object):
         self.config.process_boolean_config('how_tos_in_scope')
         self.config.process_boolean_config('alm_standard_workflow')
         self.config.process_json_str_dict('alm_custom_fields')
+        self.config.process_json_str_dict('alm_custom_lookup_fields')
+
+        self.init_custom_fields()
 
         if self.config['start_fresh'] and not self.alm_supports_delete():
             raise AlmException('Incorrect start_fresh configuration: task deletion is not supported.')
@@ -221,6 +228,17 @@ class AlmConnector(object):
                 raise AlmException('Incorrect alm_title_format configuration. Invalid field: ${%s}' % match)
 
         logger.info('*** AlmConnector initialized ***')
+
+    def init_custom_fields(self):
+        mapping = {
+            'application': self.config['sde_application'],
+            'project': self.config['sde_project'],
+            'context': self.config['alm_context']
+        }
+
+        for config_option in ['alm_custom_fields', 'alm_custom_lookup_fields']:
+            for field, value in self.config[config_option].items():
+                self.config[config_option][field] = Template(value).substitute(mapping).strip()
 
     def alm_connect(self):
         self.alm_connect_server()
