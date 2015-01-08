@@ -171,11 +171,8 @@ class FortifySSCImporter(BaseImporter):
             
         self.importer = FortifyFPRImporter(self.config['import_blacklist'])
         
-        try:
-            f = os.fdopen(temp_fd)
-            self.importer.parse(f)
-        finally:
-            os.close(temp_fd)
+        f = os.fdopen(temp_fd)
+        self.importer.parse(f)
 
         self.findings = self.importer.findings
         self.id = self.importer.id

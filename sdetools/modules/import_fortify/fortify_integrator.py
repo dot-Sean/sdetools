@@ -22,9 +22,8 @@ class FortifyIntegrator(BaseIntegrator):
             'file': ["xml", "fpr", "fvdl"],
             'network': 'https'
         }
-        super(FortifyIntegrator, self).__init__(config, self.TOOL_NAME, supported_input, DEFAULT_MAPPING_FILE)
-    
-        self.config.opts.add("import_blacklist", "Do not import issues which have been triaged with these " +
+
+        config.opts.add("import_blacklist", "Do not import issues which have been triaged with these " +
                 "statuses (i.e. 'Bad Practice, Not an Issue').", "a", "Not an Issue")
         config.opts.add('integration_mode', "Integration mode: (ssc or file)", default='file')
         config.opts.add('ssc_test_connection', 'Test Fortify SSC Connection Only '
@@ -36,7 +35,9 @@ class FortifyIntegrator(BaseIntegrator):
         config.opts.add('ssc_authtoken', 'Fortify SSC authtoken (AnalysisDownloadToken permission)', default='')
         config.opts.add('ssc_project_name', 'Fortify Project name', default='')
         config.opts.add('ssc_project_version', 'Fortify Project version', default='')
-        
+
+        super(FortifyIntegrator, self).__init__(config, self.TOOL_NAME, supported_input, DEFAULT_MAPPING_FILE)
+
         self.raw_findings = []
         self.importer = None
 
@@ -56,7 +57,8 @@ class FortifyIntegrator(BaseIntegrator):
                         raise UsageError("Missing value for option %s" % config_key)
             # disable file support
             self.supported_input.pop('file')
-            
+            super(FortifyIntegrator, self).initialize()
+
         elif self.config['integration_mode'] == 'file':
             super(FortifyIntegrator, self).initialize()
         else:
