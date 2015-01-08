@@ -13,3 +13,6 @@ class TestHPAlmLiveCase(AlmPluginLiveTestBase, unittest.TestCase):
 
     def test_synchronize_sde_as_master(self):
         pass
+
+    def test_custom_titles(self):
+        pass

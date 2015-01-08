@@ -1,6 +1,7 @@
 import unittest
 
 from mingle_response_generator import MingleResponseGenerator
+from sdetools.alm_integration.alm_plugin_base import AlmConnector, PUBLIC_TASK_CONTENT
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_mingle.mingle_plugin import MingleConnector, MingleAPIBase, AlmException
 
@@ -24,20 +25,20 @@ class TestMingleCase(AlmPluginTestBase, unittest.TestCase):
     def test_mingle_cached_cards(self):
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
-        sde_task_id = self.connector._extract_task_id(test_task['id'])
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         alm_id = test_task['id'].split('T')[1]
 
         self.connector.alm_add_task(test_task)
         cached_cards = self.connector.cached_cards
 
-        self.assertEqual(cached_cards, {sde_task_id: alm_id})
+        self.assertEqual(cached_cards, {alm_id: test_task['alm_full_title']})
 
         self.connector._cache_all_sde_mingle_cards()
         cached_cards = self.connector.cached_cards
 
         self.assertNotNone(cached_cards)
-        self.assertNotNone(cached_cards.get(sde_task_id))
-        self.assertEquals(cached_cards.get(sde_task_id), alm_id)
+        self.assertNotNone(cached_cards.get(alm_id))
+        self.assertEquals(cached_cards.get(alm_id), test_task['alm_full_title'])
         self.assertNotNone(self.connector.alm_get_task(test_task))
 
     def test_invalid_config_card_type(self):
@@ -62,12 +63,10 @@ class TestMingleCase(AlmPluginTestBase, unittest.TestCase):
         self.assert_exception(AlmException, '', exception_msg, self.connector.alm_connect)
 
     def test_content_on_public_repo(self):
-        PUBLIC_TASK_CONTENT = ("Visit us at http://www.sdelements.com/ to find out how you can easily add project-"
-                               "specific software security requirements to your existing development processes.")
-
         self.mock_alm_response.set_response_flags({'get_project': 'anonymous_accessible'})
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         alm_id = int(test_task['id'].split('T')[1])
         headers, card = self.connector.alm_plugin.call_api('%s/cards/%s.xml' % (self.connector.project_uri, alm_id))

@@ -1,6 +1,8 @@
 from sdetools.sdelib.restclient import RESTBase, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmException
 from sdetools.modules.sync_jira.jira_shared import JIRATask
+from sdetools.sdelib.commons import json
+
 
 class JIRARestAPI(RESTBase):
     """ Base plugin for JIRA """
@@ -19,6 +21,19 @@ class JIRARestAPI(RESTBase):
             return "{}"
         else:
             return super(JIRARestAPI, self).parse_response(result, headers)
+
+    def parse_error(self, result):
+        # Try to parse the response as JSON
+        try:
+            error_response = json.loads(result)
+        except ValueError:
+            return result
+
+        # Send back all the error messages in one go
+        if 'errorMessages' in error_response:
+            return ' '.join(error_response['errorMessages'])
+        else:
+            return result
 
     def connect_server(self):
         """ Verifies that JIRA connection works """
@@ -57,13 +72,18 @@ class JIRARestAPI(RESTBase):
             meta_info = self.call_api('issue/createmeta', method=self.URLRequest.GET,
                                       args={'projectKeys': self.config['alm_project'],
                                       'expand': 'projects.issuetypes.fields'})
-        except APIError:
-            raise AlmException('Could not retrieve fields for JIRA project: %s' % self.config['alm_project'])
+        except APIError, error:
+            raise AlmException('Could not retrieve fields for JIRA project: %s. %s' %
+                               (self.config['alm_project'], error))
 
         for item in meta_info['projects'][0]['issuetypes']:
             if item['name'] == self.config['jira_issue_type']:
                 self.fields = item['fields']
                 break
+
+        if not self.fields:
+            raise AlmException('Issue type %s not available for project %s' %
+                               (self.config['jira_issue_type'], self.config['alm_project']))
 
         assigned_fields = JIRARestAPI.BASE_FIELDS[:]
 
@@ -92,19 +112,19 @@ class JIRARestAPI(RESTBase):
     def get_issue_types(self):
         try:
             return self.call_api('issuetype')
-        except APIError:
-            raise AlmException('Unable to get issuetype from JIRA API')
+        except APIError, error:
+            raise AlmException('Unable to get issuetype from JIRA API. %s' % error)
 
     def get_subtask_issue_types(self):
         return self.get_issue_types()
 
     def get_task(self, task, task_id):
         try:
-            url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~\'%s%%5C%%5C:\'' % (
-                    self.config['alm_project'], task_id)
+            url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~"\\"%s\\""' % \
+                  (self.config['alm_project'], self.urlencode_str(task['alm_fixed_title']))
             result = self.call_api(url)
-        except APIError:
-            raise AlmException("Unable to get task %s from JIRA" % task_id)
+        except APIError, error:
+            raise AlmException("Unable to get task %s from JIRA. %s" % (task_id, error))
 
         if not result['total']:
             #No result was found from query
@@ -141,8 +161,9 @@ class JIRARestAPI(RESTBase):
             remote_url = 'issue/%s' % task.get_alm_id()
             version_update = {'update': {'versions': [{'add': {'name': project_version}}]}}
             self.call_api(remote_url, method=self.URLRequest.PUT, args=version_update)
-        except APIError:
-            raise AlmException('Unable to update issue %s with new version %s' % (task.get_alm_id(), project_version))
+        except APIError, error:
+            raise AlmException('Unable to update issue %s with new version %s. %s' %
+                               (task.get_alm_id(), project_version, error))
 
     def add_task(self, task, issue_type_id, project_version):
         affected_versions = []
@@ -155,12 +176,16 @@ class JIRARestAPI(RESTBase):
                 'project': {
                     'key': self.config['alm_project']
                 },
-                'summary': task['title'],
+                'summary': task['alm_full_title'],
                 'issuetype': {
                     'id': issue_type_id
                 },
             }
         }
+
+        # collect task tags
+        tags = [self.config['alm_issue_label']] + task['tags']
+
         if self.has_field('description'):
             args['fields']['description'] = task['formatted_content']
 
@@ -168,7 +193,7 @@ class JIRARestAPI(RESTBase):
             args['fields']['reporter'] = {'name': self.config['alm_user']}
 
         if self.has_field('labels'):
-            args['fields']['labels'] = ['SD-Elements']
+            args['fields']['labels'] = tags
 
         if self.has_field('priority'):
             args['fields']['priority'] = {'name': task['alm_priority']}
@@ -190,6 +215,8 @@ class JIRARestAPI(RESTBase):
 
             if mapped_field['schema']['type'] == 'array' and mapped_field['schema']['items'] == 'string':
                 args['fields'][field_id] = [{'value': custom_field_value}]
+            elif mapped_field['schema']['type'] == 'array' and mapped_field['schema']['items'] == 'component':
+                args['fields'][field_id] = [{'name': custom_field_value}]
             elif mapped_field['schema']['type'] == 'string':
                 if 'allowedValues' in mapped_field:
                     args['fields'][field_id] = {'value': custom_field_value}
@@ -225,8 +252,8 @@ class JIRARestAPI(RESTBase):
         ret_trans = {}
         try:
             transitions = self.call_api(trans_url)
-        except APIError:
-            raise AlmException("Unable to get transition IDS for JIRA task %s" % task_id)
+        except APIError, error:
+            raise AlmException("Unable to get transition IDS for JIRA task %s. %s" % (task_id, error))
         for transition in transitions['transitions']:
             ret_trans[transition['name']] = transition['id']
         return ret_trans

@@ -16,3 +16,9 @@ class TestRationalLiveCase(AlmPluginLiveTestBase, unittest.TestCase):
         We do not support SDE->Rational sync - continue without failure here
         """
         pass
+
+    def test_custom_titles(self):
+        """
+        We do not support SDE->Rational status sync - continue without failure here
+        """
+        pass

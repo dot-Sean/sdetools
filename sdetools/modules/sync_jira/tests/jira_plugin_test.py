@@ -4,9 +4,11 @@ import unittest
 
 from mock import patch, MagicMock
 from functools import partial
-from jira_response_generator import JiraResponseGenerator, JiraCustomFieldResponseGenerator
+from jira_response_generator import JiraResponseGenerator
+from jira_response_generator import JiraCustomFieldResponseGenerator, JiraInvalidProjectIssueTypeResponseGenerator
 from sdetools.sdelib.conf_mgr import Config
 from sdetools.sdelib.testlib.mock_response import MOCK_ALM_RESPONSE
+from sdetools.alm_integration.alm_plugin_base import AlmConnector
 from sdetools.alm_integration.tests.alm_plugin_test_base import AlmPluginTestBase
 from sdetools.modules.sync_jira.jira_plugin import JIRAConnector, AlmException
 from sdetools.modules.sync_jira.jira_rest import JIRARestAPI
@@ -46,6 +48,7 @@ class JiraBaseCase(AlmPluginTestBase):
                 # This will invoke add, get and update task
                 self.connector.alm_connect()
                 test_task = self.mock_sde_response.generate_sde_task()
+                test_task = AlmConnector.add_alm_title(self.config, test_task)
                 test_task['status'] = 'DONE'
                 self.connector.alm_add_task(test_task)
                 self.connector.config['alm_project_version'] = '1.2'
@@ -67,6 +70,7 @@ class JiraBaseCase(AlmPluginTestBase):
     def test_parse_non_done_status_as_todo(self):
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         test_task_result = self.connector.alm_get_task(test_task)
         test_task_result.status = "Non-done status"
@@ -79,10 +83,21 @@ class JiraBaseCase(AlmPluginTestBase):
         self.init_response_generator()
         self.connector.alm_connect()
         test_task = self.mock_sde_response.generate_sde_task()
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         test_task_result = self.connector.alm_get_task(test_task)
 
         self.assertEqual(test_task_result.versions, ['1.0'])
+
+    def test_invalid_issue_type(self):
+        self.config['jira_issue_type'] = 'No such Issue Type'
+        self.connector.initialize()
+
+        try:
+            self.connector.synchronize()
+            raise AssertionError("Did not detect invalid issue type")
+        except AlmException, e:
+            self.assertEqual(str(e), "Issue type %s is not valid" % self.config['jira_issue_type'])
 
     def test_invalid_priority(self):
         self.config['alm_priority_map'] = {"1-10": "No Such Priority"}
@@ -90,6 +105,7 @@ class JiraBaseCase(AlmPluginTestBase):
 
         try:
             self.connector.synchronize()
+            raise AssertionError("Did not detect invalid priority")
         except AlmException, e:
             self.assertEqual(str(e), 'Incorrect priority mapping values specified: No Such Priority')
 
@@ -153,6 +169,19 @@ class TestJiraAPI6Case(JiraBaseCase, unittest.TestCase):
 
         self.assertEqual(converted_text, expected, 'Expected %s, got %s' % (expected, converted_text))
 
+    def test_invalid_project_issue_type(self):
+        self.config['jira_issue_type'] = 'Bug'
+        self.response_generator = JiraInvalidProjectIssueTypeResponseGenerator(self.config, self.test_dir)
+        self.mock_alm_response.initialize(self.response_generator)
+        self.connector.initialize()
+
+        try:
+            self.connector.synchronize()
+            raise AssertionError("Did not detect invalid project issue type")
+        except AlmException, e:
+            self.assertEqual(str(e), "Issue type %s not available for project %s" %
+                                     (self.config['jira_issue_type'], self.config['alm_project']))
+
 
 class MockSoapProxy():
     def __init__(self, wsdlsource, config=Config, **kw ):
@@ -189,8 +218,9 @@ class TestJiraAPI4Case(JiraBaseCase, unittest.TestCase):
 
     def test_custom_fields(self):
         self.connector.alm_connect()
-        self.config['alm_custom_fields'] = {"Custom Field":"value"}
+        self.config['alm_custom_fields'] = {"Custom Field": "value"}
         test_task = self.mock_sde_response.generate_sde_task()
+        test_task = AlmConnector.add_alm_title(self.config, test_task)
         self.connector.alm_add_task(test_task)
         alm_task = self.connector.alm_get_task(test_task)
         self.config['jira_existing_issue'] = alm_task.get_alm_id()

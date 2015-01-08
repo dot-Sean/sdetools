@@ -35,13 +35,17 @@ class SdeResponseGenerator(ResponseGenerator):
         self.generator_add_resource('task', '38', self.get_json_from_file('T38'))
         self.generator_add_resource('phases', '', self.get_json_from_file('phases'))
 
-    def generate_sde_task(self, task_number=None, project_id=None, status=None, priority=7, phase='requirements'):
+    def generate_sde_task(self, task_number=None, project_id=None, status=None, priority=7, phase='requirements',
+                          tags=None):
         if task_number is None:
             task_number = '%d' % random.randint(50, 999999999)
         if project_id is None:
             project_id = self.default_project_id
         if status is None:
             status = 'TODO'
+        if tags is None:
+            tags = []
+
         sde_task = {
             "title": "T%s: Task Title" % task_number,
             "timestamp": self.get_current_timestamp(),
@@ -49,7 +53,8 @@ class SdeResponseGenerator(ResponseGenerator):
             "project": '%d' % project_id,
             "phase": phase,
             "status": status,
-            "id": '%d-T%s' % (project_id, task_number)
+            "id": '%d-T%s' % (project_id, task_number),
+            "tags": tags
         }
         self.generator_add_resource('task', task_number, sde_task)
 

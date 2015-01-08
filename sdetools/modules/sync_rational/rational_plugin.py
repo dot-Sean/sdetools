@@ -1,11 +1,12 @@
 # Copyright SDElements Inc
-# Extensible two way integration with Rational
+# Extensible two way integration with Rational Team Concert
 
 import re
 import urllib
 import json
 from datetime import datetime
 
+from sdetools.sdelib.commons import urlencode_str
 from sdetools.sdelib.restclient import RESTBase
 from sdetools.sdelib.restclient import URLRequest, APIError
 from sdetools.alm_integration.alm_plugin_base import AlmTask, AlmConnector
@@ -33,9 +34,18 @@ RATIONAL_HTML_CONVERT = [
 ]
 
 OSLC_CM_SERVICE_PROVIDER ='http://open-services.net/xmlns/cm/1.0/cmServiceProviders'
-OSLC_CR_TYPE = "http://open-services.net/ns/cm#task"
 AUTH_MSG = 'x-com-ibm-team-repository-web-auth-msg'
 MSG_FAIL = 'authfailed'
+WORK_ITEM_TYPES = {
+    'task': 'http://open-services.net/ns/cm#task',
+    'defect': 'http://open-services.net/ns/cm#defect',
+    'planitem': 'http://open-services.net/ns/cm#planItem',
+    'epic': 'http://jazz.net/xmlns/prod/jazz/rtc/cm/1.0/com.ibm.team.apt.workItemType.epic',
+    'buildtrackingitem': 'http://jazz.net/xmlns/prod/jazz/rtc/cm/1.0/com.ibm.team.workItemType.buildtrackingitem',
+    'impediment': 'http://jazz.net/xmlns/prod/jazz/rtc/cm/1.0/com.ibm.team.workitem.workItemType.impediment',
+    'adoption': 'http://jazz.net/xmlns/prod/jazz/rtc/cm/1.0/com.ibm.team.workItemType.adoption',
+    'retrospective': 'http://jazz.net/xmlns/prod/jazz/rtc/cm/1.0/com.ibm.team.workitem.workItemType.retrospective'
+}
 
 
 class RationalAPI(RESTBase):
@@ -46,18 +56,7 @@ class RationalAPI(RESTBase):
 
     def parse_error(self, result):
         result = json.loads(result)
-
-        error_msg = None
-        if 'oslc:message' in result:
-            error_msg = result['oslc:message']
-        else:
-            error_msg = result
-
-        return error_msg
-
-    def post_conf_init(self):
-        self.base_path = self.config['rational_context_root']
-        super(RationalAPI, self).post_conf_init()
+        return result['oslc:message'] if 'oslc:message' in result else result
 
     def call_api(self, target, method=URLRequest.GET, args=None, call_headers={}, auth_mode=None):
         call_headers['Accept'] = 'application/json'
@@ -74,10 +73,6 @@ class RationalFormsLogin(RESTBase):
 
     def __init__(self, config):
         super(RationalFormsLogin, self).__init__('alm', 'Rational Forms Login', config)
-
-    def post_conf_init(self):
-        self.base_path = self.config['rational_context_root']
-        super(RationalFormsLogin, self).post_conf_init()
 
     def encode_post_args(self, args):
         return urllib.urlencode(args)
@@ -106,7 +101,7 @@ class RationalFormsLogin(RESTBase):
 
 
 class RationalTask(AlmTask):
-    """ Representation of a task in Rational"""
+    """ Representation of a task in Rational Team Concert """
 
     def __init__(self, task_id, alm_url, alm_id, status, timestamp, done_statuses):
         self.task_id = task_id
@@ -147,41 +142,42 @@ class RationalConnector(AlmConnector):
     resource_url = None
     priorities = None
     ALM_DONE_STATUSES = 'rational_done_statuses'
-    ALM_PRIORITY_MAP = 'alm_priority_map'
+    default_priority_map = RATIONAL_DEFAULT_PRIORITY_MAP
 
     def __init__(self, config, alm_plugin):
         """ Initializes connection to Rational """
         super(RationalConnector, self).__init__(config, alm_plugin)
 
-        config.opts.add(self.ALM_DONE_STATUSES, 'Statuses that '
-                                 'signify a task is Done in Rational',
-                                 default='Completed,Done')
-        config.opts.add(self.ALM_PRIORITY_MAP, 'Customized map from priority in SDE to Rational '
-                                 '(JSON encoded dictionary of strings)', default='')
-        config.opts.add('rational_context_root', 'Application context root: the part of the URL that accesses '
-                                 'each application and Jazz Team Server', default='')
+        config.opts.add(self.ALM_DONE_STATUSES, 'Statuses that signify a task is Done in Rational Team Concert',
+                        default='Completed,Done')
         config.opts.add('alm_issue_label', 'Tags applied to tasks in Rational (space separated)', default='SD-Elements')
+        config.opts.add('alm_issue_type', 'Issue type (Fully-qualified identifier)', default='task')
+
+        self.resource_shape_url = None
+        self.creation_url = None
+        self.cm_service_provider_target = None
+        self.COOKIE_JSESSIONID = None
+        self.mark_down_converter = markdown.Markdown(safe_mode="escape")
 
     def initialize(self):
         super(RationalConnector, self).initialize()
 
-        self.COOKIE_JSESSIONID = None
-        self.mark_down_converter = markdown.Markdown(safe_mode="escape")
-
-        for item in [self.ALM_DONE_STATUSES, 'rational_context_root', 'alm_issue_label']:
+        for item in [self.ALM_DONE_STATUSES, 'alm_issue_type', 'alm_issue_label']:
             if not self.config[item]:
                 raise AlmException('Missing %s in configuration' % item)
 
         self.config.process_list_config(self.ALM_DONE_STATUSES)
 
+        # Make it easy for users to specify the short-form name of an issue type, i.e. "task"
+        # Derive the long-form identifier if possible, otherwise we will try to sync with whatever the user specified
+        issue_type = self.config['alm_issue_type'].lower()
+        if issue_type in WORK_ITEM_TYPES:
+            self.config['alm_issue_type'] = WORK_ITEM_TYPES[issue_type]
+
         if self.config['conflict_policy'] != 'alm':
             raise AlmException('Expected "alm" for configuration conflict_policy but got "%s". '
-                               'Currently only Rational can be setup as authoritative server' % self.config['conflict_policy'])
-
-        self.config.process_json_str_dict(self.ALM_PRIORITY_MAP)
-        if not self.config[self.ALM_PRIORITY_MAP]:
-            self.config[self.ALM_PRIORITY_MAP] = RATIONAL_DEFAULT_PRIORITY_MAP
-        self._validate_alm_priority_map()
+                               'Currently Rational can only be setup as authoritative server' %
+                               self.config['conflict_policy'])
 
     def _rational_forms_login(self, forms_client):
         forms_credentials = {
@@ -193,7 +189,7 @@ class RationalConnector(AlmConnector):
         try:
             forms_client.call_api('authenticated/j_security_check', args=forms_credentials, method=URLRequest.POST)
         except APIError, err:
-            raise AlmException('Unable to connect to Rational (Check server URL, '
+            raise AlmException('Unable to connect to Rational Team Concert (Check server URL, '
                                'user, pass). Reason: %s' % str(err))
 
         for cookie in forms_client.cookiejar:
@@ -202,7 +198,6 @@ class RationalConnector(AlmConnector):
 
     def alm_connect_server(self):
         """Check if user can successfully authenticate and retrieve service catalog"""
-
 
         forms_client = RationalFormsLogin(self.config)
         forms_client.set_auth_mode('cookie')
@@ -267,7 +262,7 @@ class RationalConnector(AlmConnector):
             resource_shapes = self._call_api(self.resource_shape_url)
         except APIError, err:
             logger.error(err)
-            raise AlmException('Unable to get resource shapes from Rational')
+            raise AlmException('Unable to get resource shapes from Rational Team Concert')
 
         priorities = []
         for rs in resource_shapes['oslc:property']:
@@ -316,25 +311,21 @@ class RationalConnector(AlmConnector):
                     for factory in service['oslc:creationFactory']:
                         if 'oslc:usage' in factory:
                             for resource in factory['oslc:usage']:
-                                if resource['rdf:resource'] == OSLC_CR_TYPE:
+                                if resource['rdf:resource'] == self.config['alm_issue_type']:
                                     creation_url = factory['oslc:creation']['rdf:resource']
                                     resource_shape_url = factory['oslc:resourceShape']['rdf:resource']
                                     self.creation_url = creation_url.replace(self.alm_plugin.base_uri+'/', '')
                                     self.resource_shape_url = resource_shape_url.replace(self.alm_plugin.base_uri+'/', '')
         except KeyError as e:
-            raise AlmException('Unable to retrieve creation url or resource shape. Error msg: %s' % e)
+            raise AlmException('Unable to retrieve work item creation details. Error msg: %s' % e)
+
+        if not self.resource_shape_url:
+            raise AlmException('Unable to retrieve creation details for issue type: %s' % self.config['alm_issue_type'])
 
         self.priorities = self._rational_get_priorities()
 
     def alm_validate_configurations(self):
         pass
-
-    def _extract_task_id(self, full_task_id):
-        task_id = None
-        task_search = re.search('^(\d+)-([^\d]+\d+)$', full_task_id)
-        if task_search:
-            task_id = task_search.group(2)
-        return task_id
 
     def alm_get_task(self, task):
         """Returns a RationalTask object that has the same ID as the given task"""
@@ -345,8 +336,8 @@ class RationalConnector(AlmConnector):
 
         try:
             # Fields parameter will filter response data to only contain story status, name, timestamp and id
-            work_items = self._call_api('%s/workitems?oslc.where=dcterms:title="%s:*"' %
-                                                  (self.query_url, task_id))
+            work_items = self._call_api('%s/workitems?oslc.where=dcterms:title="%s*"' % (
+                                        self.query_url, urlencode_str(task['alm_fixed_title'])))
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get task %s from Rational' % task_id)
@@ -376,11 +367,15 @@ class RationalConnector(AlmConnector):
         priority_name = self.translate_priority(task['priority'])
         priority_literal_resource = self._get_priority_literal(priority_name)
 
+        tags = self.config['alm_issue_label']
+        if task['tags']:
+            tags += ' ' + ' '.join(task['tags'])
+
         create_args = {
-            'dcterms:title': task['title'],
+            'dcterms:title': task['alm_full_title'],
             'dcterms:description': self.sde_get_task_content(task),
             'oslc_cmx:priority': priority_literal_resource,
-            'dcterms:subject': self.config['alm_issue_label'],
+            'dcterms:subject': tags,
         }
 
         if (self.config['alm_standard_workflow'] and
@@ -442,27 +437,3 @@ class RationalConnector(AlmConnector):
             s = s[:MAX_CONTENT_SIZE]
 
         return s
-
-    def translate_priority(self, priority):
-        pmap = self.config[self.ALM_PRIORITY_MAP]
-
-        if not pmap:
-            return None
-
-        try:
-            priority = int(priority)
-        except TypeError:
-            logger.error('Could not coerce %s into an integer' % priority)
-            raise AlmException("Error in translating SDE priority to Rational priority: "
-                               "%s is not an integer priority" % priority)
-
-        for key in pmap:
-            if '-' in key:
-                lrange, hrange = key.split('-')
-                lrange = int(lrange)
-                hrange = int(hrange)
-                if lrange <= priority <= hrange:
-                    return pmap[key]
-            else:
-                if int(key) == priority:
-                    return pmap[key]

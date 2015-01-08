@@ -7,9 +7,10 @@ __all__ = [
     'extlib',
 ]
 
-VERSION = '4.4.4'
+VERSION = '4.4.11'
 
 from sdetools.sdelib import mod_mgr
+
 
 def setup_path():
     import sys
@@ -27,10 +28,12 @@ def setup_path():
 
 setup_path()
 
+
 def set_api_connector(api_module):
     from sdetools.sdelib import sdeapi
 
     sdeapi.APIBase = api_module
+
 
 def call(cmd_name, options, args=(), call_back=mod_mgr.stdout_callback, call_back_args={}):
     exit_stat = mod_mgr.run_command(cmd_name, args, 'import', call_options=options,

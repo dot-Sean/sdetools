@@ -36,6 +36,7 @@ class SOAPProxyWrap:
         f = getattr(self.proxy, name)
         return self.__FCall(f, name)
 
+
 class JIRASoapAPI:
     def __init__(self, config):
         self.config = config
@@ -47,6 +48,12 @@ class JIRASoapAPI:
         self.fields = []
         self.proxy = None
 
+    def _get_context_root(self):
+        context_root = self.config['alm_context_root']
+        if context_root:
+            return '%s/' % context_root.strip('/')
+        return context_root
+
     def connect_server(self):
         config = SOAPpy.Config
         if __name__ in self.config['debug_mods']:
@@ -56,8 +63,8 @@ class JIRASoapAPI:
         self.config['alm_server'] = opener.server
 
         try:
-            stream = opener.open('%s://%s/rpc/soap/jirasoapservice-v2?wsdl' %
-                    (self.config['alm_method'], self.config['alm_server']))
+            stream = opener.open('%s://%s/%srpc/soap/jirasoapservice-v2?wsdl' %
+                    (self.config['alm_method'], self.config['alm_server'], self._get_context_root()))
         except urllib2.URLError, err:
             raise AlmException('Unable to reach JIRA service (Check URL). Reason: %s' % (err))
         except http_req.InvalidCertificateException, err:
@@ -118,7 +125,7 @@ class JIRASoapAPI:
 
     def get_task(self, task, task_id):
         try:
-            jql = "project='%s' AND summary~'%s\\\\:'" % (self.config['alm_project'], task_id)
+            jql = 'project="%s" AND summary~"\\"%s\\""' % (self.config['alm_project'], task['alm_fixed_title'])
             issues = self.proxy.getIssuesFromJqlSearch(self.auth, jql, SOAPpy.Types.intType(1))
         except SOAPpy.Types.faultType:
             raise AlmException("Unable to get task %s from JIRA" % task_id)
@@ -246,14 +253,17 @@ class JIRASoapAPI:
         if not selected_priority:
             raise AlmException('Unable to find priority %s' % task['alm_priority'])
 
+        # collect task tags
+        tags = [self.config['alm_issue_label']] + task['tags']
+
         updates = []
-        updates.append({'id': 'labels', 'values': ['SD-Elements']})
+        updates.append({'id': 'labels', 'values': tags})
                 
         if project_version:
             updates.append({'id': 'versions', 'values': [project_version['id']]})
         args = {
             'project': self.config['alm_project'],
-            'summary': task['title'],
+            'summary': task['alm_full_title'],
             'type': issue_type_id
         }
 
@@ -284,20 +294,20 @@ class JIRASoapAPI:
         except SOAPpy.Types.faultType, err:
             raise AlmException("Unable to delete task %s. Reason: %s" % (task.get_task_id(), err))
 
-    def get_available_transitions(self, task_id):
+    def get_available_transitions(self, alm_id):
         try:
-            transitions = self.proxy.getAvailableActions(self.auth, task_id)
+            transitions = self.proxy.getAvailableActions(self.auth, alm_id)
         except SOAPpy.Types.faultType, err:
-            raise AlmException("Unable to get available actions for task %s. Reason: %s" % (task_id, err))
+            raise AlmException("Unable to get available actions for issue %s. Reason: %s" % (alm_id, err))
 
         ret_trans = {}
         for transition in transitions:
             ret_trans[transition['name']] = transition['id']
         return ret_trans
 
-    def update_task_status(self, task_id, status_id):
+    def update_task_status(self, alm_id, status_id):
         try:
-            self.proxy.progressWorkflowAction(self.auth, task_id, status_id)                
+            self.proxy.progressWorkflowAction(self.auth, alm_id, status_id)
         except SOAPpy.Types.faultType, err:
             logger.error(err)
             raise AlmException("Unable to set task status: %s" % err)

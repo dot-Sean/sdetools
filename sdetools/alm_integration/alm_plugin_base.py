@@ -1,4 +1,5 @@
 from datetime import datetime
+from string import Template
 import sys
 import re
 
@@ -16,6 +17,8 @@ logger = log_mgr.mods.add_mod(__name__)
 RE_CODE_DOWNLOAD = re.compile(r'\{\{ USE_MEDIA_URL \}\}([^\)]+\))\{@class=code-download\}')
 RE_TASK_IDS = re.compile('^[^\d]+\d+$')
 RE_MAP_RANGE_KEY = re.compile('^([1-9]|10)(-([1-9]|10))?$')
+PUBLIC_TASK_CONTENT = ('Visit us at http://www.sdelements.com/ to find out how you can easily add project-specific '
+                       'software security requirements to your existing development processes.')
 
 
 class AlmException(Error):
@@ -64,8 +67,12 @@ class AlmConnector(object):
     """
     # This needs to be overwritten
     alm_name = 'ALM Module'
+    ALM_PRIORITY_MAP = 'alm_priority_map'
     TEST_OPTIONS = ['server', 'project', 'settings']
     STANDARD_STATUS_LIST = ['TODO', 'DONE', 'NA']
+    FIELD_OPTIONS = ['task_id', 'title', 'context', 'application', 'project']
+    DEFAULT_TITLE_FORMAT = '${task_id} ${title}'
+    default_priority_map = None
 
     #This is an abstract base class
     __metaclass__ = abc.ABCMeta
@@ -89,32 +96,44 @@ class AlmConnector(object):
         self.config.opts.add('alm_phases', 'Phases to sync '
                 '(comma separated list, e.g. requirements,testing)',
                 default='requirements,architecture-design,development')
-        self.config.opts.add('sde_statuses_in_scope', 'SDE statuses for adding to ALM '
-                '(comma separated %s)' % (','.join(AlmConnector.STANDARD_STATUS_LIST)),
+        self.config.opts.add('sde_statuses_in_scope', 'SDE statuses for adding to %s '
+                '(comma separated %s)' % (self.alm_name, ','.join(AlmConnector.STANDARD_STATUS_LIST)),
                 default='TODO')
         self.config.opts.add('sde_min_priority', 'Minimum SDE priority in scope',
                 default='7')
+        self.config.opts.add('sde_tags_filter', 'Filter project tasks by tag (tag1, tag2)',
+                default='')
         self.config.opts.add('how_tos_in_scope', 'Whether or not HowTos should be included',
                 default='False')
         self.config.opts.add('selected_tasks', 'Optionally limit the sync to certain tasks '
                 '(comma separated, e.g. T12,T13). Note: Overrides other selections.',
                 default='')
-        self.config.opts.add('alm_project', 'Project in ALM Tool',
+        self.config.opts.add('alm_project', 'Project in %s' % self.alm_name,
                 default='')
         self.config.opts.add('conflict_policy', 'Conflict policy to use',
                 default='alm')
-        self.config.opts.add('start_fresh', 'Delete any existing issues in the ALM',
+        self.config.opts.add('alm_context', 'Add additional context to issues created in %s' % self.alm_name,
+                default='')
+        self.config.opts.add('start_fresh', 'Delete any matching issues in %s' % self.alm_name,
                 default='False')
         self.config.opts.add('show_progress', 'Show progress',
                 default='False')
+        self.config.opts.add('alm_title_format', 'Task title format in %s. May be composed of: %s' %
+                (self.alm_name, ','.join(AlmConnector.FIELD_OPTIONS)),
+                default=AlmConnector.DEFAULT_TITLE_FORMAT)
         self.config.opts.add('test_alm', 'Test Alm "server", "project" or "settings" '
                 'configuration only',
                 default='')
         self.config.opts.add('alm_standard_workflow', 'Standard workflow in ALM?',
                 default='True')
         self.config.opts.add('alm_custom_fields', 
-                'Customized fields to include when creating a task in ALM '
-                '(JSON encoded dictionary of strings)',
+                'Customized fields to include when creating a task in %s '
+                '(JSON encoded dictionary of strings)' % self.alm_name,
+                default='')
+
+        if self.default_priority_map:
+            self.config.opts.add(self.ALM_PRIORITY_MAP, 'Customized map from priority in SDE to %s '
+                '(JSON encoded dictionary of strings)' % self.alm_name,
                 default='')
 
     def initialize(self):
@@ -141,6 +160,8 @@ class AlmConnector(object):
             for status in self.config['sde_statuses_in_scope']:
                 if status not in AlmConnector.STANDARD_STATUS_LIST:
                     raise AlmException('Invalid status specified in sde_statuses_in_scope')
+
+            self.config.process_list_config('sde_tags_filter')
 
         if (not self.config['conflict_policy'] or
             not (self.config['conflict_policy'] == 'alm' or
@@ -178,6 +199,26 @@ class AlmConnector(object):
             raise AlmException('Incorrect start_fresh configuration: task deletion is not supported.')
 
         self.alm_plugin.post_conf_init()
+
+        if self.ALM_PRIORITY_MAP in self.config:
+            self.config.process_json_str_dict(self.ALM_PRIORITY_MAP)
+            if not self.config[self.ALM_PRIORITY_MAP]:
+                self.config[self.ALM_PRIORITY_MAP] = self.default_priority_map
+            self._validate_alm_priority_map()
+
+        matches = re.findall('\$\{?([a-zA-Z_]+)\}?', self.config['alm_title_format'])
+        if not matches:
+            raise AlmException('Incorrect alm_title_format configuration')
+        if 'title' not in matches:
+            raise AlmException('Incorrect alm_title_format configuration. Missing ${title}')
+        if 'task_id' not in matches:
+            raise AlmException('Incorrect alm_title_format configuration. Missing ${task_id}')
+        if 'context' in matches and not self.config['alm_context']:
+            raise AlmException('Missing alm_context in configuration')
+
+        for match in matches:
+            if match not in AlmConnector.FIELD_OPTIONS:
+                raise AlmException('Incorrect alm_title_format configuration. Invalid field: ${%s}' % match)
 
         logger.info('*** AlmConnector initialized ***')
 
@@ -329,39 +370,41 @@ class AlmConnector(object):
         {'1-3': 'Low', '4-6': 'Medium', '6-10': 'High'}
         {'3-1': 'Low', '6-4': 'Medium', '10-7': 'High'}
         """
-        if 'alm_priority_map' not in self.config:
+        if self.ALM_PRIORITY_MAP not in self.config:
             return
 
         priority_set = set()
-        for key, value in self.config['alm_priority_map'].iteritems():
+        for key, value in self.config[self.ALM_PRIORITY_MAP].iteritems():
             if not RE_MAP_RANGE_KEY.match(key):
-                raise AlmException('Unable to process alm_priority_map (not a JSON dictionary). '
-                        'Reason: Invalid range key %s' % key)
+                raise AlmException('Unable to process %s (not a JSON dictionary). '
+                        'Reason: Invalid range key %s' % (self.ALM_PRIORITY_MAP, key))
 
             if '-' in key:
                 lrange, hrange = key.split('-')
                 lrange = int(lrange)
                 hrange = int(hrange)
                 if lrange >= hrange:
-                    raise AlmException('Invalid alm_priority_map entry %s => %s: Priority %d should be less than %d' %
-                                       (key, value, lrange, hrange))
+                    raise AlmException('Invalid %s entry %s => %s: Priority %d should be less than %d' %
+                                       (self.ALM_PRIORITY_MAP, key, value, lrange, hrange))
                 for mapped_priority in range(lrange, hrange+1):
                     if mapped_priority in priority_set:
-                        raise AlmException('Invalid alm_priority_map entry %s => %s: Priority %d is duplicated' %
-                                          (key, value, mapped_priority))
+                        raise AlmException('Invalid %s entry %s => %s: Priority %d is duplicated' %
+                                          (self.ALM_PRIORITY_MAP, key, value, mapped_priority))
                     priority_set.add(mapped_priority)
             else:
                 key_value = int(key)
                 if key_value in priority_set:
-                    raise AlmException('Invalid alm_priority_map entry %s => %s: Priority %d is duplicated' %
-                                      (key, value, key_value))
+                    raise AlmException('Invalid %s entry %s => %s: Priority %d is duplicated' %
+                                      (self.ALM_PRIORITY_MAP, key, value, key_value))
                 priority_set.add(key_value)
 
         for mapped_priority in xrange(1, 11):
             if mapped_priority not in priority_set:
-                raise AlmException('Invalid alm_priority_map: missing a value mapping for priority %d' % mapped_priority)
+                raise AlmException('Invalid %s: missing a value mapping for priority %d' %
+                                   (self.ALM_PRIORITY_MAP, mapped_priority))
 
-    def _extract_task_id(self, full_task_id):
+    @staticmethod
+    def _extract_task_id(full_task_id):
         """
         Extract the task id e.g. "CT213" from the full project_id-task_id string e.g. "123-CT213"
         """
@@ -370,6 +413,30 @@ class AlmConnector(object):
         if task_search:
             task_id = task_search.group(2)
         return task_id
+
+    @staticmethod
+    def get_alm_task_title(config, task, fixed=False):
+        """
+        Return the user-defined formatted fixed or full alm title for an SDE task. The fixed title can be used
+        to uniquely identify an issue inside the ALM, allowing one ALM project to sync
+        with more than one instance of the same SDE task
+        """
+        task_id = AlmConnector._extract_task_id(task['id'])
+
+        # Remove the task id from the title to get the actual title
+        title = re.sub('^%s:\s+' % task_id, '', task['title'])
+
+        mapping = {
+            'task_id': '%s:' % task_id,  # Force a suffix to avoid finding "T222" when searching with "T2"
+            'context': config['alm_context'],
+            'application': config['sde_application'],
+            'project': config['sde_project'],
+            'title': title,
+        }
+        if fixed:
+            mapping['title'] = ''
+
+        return Template(config['alm_title_format']).substitute(mapping).strip()
 
     def sde_get_tasks(self):
         """ Gets all tasks for project in SD Elements
@@ -381,7 +448,10 @@ class AlmConnector(object):
             raise AlmException('Requires initialization')
 
         try:
-            return self.sde_plugin.get_task_list()
+            if self.config['selected_tasks']:
+                return self.sde_plugin.get_task_list()
+            else:
+                return self.sde_plugin.get_task_list(priority__gte=self.config['sde_min_priority'])
         except APIError, err:
             logger.error(err)
             raise AlmException('Unable to get tasks from SD Elements. Please ensure'
@@ -420,11 +490,17 @@ class AlmConnector(object):
 
         For example, has one of the appropriate phases
         """
-        tid = task['id'].split('-', 1)[-1]
+        tid = self._extract_task_id(task['id'])
         if self.config['selected_tasks']:
             return tid in self.config['selected_tasks']
-        return (task['phase'] in self.config['alm_phases'] and
-                task['priority'] >= self.config['sde_min_priority'])
+
+        in_scope = (task['phase'] in self.config['alm_phases'] and
+                    task['priority'] >= self.config['sde_min_priority'])
+
+        if self.config['sde_tags_filter']:
+            in_scope = set(self.config['sde_tags_filter']).issubset(task['tags'])
+
+        return in_scope
 
     def sde_update_task_status(self, task, status):
         """ Updates the status of the given task in SD Elements
@@ -451,7 +527,7 @@ class AlmConnector(object):
                                'to the server, or the status was invalid')
         logger.info('Status for task %s successfully set in SD Elements' % task['id'])
 
-        note_msg = 'Task status changed via %s' % self.alm_name
+        note_msg = 'Task status changed to %s via %s' % (status, self.alm_name)
         try:
             self._add_note(task['id'], note_msg, '', status)
         except APIError, err:
@@ -493,10 +569,16 @@ class AlmConnector(object):
         else:
             return alm_status == "TODO"
 
-    def prune_tasks(self, tasks):
-        tasks = [task for task in tasks if self.in_scope(task)]
+    def filter_tasks(self, tasks):
+        tasks = [AlmConnector.add_alm_title(self.config, task) for task in tasks if self.in_scope(task)]
 
         return tasks
+
+    @staticmethod
+    def add_alm_title(config, task):
+        task['alm_full_title'] = AlmConnector.get_alm_task_title(config, task, fixed=False)
+        task['alm_fixed_title'] = AlmConnector.get_alm_task_title(config, task, fixed=True)
+        return task
 
     def synchronize(self):
         """ Synchronizes SDE project with ALM project.
@@ -541,10 +623,10 @@ class AlmConnector(object):
             tasks = self.sde_get_tasks()
             logger.info('Retrieved all tasks from SDE')
 
-            #Prune unnecessary tasks - progress must match reality
-            tasks = self.prune_tasks(tasks)
+            #Filter tasks - progress must match reality
+            tasks = self.filter_tasks(tasks)
 
-            logger.info('Pruned tasks out of scope')
+            logger.info('Filtered tasks')
 
             if self.config['start_fresh']:
                 total_work = progress + len(tasks) * 2
@@ -560,7 +642,7 @@ class AlmConnector(object):
                     self.output_progress(100*progress/total_work)
 
             for task in tasks:
-                tid = task['id'].split('-', 1)[-1]
+                tid = self._extract_task_id(task['id'])
                 progress += 1
                 self.output_progress(100*progress/total_work)
 
@@ -614,3 +696,27 @@ class AlmConnector(object):
             self.alm_disconnect()
             raise
 
+    def translate_priority(self, priority):
+        """ Translates an SDE priority into a GitHub label """
+        pmap = self.config[self.ALM_PRIORITY_MAP]
+
+        if not pmap:
+            return None
+
+        try:
+            priority = int(priority)
+        except TypeError:
+            logger.error('Could not coerce %s into an integer' % priority)
+            raise AlmException("Error in translating SDE priority to %s: "
+                               "%s is not an integer priority" % (priority, self.alm_name))
+
+        for key in pmap:
+            if '-' in key:
+                lrange, hrange = key.split('-')
+                lrange = int(lrange)
+                hrange = int(hrange)
+                if lrange <= priority <= hrange:
+                    return pmap[key]
+            else:
+                if int(key) == priority:
+                    return pmap[key]

@@ -155,6 +155,9 @@ class ResponseGenerator(object):
         if _id in self.resources[resource_type]['resources']:
             self.resources[resource_type]['resources'].pop(_id)
 
+    def generator_clear_resource(self, resource_type):
+        self.resources[resource_type]['resources'] = {}
+
     def generator_resource_exists(self, resource_type, _id):
         self._check_resource_type_exists(resource_type)
         if _id == IntType:
@@ -200,13 +203,22 @@ class ResponseGenerator(object):
             the corresponding values in the resource
         """
         for key, value in _filter.items():
-            _task_value = task.get(key)
-            if type(_task_value) == IntType:
-                _task_value = str(_task_value)
-            if type(value) == ListType:
-                value = value[0]
-            if _task_value is None or not re.match(value, _task_value):
-                return False
+
+            # Support priority__gte filter on the SDE /api/tasks endpoint
+            m = re.match(r"(\w+)__gte", key)
+            if m:
+                _task_value = int(task.get(m.group(1)))
+                if type(value) == ListType:
+                    value = int(value[0])
+                return _task_value >= value
+            else:
+                _task_value = task.get(key)
+                if type(_task_value) == IntType:
+                    _task_value = str(_task_value)
+                if type(value) == ListType:
+                    value = value[0]
+                if _task_value is None or not re.match(value, _task_value):
+                    return False
         return True
 
     def generator_update_resource(self, resource_type, _id, update_args):

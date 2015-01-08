@@ -119,6 +119,7 @@ def load_modules():
 
     return command
 
+
 def run_command(cmd_name, args, call_src, call_options={},
         call_back=stdout_callback, call_back_args={}):
 
@@ -130,7 +131,7 @@ def run_command(cmd_name, args, call_src, call_options={},
     command_list = load_modules()
 
     if cmd_name not in command_list:
-        raise commons.UsageError("Command not found: %s" % (cmd_name))
+        raise commons.UsageError("Command not found: %s" % cmd_name)
 
     curr_cmd = command_list[cmd_name]
 
