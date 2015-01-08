@@ -22,7 +22,7 @@ logger = log_mgr.mods.add_mod(__name__)
 class TokenPlugin(MessagePlugin):
 
     def __init__(self, token_value):
-        self.auth_token=token_value
+        self.auth_token = token_value
 
     def marshalled(self, context):
         header = context.envelope.getChild('Header')
@@ -111,24 +111,22 @@ class FortifySSCImporter(BaseImporter):
             
         return project_version_id
     
-    def _download_file(self, stream, fpr_fname):
+    def _download_file(self, stream, fp):
 
         logger.info('Downloading FPR file')
 
-        fp = open(fpr_fname, 'wb')
         while True:
             try:
                 chunk = stream.read()
             except httplib.IncompleteRead as e:
                 chunk = e.partial
             except Exception as error:
-                fp.close()
+                os.close(fp)
                 raise error
             if not chunk:
                 break
-            fp.write(chunk)
-        fp.close()
-    
+            os.write(fp, chunk)
+
     def run(self):
 
         logger.info('Initiating connection to Fortify SSC service')    
@@ -164,21 +162,20 @@ class FortifySSCImporter(BaseImporter):
         temp_fd, fpr_filename = tempfile.mkstemp()
 
         try:
-            self._download_file(stream, fpr_filename)
+            self._download_file(stream, temp_fd)
         except Exception, e:
             os.close(temp_fd)
-            os.remove(fpr_filename)
             raise FortifyIntegrationError("Could not download FPR file: %s" % e)
 
         logger.info('FPR file downloaded successfully')
             
-        self.importer = FortifyFPRImporter()
+        self.importer = FortifyFPRImporter(self.config['import_blacklist'])
         
         try:
-            self.importer.parse(fpr_filename)
+            f = os.fdopen(temp_fd)
+            self.importer.parse(f)
         finally:
             os.close(temp_fd)
-            os.remove(fpr_filename)
 
-        self.raw_findings = self.importer.raw_findings
-        self.report_id = self.importer.report_id
+        self.findings = self.importer.findings
+        self.id = self.importer.id
