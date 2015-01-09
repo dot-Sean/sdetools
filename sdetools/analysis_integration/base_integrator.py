@@ -343,7 +343,7 @@ class BaseIntegrator(object):
                 elif re.search('[*?]', file_ext):
                     # Run the glob and filter out unsupported file types
                     processed_report_files.extend([f for f in glob.iglob(file_path)
-                                                  if self._get_file_extension(f) in self.supported_file_types])
+                                                  if self._get_file_extension(f) in self.supported_input['file']])
                 elif not file_ext:
                     # Glob using our supported file types
                     if os.path.isdir(file_path):

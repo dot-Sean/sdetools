@@ -18,8 +18,10 @@ class VeracodeIntegrator(BaseIntegrator):
     TOOL_NAME = "veracode"
 
     def __init__(self, config):
-        supported_file_types = ['xml']
-        super(VeracodeIntegrator, self).__init__(config, self.TOOL_NAME, supported_file_types, DEFAULT_MAPPING_FILE)
+        supported_input = {
+            'file': ['xml'],
+        }
+        super(VeracodeIntegrator, self).__init__(config, self.TOOL_NAME, supported_input, DEFAULT_MAPPING_FILE)
 
     def _make_raw_finding(self, node):
         """

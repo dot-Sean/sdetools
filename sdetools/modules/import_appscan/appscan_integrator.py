@@ -16,8 +16,10 @@ class AppScanIntegrator(BaseIntegrator):
     TOOL_NAME = "appscan"
 
     def __init__(self, config):
-        supported_file_types = ['xml', 'zip']
-        super(AppScanIntegrator, self).__init__(config, self.TOOL_NAME, supported_file_types, DEFAULT_MAPPING_FILE)
+        supported_input = {
+            'file': ['xml', 'zip'],
+        }
+        super(AppScanIntegrator, self).__init__(config, self.TOOL_NAME, supported_input, DEFAULT_MAPPING_FILE)
 
     def parse_report_file(self, report_file, report_type):
         if report_type == 'xml':

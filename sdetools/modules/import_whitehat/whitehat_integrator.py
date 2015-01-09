@@ -43,12 +43,16 @@ class WhiteHatIntegrator(BaseIntegrator):
     def __init__(self, wh_api, config):
         self.wh_api = wh_api
 
+        supported_input = {
+            'network': ['https']
+        }
+
         config.opts.add("asset_type", "Asset type: Site or Application (Not required if ID is specified)", None, default='')
         config.opts.add("asset_name", "Asset label (Note required if ID is specified)", None, default='')
         config.opts.add("asset_id", "Asset ID", None, default='')
         config.opts.add("api_key", "API Key", None, default='')
 
-        super(WhiteHatIntegrator, self).__init__(config, self.TOOL_NAME, [], DEFAULT_MAPPING_FILE)
+        super(WhiteHatIntegrator, self).__init__(config, self.TOOL_NAME, supported_input, DEFAULT_MAPPING_FILE)
 
     def initialize(self):
         """

@@ -18,8 +18,10 @@ class WebInspectIntegrator(BaseIntegrator):
     TOOL_NAME = "webinspect"
 
     def __init__(self, config):
-        supported_file_types = ['xml', 'fpr']
-        super(WebInspectIntegrator, self).__init__(config, self.TOOL_NAME, supported_file_types, DEFAULT_MAPPING_FILE)
+        supported_input = {
+            'file': ['xml', 'fpr'],
+        }
+        super(WebInspectIntegrator, self).__init__(config, self.TOOL_NAME, supported_input, DEFAULT_MAPPING_FILE)
 
     def parse_report_file(self, report_file, report_type):
         if report_type == 'xml':
