@@ -455,7 +455,6 @@ class BaseIntegrator(object):
                     (self.config['sde_application'], self.config['sde_project']))
 
         if self.config['trial_run']:
-            print "WAAAAAAAAAAAAAAAAAAAAAAAAAAA %s" % self.config['trial_run']
             logger.info("Trial run only. No changes will be made")
         else:
             ret = self.plugin.add_project_analysis_note(self.report_id, self.TOOL_NAME)
