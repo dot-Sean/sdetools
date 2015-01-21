@@ -24,4 +24,4 @@ class TestAppScanIntegration(BaseIntegrationTest, unittest.TestCase):
             self.init_data()
             self.assertTrue(False, 'Unsupported AppScan edition: %s' % self.config['edition'])
         except UsageError:
-            self.assertTrue(True)
+            pass

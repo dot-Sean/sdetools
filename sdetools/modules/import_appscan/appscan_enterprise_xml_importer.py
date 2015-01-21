@@ -4,7 +4,7 @@ from sdetools.analysis_integration.base_integrator import BaseXMLImporter, BaseC
 class AppScanEnterpriseXMLContent(BaseContentHandler):
     def __init__(self):
         self.saw_app_scan_node = False
-        self.in_report_node = False # top-level node
+        self.in_report_node = False  # top-level node
         self.in_report_control_node = False
         self.in_report_control_row_node = False
         self.in_report_control_row_issue_type_node = False
@@ -22,7 +22,7 @@ class AppScanEnterpriseXMLContent(BaseContentHandler):
     def startElement(self, name, attrs):
         if name == 'report':
             self.in_report_node = True
-            self.saw_xml_report_node = True
+            self.saw_app_scan_node = True
         elif self.in_report_node and name == 'control':
             self.in_report_control_node = True
         elif self.in_report_control_node and name == 'row':
@@ -46,7 +46,7 @@ class AppScanEnterpriseXMLContent(BaseContentHandler):
 
     def endElement(self, name):
         if name == 'report':
-            self.saw_xml_report_node = False
+            self.saw_app_scan_node = False
         elif self.in_report_node and name == 'control':
             self.in_report_control_node = False
         elif self.in_report_control_node and name == 'row':
@@ -54,10 +54,12 @@ class AppScanEnterpriseXMLContent(BaseContentHandler):
         elif self.in_report_control_row_node and name == 'issue_type_name':
             self.in_report_control_row_issue_type_node = False
 
+
 class AppScanEnterpriseXMLImporter(BaseXMLImporter):
 
     def __init__(self):
         super(AppScanEnterpriseXMLImporter, self).__init__()
+        self.name = 'appscan_enterprise'
 
     def _get_content_handler(self):
         return AppScanEnterpriseXMLContent()

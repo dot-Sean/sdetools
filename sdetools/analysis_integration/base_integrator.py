@@ -18,8 +18,10 @@ abstractmethod = abc.abstractmethod
 from sdetools.sdelib import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
+
 class IntegrationError(Error):
     pass
+
 
 class IntegrationResult(object):
     def __init__(self, import_start_datetime, import_finish_datetime, affected_tasks, noflaw_tasks,
@@ -31,47 +33,95 @@ class IntegrationResult(object):
         self.error_count = error_count
         self.error_weaknesses_unmapped = error_weaknesses_unmapped
 
-class BaseContentHandler(ContentHandler):
-
-    findings = []
-    id = None
-
-    def __init__(self):
-        self.findings = []
-        self.id = None
-
-    @abstractmethod
-    def valid_content_detected(self):
-        pass
 
 class BaseImporter(object):
 
     findings = []
     id = ""
+    name = None
 
     def __init__(self):
-        self.id = ""
+        self.clear()
+
+    def clear(self):
         self.findings = []
+        self.id = ""
+        self.name = None
+
+    def can_parse_file(self):
+        return False
+
+
+class BaseContentHandler(ContentHandler, BaseImporter):
+
+    def __init__(self):
+        super(BaseContentHandler, self).__init__()
+
+    @abstractmethod
+    def valid_content_detected(self):
+        pass
 
 
 class BaseZIPImporter(BaseImporter):
     ARCHIVED_FILE_NAME = None
-    MAX_NUMER_ARCHIVED_FILES = 10
+    MAX_NUMBER_ARCHIVED_FILES = 10
     MAX_SIZE_IN_MB = 300  # Maximum archived file size in MB
     MAX_MEMORY_SIZE_IN_MB = 50  # Python 2.5 and prior must be much more conservative
     IMPORTERS = {}
     PATTERN_IMPORTERS = {}
+    available_importers = []
+    detected_req_importer = None
 
     def __init__(self):
         super(BaseZIPImporter, self).__init__()
+        self.clear()
+
+    def clear(self):
+        super(BaseZIPImporter, self).clear()
         self.IMPORTERS = {}
         self.PATTERN_IMPORTERS = {}
+        self.available_importers = []
+        self.detected_req_importer = None
 
     def register_importer(self, file_name, importer):
         self.IMPORTERS[file_name] = importer
 
     def register_importer_for_pattern(self, pattern, importer):
         self.PATTERN_IMPORTERS[pattern] = importer
+
+    def detect_req_importer(self, report_file):
+        """
+        Examine all available importers scoped for this ZIP importer:
+            - iterate over all zipped files
+            - return the first importer that can open report_file
+        """
+        req_importer = None
+        for item in self.available_importers:
+            if req_importer:
+                break
+
+            self.clear()
+            self.register_importer_for_pattern(item['pattern'], item['importer'])
+            try:
+                self.process_archive(report_file)
+            except IntegrationError:
+                # This is not the importer we're looking for
+                continue
+
+            for file_name, importer in self.IMPORTERS.items():
+                if not req_importer and importer.get_parse_was_successful():
+                    print "Detected importer %s" % item['name']
+                    req_importer = importer
+                importer.clear()
+
+        self.detected_req_importer = req_importer
+        return self.detected_req_importer
+
+    def can_parse_file(self, report_file):
+        if not zipfile.is_zipfile(report_file):
+            return False
+
+        return self.detect_req_importer(report_file) is not None
 
     def process_archive(self, zip_archive):
 
@@ -91,9 +141,9 @@ class BaseZIPImporter(BaseImporter):
                     self.register_importer(file_name, self.PATTERN_IMPORTERS[pattern])
 
         # Put a limit on the number of supported files we will process from a ZIP
-        if len(self.IMPORTERS.keys()) > BaseZIPImporter.MAX_NUMER_ARCHIVED_FILES:
+        if len(self.IMPORTERS.keys()) > self.MAX_NUMBER_ARCHIVED_FILES:
             raise IntegrationError("File %s exceeds the limit of %d files" % (zip_archive,
-                                                                              BaseZIPImporter.MAX_NUMER_ARCHIVED_FILES))
+                                                                              self.MAX_NUMBER_ARCHIVED_FILES))
 
         for file_name in self.IMPORTERS.keys():
             try:
@@ -159,8 +209,11 @@ class BaseZIPImporter(BaseImporter):
 
 class BaseXMLImporter(BaseImporter):
 
+    last_parse_indicator = False
+
     def __init__(self):
         super(BaseXMLImporter, self).__init__()
+        self.last_parse_indicator = False
 
     @abstractmethod
     def _get_content_handler(self):
@@ -190,6 +243,8 @@ class BaseXMLImporter(BaseImporter):
                 xml.sax.SAXNotRecognizedException), se:
             raise IntegrationError("Could not parse file '%s': %s" % (xml_file, se))
 
+        self.last_parse_indicator = XMLReader.valid_content_detected()
+
         if not XMLReader.valid_content_detected():
             raise IntegrationError("Malformed document detected: %s" % xml_file)
 
@@ -205,6 +260,8 @@ class BaseXMLImporter(BaseImporter):
                 xml.sax.SAXNotRecognizedException), se:
             raise IntegrationError("Could not parse xml source %s" % (se))
 
+        self.last_parse_indicator = XMLReader.valid_content_detected()
+
         if not XMLReader.valid_content_detected():
             raise IntegrationError("Malformed document detected")
 
@@ -212,8 +269,29 @@ class BaseXMLImporter(BaseImporter):
         if XMLReader.id:
             self.id = XMLReader.id
 
+    def get_parse_was_successful(self):
+        return self.last_parse_indicator
+
+    def can_parse_file(self, xml_file):
+        XMLReader = self._get_content_handler()
+
+        parser = sax.make_parser()
+        parser.setContentHandler(XMLReader)
+
+        try:
+            parser.parse(xml_file)
+        except (xml.sax.SAXException, xml.sax.SAXParseException, xml.sax.SAXNotSupportedException,
+                xml.sax.SAXNotRecognizedException), se:
+            print xml_file
+            print se
+            return False
+
+        return XMLReader.valid_content_detected()
+
+
 class BaseIntegrator(object):
     TOOL_NAME = 'External tool'
+    AVAILABLE_IMPORTERS = [] # Subclasses must fill this list
     VALID_IMPORT_BEHAVIOUR = ['replace', 'replace-scanner', 'combine']
 
     # An internal map of possible verification and acceptable status meanings
@@ -308,14 +386,24 @@ class BaseIntegrator(object):
         for status in statuses['taskstatuses']:
             self.taskstatuses[status['slug']] = status
 
+    def detect_importer(self, report_file):
+        for item in self.AVAILABLE_IMPORTERS:
+            if item['importer'].can_parse_file(report_file):
+                return item['importer']
+        return None
+
     @staticmethod
     def _get_file_extension(file_path):
         return os.path.splitext(file_path)[1][1:]
 
     @abstractmethod
     def parse_report_file(self, report_file, report_type):
-        """Returns the raw findings and the report id for a single report file"""
+        """ Returns the raw findings and the report id for a single report file """
+
         return [], None
+
+    def set_tool_name(self, tool_name):
+        self.TOOL_NAME = tool_name
 
     def parse(self):
         _raw_findings = []
@@ -474,7 +562,7 @@ class BaseIntegrator(object):
         stats_total_flaws_found = 0
         import_start_datetime = datetime.now()
 
-        logger.info("Integration underway for: %s" % (self.report_id))
+        logger.info("Integration underway for: %s" % self.report_id)
         logger.info("Mapped SD application/project: %s/%s" %
                     (self.config['sde_application'], self.config['sde_project']))
 

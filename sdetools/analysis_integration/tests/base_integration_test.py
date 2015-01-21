@@ -131,7 +131,7 @@ class BaseIntegrationTest(object):
                     self.init_data()
                     self.assertTrue(False, 'Invalid task_status_mapping (%s=>%s) not detected' % (verification, status))
                 except UsageError:
-                    self.assertTrue(True)
+                    pass
 
     def test_valid_task_status_mapping(self):
         # Set of valid verification => status meaning mappings

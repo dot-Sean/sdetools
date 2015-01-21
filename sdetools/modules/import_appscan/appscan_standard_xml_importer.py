@@ -69,11 +69,13 @@ class AppScanStandardXMLContent(BaseContentHandler):
             self.in_hosts_host_id_node = False
         elif self.in_hosts_node and name == 'Hosts':
             self.in_hosts_node = False
-    
+
+
 class AppScanStandardXMLImporter(BaseXMLImporter):
 
     def __init__(self):
         super(AppScanStandardXMLImporter, self).__init__()
+        self.name = 'appscan_standard'
 
     def _get_content_handler(self):
         return AppScanStandardXMLContent()
