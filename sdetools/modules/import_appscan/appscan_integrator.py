@@ -50,9 +50,7 @@ class AppScanIntegrator(BaseIntegrator):
             importer = AppScanStandardXMLImporter()
         elif report_type == 'xml' and self.config['edition'] == 'enterprise':
             importer = AppScanEnterpriseXMLImporter()
-        elif report_type == 'zip':
-            importer = AppScanZIPImporter()
-        elif report_type == 'auto' or self.config['edition'] == 'auto':
+        else:
             importer = self.detect_importer(report_file)
 
         if not importer:

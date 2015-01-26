@@ -82,7 +82,11 @@ class BaseIntegrationTest(object):
 
     def check_analysis_note(self, task_id, expected_status, expected_confidence, expected_count):
         expected_count *= self.num_reports
-        analysis_task_note = self.integrator.plugin.get_task_notes('T%s' % task_id)['analysis'][0]
+        analysis_task_notes = self.integrator.plugin.get_task_notes('T%s' % task_id)['analysis']
+        self.assertTrue(analysis_task_notes is not None, 'Expected analysis notes for T%s' % task_id)
+        self.assertTrue(len(analysis_task_notes) > 0, 'Expected at least 1 analysis note for T%s' % task_id)
+
+        analysis_task_note = analysis_task_notes[0]
 
         if expected_count:
             findings = analysis_task_note['findings'][0]
@@ -103,7 +107,7 @@ class BaseIntegrationTest(object):
             self.init_data()
             self.assertTrue(False, 'Invalid import_behaviour %s not detected' % self.config['import_behaviour'])
         except UsageError:
-            self.assertTrue(True)
+            pass
 
     def test_valid_import_behaviour(self):
         for behaviour in BaseIntegrator.VALID_IMPORT_BEHAVIOUR:
@@ -111,7 +115,6 @@ class BaseIntegrationTest(object):
             self.config['import_behaviour'] = behaviour
             try:
                 self.init_data()
-                self.assertTrue(True)
             except UsageError:
                 self.assertTrue(False, 'Valid import_behaviour %s improperly disallowed' % behaviour)
 
@@ -121,7 +124,7 @@ class BaseIntegrationTest(object):
             'no_such_verification': ['BAD', 'TODO', 'DONE'],
             'partial': ['BAD', 'NA'],
             'fail': ['BAD', 'DONE', 'NA'],
-            'pass': ['BAD','NA'],
+            'pass': ['BAD', 'NA'],
         }
         for verification, statuses in invalid_mappings.iteritems():
             for status in statuses:
@@ -146,7 +149,6 @@ class BaseIntegrationTest(object):
                 self.config['task_status_mapping'] = {verification: status}
                 try:
                     self.init_data()
-                    self.assertTrue(True)
                 except UsageError:
                     self.assertTrue(False, 'Valid task_mapping (%s => %s) improperly disallowed' %
                                     (verification, status))

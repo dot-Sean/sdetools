@@ -74,13 +74,13 @@ class BaseZIPImporter(BaseImporter):
 
     def __init__(self):
         super(BaseZIPImporter, self).__init__()
+        self.available_importers = []
         self.clear()
 
     def clear(self):
         super(BaseZIPImporter, self).clear()
         self.IMPORTERS = {}
         self.PATTERN_IMPORTERS = {}
-        self.available_importers = []
         self.detected_req_importer = None
 
     def register_importer(self, file_name, importer):
@@ -110,7 +110,6 @@ class BaseZIPImporter(BaseImporter):
 
             for file_name, importer in self.IMPORTERS.items():
                 if not req_importer and importer.get_parse_was_successful():
-                    print "Detected importer %s" % item['name']
                     req_importer = importer
                 importer.clear()
 
@@ -305,7 +304,7 @@ class BaseIntegrator(object):
         self.config = config
         self.emit = self.config.emit
         self.behaviour = 'replace'
-        self.weakness_map_identifier = 'id' # default XML attribute with weakness identifier
+        self.weakness_map_identifier = 'id'  # default XML attribute with weakness identifier
         self.weakness_title = {}
         self.confidence = {}
         self.taskstatuses = {}
@@ -486,7 +485,7 @@ class BaseIntegrator(object):
         self.weakness_type = {}
         for task in base.getElementsByTagName('task'):
             if task.attributes.has_key('confidence'):
-                self.confidence[task.attributes[self.weakness_map_identifier].value] = task.attributes['confidence'].value
+                self.confidence[task.attributes['id'].value] = task.attributes['confidence'].value
 
             for weakness in task.getElementsByTagName('weakness'):
                 weakness_id = weakness.attributes[self.weakness_map_identifier].value
@@ -529,7 +528,7 @@ class BaseIntegrator(object):
     def lookup_task(self, weakness_id):
         if self.mapping.has_key(weakness_id):
             return self.mapping[weakness_id]
-        if self.mapping.has_key('*'):
+        if '*' in self.mapping:
             return self.mapping['*']
         return None
 
@@ -589,7 +588,7 @@ class BaseIntegrator(object):
                 logger.debug("Task %s not found in project tasks" % task_id)
                 mapped_tasks = self.lookup_task("*")
                 if mapped_tasks:
-                    new_task_id = mapped_tasks[0] # use the first one
+                    new_task_id = mapped_tasks[0]  # use the first one
                     if task_id != new_task_id:
                         logger.warn("Task %s was not found in the project, mapping it to the default task %s." %
                                 (task_id, new_task_id))
@@ -614,7 +613,7 @@ class BaseIntegrator(object):
                 stats_total_skips_findings += len(finding['weaknesses'])
                 continue
 
-            task_name = "T%s" % (task_id)
+            task_name = "T%s" % task_id
 
             analysis_findings = []
             last_weakness = None
@@ -624,7 +623,7 @@ class BaseIntegrator(object):
 
                 if 'description' in weakness:
                     weakness_description = weakness['description']
-                elif (self.weakness_title.has_key(weakness['weakness_id']) and
+                elif (weakness['weakness_id'] in self.weakness_title and
                         self.weakness_title[weakness['weakness_id']] != ''):
                     weakness_description = self.weakness_title[weakness['weakness_id']]
                 else:
@@ -636,7 +635,7 @@ class BaseIntegrator(object):
                         weakness_finding = {}
                     weakness_finding['count'] = 0
 
-                    if (self.weakness_type.has_key(weakness['weakness_id']) and
+                    if (weakness['weakness_id'] in self.weakness_type and
                             self.weakness_type[weakness['weakness_id']] == 'cwe'):
                         weakness_finding['cwe'] = weakness['weakness_id']
 
@@ -653,7 +652,7 @@ class BaseIntegrator(object):
 
             try:
                 finding_confidence = "low"
-                if self.confidence.has_key(task_id):
+                if task_id in self.confidence:
                     finding_confidence = self.confidence[task_id]
 
                 if not self.config['trial_run']:
@@ -688,10 +687,11 @@ class BaseIntegrator(object):
 
                 task_name = "T%s" % task_id
 
-                finding_confidence = "none"
-                if self.confidence.has_key(task_id):
+                finding_confidence = "low"
+                if task_id in self.confidence:
                     finding_confidence = self.confidence[task_id]
                 else:
+                    # We have no requirement coverage for this task
                     continue
 
                 try:

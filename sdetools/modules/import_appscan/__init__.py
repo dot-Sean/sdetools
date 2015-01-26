@@ -1,6 +1,7 @@
 from sdetools.sdelib.cmd import BaseCommand
 from sdetools.modules.import_appscan import appscan_integrator
 
+
 class Command(BaseCommand):
     help = 'AppScan -> SDE import utility.'
 
