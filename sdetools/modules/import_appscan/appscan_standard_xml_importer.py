@@ -1,7 +1,7 @@
 from sdetools.analysis_integration.base_integrator import BaseXMLImporter, BaseContentHandler
 
 
-class AppScanXMLContent(BaseContentHandler):
+class AppScanStandardXMLContent(BaseContentHandler):
     def __init__(self):
         self.saw_xml_report_node = False # top-level node
         self.saw_app_scan_node = False
@@ -69,11 +69,13 @@ class AppScanXMLContent(BaseContentHandler):
             self.in_hosts_host_id_node = False
         elif self.in_hosts_node and name == 'Hosts':
             self.in_hosts_node = False
-    
-class AppScanXMLImporter(BaseXMLImporter):
+
+
+class AppScanStandardXMLImporter(BaseXMLImporter):
 
     def __init__(self):
-        super(AppScanXMLImporter, self).__init__()
+        super(AppScanStandardXMLImporter, self).__init__()
+        self.edition = 'standard'
 
     def _get_content_handler(self):
-        return AppScanXMLContent()
+        return AppScanStandardXMLContent()

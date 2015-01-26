@@ -1950,7 +1950,7 @@
     <weakness type="check" id="AdobeRoboHelpDOMBasedXSS" cause="usOfClientSideLogic" title="Adobe RoboHelp DOM Based Cross-Site Scripting"/>
     <weakness type="check" id="DOMXSS1" cause="usOfClientSideLogic" title="DOM Based Cross-Site Scripting"/>
   </task>
-  <task id="38" title="Bind variables in SQL statements" confidence="low">
+  <task id="38" title="Bind variables in SQL statements" confidence="high">
     <weakness type="check" id="probeSQL" cause="" title="detect whether a parameter is SQL-injectable"/>
     <weakness type="check" id="TPHidden_OWB_ABAP_Injection_SQL" cause="WB_DBAccess" title="ABAP Injection SQL"/>
     <weakness type="check" id="TPHidden_OWB_ABAP_Injection_SQL_C_DB_EXECUTE" cause="WB_DBAccess" title="Only use Open SQL in order to access the SAP database"/>
