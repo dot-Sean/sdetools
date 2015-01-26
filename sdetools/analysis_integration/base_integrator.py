@@ -208,8 +208,6 @@ class BaseZIPImporter(BaseImporter):
 
 class BaseXMLImporter(BaseImporter):
 
-    last_parse_indicator = False
-
     def __init__(self):
         super(BaseXMLImporter, self).__init__()
         self.last_parse_indicator = False
