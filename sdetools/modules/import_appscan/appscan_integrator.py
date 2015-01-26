@@ -44,9 +44,6 @@ class AppScanIntegrator(BaseIntegrator):
         if self.config['edition'] not in AppScanIntegrator.VALID_PRODUCT_EDITIONS:
             raise UsageError("Unsupported AppScan edition: %s" % self.config['edition'])
 
-        if self.config['edition'] == 'enterprise':
-            self.weakness_map_identifier = 'title'
-
     def parse_report_file(self, report_file, report_type):
 
         if report_type == 'xml' and self.config['edition'] == 'standard':
@@ -61,10 +58,17 @@ class AppScanIntegrator(BaseIntegrator):
         if not importer:
             raise UsageError("Unsupported file: %s" % report_file)
 
-        importer.parse(report_file)
+        if importer.edition == 'standard':
+            self.weakness_map_identifier = 'id'
+            self.set_tool_name('appscan')
+        elif importer.edition == 'enterprise':
+            self.weakness_map_identifier = 'title'
+            self.set_tool_name('appscan_enterprise')
 
-        if importer.name:
-            self.set_tool_name(importer.name)
+        # load the task -> weakness mapping
+        self.load_mapping_from_xml()
+
+        importer.parse(report_file)
 
         self.findings = importer.findings
         self.report_id = importer.id

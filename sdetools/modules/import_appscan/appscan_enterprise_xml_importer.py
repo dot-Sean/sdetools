@@ -45,9 +45,7 @@ class AppScanEnterpriseXMLContent(BaseContentHandler):
             self.check_id = ""
 
     def endElement(self, name):
-        if name == 'report':
-            self.saw_app_scan_node = False
-        elif self.in_report_node and name == 'control':
+        if self.in_report_node and name == 'control':
             self.in_report_control_node = False
         elif self.in_report_control_node and name == 'row':
             self.in_report_control_row_node = False
@@ -59,7 +57,7 @@ class AppScanEnterpriseXMLImporter(BaseXMLImporter):
 
     def __init__(self):
         super(AppScanEnterpriseXMLImporter, self).__init__()
-        self.name = 'appscan_enterprise'
+        self.edition = 'enterprise'
 
     def _get_content_handler(self):
         return AppScanEnterpriseXMLContent()

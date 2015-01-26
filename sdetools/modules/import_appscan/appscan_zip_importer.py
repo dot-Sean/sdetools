@@ -18,4 +18,5 @@ class AppScanZIPImporter(BaseZIPImporter):
                 'importer': AppScanEnterpriseXMLImporter()
             }
         ]
+        self.edition = None
 

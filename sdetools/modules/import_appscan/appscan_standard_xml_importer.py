@@ -75,7 +75,7 @@ class AppScanStandardXMLImporter(BaseXMLImporter):
 
     def __init__(self):
         super(AppScanStandardXMLImporter, self).__init__()
-        self.name = 'appscan_standard'
+        self.edition = 'standard'
 
     def _get_content_handler(self):
         return AppScanStandardXMLContent()
