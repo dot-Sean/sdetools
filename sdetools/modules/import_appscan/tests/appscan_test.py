@@ -11,12 +11,15 @@ class TestAppScanIntegration(BaseIntegrationTest, unittest.TestCase):
     def setUpClass(cls):
         sde_cmd = "import_appscan"
         mapping_file = 'mapping.xml'
-        report_file = 'results.zip'
+        report_file = 'appscan.xml'
         integrator = AppScanIntegrator
         super(TestAppScanIntegration, cls).setUpClass(sde_cmd, mapping_file, report_file, integrator)
 
     def expected_number_of_findings(self):
         return 2
+
+    def test_import_with_zip(self):
+        self._test_import_with_zip()
 
     def test_invalid_edition(self):
         self.config['edition'] = 'unknown'

@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<XmlReport Name="demo.testfire.net" XmlExportVersion="2.0">
+  <AppScanInfo>
+    <Version>8.7.0.0</Version>
+    <ServicePack />
+  </AppScanInfo>
+  <Summary>
+    <TotalIssues>2</TotalIssues>
+    <TotalVariants>2</TotalVariants>
+    <TotalRemediations>0</TotalRemediations>
+    <TotalScanDuration>01:21:49.4638973</TotalScanDuration>
+    <Hosts>
+      <Host Name="http://some.host.com/">
+        <TotalInformationalIssues>0</TotalInformationalIssues>
+        <TotalLowSeverityIssues>0</TotalLowSeverityIssues>
+        <TotalMediumSeverityIssues>0</TotalMediumSeverityIssues>
+        <TotalHighSeverityIssues>3</TotalHighSeverityIssues>
+        <Total>124</Total>
+      </Host>
+    </Hosts>
+  </Summary>
+  <Results>
+    <RemediationTypes/>
+      <IssueTypes>
+      <IssueType ID="attUserAgentXSS" Count="1">
+        <RemediationID>fix_52000</RemediationID>
+        <advisory>
+          <name>Some sort of XSS</name>
+          <testDescription>Application-level test</testDescription>
+          <threatClassification>
+            <name>Cross Site Scripting</name>
+            <reference>http://some.reference.url/</reference>
+          </threatClassification>
+        </advisory>
+      </IssueType>
+      <IssueType ID="attSomeUnknownWeakness" Count="1">
+        <RemediationID>fix_52000</RemediationID>
+        <advisory>
+          <name>Some sort of Weakness</name>
+          <testDescription>Application-level test</testDescription>
+          <threatClassification>
+            <name>Unknown Weakness</name>
+            <reference>http://some.reference.url/</reference>
+          </threatClassification>
+        </advisory>
+      </IssueType>      
+    </IssueTypes>
+  </Results>
+</XmlReport>

@@ -117,7 +117,9 @@ class BaseZIPImporter(BaseImporter):
         return self.detected_req_importer
 
     def can_parse_file(self, report_file):
-        if not zipfile.is_zipfile(report_file):
+        try:
+            results_archive = zipfile.ZipFile(report_file, "r")
+        except zipfile.BadZipfile, zipfile.LargeZipFile:
             return False
 
         return self.detect_req_importer(report_file) is not None
@@ -228,6 +230,7 @@ class BaseXMLImporter(BaseImporter):
                 raise IntegrationError("Could not open file '%s': %s" % (file_name, ioe))
         else:
             fp = file_name
+        fp.seek(0)
         self.parse_file(fp)
 
     def parse_file(self, xml_file):
@@ -270,21 +273,14 @@ class BaseXMLImporter(BaseImporter):
         return self.last_parse_indicator
 
     def can_parse_file(self, xml_file):
-        XMLReader = self._get_content_handler()
-
-        parser = sax.make_parser()
-        parser.setContentHandler(XMLReader)
-
         try:
-            parser.parse(xml_file)
-        except (xml.sax.SAXException, xml.sax.SAXParseException, xml.sax.SAXNotSupportedException,
-                xml.sax.SAXNotRecognizedException), se:
-            print xml_file
-            print se
+            self.parse(xml_file)
+        except IntegrationError:
             return False
 
-        return XMLReader.valid_content_detected()
-
+        self.findings = []
+        self.id = None
+        return self.last_parse_indicator
 
 class BaseIntegrator(object):
     TOOL_NAME = 'External tool'
