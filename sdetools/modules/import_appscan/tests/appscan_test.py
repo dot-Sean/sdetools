@@ -3,7 +3,6 @@ import unittest
 from sdetools.sdelib.commons import UsageError
 from sdetools.analysis_integration.tests.base_integration_test import BaseIntegrationTest
 from sdetools.modules.import_appscan.appscan_integrator import AppScanIntegrator
-from sdetools.modules.import_appscan.appscan_zip_importer import AppScanZIPImporter
 
 
 class TestAppScanIntegration(BaseIntegrationTest, unittest.TestCase):
