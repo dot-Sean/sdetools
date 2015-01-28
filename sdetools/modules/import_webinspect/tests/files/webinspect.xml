@@ -1,0 +1,18 @@
+﻿<Sessions>
+    <Session requestId="B87C26151D78AB353B5F59C15E10E797">
+        <URL>http://zero.webappsecurity.com:80/login1.asp</URL>
+        <Scheme>http</Scheme>
+        <Host>zero.webappsecurity.com</Host>
+        <Port>80</Port>
+        <Issues>
+            <Issue id="248cbb37-5edb-41d0-98ab-69882666b31a">
+                <VulnerabilityID>5649</VulnerabilityID>
+                <Name>Cross-Site Scripting</Name>
+            </Issue>
+            <Issue id="248cbb37-5edb-41d0-98ab-69882666b31a">
+                <VulnerabilityID>99999999</VulnerabilityID>
+                <Name>Some unknown weakness</Name>
+            </Issue>
+        </Issues>
+    </Session>
+</Sessions>

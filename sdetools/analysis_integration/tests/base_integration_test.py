@@ -1,4 +1,6 @@
 import os
+import StringIO
+import zipfile
 
 from sdetools.sdelib import conf_mgr
 from sdetools.sdelib.mod_mgr import ReturnChannel, load_modules
@@ -79,6 +81,32 @@ class BaseIntegrationTest(object):
         self.num_reports = 2
 
         self.test_import_findings_assert_failed_tasks()
+
+    def _test_import_with_zip(self):
+        buf = StringIO.StringIO()
+
+        zip_archive = zipfile.ZipFile(buf, mode='w')
+        report_path = os.path.join(self.test_file_dir, self.report_file)
+        zip_archive.write(report_path, self.report_file)
+        zip_archive.close()
+
+        self.integrator.config['report_file'] = buf
+        self.integrator.config['report_type'] = 'zip'
+
+        self.test_import_findings_assert_failed_tasks()
+
+    def test_import_with_file_object(self):
+        report_file_name = os.path.join(self.test_file_dir, self.report_file)
+        report_type = BaseIntegrator._get_file_extension(report_file_name)
+
+        report_file = open(report_file_name, 'r')
+
+        self.integrator.config['report_file'] = report_file
+        self.integrator.config['report_type'] = report_type
+
+        self.test_import_findings_assert_failed_tasks()
+
+        report_file.close()
 
     def check_analysis_note(self, task_id, expected_status, expected_confidence, expected_count):
         expected_count *= self.num_reports

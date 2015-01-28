@@ -54,7 +54,7 @@ class AppScanIntegrator(BaseIntegrator):
             importer = self.detect_importer(report_file)
 
         if not importer:
-            raise UsageError("Unsupported file: %s" % report_file)
+            raise UsageError("Unsupported or malformed file")
 
         if importer.edition == 'standard':
             self.weakness_map_identifier = 'id'

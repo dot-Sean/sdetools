@@ -18,13 +18,13 @@ class WebInspectIntegrator(BaseIntegrator):
     TOOL_NAME = "webinspect"
 
     def __init__(self, config):
-        supported_file_types = ['xml', 'fpr']
+        supported_file_types = ['xml', 'fpr', 'zip']
         super(WebInspectIntegrator, self).__init__(config, self.TOOL_NAME, supported_file_types, DEFAULT_MAPPING_FILE)
 
     def parse_report_file(self, report_file, report_type):
         if report_type == 'xml':
             importer = WebInspectXMLImporter()
-        elif report_type == 'fpr':
+        elif report_type in ['fpr', 'zip']:
             importer = WebInspectFPRImporter()
         else:
             raise UsageError("Unsupported file type (%s)" % report_type)
