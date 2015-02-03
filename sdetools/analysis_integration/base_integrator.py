@@ -43,6 +43,9 @@ class BaseImporter(object):
     def __init__(self):
         self.clear()
 
+    def __str__(self):
+        return self.__class__.__name__
+
     def clear(self):
         self.findings = []
         self.id = ""
@@ -99,6 +102,8 @@ class BaseZIPImporter(BaseImporter):
         for item in self.available_importers:
             if req_importer:
                 break
+
+            logger.debug("Trying to import file using %s" % item['importer'])
 
             self.clear()
             self.register_importer_for_pattern(item['pattern'], item['importer'])
@@ -281,6 +286,7 @@ class BaseXMLImporter(BaseImporter):
         self.findings = []
         self.id = None
         return self.last_parse_indicator
+
 
 class BaseIntegrator(object):
     TOOL_NAME = 'External tool'

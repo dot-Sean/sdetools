@@ -31,6 +31,7 @@ class BaseIntegrationTest(object):
         cls.mock_sde_response = MOCK_SDE_RESPONSE
 
     def setUp(self):
+        print self.report_file
         command_list = load_modules()
         ret_chn = ReturnChannel(stdout_callback, {})
         self.config = conf_mgr.Config(self.sde_cmd, '', command_list, [], ret_chn, 'shell')
@@ -41,6 +42,7 @@ class BaseIntegrationTest(object):
         self.integrator.load_mapping_from_xml()
 
     def init_data(self):
+        print self.report_file
         self.integrator.initialize()
         self.integrator.parse()
 
@@ -209,6 +211,8 @@ class BaseIntegrationTest(object):
         self.assertFalse('193' in result.affected_tasks, 'Task 193 is not suppose to be mapped to an affected task')
 
     def test_import_findings_assert_passed_tasks(self):
+        import pdb
+        pdb.set_trace()
         self.init_data()
         result = self.integrator.import_findings()
 

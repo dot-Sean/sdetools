@@ -20,3 +20,5 @@ class AppScanZIPImporter(BaseZIPImporter):
         ]
         self.edition = None
 
+    def get_edition(self):
+        return self.detected_req_importer.get_edition()

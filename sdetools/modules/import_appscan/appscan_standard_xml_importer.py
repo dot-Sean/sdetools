@@ -79,3 +79,6 @@ class AppScanStandardXMLImporter(BaseXMLImporter):
 
     def _get_content_handler(self):
         return AppScanStandardXMLContent()
+
+    def get_edition(self):
+        return self.edition

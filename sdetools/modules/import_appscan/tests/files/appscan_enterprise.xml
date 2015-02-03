@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<report>
+  <control>
+    <row>
+      <issue_severity>High</issue_severity>
+      <issue_status>Open</issue_status>
+      <issue_id>1989142</issue_id>
+      <issue_type_name>attSomeUnknownWeakness</issue_type_name>
+      <test_url>https://example.com/crossdomain.xml</test_url>
+      <security_entity_element />
+      <source_file />
+      <api />
+      <risk_category_name>It is possible to steal or manipulate customer session and cookies, which might be used to impersonate a legitimate user, allowing the hacker to view or alter user records, and to perform transactions as that user</risk_category_name>
+    </row>
+    <row>
+      <issue_severity>High</issue_severity>
+      <issue_status>Open</issue_status>
+      <issue_id>1989142</issue_id>
+      <issue_type_name>New_XSS</issue_type_name>
+      <test_url>https://example.com/crossdomain.xml</test_url>
+      <security_entity_element />
+      <source_file />
+      <api />
+      <risk_category_name>It is possible to steal or manipulate customer session and cookies, which might be used to impersonate a legitimate user, allowing the hacker to view or alter user records, and to perform transactions as that user</risk_category_name>
+    </row>
+  </control>
+</report>

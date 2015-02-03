@@ -56,10 +56,10 @@ class AppScanIntegrator(BaseIntegrator):
         if not importer:
             raise UsageError("Unsupported or malformed file")
 
-        if importer.edition == 'standard':
+        if importer.get_edition() == 'standard':
             self.weakness_map_identifier = 'id'
             self.set_tool_name('appscan')
-        elif importer.edition == 'enterprise':
+        elif importer.get_edition() == 'enterprise':
             self.weakness_map_identifier = 'title'
             self.set_tool_name('appscan_enterprise')
 
