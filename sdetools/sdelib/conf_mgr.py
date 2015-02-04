@@ -1,3 +1,5 @@
+from string import Template
+
 import sys
 import os
 import optparse
@@ -423,6 +425,20 @@ class Config(object):
         except Exception, err:
             raise UsageError('Unable to process %s (not a JSON dictionary). Reason: %s' % (key, str(err)))
 
+    def process_json_dict(self, key):
+        try:
+            if not self[key]:
+                self[key] = {}
+            elif isinstance(self[key], basestring):
+                self[key] = json.loads(self[key])
+            if type(self[key]) is not dict:
+                raise TypeError('Not a dictionary: %s' % self[key])
+            for name in self[key]:
+                if not isinstance(name, basestring):
+                    raise TypeError('Invalid key for %s: %s' % (key, str(name)))
+        except Exception, err:
+            raise UsageError('Unable to process %s (not a JSON dictionary). Reason: %s' % (key, str(err)))
+
     def process_date_config(self, key):
         if not isinstance(self[key], basestring):
             return
@@ -430,6 +446,16 @@ class Config(object):
             self[key] = datetime.datetime.strptime(self[key], '%Y-%m-%d').date()
         except ValueError, err:
             raise UsageError('Unable to read date field %s. Reason: %s' % (key, str(err)))
+
+    def transform(self, key, mapping):
+        for field, value in self[key].items():
+            if isinstance(value, basestring):
+                self[key][field] = Template(value).substitute(mapping).strip()
+            elif isinstance(value, list):
+                new_value = []
+                for list_item in value:
+                    new_value.append(Template(list_item).substitute(mapping).strip())
+                self[key][field] = new_value
 
     def set_custom_cert_loc(self, cert_loc):
         if not os.path.isfile(cert_loc):

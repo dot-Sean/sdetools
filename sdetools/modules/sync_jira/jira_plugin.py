@@ -18,6 +18,7 @@ JIRA_DEFAULT_PRIORITY_MAP = {
 
 class JIRAConnector(AlmConnector):
     alm_name = 'JIRA'
+    feature_custom_lookup = True
     default_priority_map = JIRA_DEFAULT_PRIORITY_MAP
 
     def __init__(self, config, alm_plugin):

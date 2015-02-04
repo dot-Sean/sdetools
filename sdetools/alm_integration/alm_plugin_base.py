@@ -73,8 +73,9 @@ class AlmConnector(object):
     FIELD_OPTIONS = ['task_id', 'title', 'context', 'application', 'project']
     DEFAULT_TITLE_FORMAT = '${task_id} ${title}'
     default_priority_map = None
+    feature_custom_lookup = False  # Assume the connector does not support custom lookups
 
-    #This is an abstract base class
+    # This is an abstract base class
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, config, alm_plugin):
@@ -130,10 +131,12 @@ class AlmConnector(object):
                 'Customized fields to include when creating a task in %s '
                 '(JSON encoded dictionary of strings)' % self.alm_name,
                 default='')
-        self.config.opts.add('alm_custom_lookup_fields',
-                'Custom fields and values to use when finding a task in %s '
-                '(JSON encoded dictionary of strings)' % self.alm_name,
-                default='')
+
+        if self.feature_custom_lookup:
+            self.config.opts.add('alm_custom_lookup_fields',
+                    'Custom fields and values to use when finding a task in %s '
+                    '(JSON encoded dictionary of strings)' % self.alm_name,
+                    default='')
 
         if self.default_priority_map:
             self.config.opts.add(self.ALM_PRIORITY_MAP, 'Customized map from priority in SDE to %s '
@@ -197,8 +200,10 @@ class AlmConnector(object):
         self.config.process_boolean_config('show_progress')
         self.config.process_boolean_config('how_tos_in_scope')
         self.config.process_boolean_config('alm_standard_workflow')
-        self.config.process_json_str_dict('alm_custom_fields')
-        self.config.process_json_str_dict('alm_custom_lookup_fields')
+        self.config.process_json_dict('alm_custom_fields')
+
+        if self.feature_custom_lookup:
+            self.config.process_json_dict('alm_custom_lookup_fields')
 
         self.init_custom_fields()
 
@@ -230,15 +235,28 @@ class AlmConnector(object):
         logger.info('*** AlmConnector initialized ***')
 
     def init_custom_fields(self):
+
         mapping = {
             'application': self.config['sde_application'],
             'project': self.config['sde_project'],
             'context': self.config['alm_context']
         }
 
-        for config_option in ['alm_custom_fields', 'alm_custom_lookup_fields']:
+        config_custom_fields = ['alm_custom_fields']
+        if self.feature_custom_lookup:
+            config_custom_fields.append('alm_custom_lookup_fields')
+
+        for config_option in config_custom_fields:
+
             for field, value in self.config[config_option].items():
-                self.config[config_option][field] = Template(value).substitute(mapping).strip()
+                matches = re.findall('\$\{?([a-zA-Z_]+)\}?', value)
+                if not matches:
+                    continue
+
+                if 'context' in matches and not self.config['alm_context']:
+                    raise AlmException('Missing alm_context in configuration')
+
+            self.config.transform(config_option, mapping)
 
     def alm_connect(self):
         self.alm_connect_server()

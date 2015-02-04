@@ -66,7 +66,7 @@ class JIRASoapAPI:
             stream = opener.open('%s://%s/%srpc/soap/jirasoapservice-v2?wsdl' %
                     (self.config['alm_method'], self.config['alm_server'], self._get_context_root()))
         except urllib2.URLError, err:
-            raise AlmException('Unable to reach JIRA service (Check URL). Reason: %s' % (err))
+            raise AlmException('Unable to reach JIRA service (Check URL). Reason: %s' % err)
         except http_req.InvalidCertificateException, err:
             raise AlmException('Unable to verify SSL certificate for host: %s' % (self.config['alm_server']))
 
@@ -135,7 +135,7 @@ class JIRASoapAPI:
             #No result was found from query
             return None
 
-        #We will use the first result from the query
+        # We will use the first result from the query
         jtask = issues[0]
 
         task_resolution = None
@@ -244,7 +244,7 @@ class JIRASoapAPI:
         return True
 
     def add_task(self, task, issue_type_id, project_version):
-        #Add task
+        # Add task
         selected_priority = None
         for priority in self.priorities:
             if priority['name'] == task['alm_priority']:
