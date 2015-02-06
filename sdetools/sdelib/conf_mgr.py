@@ -11,7 +11,7 @@ import datetime
 import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
-from sdetools.sdelib.commons import UsageError, json
+from sdetools.sdelib.commons import UsageError, Error, json
 
 __all__ = ['Config']
 
@@ -66,6 +66,7 @@ class Option(object):
     def __repr__(self):
         return '%s(**%s)' % (self.__class__.__name__, str(self))
 
+
 class ModuleOptions(dict):
     """
     Note: The first item in sub_cmds is the default.
@@ -101,6 +102,7 @@ class ModuleOptions(dict):
         for item in self:
             dup[item] = self[item]
         return dup
+
 
 class Config(object):
     """
@@ -449,18 +451,6 @@ class Config(object):
             self[key] = datetime.datetime.strptime(self[key], '%Y-%m-%d').date()
         except ValueError, err:
             raise UsageError('Unable to read date field %s. Reason: %s' % (key, str(err)))
-
-    def transform(self, key, mapping):
-        for field, value in self[key].iteritems():
-            if isinstance(value, list):
-                new_value = []
-                for list_item in value:
-                    new_value.append(Template(list_item).substitute(mapping).strip())
-                self[key][field] = new_value
-            elif isinstance(value, basestring):
-                self[key][field] = Template(value).substitute(mapping).strip()
-            else:
-                raise TypeError('Unsupported type, cannot transform value: %s' % value)
 
     def set_custom_cert_loc(self, cert_loc):
         if not os.path.isfile(cert_loc):

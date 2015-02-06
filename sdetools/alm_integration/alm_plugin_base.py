@@ -254,16 +254,31 @@ class AlmConnector(object):
             config_custom_fields.append('alm_custom_lookup_fields')
 
         for config_option in config_custom_fields:
+            self.transform_config_value(config_option, mapping)
 
-            for field, value in self.config[config_option].iteritems():
-                matches = re.findall('\$\{?([a-zA-Z_]+)\}?', value)
-                if not matches:
-                    continue
+    def _transform_value(self, value, mapping):
+        macros = re.findall('\$\{?([a-zA-Z_]+)\}?', value)
+        for required_macro in macros:
+            if required_macro not in mapping or not mapping[required_macro]:
+                raise AlmException("Missing value for configuration macro ${%s}" % required_macro)
+        return Template(value).substitute(mapping).strip()
 
-                if 'context' in matches and not self.config['alm_context']:
-                    raise AlmException('Missing alm_context in configuration')
-
-            self.config.transform(config_option, mapping)
+    def transform_config_value(self, key, mapping):
+        """
+        Perform macro substitutions on configuration
+         - key - Configuration key
+         - mapping - dictionary of macro->substitution values
+        """
+        for field, value in self.config[key].iteritems():
+            if isinstance(value, list):
+                new_value = []
+                for list_item in value:
+                    new_value.append(self._transform_value(list_item, mapping))
+                self.config[key][field] = new_value
+            elif isinstance(value, basestring):
+                self.config[key][field] = self._transform_value(value, mapping)
+            else:
+                raise TypeError('Unsupported type, cannot transform value: %s' % value)
 
     def alm_connect(self):
         self.alm_connect_server()
@@ -651,7 +666,7 @@ class AlmConnector(object):
                 self.alm_connect()
                 return
 
-            #Attempt to connect to SDE & ALM
+            # Attempt to connect to SDE & ALM
             progress = 0
 
             self.sde_connect()
@@ -662,11 +677,11 @@ class AlmConnector(object):
             progress += 2
             self.output_progress(progress)
 
-            #Attempt to get all tasks
+            # Attempt to get all tasks
             tasks = self.sde_get_tasks()
             logger.info('Retrieved all tasks from SDE')
 
-            #Filter tasks - progress must match reality
+            # Filter tasks - progress must match reality
             tasks = self.filter_tasks(tasks)
 
             logger.info('Filtered tasks')
