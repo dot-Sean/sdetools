@@ -436,6 +436,9 @@ class Config(object):
             for name in self[key]:
                 if not isinstance(name, basestring):
                     raise TypeError('Invalid key for %s: %s' % (key, str(name)))
+                val = self[key][name]
+                if not isinstance(val, basestring) and not isinstance(val, list):
+                    raise TypeError('Invalid value for %s: %s' % (key, repr(val)))
         except Exception, err:
             raise UsageError('Unable to process %s (not a JSON dictionary). Reason: %s' % (key, str(err)))
 
@@ -448,14 +451,16 @@ class Config(object):
             raise UsageError('Unable to read date field %s. Reason: %s' % (key, str(err)))
 
     def transform(self, key, mapping):
-        for field, value in self[key].items():
-            if isinstance(value, basestring):
-                self[key][field] = Template(value).substitute(mapping).strip()
-            elif isinstance(value, list):
+        for field, value in self[key].iteritems():
+            if isinstance(value, list):
                 new_value = []
                 for list_item in value:
                     new_value.append(Template(list_item).substitute(mapping).strip())
                 self[key][field] = new_value
+            elif isinstance(value, basestring):
+                self[key][field] = Template(value).substitute(mapping).strip()
+            else:
+                raise TypeError('Unsupported type, cannot transform value: %s' % value)
 
     def set_custom_cert_loc(self, cert_loc):
         if not os.path.isfile(cert_loc):

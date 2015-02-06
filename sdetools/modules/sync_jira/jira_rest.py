@@ -80,7 +80,6 @@ class JIRARestAPI(RESTBase):
         return None
 
     def setup_fields(self, issue_type_id):
-
         # Retrieve field meta information for the chosen issue type
         try:
             meta_info = self.call_api('issue/createmeta', method=self.URLRequest.GET,
@@ -154,9 +153,12 @@ class JIRARestAPI(RESTBase):
 
     def get_task(self, task, task_id):
 
-        custom_lookup = []
+        task_lookup = []
+        task_lookup.append('summary~\'%s\'' % self.urlencode_str(task['alm_fixed_title']))
+
         for field_data in self.custom_lookup_fields:
 
+            # clauseNames is a list of JQL field name aliases. We only need one
             field_clause = field_data['meta']['clauseNames'][0]
             field_meta = field_data['meta']
             field_value = field_data['value']
@@ -164,17 +166,17 @@ class JIRARestAPI(RESTBase):
             if isinstance(field_value, list):
                 for list_item in field_value:
                     condition = '%s=\'%s\'' % (field_clause, self.urlencode_str(list_item))
-                    custom_lookup.append(condition)
+                    task_lookup.append(condition)
             else:
                 if field_meta['schema']['type'] == 'string':
                     condition = '%s~\'%s\'' % (field_clause, self.urlencode_str(field_value))
                 else:
                     condition = '%s=\'%s\'' % (field_clause, self.urlencode_str(field_value))
-                custom_lookup.append(condition)
+                task_lookup.append(condition)
 
         try:
-            url = 'search?jql=project%%3D\'%s\'%%20AND%%20%s%%20AND%%20summary~"\\"%s\\""' % \
-                  (self.config['alm_project'], '%20AND%20'.join(custom_lookup), self.urlencode_str(task['alm_fixed_title']))
+            url = 'search?jql=project%%3D\'%s\'%%20AND%%20%s' % (self.config['alm_project'],
+                                                                 '%20AND%20'.join(task_lookup))
             result = self.call_api(url)
         except APIError, error:
             raise AlmException("Unable to get task %s from JIRA. %s" % (task_id, error))

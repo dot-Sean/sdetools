@@ -148,8 +148,8 @@ class AlmConnector(object):
         Verify that the configuration options are set properly
         """
 
-        #Note: This will consider space as empty due to strip
-        #We do this before checking if the config is non-empty later
+        # Note: This will consider space as empty due to strip
+        # We do this before checking if the config is non-empty later
         self.config.process_list_config('selected_tasks')
         for task in self.config['selected_tasks']:
             if not RE_TASK_IDS.match(task):
@@ -235,7 +235,14 @@ class AlmConnector(object):
         logger.info('*** AlmConnector initialized ***')
 
     def init_custom_fields(self):
+        """
+        Apply any project-level macro substitutions to the custom field and lookup configuration
 
+        Available macros are:
+         - $application - Name of the application
+         - $project - Name of the project
+         - $context - User-defined context
+        """
         mapping = {
             'application': self.config['sde_application'],
             'project': self.config['sde_project'],
@@ -248,7 +255,7 @@ class AlmConnector(object):
 
         for config_option in config_custom_fields:
 
-            for field, value in self.config[config_option].items():
+            for field, value in self.config[config_option].iteritems():
                 matches = re.findall('\$\{?([a-zA-Z_]+)\}?', value)
                 if not matches:
                     continue
