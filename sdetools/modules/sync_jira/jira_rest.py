@@ -179,7 +179,7 @@ class JIRARestAPI(RESTBase):
                                                                  '%20AND%20'.join(task_lookup))
             result = self.call_api(url)
         except APIError, error:
-            raise AlmException("Unable to get task %s from JIRA. %s" % (task_id, error))
+            raise AlmException("Unable to search for task %s in JIRA. %s" % (task_id, error))
 
         if not result['total']:
             # No result was found from query
