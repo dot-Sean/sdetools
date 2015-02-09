@@ -121,13 +121,15 @@ class JIRARestAPI(RESTBase):
                 for field_id, field_details in self.fields.iteritems():
                     if key == field_details['name']:
                         field_meta = self._get_field_meta(all_fields_meta, key)
-                        if field_meta:
+                        if not field_meta:
+                            raise AlmException('No filter found for: %s' % key)
+                        if field_meta['searchable']:
                             self.custom_lookup_fields.append({
                                 'meta': field_meta,
                                 'value': value
                             })
                         else:
-                            raise AlmException('No filter name found for: %s' % key)
+                            raise AlmException('Field %s is not searchable' % key)
 
         for field_id, field_details in self.fields.iteritems():
             if field_details['required'] and field_id not in assigned_fields:
@@ -265,7 +267,10 @@ class JIRARestAPI(RESTBase):
 
             mapped_field = self.fields[field_id]
 
-            if mapped_field['schema']['type'] == 'array' and mapped_field['schema']['items'] == 'string':
+            # Field is an array of string
+            if mapped_field['schema']['type'] == 'array' and \
+                    mapped_field['schema']['items'] == 'string':
+
                 # Expand on what we already have defined above
                 if field_id in args['fields'] and isinstance(args['fields'][field_id], list):
                     field_values = args['fields'][field_id]
@@ -279,19 +284,30 @@ class JIRARestAPI(RESTBase):
                 else:
                     field_values.append(custom_field_value)
                 args['fields'][field_id] = field_values
-            elif mapped_field['schema']['type'] == 'array' and mapped_field['schema']['items'] == 'component':
-                if isinstance(custom_field_value, list):
+            # Field is an array of version or component
+            elif mapped_field['schema']['type'] == 'array' and \
+                    mapped_field['schema']['items'] in ['version', 'component']:
+
+                # Expand on what we already have defined above
+                if field_id in args['fields'] and isinstance(args['fields'][field_id], list):
+                    field_values = args['fields'][field_id]
+                else:
                     field_values = []
+
+                # Accommodate more than one custom field value in this field
+                if isinstance(custom_field_value, list):
                     for list_item in custom_field_value:
                         field_values.append({'name': list_item})
-                    args['fields'][field_id] = field_values
                 else:
-                    args['fields'][field_id] = [{'name': custom_field_value}]
+                    field_values.append({'name': custom_field_value})
+                args['fields'][field_id] = field_values
+            # Field is a string
             elif mapped_field['schema']['type'] == 'string':
                 if 'allowedValues' in mapped_field:
                     args['fields'][field_id] = {'value': custom_field_value}
                 else:
                     args['fields'][field_id] = custom_field_value
+            # Field is a type we don't support
             elif mapped_field['required']:
                 unsupported_fields.append(mapped_field['name'])
 
