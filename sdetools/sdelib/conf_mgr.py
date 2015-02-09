@@ -1,5 +1,3 @@
-from string import Template
-
 import sys
 import os
 import optparse
@@ -11,7 +9,7 @@ import datetime
 import log_mgr
 logger = log_mgr.mods.add_mod(__name__)
 
-from sdetools.sdelib.commons import UsageError, Error, json
+from sdetools.sdelib.commons import UsageError, json
 
 __all__ = ['Config']
 
