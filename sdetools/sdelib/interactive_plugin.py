@@ -158,6 +158,14 @@ class PlugInExperience:
         return self.api.add_task_ide_note("%d-%s" % (self.prj_id, task_id), text, filename, status)
 
     @_verify_connect
+    def update_task_ide_note(self, note_id, text, status=None):
+        return self.api.update_task_ide_note(note_id, text, status)
+
+    @_verify_connect
+    def update_task_text_note(self, note_id, text):
+        return self.api.update_task_text_note(note_id, text)
+
+    @_verify_connect
     def get_task_notes(self, task_id, note_type=''):
         return self.api.get_task_notes("%d-%s" % (self.prj_id, task_id), note_type)
 
