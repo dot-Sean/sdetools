@@ -156,7 +156,7 @@ class JIRARestAPI(RESTBase):
     def get_task(self, task, task_id):
 
         task_lookup = []
-        task_lookup.append('summary~\'%s\'' % self.urlencode_str(task['alm_fixed_title']))
+        task_lookup.append('summary~"\\"%s\\""' % self.urlencode_str(task['alm_fixed_title']))
 
         for field_data in self.custom_lookup_fields:
 
@@ -171,7 +171,7 @@ class JIRARestAPI(RESTBase):
                     task_lookup.append(condition)
             else:
                 if field_meta['schema']['type'] == 'string':
-                    condition = '%s~\'%s\'' % (field_clause, self.urlencode_str(field_value))
+                    condition = '%s~"\\"%s\\""' % (field_clause, self.urlencode_str(field_value))
                 else:
                     condition = '%s=\'%s\'' % (field_clause, self.urlencode_str(field_value))
                 task_lookup.append(condition)
