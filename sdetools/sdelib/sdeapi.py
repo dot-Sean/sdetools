@@ -106,6 +106,20 @@ class ExtAPI(restclient.RESTBase):
             'task': task}
         return self.call_api('tasknotes/ide', self.URLRequest.POST, args=note)
 
+    def update_task_ide_note(self, note_id, text, status=None):
+        note = {
+            'text': text,
+        }
+        if status:
+            note['status'] = status
+        return self.call_api('tasknotes/ide/%d' % note_id, self.URLRequest.PUT, args=note)
+
+    def update_task_text_note(self, note_id, text):
+        note = {
+            'text': text,
+        }
+        return self.call_api('tasknotes/text/%d' % note_id, self.URLRequest.PUT, args=note)
+
     def get_task_notes(self, task, note_type, options={}, **filters):
         end_point = 'tasknotes'
         if note_type not in ['', 'ide', 'text', 'analysis']:
