@@ -14,6 +14,7 @@ class JIRARestAPI(RESTBase):
         super(JIRARestAPI, self).__init__('alm', 'JIRA', config, 'rest/api/2')
         self.versions = None
         self.custom_fields = {}
+        self.custom_lookup_fields = []
         self.fields = {}
 
     def parse_response(self, result, headers):
@@ -30,8 +31,13 @@ class JIRARestAPI(RESTBase):
             return result
 
         # Send back all the error messages in one go
-        if 'errorMessages' in error_response:
+        if 'errorMessages' in error_response and error_response['errorMessages']:
             return ' '.join(error_response['errorMessages'])
+        elif 'errors' in error_response:
+            error_messages = []
+            for field, field_message in error_response['errors'].items():
+                error_messages.append('%s: %s' % (field, field_message))
+            return ' '.join(error_messages)
         else:
             return result
 
@@ -66,8 +72,15 @@ class JIRARestAPI(RESTBase):
 
         return False
 
-    def setup_fields(self, issue_type_id):
+    def _get_field_meta(self, all_field_meta, field_name):
+        # Jira maps a field to one or many internal JQL filter names - pick one
+        for field in all_field_meta:
+            if field['name'] == field_name:
+                return field
+        return None
 
+    def setup_fields(self, issue_type_id):
+        # Retrieve field meta information for the chosen issue type
         try:
             meta_info = self.call_api('issue/createmeta', method=self.URLRequest.GET,
                                       args={'projectKeys': self.config['alm_project'],
@@ -96,6 +109,28 @@ class JIRARestAPI(RESTBase):
                         self.custom_fields[field_id] = value
                         assigned_fields.append(field_id)
 
+        # Get all fields from the system to help with custom lookups
+        if self.config['alm_custom_lookup_fields']:
+            try:
+                all_fields_meta = self.call_api('field', method=self.URLRequest.GET)
+            except APIError, error:
+                raise AlmException('Could not retrieve sql search for JIRA project: %s. %s' %
+                                   (self.config['alm_project'], error))
+
+            for key, value in self.config['alm_custom_lookup_fields'].iteritems():
+                for field_id, field_details in self.fields.iteritems():
+                    if key == field_details['name']:
+                        field_meta = self._get_field_meta(all_fields_meta, key)
+                        if not field_meta:
+                            raise AlmException('No filter found for: %s' % key)
+                        if field_meta['searchable']:
+                            self.custom_lookup_fields.append({
+                                'meta': field_meta,
+                                'value': value
+                            })
+                        else:
+                            raise AlmException('Field %s is not searchable' % key)
+
         for field_id, field_details in self.fields.iteritems():
             if field_details['required'] and field_id not in assigned_fields:
                 missing_fields.append(field_details['name'])
@@ -119,18 +154,40 @@ class JIRARestAPI(RESTBase):
         return self.get_issue_types()
 
     def get_task(self, task, task_id):
+
+        task_lookup = []
+        task_lookup.append('summary~\'%s\'' % self.urlencode_str(task['alm_fixed_title']))
+
+        for field_data in self.custom_lookup_fields:
+
+            # clauseNames is a list of JQL field name aliases. We only need one
+            field_clause = field_data['meta']['clauseNames'][0]
+            field_meta = field_data['meta']
+            field_value = field_data['value']
+
+            if isinstance(field_value, list):
+                for list_item in field_value:
+                    condition = '%s=\'%s\'' % (field_clause, self.urlencode_str(list_item))
+                    task_lookup.append(condition)
+            else:
+                if field_meta['schema']['type'] == 'string':
+                    condition = '%s~\'%s\'' % (field_clause, self.urlencode_str(field_value))
+                else:
+                    condition = '%s=\'%s\'' % (field_clause, self.urlencode_str(field_value))
+                task_lookup.append(condition)
+
         try:
-            url = 'search?jql=project%%3D\'%s\'%%20AND%%20summary~"\\"%s\\""' % \
-                  (self.config['alm_project'], self.urlencode_str(task['alm_fixed_title']))
+            url = 'search?jql=project%%3D\'%s\'%%20AND%%20%s' % (self.config['alm_project'],
+                                                                 '%20AND%20'.join(task_lookup))
             result = self.call_api(url)
         except APIError, error:
-            raise AlmException("Unable to get task %s from JIRA. %s" % (task_id, error))
+            raise AlmException("Unable to search for task %s in JIRA. %s" % (task_id, error))
 
         if not result['total']:
-            #No result was found from query
+            # No result was found from query
             return None
 
-        #We will use the first result from the query
+        # We will use the first result from the query
         jtask = result['issues'][0]
 
         task_resolution = None
@@ -170,7 +227,7 @@ class JIRARestAPI(RESTBase):
         if self.config['alm_project_version']:
             affected_versions.append({'name': self.config['alm_project_version']})
 
-        #Add task
+        # Add task
         args = {
             'fields': {
                 'project': {
@@ -207,21 +264,50 @@ class JIRARestAPI(RESTBase):
         unsupported_fields = []
 
         for field_id, custom_field_value in self.custom_fields.iteritems():
-            # We covered this field already, skip it
-            if field_id in self.BASE_FIELDS:
-                continue
 
             mapped_field = self.fields[field_id]
 
-            if mapped_field['schema']['type'] == 'array' and mapped_field['schema']['items'] == 'string':
-                args['fields'][field_id] = [{'value': custom_field_value}]
-            elif mapped_field['schema']['type'] == 'array' and mapped_field['schema']['items'] == 'component':
-                args['fields'][field_id] = [{'name': custom_field_value}]
+            # Field is an array of string
+            if mapped_field['schema']['type'] == 'array' and \
+                    mapped_field['schema']['items'] == 'string':
+
+                # Expand on what we already have defined above
+                if field_id in args['fields'] and isinstance(args['fields'][field_id], list):
+                    field_values = args['fields'][field_id]
+                else:
+                    field_values = []
+
+                # Accommodate more than one custom field value in this field
+                if isinstance(custom_field_value, list):
+                    for list_item in custom_field_value:
+                        field_values.append(list_item)
+                else:
+                    field_values.append(custom_field_value)
+                args['fields'][field_id] = field_values
+            # Field is an array of version or component
+            elif mapped_field['schema']['type'] == 'array' and \
+                    mapped_field['schema']['items'] in ['version', 'component']:
+
+                # Expand on what we already have defined above
+                if field_id in args['fields'] and isinstance(args['fields'][field_id], list):
+                    field_values = args['fields'][field_id]
+                else:
+                    field_values = []
+
+                # Accommodate more than one custom field value in this field
+                if isinstance(custom_field_value, list):
+                    for list_item in custom_field_value:
+                        field_values.append({'name': list_item})
+                else:
+                    field_values.append({'name': custom_field_value})
+                args['fields'][field_id] = field_values
+            # Field is a string
             elif mapped_field['schema']['type'] == 'string':
                 if 'allowedValues' in mapped_field:
                     args['fields'][field_id] = {'value': custom_field_value}
                 else:
                     args['fields'][field_id] = custom_field_value
+            # Field is a type we don't support
             elif mapped_field['required']:
                 unsupported_fields.append(mapped_field['name'])
 

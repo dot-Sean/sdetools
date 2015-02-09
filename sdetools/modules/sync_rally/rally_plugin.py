@@ -88,6 +88,7 @@ class RallyTask(AlmTask):
 class RallyConnector(AlmConnector):
     """Connects SD Elements to Rally"""
     alm_name = 'Rally'
+    feature_custom_lookup = True
 
     def __init__(self, config, alm_plugin):
         super(RallyConnector, self).__init__(config, alm_plugin)
@@ -103,6 +104,7 @@ class RallyConnector(AlmConnector):
         config.opts.add('alm_parent_issue', 'Parent Story for new Tasks', default='')
 
         self.tag_references = {}
+        self.card_types = {}
         self.project_ref = None
         self.workspace_ref = None
         self.alm_parent_issue_ref = None
@@ -112,7 +114,7 @@ class RallyConnector(AlmConnector):
     def initialize(self):
         super(RallyConnector, self).initialize()
 
-        #Verify that the configuration options are set properly
+        # Verify that the configuration options are set properly
         for item in ['rally_done_statuses',
                      'rally_card_type',
                      'rally_new_status',
@@ -170,7 +172,7 @@ class RallyConnector(AlmConnector):
 
     def alm_connect_server(self):
         """ Verifies that Rally connection works """
-        #Check to make sure that we can do a simple API call
+        # Check to make sure that we can do a simple API call
         try:
             self.alm_plugin.call_api('task.js')
         except APIError, err:
@@ -180,7 +182,7 @@ class RallyConnector(AlmConnector):
     def alm_connect_project(self):
         workspace_ref = None
 
-        #Now try to get workspace ID
+        # Now try to get workspace ID
         try:
             subscription_ref = self.alm_plugin.call_api('subscription.js')
         except APIError, err:
@@ -195,7 +197,7 @@ class RallyConnector(AlmConnector):
             raise AlmException('Workspace is not valid, please check config value: %s' % self.config['rally_workspace'])
         self.workspace_ref = workspace_ref
 
-        #Now get project ID
+        # Now get project ID
         query_args = {
             'query': '(Name = \"%s\")' % self.config['alm_project'],
             'workspace': self.workspace_ref,
@@ -372,9 +374,12 @@ class RallyConnector(AlmConnector):
 
         if card_type_details['type'] == 'Task':
             artifact_query = '(%s and (WorkProduct.FormattedID = "%s"))' % (
-                    artifact_query, self.config['alm_parent_issue'])
+                             artifact_query, self.config['alm_parent_issue'])
 
-        task_data = self.rally_get_artifact(task_id, artifact_query, card_type_details['type'],
+        for field, value in self.config['alm_custom_lookup_fields'].items():
+            artifact_query = '(%s and (%s = "%s"))' % (artifact_query, field, value)
+
+        task_data = self.rally_get_artifact(task_id, '%s' % artifact_query, card_type_details['type'],
                                             card_type_details['type'], card_type_details['api'])
         if not task_data:
             return task_data
@@ -433,7 +438,7 @@ class RallyConnector(AlmConnector):
             raise AlmException('Unable to add task to Rally %s. Reason: %s' %
                                (task['id'], str(result['CreateResult']['Errors'])[:200]))
 
-        #Return a unique identifier to this task in Rally
+        # Return a unique identifier to this task in Rally
         logger.info('Getting task %s', task['id'])
         alm_task = self.alm_get_task(task)
         if not alm_task:
