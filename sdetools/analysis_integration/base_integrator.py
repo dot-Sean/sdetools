@@ -282,6 +282,7 @@ class BaseXMLImporter(BaseImporter):
         self.id = None
         return self.last_parse_indicator
 
+
 class BaseIntegrator(object):
     TOOL_NAME = 'External tool'
     AVAILABLE_IMPORTERS = [] # Subclasses must fill this list

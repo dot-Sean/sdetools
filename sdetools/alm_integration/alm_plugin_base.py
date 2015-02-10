@@ -68,6 +68,7 @@ class AlmConnector(object):
     # This needs to be overwritten
     alm_name = 'ALM Module'
     ALM_PRIORITY_MAP = 'alm_priority_map'
+    VERIFICATION_STATUSES = ['partial', 'pass', 'fail']
     TEST_OPTIONS = ['server', 'project', 'settings']
     STANDARD_STATUS_LIST = ['TODO', 'DONE', 'NA']
     FIELD_OPTIONS = ['task_id', 'title', 'context', 'application', 'project']
@@ -103,6 +104,9 @@ class AlmConnector(object):
         self.config.opts.add('sde_min_priority', 'Minimum SDE priority in scope',
                 default='7')
         self.config.opts.add('sde_tags_filter', 'Filter project tasks by tag (tag1, tag2)',
+                default='')
+        self.config.opts.add('sde_verification_filter', 'Filter project tasks by verification statuses. Valid statuses '
+                'are: ' + ', '.join(AlmConnector.VERIFICATION_STATUSES),
                 default='')
         self.config.opts.add('how_tos_in_scope', 'Whether or not HowTos should be included',
                 default='False')
@@ -154,6 +158,11 @@ class AlmConnector(object):
         for task in self.config['selected_tasks']:
             if not RE_TASK_IDS.match(task):
                 raise UsageError('Invalid Task ID: %s' % task)
+
+        self.config.process_list_config('sde_verification_filter')
+        for verification_status in self.config['sde_verification_filter']:
+            if verification_status not in AlmConnector.VERIFICATION_STATUSES:
+                raise UsageError('Invalid status specified in sde_verification_filter: %s' % verification_status)
 
         if not self.config['selected_tasks']:
             self.config.process_list_config('alm_phases')
@@ -554,9 +563,16 @@ class AlmConnector(object):
 
         in_scope = (task['phase'] in self.config['alm_phases'] and
                     task['priority'] >= self.config['sde_min_priority'])
+        if not in_scope:
+            return False
 
         if self.config['sde_tags_filter']:
             in_scope = set(self.config['sde_tags_filter']).issubset(task['tags'])
+            if not in_scope:
+                return False
+
+        if self.config['sde_verification_filter']:
+            in_scope = task['verification_status'] in self.config['sde_verification_filter']
 
         return in_scope
 
