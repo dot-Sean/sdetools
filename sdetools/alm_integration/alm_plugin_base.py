@@ -563,16 +563,12 @@ class AlmConnector(object):
 
         in_scope = (task['phase'] in self.config['alm_phases'] and
                     task['priority'] >= self.config['sde_min_priority'])
-        if not in_scope:
-            return False
 
-        if self.config['sde_tags_filter']:
-            in_scope = set(self.config['sde_tags_filter']).issubset(task['tags'])
-            if not in_scope:
-                return False
+        if in_scope and self.config['sde_tags_filter']:
+            in_scope = in_scope and set(self.config['sde_tags_filter']).issubset(task['tags'])
 
-        if self.config['sde_verification_filter']:
-            in_scope = task['verification_status'] in self.config['sde_verification_filter']
+        if in_scope and self.config['sde_verification_filter']:
+            in_scope = in_scope and task['verification_status'] in self.config['sde_verification_filter']
 
         return in_scope
 
