@@ -28,7 +28,7 @@ class TestAppScanIntegration(BaseIntegrationTest, unittest.TestCase):
 
     def test_appscan_enterprise_import_findings_assert_passed_tasks(self):
         self.report_file = 'appscan_enterprise.xml'
-        print self.report_file
+        self.init_integrator()
         self.test_import_findings_assert_passed_tasks()
         self.assertTrue(self.integrator.TOOL_NAME == 'appscan_enterprise', 'Detected AppScan Enterprise report')
 
