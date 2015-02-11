@@ -111,8 +111,9 @@ class MockSDEResponse(MockResponse):
         super(MockSDEResponse, self).initialize(response_generator)
 
     def generate_sde_task(self, task_number=None, project_id=None, status='TODO', priority=7, phase='requirements',
-                          tags=None):
-        return self.get_response_generator().generate_sde_task(task_number, project_id, status, priority, phase, tags)
+                          tags=None, verification_status=None):
+        return self.get_response_generator().generate_sde_task(task_number, project_id, status, priority, phase, tags,
+                                                               verification_status)
 
     def clear_tasks(self):
         return self.get_response_generator().generator_clear_resource('task')

@@ -64,6 +64,7 @@ class Option(object):
     def __repr__(self):
         return '%s(**%s)' % (self.__class__.__name__, str(self))
 
+
 class ModuleOptions(dict):
     """
     Note: The first item in sub_cmds is the default.
@@ -99,6 +100,7 @@ class ModuleOptions(dict):
         for item in self:
             dup[item] = self[item]
         return dup
+
 
 class Config(object):
     """
@@ -419,6 +421,23 @@ class Config(object):
                     raise TypeError('Invalid key for %s: %s' % (key, str(name)))
                 val = self[key][name]
                 if not isinstance(val, basestring):
+                    raise TypeError('Invalid value for %s: %s' % (key, repr(val)))
+        except Exception, err:
+            raise UsageError('Unable to process %s (not a JSON dictionary). Reason: %s' % (key, str(err)))
+
+    def process_json_dict(self, key):
+        try:
+            if not self[key]:
+                self[key] = {}
+            elif isinstance(self[key], basestring):
+                self[key] = json.loads(self[key])
+            if type(self[key]) is not dict:
+                raise TypeError('Not a dictionary: %s' % self[key])
+            for name in self[key]:
+                if not isinstance(name, basestring):
+                    raise TypeError('Invalid key for %s: %s' % (key, str(name)))
+                val = self[key][name]
+                if not isinstance(val, basestring) and not isinstance(val, list):
                     raise TypeError('Invalid value for %s: %s' % (key, repr(val)))
         except Exception, err:
             raise UsageError('Unable to process %s (not a JSON dictionary). Reason: %s' % (key, str(err)))

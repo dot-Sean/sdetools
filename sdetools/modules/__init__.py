@@ -21,4 +21,5 @@ __all__ = [
     'connect',
     'add_ssl_cert',
     'fetch_config',
+    'modify_notes',
 ]

@@ -68,13 +68,15 @@ class AlmConnector(object):
     # This needs to be overwritten
     alm_name = 'ALM Module'
     ALM_PRIORITY_MAP = 'alm_priority_map'
+    VERIFICATION_STATUSES = ['partial', 'pass', 'fail']
     TEST_OPTIONS = ['server', 'project', 'settings']
     STANDARD_STATUS_LIST = ['TODO', 'DONE', 'NA']
     FIELD_OPTIONS = ['task_id', 'title', 'context', 'application', 'project']
     DEFAULT_TITLE_FORMAT = '${task_id} ${title}'
     default_priority_map = None
+    feature_custom_lookup = False  # Assume the connector does not support custom lookups
 
-    #This is an abstract base class
+    # This is an abstract base class
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, config, alm_plugin):
@@ -102,6 +104,9 @@ class AlmConnector(object):
         self.config.opts.add('sde_min_priority', 'Minimum SDE priority in scope',
                 default='7')
         self.config.opts.add('sde_tags_filter', 'Filter project tasks by tag (tag1, tag2)',
+                default='')
+        self.config.opts.add('sde_verification_filter', 'Filter project tasks by verification statuses. Valid statuses '
+                'are: ' + ', '.join(AlmConnector.VERIFICATION_STATUSES),
                 default='')
         self.config.opts.add('how_tos_in_scope', 'Whether or not HowTos should be included',
                 default='False')
@@ -131,6 +136,12 @@ class AlmConnector(object):
                 '(JSON encoded dictionary of strings)' % self.alm_name,
                 default='')
 
+        if self.feature_custom_lookup:
+            self.config.opts.add('alm_custom_lookup_fields',
+                    'Custom fields and values to use when finding a task in %s '
+                    '(JSON encoded dictionary of strings)' % self.alm_name,
+                    default='')
+
         if self.default_priority_map:
             self.config.opts.add(self.ALM_PRIORITY_MAP, 'Customized map from priority in SDE to %s '
                 '(JSON encoded dictionary of strings)' % self.alm_name,
@@ -141,12 +152,17 @@ class AlmConnector(object):
         Verify that the configuration options are set properly
         """
 
-        #Note: This will consider space as empty due to strip
-        #We do this before checking if the config is non-empty later
+        # Note: This will consider space as empty due to strip
+        # We do this before checking if the config is non-empty later
         self.config.process_list_config('selected_tasks')
         for task in self.config['selected_tasks']:
             if not RE_TASK_IDS.match(task):
                 raise UsageError('Invalid Task ID: %s' % task)
+
+        self.config.process_list_config('sde_verification_filter')
+        for verification_status in self.config['sde_verification_filter']:
+            if verification_status not in AlmConnector.VERIFICATION_STATUSES:
+                raise UsageError('Invalid status specified in sde_verification_filter: %s' % verification_status)
 
         if not self.config['selected_tasks']:
             self.config.process_list_config('alm_phases')
@@ -193,7 +209,12 @@ class AlmConnector(object):
         self.config.process_boolean_config('show_progress')
         self.config.process_boolean_config('how_tos_in_scope')
         self.config.process_boolean_config('alm_standard_workflow')
-        self.config.process_json_str_dict('alm_custom_fields')
+        self.config.process_json_dict('alm_custom_fields')
+
+        if self.feature_custom_lookup:
+            self.config.process_json_dict('alm_custom_lookup_fields')
+
+        self.init_custom_fields()
 
         if self.config['start_fresh'] and not self.alm_supports_delete():
             raise AlmException('Incorrect start_fresh configuration: task deletion is not supported.')
@@ -221,6 +242,52 @@ class AlmConnector(object):
                 raise AlmException('Incorrect alm_title_format configuration. Invalid field: ${%s}' % match)
 
         logger.info('*** AlmConnector initialized ***')
+
+    def init_custom_fields(self):
+        """
+        Apply any project-level macro substitutions to the custom field and lookup configuration
+
+        Available macros are:
+         - $application - Name of the application
+         - $project - Name of the project
+         - $context - User-defined context
+        """
+        mapping = {
+            'application': self.config['sde_application'],
+            'project': self.config['sde_project'],
+            'context': self.config['alm_context']
+        }
+
+        config_custom_fields = ['alm_custom_fields']
+        if self.feature_custom_lookup:
+            config_custom_fields.append('alm_custom_lookup_fields')
+
+        for config_option in config_custom_fields:
+            self.transform_config_value(config_option, mapping)
+
+    def _transform_value(self, value, mapping):
+        macros = re.findall('\$\{?([a-zA-Z_]+)\}?', value)
+        for required_macro in macros:
+            if required_macro not in mapping or not mapping[required_macro]:
+                raise AlmException("Missing value for configuration macro ${%s}" % required_macro)
+        return Template(value).substitute(mapping).strip()
+
+    def transform_config_value(self, key, mapping):
+        """
+        Perform macro substitutions on configuration
+         - key - Configuration key
+         - mapping - dictionary of macro->substitution values
+        """
+        for field, value in self.config[key].iteritems():
+            if isinstance(value, list):
+                new_value = []
+                for list_item in value:
+                    new_value.append(self._transform_value(list_item, mapping))
+                self.config[key][field] = new_value
+            elif isinstance(value, basestring):
+                self.config[key][field] = self._transform_value(value, mapping)
+            else:
+                raise TypeError('Unsupported type, cannot transform value: %s' % value)
 
     def alm_connect(self):
         self.alm_connect_server()
@@ -497,8 +564,11 @@ class AlmConnector(object):
         in_scope = (task['phase'] in self.config['alm_phases'] and
                     task['priority'] >= self.config['sde_min_priority'])
 
-        if self.config['sde_tags_filter']:
-            in_scope = set(self.config['sde_tags_filter']).issubset(task['tags'])
+        if in_scope and self.config['sde_tags_filter']:
+            in_scope = in_scope and set(self.config['sde_tags_filter']).issubset(task['tags'])
+
+        if in_scope and self.config['sde_verification_filter']:
+            in_scope = in_scope and task['verification_status'] in self.config['sde_verification_filter']
 
         return in_scope
 
@@ -608,7 +678,7 @@ class AlmConnector(object):
                 self.alm_connect()
                 return
 
-            #Attempt to connect to SDE & ALM
+            # Attempt to connect to SDE & ALM
             progress = 0
 
             self.sde_connect()
@@ -619,11 +689,11 @@ class AlmConnector(object):
             progress += 2
             self.output_progress(progress)
 
-            #Attempt to get all tasks
+            # Attempt to get all tasks
             tasks = self.sde_get_tasks()
             logger.info('Retrieved all tasks from SDE')
 
-            #Filter tasks - progress must match reality
+            # Filter tasks - progress must match reality
             tasks = self.filter_tasks(tasks)
 
             logger.info('Filtered tasks')
