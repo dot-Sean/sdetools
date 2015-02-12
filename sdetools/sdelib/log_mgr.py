@@ -15,6 +15,7 @@ except:
 
 import logging
 
+
 class LoggerModules:
     """
     This initializes the loggers and provides an easy control for setting log levels.
@@ -48,6 +49,7 @@ mods = LoggerModules()
 from sdetools import sdelib
 for modname in sdelib.__all__:
     mods.add_mod('%s.%s' % (__name__.rsplit('.', 1)[0], modname))
+
 
 def setup_root_logger():
     mods.add_mod('') # Root handler

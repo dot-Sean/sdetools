@@ -17,8 +17,20 @@ class TestAppScanIntegration(BaseIntegrationTest, unittest.TestCase):
     def expected_number_of_findings(self):
         return 2
 
-    def test_import_with_zip(self):
+    def test_appscan_standard_import_with_zip(self):
         self._test_import_with_zip()
+        self.assertTrue(self.integrator.TOOL_NAME == 'appscan', 'Detected AppScan Standard report')
+
+    def test_appscan_enterprise_import_with_zip(self):
+        self.report_file = 'appscan_enterprise.xml'
+        self._test_import_with_zip()
+        self.assertTrue(self.integrator.TOOL_NAME == 'appscan_enterprise', 'Detected AppScan Enterprise report')
+
+    def test_appscan_enterprise_import_findings_assert_passed_tasks(self):
+        self.report_file = 'appscan_enterprise.xml'
+        self.init_integrator()
+        self.test_import_findings_assert_passed_tasks()
+        self.assertTrue(self.integrator.TOOL_NAME == 'appscan_enterprise', 'Detected AppScan Enterprise report')
 
     def test_invalid_edition(self):
         self.config['edition'] = 'unknown'

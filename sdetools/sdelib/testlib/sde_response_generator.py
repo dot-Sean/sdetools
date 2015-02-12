@@ -6,7 +6,7 @@ from sdetools.sdelib.testlib.response_generator import ResponseGenerator, RESPON
 
 class SdeResponseGenerator(ResponseGenerator):
     def __init__(self, config, test_dir=None):
-        self.analysis_tools = ['appscan', 'veracode', 'fortify', 'webinspect']
+        self.analysis_tools = ['appscan', 'appscan_enterprise', 'veracode', 'fortify', 'webinspect']
         self.default_project_id = 1296
         self.default_app_id = 874
         self.app_name = config['sde_application']
