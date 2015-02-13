@@ -185,3 +185,11 @@ class PlugInExperience:
     @_verify_connect
     def get_phases(self):
         return self.api.get_phases()
+
+    @_verify_connect
+    def get_library_tasks(self, options={}, **filters):
+        return self.api.get_library_tasks(options, **filters)
+
+    @_verify_connect
+    def get_library_task(self, task_id, options={}, **filters):
+        return self.api.get_library_task(task_id, options, **filters)

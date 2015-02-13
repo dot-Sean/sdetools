@@ -169,5 +169,23 @@ class ExtAPI(restclient.RESTBase):
         """
         return self.call_api('phases', args=filters, call_headers=_encode_options(options))
 
+    def get_library_tasks(self, options={}, **filters):
+        """
+        Get all library tasks in the organization
+        """
+        args = {}
+        args.update(filters)
+        result = self.call_api('library/tasks', args=args, call_headers=_encode_options(options))
+        return result['tasks']
+
+    def get_library_task(self, task, options={}, **filters):
+        """
+        Get an individual library task with parameter task id
+        e.g. T21 or CT321
+        """
+        end_point = 'library/tasks/%s' % task
+        return self.call_api(end_point, args=filters, call_headers=_encode_options(options))
+    
+
 APIBase = ExtAPI
 

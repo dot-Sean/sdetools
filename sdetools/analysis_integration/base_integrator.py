@@ -334,6 +334,7 @@ class BaseIntegrator(object):
                 default='')
         self.config.opts.add("flaws_only", "Only update tasks identified having flaws. (True | False)", "z", "False")
         self.config.opts.add("trial_run", "Trial run only: (True | False)", "t", "False")
+        self.config.opts.add("test_import", 'Test import "mapping"', default='')
 
     def initialize(self):
         """
@@ -405,6 +406,10 @@ class BaseIntegrator(object):
         self.TOOL_NAME = tool_name
 
     def parse(self):
+        if self.config['test_import']:
+            self.validate_mapping()
+            return
+
         _raw_findings = []
         _report_ids = []
 
@@ -497,6 +502,32 @@ class BaseIntegrator(object):
         if not self.mapping:
             raise IntegrationError("No mapping was found in file '%s'" % self.config['mapping_file'])
 
+    def validate_mapping(self):
+        """
+        Load the weakness->task mapping and sanity check against the task verification capabilities
+        """
+        self.load_mapping_from_xml()
+
+        task_mapping_errors = []
+        library_tasks = self.plugin.get_library_tasks()
+        for library_task in library_tasks:
+            # We don't support custom tasks at this moment
+            task_search = re.search('^T(\d+)$', library_task['id'])
+            if not task_search:
+                continue
+
+            task_id = task_search.group(1)
+
+            for coverage in library_task['verification_coverage']:
+                if coverage in ['No Automated Static Analysis Coverage', 'No Automated Dynamic Analysis Coverage']:
+                    for weakness in self.mapping:
+                        if task_id in self.mapping[weakness] and library_task['id'] not in task_mapping_errors:
+                            task_mapping_errors.append(library_task['id'])
+
+        if task_mapping_errors:
+            task_mapping_errors.sort()
+            raise IntegrationError("Mapping errors. The following tasks have no static or dynamic coverage: %s" % ', '.join(task_mapping_errors))
+ 
     def generate_findings(self):
         return []
 
