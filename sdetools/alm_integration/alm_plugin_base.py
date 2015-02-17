@@ -68,7 +68,7 @@ class AlmConnector(object):
     # This needs to be overwritten
     alm_name = 'ALM Module'
     ALM_PRIORITY_MAP = 'alm_priority_map'
-    VERIFICATION_STATUSES = ['partial', 'pass', 'fail']
+    VERIFICATION_STATUSES = ['none', 'partial', 'pass', 'fail']
     TEST_OPTIONS = ['server', 'project', 'settings']
     STANDARD_STATUS_LIST = ['TODO', 'DONE', 'NA']
     FIELD_OPTIONS = ['task_id', 'title', 'context', 'application', 'project']
@@ -568,6 +568,9 @@ class AlmConnector(object):
             in_scope = in_scope and set(self.config['sde_tags_filter']).issubset(task['tags'])
 
         if in_scope and self.config['sde_verification_filter']:
+            # Translate null to 'none' to match filter options
+            if not task['verification_status']:
+                task['verification_status'] = 'none'
             in_scope = in_scope and task['verification_status'] in self.config['sde_verification_filter']
 
         return in_scope

@@ -409,6 +409,33 @@ class AlmPluginTestBase(object):
             self.assertTrue(task['verification_status'] in self.config['sde_verification_filter'],
                             'Task %s has unexpected verification status %s' % (task['id'], task['verification_status']))
 
+    def test_tasks_filter_no_verification(self):
+        self.connector.config['conflict_policy'] = 'sde'
+        self.connector.config['sde_verification_filter'] = ['none', 'pass']
+        self.connector.sde_connect()
+        self.connector.alm_connect()
+
+        # clear out default tasks
+        self.mock_sde_response.clear_tasks()
+
+        # These tasks should match
+        self.mock_sde_response.generate_sde_task(verification_status='pass')
+        self.mock_sde_response.generate_sde_task()
+
+        # These tasks should not match
+        self.mock_sde_response.generate_sde_task(verification_status='fail')
+        self.mock_sde_response.generate_sde_task(verification_status='partial')
+
+        tasks = self.connector.sde_get_tasks()
+        self.assertTrue(len(tasks) == 4, 'Expected 4 tasks')
+
+        tasks = self.connector.filter_tasks(tasks)
+        self.assertTrue(len(tasks) == 2, 'Expected 2 tasks')
+
+        for task in tasks:
+            self.assertTrue(task['verification_status'] in self.config['sde_verification_filter'],
+                            'Task %s has unexpected verification status %s' % (task['id'], task['verification_status']))
+
     def test_tasks_filter_empty_verification(self):
         self.connector.config['conflict_policy'] = 'sde'
         self.connector.config['sde_verification_filter'] = []
